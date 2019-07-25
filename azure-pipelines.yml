@@ -1,3 +1,7 @@
+variables:
+  MAJOR: 0
+  MINOR: 1
+  PATCH: $[counter(format('{0}.{1}', variables['MAJOR'], variables['MINOR']), 0)]
 trigger:
   - master
   - develop
@@ -11,11 +15,12 @@ stages:
           - task: DotNetCoreCLI@2
             inputs:
               command: build
+          - bash: export VERSION=$(cat .release);
   - stage: test
     displayName: Test
     jobs:
       - job: unit
-        displayName: Unit Tests
+        displayName: Unit
         steps:
           - task: DotNetCoreCLI@2
             inputs:
@@ -31,3 +36,7 @@ stages:
             inputs:
               command: pack
               configuration: Release
+              versioningScheme: byPrereleaseNumber
+              majorVersion: $(MAJOR)
+              minorVersion: $(MINOR)
+              patchVersion: $(PATCH)
