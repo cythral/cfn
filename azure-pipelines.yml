@@ -1,7 +1,6 @@
 variables:
   MAJOR: 0
   MINOR: 1
-  PATCH: $[counter(format('{0}.{1}', variables['MAJOR'], variables['MINOR']), 0)]
 trigger:
   - master
   - develop
@@ -31,6 +30,8 @@ stages:
     jobs:
       - job: package
         displayName: Package
+        variables:
+          PATCH: $[counter(format('{0}.{1}', variables['MAJOR'], variables['MINOR']), 0)]
         steps:
           - task: DotNetCoreCLI@2
             inputs:
