@@ -7,6 +7,8 @@ stages:
     jobs:
       - job: default
         displayName: Default
+        pool: 
+          name: LabAgents
         steps:
           - task: gittools.gitversion.gitversion-task.GitVersion@4
             displayName: GitVersion 
