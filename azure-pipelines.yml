@@ -1,3 +1,6 @@
+trigger:
+  - master
+  - develop
 stages:
   - stage: build
     displayName: Build
