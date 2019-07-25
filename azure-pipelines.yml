@@ -8,11 +8,10 @@ stages:
       - job: default
         displayName: Default
         steps:
-          - task: NuGetCommand@2
+          - task: GitVersion@4
+            displayName: GitVersion 
             inputs:
-              command: custom
-              arguments: install GitVersion.CommandLine -Version 4.0.0 -OutputDirectory $(Build.BinariesDirectory)/tools -ExcludeVersion
-          - script: mono $(Build.BinariesDirectory)/tools/GitVersion.CommandLine/tools/GitVersion.exe /output buildserver /nofetch
+              updateAssemblyInfo: true
           - task: DotNetCoreCLI@2
             inputs:
               command: build
