@@ -45,6 +45,7 @@ stages:
               command: push
               nuGetFeedType: external
               publishFeedCredentials: NuGet
+              packagesToPush: src/**/*.nupkg
               versioningScheme: byPrereleaseNumber
               majorVersion: $(MAJOR)
               minorVersion: $(MINOR)
