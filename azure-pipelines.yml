@@ -8,10 +8,12 @@ trigger:
   - refs/tags/*
 
 steps:
-  - task: GitVersion@4
-    displayName: GitVersion 
+  - task: NuGetCommand@2
     inputs:
-      updateAssemblyInfo: true
+      command: custom
+      arguments: install GitVersion.CommandLine -Version 4.0.0 -OutputDirectory $(Build.BinariesDirectory)/tools -ExcludeVersion
+      
+  - script: mono $(Build.BinariesDirectory)/tools/GitVersion.CommandLine/tools/GitVersion.exe /output buildserver /nofetch
 
   - task: DotNetCoreCLI@2
     inputs:
