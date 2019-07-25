@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Cythral.CloudFormation.CustomResource</PackageId>
     <RootNamespace>Cythral.CloudFormation.CustomResource</RootNamespace>
   </PropertyGroup>
 
