@@ -1,46 +1,42 @@
 trigger:
   - master
   - develop
-stages:
-  - stage: build
-    displayName: Build
-    jobs:
-      - job: default
-        displayName: Default
-        steps:
-          - task: GitVersion@4
-            displayName: GitVersion 
-            inputs:
-              updateAssemblyInfo: true
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: build
-              versioningScheme: byBuildNumber
-  - stage: test
-    displayName: Test
-    jobs:
-      - job: unit
-        displayName: Unit
-        steps:
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: test
-  - stage: publish
+  - release/*
+  - feature/*
+  - bugfix/*
+  - hotfix/*
+  - refs/tags/*
+
+pool:
+  name: Default
+
+steps:
+  - task: GitVersion@4
+    displayName: GitVersion 
+    inputs:
+      updateAssemblyInfo: true
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: build
+      versioningScheme: byBuildNumber
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: test
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: pack
+      configuration: Release
+      versioningScheme: byEnvVar
+      versionEnvVar: GitVersion.NuGetVersion
+
+  - task: NuGetCommand@2
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    displayName: Publish
-    jobs:
-      - job: package
-        displayName: Package
-        steps:
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: pack
-              configuration: Release
-              versioningScheme: byEnvVar
-              versionEnvVar: GitVersion.NuGetVersion
-          - task: NuGetCommand@2
-            inputs:
-              command: push
-              nuGetFeedType: external
-              publishFeedCredentials: NuGet
-              versioningScheme: byBuildNumber
+    inputs:
+      command: push
+      nuGetFeedType: external
+      publishFeedCredentials: NuGet
+      versioningScheme: byBuildNumber
+      
