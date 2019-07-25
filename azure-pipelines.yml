@@ -40,3 +40,12 @@ stages:
               majorVersion: $(MAJOR)
               minorVersion: $(MINOR)
               patchVersion: $(PATCH)
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: push
+              nuGetFeedType: external
+              publishFeedCredentials: NuGet
+              versioningScheme: byPrereleaseNumber
+              majorVersion: $(MAJOR)
+              minorVersion: $(MINOR)
+              patchVersion: $(PATCH)
