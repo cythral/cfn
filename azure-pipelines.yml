@@ -1,0 +1,30 @@
+stages:
+  - stage: build
+    displayName: Build
+    jobs:
+      - job: default
+        displayName: Default
+        steps:
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: build
+  - stage: test
+    displayName: Test
+    jobs:
+      - job: unit
+        displayName: Unit Tests
+        steps:
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: test
+  - stage: publish
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    displayName: Publish
+    jobs:
+      - job: package
+        displayName: Package
+        steps:
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: pack
+              configuration: Release
