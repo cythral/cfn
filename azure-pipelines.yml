@@ -7,9 +7,6 @@ trigger:
   - hotfix/*
   - refs/tags/*
 
-pool:
-  name: Default
-
 steps:
   - task: GitVersion@4
     displayName: GitVersion 
@@ -39,4 +36,3 @@ steps:
       nuGetFeedType: external
       publishFeedCredentials: NuGet
       versioningScheme: byBuildNumber
-      
