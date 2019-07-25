@@ -1,6 +1,3 @@
-variables:
-  MAJOR: 0
-  MINOR: 1
 trigger:
   - master
   - develop
@@ -11,10 +8,14 @@ stages:
       - job: default
         displayName: Default
         steps:
+          - task: gittools.gitversion.gitversion-task.GitVersion@4
+            displayName: GitVersion 
+            inputs: 
+              preferBundledVersion: false
           - task: DotNetCoreCLI@2
             inputs:
               command: build
-          - bash: export VERSION=$(cat .release);
+              versioningScheme: byBuildNumber
   - stage: test
     displayName: Test
     jobs:
@@ -30,23 +31,16 @@ stages:
     jobs:
       - job: package
         displayName: Package
-        variables:
-          PATCH: $[counter(format('{0}.{1}', variables['MAJOR'], variables['MINOR']), 0)]
         steps:
           - task: DotNetCoreCLI@2
             inputs:
               command: pack
               configuration: Release
-              versioningScheme: byPrereleaseNumber
-              majorVersion: $(MAJOR)
-              minorVersion: $(MINOR)
-              patchVersion: $(PATCH)
+              versioningScheme: byEnvVar
+              versionEnvVar: GitVersion.NuGetVersion
           - task: NuGetCommand@2
             inputs:
               command: push
               nuGetFeedType: external
               publishFeedCredentials: NuGet
-              versioningScheme: byPrereleaseNumber
-              majorVersion: $(MAJOR)
-              minorVersion: $(MINOR)
-              patchVersion: $(PATCH)
+              versioningScheme: byBuildNumber
