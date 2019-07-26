@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Cythral.CloudFormation.CustomResource</PackageId>
     <RootNamespace>Cythral.CloudFormation.CustomResource</RootNamespace>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
