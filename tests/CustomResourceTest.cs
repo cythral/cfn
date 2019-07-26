@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Tests {
-    [CustomResource(typeof(object))]
+    [CustomResourceAttribute(typeof(object))]
     public partial class ExampleCustomResource {
         static public bool Passing { get; set; } = true;
         public Task<object> Create() {
