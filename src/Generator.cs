@@ -25,7 +25,8 @@ namespace Cythral.CloudFormation.CustomResource {
 
         private const string HANDLER_DEFINITION_TEMPLATE = @"
             [Amazon.Lambda.Core.LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
-            public static async System.Threading.Tasks.Task Handle(Cythral.CloudFormation.CustomResource.Request<{0}> request, System.Net.Http.HttpClient client = null) {{
+            public static async System.Threading.Tasks.Task Handle(Cythral.CloudFormation.CustomResource.Request<{0}> request, Amazon.Lambda.Core.ILambdaContext context = null) {{
+                var client = HttpClientProvider.Provide();
                 var resource = new {1}(request, client);
                 
                 try {{
@@ -115,6 +116,12 @@ namespace Cythral.CloudFormation.CustomResource {
             }
         }
 
+        private string HttpClientProviderDefinition {
+            get {
+                return String.Format("public static Cythral.CloudFormation.CustomResource.IHttpClientProvider HttpClientProvider = new DefaultHttpClientProvider();");
+            }
+        }
+
         public Generator(AttributeData attributeData) {
             Requires.NotNull(attributeData, nameof(attributeData));
             ResourcePropertiesType = attributeData.ConstructorArguments[0].Value.ToString();
@@ -135,6 +142,7 @@ namespace Cythral.CloudFormation.CustomResource {
                 .AddMembers(
                     SyntaxFactory.ParseMemberDeclaration(HttpClientPropertyDefinition),
                     SyntaxFactory.ParseMemberDeclaration(RequestPropertyDefinition),
+                    SyntaxFactory.ParseMemberDeclaration(HttpClientProviderDefinition),
                     SyntaxFactory.ParseMemberDeclaration(ConstructorDefinition),
                     SyntaxFactory.ParseMemberDeclaration(RespondDefinition),
                     SyntaxFactory.ParseMemberDeclaration(HandlerDefinition)

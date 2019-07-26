@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net;
+using System.Net.Http;
 using Cythral.CloudFormation.CustomResource;
 using NUnit.Framework;
 using RichardSzalay.MockHttp;
@@ -8,9 +10,22 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Tests {
+
+    public class FakeHttpClientProvider : IHttpClientProvider {
+        public readonly MockHttpMessageHandler httpMock;
+
+        public FakeHttpClientProvider(MockHttpMessageHandler httpMock) {
+            this.httpMock = httpMock;
+        }
+
+        public HttpClient Provide() {
+            return httpMock.ToHttpClient();
+        }
+    }
+
     [CustomResourceAttribute(typeof(object))]
     public partial class ExampleCustomResource {
-        static public bool Passing { get; set; } = true;
+        public static bool Passing { get; set; } = true;
         public Task<object> Create() {
             ThrowIfNotPassing();
 
@@ -50,8 +65,11 @@ namespace Tests {
                     Status = "Created"
                 }
             };
-
+            
             var mockHttp = new MockHttpMessageHandler();
+            var httpProvider = new FakeHttpClientProvider(mockHttp);
+            ExampleCustomResource.HttpClientProvider = httpProvider;
+
             mockHttp
                 .Expect("http://example.com")
                 .WithPartialContent(Serialize(expectedPayload));
@@ -61,7 +79,7 @@ namespace Tests {
                 ResponseURL = "http://example.com"
             };
 
-            await ExampleCustomResource.Handle(request, mockHttp.ToHttpClient());
+            await ExampleCustomResource.Handle(request);
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -72,8 +90,11 @@ namespace Tests {
                     Status = "Updated"
                 }
             };
-
+            
             var mockHttp = new MockHttpMessageHandler();
+            var httpProvider = new FakeHttpClientProvider(mockHttp);
+            ExampleCustomResource.HttpClientProvider = httpProvider;
+
             mockHttp
                 .Expect("http://example.com")
                 .WithContent(Serialize(expectedPayload));
@@ -83,7 +104,7 @@ namespace Tests {
                 ResponseURL = "http://example.com"
             };
 
-            await ExampleCustomResource.Handle(request, mockHttp.ToHttpClient());
+            await ExampleCustomResource.Handle(request);
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -96,6 +117,8 @@ namespace Tests {
             };
 
             var mockHttp = new MockHttpMessageHandler();
+            var httpProvider = new FakeHttpClientProvider(mockHttp);
+            ExampleCustomResource.HttpClientProvider = httpProvider;
             mockHttp
                 .Expect("http://example.com")
                 .WithContent(Serialize(expectedPayload));
@@ -105,7 +128,7 @@ namespace Tests {
                 ResponseURL = "http://example.com"
             };
 
-            await ExampleCustomResource.Handle(request, mockHttp.ToHttpClient());
+            await ExampleCustomResource.Handle(request);
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -116,8 +139,11 @@ namespace Tests {
                 Reason = "Expected this error message",
                 Data = new object()
             };
-
+            
             var mockHttp = new MockHttpMessageHandler();
+            var httpProvider = new FakeHttpClientProvider(mockHttp);
+            ExampleCustomResource.HttpClientProvider = httpProvider;
+
             mockHttp
                 .Expect("http://example.com")
                 .WithContent(Serialize(expectedPayload));
@@ -128,7 +154,7 @@ namespace Tests {
             };
 
             ExampleCustomResource.Passing = false;
-            await ExampleCustomResource.Handle(request, mockHttp.ToHttpClient());
+            await ExampleCustomResource.Handle(request);
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
