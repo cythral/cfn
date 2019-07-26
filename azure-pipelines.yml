@@ -16,7 +16,7 @@ steps:
     inputs:
       command: test
     
-  - bash: export VERSION=$(echo "$(Build.SourceBranchName)" | sed "s/v//")
+  - bash: echo "##vso[task.setvariable variable=version]$(echo $(Build.SourceBranchName) | sed 's/v//')"
 
   - task: DotNetCoreCLI@2
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
