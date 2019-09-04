@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomResource", "src\CustomResource.csproj", "{C9FA5E05-15DA-4B7F-A371-0E09CD6F1614}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomResource", "src\CustomResource\CustomResource.csproj", "{C9FA5E05-15DA-4B7F-A371-0E09CD6F1614}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomResourceTests", "tests\CustomResourceTests.csproj", "{68CA6F3C-CBBB-49F1-A018-070DAA791826}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomResourceTests", "tests\CustomResource\CustomResourceTests.csproj", "{68CA6F3C-CBBB-49F1-A018-070DAA791826}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
