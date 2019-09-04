@@ -1,4 +1,4 @@
-# cfn-custom-response
+# CloudFormation.CustomResource
 A C# attribute for creating Lambda-backed CloudFormation custom resources.  
 
 # Installation
@@ -10,10 +10,6 @@ dotnet add package Cythral.CloudFormation.CustomResource
 
 2. Add this line to your .csproj file:
 
-```xml
-<DotNetCliToolReference Include="dotnet-codegen" Version="0.6.1" />
-```
-
 # Usage
 ```csharp
 using System;
@@ -22,7 +18,7 @@ using System.Threading.Tasks;
 using Cythral.CloudFormation.CustomResource;
 
 namespace Example {
-    [CustomResourceAttribute(typeof(ResourcePropertiesType))] // replace ResourcePropertiesType with your ResourceProperties class definition
+    [CustomResource(typeof(ResourcePropertiesType))] // replace ResourcePropertiesType with the name of your ResourceProperties model
     public partial class ExampleClass {
         public async Task<object> Create() {
             // do stuff

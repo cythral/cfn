@@ -3,11 +3,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http;
+using System.ComponentModel.DataAnnotations;
 using Cythral.CloudFormation.CustomResource;
+using CodeGeneration.Roslyn.Engine;
 using NUnit.Framework;
 using RichardSzalay.MockHttp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Amazon.S3;
 
 namespace Tests {
 
@@ -26,6 +29,7 @@ namespace Tests {
     [CustomResourceAttribute(typeof(object))]
     public partial class ExampleCustomResource {
         public static bool Passing { get; set; } = true;
+
         public Task<object> Create() {
             ThrowIfNotPassing();
 
@@ -55,6 +59,7 @@ namespace Tests {
                 throw new Exception("Expected this error message");
             }
         }
+
     }
 
     public class CustomResourceTest {
@@ -162,5 +167,6 @@ namespace Tests {
             var serializers = new JsonConverter[] { new StringEnumConverter() };
             return JsonConvert.SerializeObject(toSerialize, serializers);
         }
+        
     }
 }

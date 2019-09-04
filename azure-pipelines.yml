@@ -7,24 +7,38 @@ trigger:
   - hotfix/*
   - refs/tags/*
 
+variables:
+  suffix: -CI.$(Build.BuildId)
+
 steps:
+  - bash: |
+      if [ $(Build.SourceBranch) ~= refs/tags/* ]; then \
+        echo "##vso[task.setvariable variable=suffix]"; \
+      fi
+
   - task: DotNetCoreCLI@2
     inputs:
       command: build
+      configuration: Release
+      arguments: --version-suffix $(suffix)
 
   - task: DotNetCoreCLI@2
     inputs:
       command: test
-    
-  - bash: echo "##vso[task.setvariable variable=version]$(echo $(Build.SourceBranchName) | sed 's/v//')"
-
+      nobuild: true
+  
   - task: DotNetCoreCLI@2
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
     inputs:
       command: pack
       configuration: Release
-      versioningScheme: byEnvVar
-      versionEnvVar: VERSION
+      nobuild: true
+    
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: push
+      nuGetFeedType: internal
+      configuration: Debug
+      publishVstsFeed: 9251c6a1-c000-47ee-8e03-02d656a9418f
 
   - task: NuGetCommand@2
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
@@ -32,5 +46,3 @@ steps:
       command: push
       nuGetFeedType: external
       publishFeedCredentials: NuGet
-      versioningScheme: byEnvVar
-      versionEnvVar: VERSION
