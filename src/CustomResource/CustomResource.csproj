@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Cythral.CloudFormation.CustomResource</PackageId>
+    <AssemblyName>Cythral.CloudFormation.CustomResource</AssemblyName>
+    <RootNamespace>Cythral.CloudFormation.CustomResource</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GetPackageVersionDependsOn>Version</GetPackageVersionDependsOn>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.5.0" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.103.32" />
+    <PackageReference Include="GitInfo" Version="2.0.20" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.1.0" />
+    <PackageReference Include="Cythral.CodeGeneration.Roslyn" Version="0.7.9" PrivateAssets="none" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
+    <PackageReference Include="YamlDotNet" Version="6.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="build/" Pack="true" PackagePath="build/" />
+    <None Include="tasks/" Pack="true" PackagePath="tasks/" />
+    <Compile Remove="tasks/**" />
+  </ItemGroup>
+
+  <Target Name="Version" DependsOnTargets="GitInfo;GitVersion" AfterTargets="GitInfo;GitVersion" BeforeTargets="Restore">
+    <PropertyGroup>
+        <VersionPrefix>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)</VersionPrefix>
+        <PackageVersion>$(VersionPrefix)$(VersionSuffix)</PackageVersion>
+    </PropertyGroup>
+  </Target>
+</Project>
