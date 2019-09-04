@@ -16,17 +16,8 @@ steps:
         echo "##vso[task.setvariable variable=suffix]"; \
       fi
 
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: build
-      configuration: Release
-      arguments: --version-suffix $(suffix)
-
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: test
-      arguments: --no-build
-  
+  - bash: dotnet build -c Release --version-suffix $(suffix)
+  - bash: dotnet test --no-build
   - bash: dotnet pack -c Release --no-build --version-suffix $(suffix)
     
   - task: DotNetCoreCLI@2
