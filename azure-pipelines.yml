@@ -36,6 +36,7 @@ steps:
   - task: DotNetCoreCLI@2
     inputs:
       command: push
+      arguments: --version-suffix $(suffix)
       nuGetFeedType: internal
       configuration: Debug
       publishVstsFeed: 9251c6a1-c000-47ee-8e03-02d656a9418f
