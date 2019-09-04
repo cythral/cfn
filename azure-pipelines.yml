@@ -27,7 +27,7 @@ steps:
       command: test
       arguments: --no-build
   
-  - bash: dotnet pack --no-build --version-suffix $(suffix)
+  - bash: dotnet pack -c Release --no-build --version-suffix $(suffix)
     
   - task: DotNetCoreCLI@2
     inputs:
