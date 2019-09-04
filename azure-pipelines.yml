@@ -17,7 +17,7 @@ steps:
       fi
 
   - bash: dotnet build -c Release --version-suffix $(suffix)
-  - bash: dotnet test --no-build
+  - bash: dotnet test -c Release --no-build
   - bash: dotnet pack -c Release --no-build --version-suffix $(suffix)
     
   - task: DotNetCoreCLI@2
