@@ -27,18 +27,14 @@ steps:
       command: test
       arguments: --no-build
   
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: pack
-      configuration: Release
-      arguments: --version-suffix $(suffix) --no-build
+  - bash: dotnet pack --no-build --version-suffix $(suffix)
     
   - task: DotNetCoreCLI@2
     inputs:
       command: push
       arguments: --version-suffix $(suffix)
       nuGetFeedType: internal
-      configuration: Debug
+      configuration: Release
       publishVstsFeed: 9251c6a1-c000-47ee-8e03-02d656a9418f
 
   - task: NuGetCommand@2
