@@ -31,6 +31,7 @@ steps:
     inputs:
       command: pack
       configuration: Release
+      arguments: --version-suffix $(suffix)
       nobuild: true
     
   - task: DotNetCoreCLI@2
