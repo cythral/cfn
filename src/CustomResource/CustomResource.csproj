@@ -22,8 +22,6 @@
 
   <ItemGroup>
     <None Include="build/" Pack="true" PackagePath="build/" />
-    <None Include="tasks/" Pack="true" PackagePath="tasks/" />
-    <Compile Remove="tasks/**" />
   </ItemGroup>
 
   <Target Name="Version" DependsOnTargets="GitInfo;GitVersion" AfterTargets="GitInfo;GitVersion" BeforeTargets="Restore">
