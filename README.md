@@ -3,12 +3,11 @@ A C# attribute for creating Lambda-backed CloudFormation custom resources.
 
 # Installation
 
-1. Install the CustomResource package:
+
 ```bash
 dotnet add package Cythral.CloudFormation.CustomResource
 ```
 
-2. Add this line to your .csproj file:
 
 # Usage
 ```csharp
