@@ -10,6 +10,10 @@
         <CRS3ObjectKey Condition="$(CRS3ObjectKey) == ''">deployment.zip</CRS3ObjectKey>
         <CRProjectZipPath>$(IntermediateOutputPath)/$(AssemblyName).zip</CRProjectZipPath>
     </PropertyGroup>
+
+    <ItemGroup>
+        <GeneratorAssemblySearchPaths Include="$(MSBuildThisFileDirectory)../lib" />
+    </ItemGroup>
     
     <Target Name="PostPublish" AfterTargets="Publish" DependsOnTargets="Publish">
         <!-- <DeployStack Bucket="$(CRS3Bucket)" ObjectKey="$(CRS3ObjectKey)" TemplateFile="$(CRTemplatePath)" /> -->
