@@ -23,10 +23,10 @@ namespace Cythral.CloudFormation.CustomResource {
         }
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node) {
-            var type = GetCallingMemberType(node);
-
             try {
+                var type = GetCallingMemberType(node);
                 if(type == null || !IsAmazonType(type)) return;
+
                 var assembly = LoadAssemblyForType(type);
                 var configClassName = GetConfigClassName(type);
                 var metadataType = assembly.GetType(configClassName);
