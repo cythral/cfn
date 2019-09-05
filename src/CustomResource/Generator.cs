@@ -210,7 +210,10 @@ namespace Cythral.CloudFormation.CustomResource {
             .AddTrustedServiceEntity("lambda.amazonaws.com");
             
             var collector = new PermissionsCollector(context);
-            collector.Visit(context.ProcessingNode);
+
+            try {
+                collector.Visit(context.ProcessingNode);
+            } catch(Exception) {}
             
             if(collector.Permissions.Count() > 0) {
                 role.AddPolicy(
