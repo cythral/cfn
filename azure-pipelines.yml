@@ -25,7 +25,7 @@ steps:
       command: push
       nuGetFeedType: internal
       configuration: Release
-      publishVstsFeed: 9251c6a1-c000-47ee-8e03-02d656a9418f
+      publishVstsFeed: 3c2d2c8b-6319-47d4-bc73-f36d7ab7a9f8/9a760305-cfa3-4d6b-9e6c-9fb664931e1d
 
   - task: NuGetCommand@2
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
