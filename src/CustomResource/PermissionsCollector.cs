@@ -25,15 +25,17 @@ namespace Cythral.CloudFormation.CustomResource {
         public override void VisitInvocationExpression(InvocationExpressionSyntax node) {
             var type = GetCallingMemberType(node);
 
-            if(type == null || !IsAmazonType(type)) return;
-            var assembly = LoadAssemblyForType(type);
-            var configClassName = GetConfigClassName(type);
-            var metadataType = assembly.GetType(configClassName);
-            var metadata = (ClientConfig) Activator.CreateInstance(metadataType);
-            var iamPrefix = metadata.AuthenticationServiceName;
-            var apiCallName = GetApiCallName(node);
+            try {
+                if(type == null || !IsAmazonType(type)) return;
+                var assembly = LoadAssemblyForType(type);
+                var configClassName = GetConfigClassName(type);
+                var metadataType = assembly.GetType(configClassName);
+                var metadata = (ClientConfig) Activator.CreateInstance(metadataType);
+                var iamPrefix = metadata.AuthenticationServiceName;
+                var apiCallName = GetApiCallName(node);
 
-            Permissions.Add(iamPrefix + ":" + apiCallName);
+                Permissions.Add(iamPrefix + ":" + apiCallName);
+            } catch(Exception) {}
         }
 
         private ITypeSymbol GetCallingMemberType(InvocationExpressionSyntax node) {
