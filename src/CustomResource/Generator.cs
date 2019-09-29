@@ -176,23 +176,23 @@ namespace Cythral.CloudFormation.CustomResource {
                 yield return partialClass;
             }
         }
-
+        
         public static void OnComplete(CompilationGenerator context) {
             // todo: handle generating cloudformation templates here
             var outputDirectory = context.IntermediateOutputDirectory;
             var filePath = outputDirectory + "/" + context.AssemblyName + ".template.yml";
-            System.IO.File.WriteAllText(filePath, "testing");
 
-            // try {
-            //     var serializer = new SerializerBuilder()
-            //     .WithTagMapping("!GetAtt", typeof(GetAttTag))
-            //     .WithTypeConverter(new GetAttTagConverter())
-            //     .Build();
+            try {
+                var yamlDotNet = Assembly.Load("YamlDotNet");
+                var serializer = (SerializerBuilder) yamlDotNet.CreateInstance("YamlDotNet.Serialization.SerializerBuilder")
+                .WithTagMapping("!GetAtt", typeof(GetAttTag))
+                .WithTypeConverter(new GetAttTagConverter())
+                .Build();
 
-            //     var yaml = serializer.Serialize(Resources);
-            // } catch(Exception e) {
-            //     System.IO.File.WriteAllText(filePath, e.Message);
-            // }
+                var yaml = serializer.Serialize(Resources);
+            } catch(Exception e) {
+                System.IO.File.WriteAllText(filePath, e.Message);
+            }
         }
 
         private void AddResources(TransformationContext context) {
