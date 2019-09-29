@@ -181,7 +181,7 @@ namespace Cythral.CloudFormation.CustomResource {
             // todo: handle generating cloudformation templates here
             var outputDirectory = context.IntermediateOutputDirectory;
             var filePath = outputDirectory + "/" + context.AssemblyName + ".template.yml";
-            
+            System.IO.File.WriteAllText(filePath, "testing");
 
             try {
                 var serializer = new SerializerBuilder()
