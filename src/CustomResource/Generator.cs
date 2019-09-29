@@ -190,6 +190,7 @@ namespace Cythral.CloudFormation.CustomResource {
                 .Build();
 
                 var yaml = serializer.Serialize(Resources);
+                System.IO.File.WriteAllText(filePath, yaml);
             } catch(Exception e) {
                 System.IO.File.WriteAllText(filePath, e.Message);
             }
