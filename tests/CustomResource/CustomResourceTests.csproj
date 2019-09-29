@@ -16,5 +16,5 @@
     <ProjectReference Include="../../src/CustomResource/CustomResource.csproj" />
   </ItemGroup>
 
-  <Import Project="../../src/CustomResource/build/CustomResource.targets" />
+  <Import Project="../../src/CustomResource/build/Cythral.CloudFormation.CustomResource.targets" />
 </Project>
