@@ -187,7 +187,7 @@ namespace Cythral.CloudFormation.CustomResource {
             .Build();
 
             var yaml = serializer.Serialize(Resources);
-            System.IO.File.WriteAllText(filePath, yaml);
+            System.IO.File.WriteAllText(filePath, "this is a test");
         }
 
         private void AddResources(TransformationContext context) {
