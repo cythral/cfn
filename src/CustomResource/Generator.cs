@@ -176,7 +176,7 @@ namespace Cythral.CloudFormation.CustomResource {
                 yield return partialClass;
             }
         }
-        
+
         public static void OnComplete(CompilationGenerator context) {
             // todo: handle generating cloudformation templates here
             var outputDirectory = context.IntermediateOutputDirectory;
@@ -184,7 +184,7 @@ namespace Cythral.CloudFormation.CustomResource {
 
             try {
                 var yamlDotNet = Assembly.Load("YamlDotNet");
-                var serializer = (SerializerBuilder) yamlDotNet.CreateInstance("YamlDotNet.Serialization.SerializerBuilder")
+                var serializer = ((SerializerBuilder) yamlDotNet.CreateInstance("YamlDotNet.Serialization.SerializerBuilder"))
                 .WithTagMapping("!GetAtt", typeof(GetAttTag))
                 .WithTypeConverter(new GetAttTagConverter())
                 .Build();
