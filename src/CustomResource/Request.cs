@@ -16,8 +16,11 @@ namespace Cythral.CloudFormation.CustomResource {
 
         public string LogicalResourceId { get; set; }
 
+        public string PhysicalResourceId { get; set; }
+
         public T ResourceProperties { get; set; }
         
+        public T OldResourceProperties { get; set; }
     }
     
 }

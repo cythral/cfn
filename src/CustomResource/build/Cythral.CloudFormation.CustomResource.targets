@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>
-        <CRTasksDirectory Condition="$(CRTasksPath) == ''">$(MSBuildThisFileDirectory)../tasks/</CRTasksDirectory>
-        <CRTasksAssemblyName>Cythral.CloudFormation.BuildTasks</CRTasksAssemblyName>
-        <CRTasksNamespace>$(CRTasksAssemblyName)</CRTasksNamespace>
-        <CRTasksPath>$(CRTasksDirectory)$(CRTasksAssemblyName).dll</CRTasksPath>
-        <CRTemplatePath>$(IntermediateOutputPath)/$(AssemblyName).template.yml</CRTemplatePath>
-        <CRS3Bucket Condition="$(CRS3Bucket) == ''">$(AssemblyName.ToLower())</CRS3Bucket>
-        <CRS3ObjectKey Condition="$(CRS3ObjectKey) == ''">deployment.zip</CRS3ObjectKey>
-        <CRProjectZipPath>$(IntermediateOutputPath)/$(AssemblyName).zip</CRProjectZipPath>
-    </PropertyGroup>
-
     <ItemGroup>
         <GeneratorAssemblySearchPaths Include="$(MSBuildThisFileDirectory)../lib" />
     </ItemGroup>
     
     <Target Name="PostPublish" AfterTargets="Publish" DependsOnTargets="Publish">
+        <PropertyGroup>
+            <CRTasksDirectory Condition="$(CRTasksPath) == ''">$(MSBuildThisFileDirectory)../tasks/</CRTasksDirectory>
+            <CRTasksAssemblyName>Cythral.CloudFormation.BuildTasks</CRTasksAssemblyName>
+            <CRTasksNamespace>$(CRTasksAssemblyName)</CRTasksNamespace>
+            <CRTasksPath>$(CRTasksDirectory)$(CRTasksAssemblyName).dll</CRTasksPath>
+            <CRTemplateSrcPath>$(IntermediateOutputPath)/$(AssemblyName).template.yml</CRTemplateSrcPath>
+            <CRTemplateDestPath>$(OutputPath)/$(AssemblyName).template.yml</CRTemplateDestPath>
+            <CRS3Bucket Condition="$(CRS3Bucket) == ''">$(AssemblyName.ToLower())</CRS3Bucket>
+            <CRS3ObjectKey Condition="$(CRS3ObjectKey) == ''">deployment.zip</CRS3ObjectKey>
+            <CRProjectZipPath>$(OutputPath)/$(AssemblyName).zip</CRProjectZipPath>
+        </PropertyGroup>
+
         <!-- <DeployStack Bucket="$(CRS3Bucket)" ObjectKey="$(CRS3ObjectKey)" TemplateFile="$(CRTemplatePath)" /> -->
-        <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(CRProjectZipPath)" />
+        <Delete Files="$(CRTemplateDestPath);$(CRProjectZipPath)" />
+        <Exec Command="chmod -R 755 $(PublishDir)" />
+        <Exec Command="cd $(PublishDir) &amp;&amp; zip -r ../Resources.zip * **/*" />
+        <!-- <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(CRProjectZipPath)" Properties/> -->
+        <Move SourceFiles="$(CRTemplateSrcPath)" DestinationFiles="$(CRTemplateDestPath)" />
     </Target>
 </Project>

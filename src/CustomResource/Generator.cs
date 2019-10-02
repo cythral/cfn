@@ -46,46 +46,41 @@ namespace Cythral.CloudFormation.CustomResource {
                 var client = HttpClientProvider.Provide();
                 var resource = new {1}(request, client);
                 
-                try {{
-                    object data;
+                Response response = new Response();
 
+                try {{
                     switch(request.RequestType) {{
                         case RequestType.Create:
                             resource.Validate();
-                            data = await resource.Create();
+                            response = await resource.Create();
                             break;
                         case RequestType.Update:
                             resource.Validate();
-                            data = await resource.Update();
+                            response = await resource.Update();
                             break;
                         case RequestType.Delete:
-                            data = await resource.Delete();
+                            response = await resource.Delete();
                             break;
                         default:
-                            data = new object();
                             break;
                     }}
 
-                    var status = Cythral.CloudFormation.CustomResource.ResponseStatus.SUCCESS;
-                    await resource.Respond(status, data);
+                    await resource.Respond(response);
+
                 }} catch(Exception e) {{
-                    var status = Cythral.CloudFormation.CustomResource.ResponseStatus.FAILED;
-                    var message = e.Message;
-                    await resource.Respond(status, null, message);
+                    response.Status = Cythral.CloudFormation.CustomResource.ResponseStatus.FAILED;
+                    response.Reason = e.Message;
+
+                    await resource.Respond(response);
                 }}
             }}
         ";
 
         private const string RESPOND_DEFINITION_TEMPLATE = @"
-            public async System.Threading.Tasks.Task<bool> Respond(Cythral.CloudFormation.CustomResource.ResponseStatus status, object data = null, string reason = null, string id = null) {{
-                var response = new Cythral.CloudFormation.CustomResource.Response();
-                response.Status = status;
+            public async System.Threading.Tasks.Task<bool> Respond(Response response) {{
                 response.StackId = Request.StackId;
                 response.LogicalResourceId = Request.LogicalResourceId;
-                response.PhysicalResourceId = id ?? Request.LogicalResourceId;
-                response.Reason = reason;
                 response.RequestId = Request.RequestId;
-                response.Data = data ?? new object();
                 
                 var enumConverter = new Newtonsoft.Json.Converters.StringEnumConverter();
                 var converters = new Newtonsoft.Json.JsonConverter[] {{ enumConverter }};
@@ -189,7 +184,7 @@ namespace Cythral.CloudFormation.CustomResource {
                 .WithTypeConverter(new GetAttTagConverter())
                 .Build();
 
-                var yaml = serializer.Serialize(Resources);
+                var yaml = serializer.Serialize(new { Resources = Resources });
                 System.IO.File.WriteAllText(filePath, yaml);
             } catch(Exception e) {
                 System.IO.File.WriteAllText(filePath, e.Message);
@@ -203,17 +198,19 @@ namespace Cythral.CloudFormation.CustomResource {
                 Type = "AWS::Lambda::Function",
                 Properties = new {
                     FunctionName = ClassName,
-                    Handler = $"{context.Compilation.Assembly.Name}::{context.ProcessingNode.GetFullName()}::Handler",
+                    Handler = $"{context.Compilation.Assembly.Name}::{context.ProcessingNode.GetFullName()}::Handle",
                     Role = new GetAttTag() { Name = $"{ClassName}Role", Attribute = "Arn" },
                     Code = $"{context.Compilation.AssemblyName}.zip",
-                    Runtime = "netcoreapp2.1" // todo: add autodetection here / some way to change this
+                    Runtime = "dotnetcore2.1", // todo: add autodetection here / some way to change this
+                    Timeout = 300,
                 }
             });
         }
 
         private void AddRoleResource(TransformationContext context) {
             var role = new Role()
-            .AddTrustedServiceEntity("lambda.amazonaws.com");
+            .AddTrustedServiceEntity("lambda.amazonaws.com")
+            .AddManagedPolicy("arn:aws:iam::aws:policy/AWSLambdaExecute");
             
             var collector = new PermissionsCollector(context);
 
@@ -246,12 +243,15 @@ namespace Cythral.CloudFormation.CustomResource {
                 }
 
                 foreach(var attribute in symbol.GetAttributes()) {
+                    if(attribute.AttributeClass.BaseType.Name != "ValidationAttribute") {
+                        continue;
+                    }
+
                     var statement = new ValidationGenerator(symbol, attribute).GenerateStatement();
                     yield return statement;
                 }
             }
         }
-        
     }
 
 }

@@ -4,7 +4,7 @@ namespace Cythral.CloudFormation.CustomResource {
 
     public class Response {
 
-        public ResponseStatus Status { get; set; }
+        public ResponseStatus Status { get; set; } = ResponseStatus.SUCCESS;
 
         public string PhysicalResourceId { get; set; }
 
