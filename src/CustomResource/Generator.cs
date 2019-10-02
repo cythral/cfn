@@ -82,6 +82,10 @@ namespace Cythral.CloudFormation.CustomResource {
                 response.LogicalResourceId = Request.LogicalResourceId;
                 response.RequestId = Request.RequestId;
                 
+                if(response.PhysicalResourceId == null) {{
+                    response.PhysicalResourceId = Request.PhysicalResourceId;
+                }}
+                
                 var enumConverter = new Newtonsoft.Json.Converters.StringEnumConverter();
                 var converters = new Newtonsoft.Json.JsonConverter[] {{ enumConverter }};
                 var serializedResponse = Newtonsoft.Json.JsonConvert.SerializeObject(response, converters);
@@ -138,6 +142,8 @@ namespace Cythral.CloudFormation.CustomResource {
 
         public static Dictionary<string,Resource> Resources = new Dictionary<string,Resource>();
 
+        public static Dictionary<string,Output> Outputs = new Dictionary<string,Output>();
+
         public Generator(AttributeData attributeData) {
             Requires.NotNull(attributeData, nameof(attributeData));
             Data = attributeData;
@@ -181,10 +187,16 @@ namespace Cythral.CloudFormation.CustomResource {
                 var yamlDotNet = Assembly.Load("YamlDotNet");
                 var serializer = ((SerializerBuilder) yamlDotNet.CreateInstance("YamlDotNet.Serialization.SerializerBuilder"))
                 .WithTagMapping("!GetAtt", typeof(GetAttTag))
+                .WithTagMapping("!Sub", typeof(SubTag))
                 .WithTypeConverter(new GetAttTagConverter())
+                .WithTypeConverter(new SubTagConverter())
                 .Build();
 
-                var yaml = serializer.Serialize(new { Resources = Resources });
+                var yaml = serializer.Serialize(new { 
+                    Resources = Resources,
+                    Outputs = Outputs
+                });
+
                 System.IO.File.WriteAllText(filePath, yaml);
             } catch(Exception e) {
                 System.IO.File.WriteAllText(filePath, e.Message);
@@ -205,6 +217,11 @@ namespace Cythral.CloudFormation.CustomResource {
                     Timeout = 300,
                 }
             });
+
+            Outputs.Add(ClassName + "LambdaArn", new Output(
+                value: new GetAttTag { Name = $"{ClassName}Lambda", Attribute = "Arn" },
+                export: new SubTag { Expression = $"${{AWS::StackName}}:{ClassName}LambdaArn" }
+            ));
         }
 
         private void AddRoleResource(TransformationContext context) {
