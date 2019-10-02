@@ -23,27 +23,33 @@ namespace Tests {
     public partial class CustomResourceWithMaxLengthProps {
         public static bool Passing { get; set; } = true;
         
-        public Task<object> Create() {
+        public Task<Response> Create() {
             ThrowIfNotPassing();
 
-            return Task.FromResult((object) new {
-                Status = "Created"
+            return Task.FromResult(new Response {
+                Data = new {
+                    Status = "Created"
+                }
             });
         }
 
-        public Task<object> Update() {
+        public Task<Response> Update() {
             ThrowIfNotPassing();
 
-            return Task.FromResult((object) new {
-                Status = "Updated"
+            return Task.FromResult(new Response {
+                Data = new {
+                    Status = "Updated"
+                }
             });
         }
 
-        public Task<object> Delete() {
+        public Task<Response> Delete() {
             ThrowIfNotPassing();
 
-            return Task.FromResult((object) new {
-                Status = "Deleted"
+            return Task.FromResult(new Response {
+                Data = new {
+                    Status = "Deleted"
+                }
             });
         }
 
@@ -60,7 +66,6 @@ namespace Tests {
             var expectedPayload = new Response() {
                 Status = ResponseStatus.FAILED,
                 Reason = "The field Message must be a string or array type with a maximum length of '12'.",
-                Data = new object()
             };
             
             var mockHttp = new MockHttpMessageHandler();

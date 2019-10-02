@@ -9,6 +9,7 @@ namespace Cythral.CloudFormation.CustomResource.Yaml {
         public override object Properties { get; set; } = new PropertiesDefinition();
 
         public class PropertiesDefinition {
+            public List<string> ManagedPolicyArns { get; set; } = new List<string>();
             public List<Policy> Policies { get; set; } = new List<Policy>();
             public PolicyDocument AssumeRolePolicyDocument { get; set; }     
         }
@@ -43,6 +44,11 @@ namespace Cythral.CloudFormation.CustomResource.Yaml {
             }
 
             trustStatement.Service.Add(principal);
+            return this;
+        }
+
+        public Role AddManagedPolicy(string arn) {
+            ((PropertiesDefinition) Properties).ManagedPolicyArns.Add(arn);
             return this;
         }
 

@@ -12,6 +12,8 @@ namespace Cythral.CloudFormation.CustomResource {
         
         private AttributeData Data;
 
+        public string Test => "test";
+
         public ValidationGenerator(ISymbol property, AttributeData attributeData) {
             Property = property;
             Data = attributeData;
