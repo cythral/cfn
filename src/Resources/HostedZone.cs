@@ -11,11 +11,10 @@ namespace Cythral.CloudFormation.Resources {
         
         public async Task<Response> Create() {
             var client = new AmazonRoute53Client();
-
             var payload = Request.ResourceProperties;
             payload.CallerReference = DateTime.Now.ToString();
 
-            var result = await client.CreateHostedZoneAsync(Request.ResourceProperties);
+            var result = await client.CreateHostedZoneAsync(payload);
 
             return new Response {
                 PhysicalResourceId = result.HostedZone.Id,
