@@ -14,7 +14,7 @@ namespace Cythral.CloudFormation.CustomResource {
 
         public string RequestId { get; set; }
 
-        public string Reason { get; set; }
+        public string Reason { get; set; } = "";
         
         public object Data { get; set; }
         

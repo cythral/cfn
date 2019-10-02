@@ -20,8 +20,11 @@
         <!-- <DeployStack Bucket="$(CRS3Bucket)" ObjectKey="$(CRS3ObjectKey)" TemplateFile="$(CRTemplatePath)" /> -->
         <Delete Files="$(CRTemplateDestPath);$(CRProjectZipPath)" />
         <Exec Command="chmod -R 755 $(PublishDir)" />
-        <Exec Command="cd $(PublishDir) &amp;&amp; zip -r ../Resources.zip * **/*" />
+        <Exec Command="cd $(PublishDir) &amp;&amp; zip -r ../$(AssemblyName).zip * **/*" />
+        
         <!-- <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(CRProjectZipPath)" Properties/> -->
         <Move SourceFiles="$(CRTemplateSrcPath)" DestinationFiles="$(CRTemplateDestPath)" />
+        <Exec Condition="$(CRStackName) != ''" Command="aws cloudformation package --template-file $(CRTemplateDestPath) --s3-bucket $(CRS3Bucket) --output-template-file $(CRTemplateDestPath).packaged" />
+        <Exec Condition="$(CRStackName) != ''" Command="aws cloudformation deploy --template-file $(CRTemplateDestPath).packaged --stack-name $(CRStackName) --capabilities CAPABILITY_IAM" />
     </Target>
 </Project>
