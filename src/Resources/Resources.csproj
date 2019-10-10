@@ -2,8 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <CRStackName>cfn-extensions</CRStackName>
-    <CRS3Bucket>common-s3</CRS3Bucket>
+    <CRStackName>cfn-resources</CRStackName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,4 +16,5 @@
 
   <Import Project="../CustomResource/build/Cythral.CloudFormation.CustomResource.props" />
   <Import Project="../CustomResource/build/Cythral.CloudFormation.CustomResource.targets" />
+  <Import Project="../Utilities/Utilities.targets" />
 </Project>

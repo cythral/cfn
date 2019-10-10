@@ -8,14 +8,14 @@ namespace Cythral.CloudFormation.Resources {
 
     [CustomResourceAttribute(typeof(CreateHostedZoneRequest))]
     partial class HostedZone {
+
+        private AmazonRoute53Client client = new AmazonRoute53Client();
         
         public async Task<Response> Create() {
-            var client = new AmazonRoute53Client();
             var payload = Request.ResourceProperties;
             payload.CallerReference = DateTime.Now.ToString();
 
             var result = await client.CreateHostedZoneAsync(payload);
-
             return new Response {
                 PhysicalResourceId = result.HostedZone.Id,
                 Data = result
@@ -27,7 +27,6 @@ namespace Cythral.CloudFormation.Resources {
         }
 
         public async Task<Response> Delete() {
-            var client = new AmazonRoute53Client();
             var request = new DeleteHostedZoneRequest() { Id = Request.PhysicalResourceId };
             var result = await client.DeleteHostedZoneAsync(request);
             
