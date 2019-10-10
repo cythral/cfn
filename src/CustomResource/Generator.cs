@@ -220,7 +220,7 @@ namespace Cythral.CloudFormation.CustomResource {
 
             Outputs.Add(ClassName + "LambdaArn", new Output(
                 value: new GetAttTag { Name = $"{ClassName}Lambda", Attribute = "Arn" },
-                export: new SubTag { Expression = $"${{AWS::StackName}}:{ClassName}LambdaArn" }
+                name: new SubTag { Expression = $"${{AWS::StackName}}:{ClassName}LambdaArn" }
             ));
         }
 

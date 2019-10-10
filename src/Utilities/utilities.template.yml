@@ -1,0 +1,12 @@
+Resources:
+  UtilityBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: BucketOwnerFullControl
+
+Outputs:
+  UtilityBucketName:
+    Description: Name of the utility bucket
+    Value: !Ref UtilityBucket
+    Export:
+      Name: !Sub ${AWS::StackName}:UtilityBucketName
