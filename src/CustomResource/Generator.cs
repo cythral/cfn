@@ -33,92 +33,100 @@ namespace Cythral.CloudFormation.CustomResource {
 
         private AttributeData Data;
 
-        private const string CONSTRUCTOR_DEFINITION_TEMPLATE = @"
-            public {1}(Request<{0}> request, System.Net.Http.HttpClient httpClient = null) {{
-                Request = request;
-                HttpClient = httpClient ?? new System.Net.Http.HttpClient();
-            }}
-        ";
-
-        private const string HANDLER_DEFINITION_TEMPLATE = @"
-            [Amazon.Lambda.Core.LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
-            public static async System.Threading.Tasks.Task Handle(Cythral.CloudFormation.CustomResource.Request<{0}> request, Amazon.Lambda.Core.ILambdaContext context = null) {{
-                var client = HttpClientProvider.Provide();
-                var resource = new {1}(request, client);
-                
-                Response response = new Response();
-
-                try {{
-                    switch(request.RequestType) {{
-                        case RequestType.Create:
-                            resource.Validate();
-                            response = await resource.Create();
-                            break;
-                        case RequestType.Update:
-                            resource.Validate();
-                            response = await resource.Update();
-                            break;
-                        case RequestType.Delete:
-                            response = await resource.Delete();
-                            break;
-                        default:
-                            break;
-                    }}
-
-                    await resource.Respond(response);
-
-                }} catch(Exception e) {{
-                    response.Status = Cythral.CloudFormation.CustomResource.ResponseStatus.FAILED;
-                    response.Reason = e.Message;
-
-                    await resource.Respond(response);
-                }}
-            }}
-        ";
-
-        private const string RESPOND_DEFINITION_TEMPLATE = @"
-            public async System.Threading.Tasks.Task<bool> Respond(Response response) {{
-                response.StackId = Request.StackId;
-                response.LogicalResourceId = Request.LogicalResourceId;
-                response.RequestId = Request.RequestId;
-                
-                if(response.PhysicalResourceId == null) {{
-                    response.PhysicalResourceId = Request.PhysicalResourceId;
-                }}
-                
-                var enumConverter = new Newtonsoft.Json.Converters.StringEnumConverter();
-                var converters = new Newtonsoft.Json.JsonConverter[] {{ enumConverter }};
-                var serializedResponse = Newtonsoft.Json.JsonConvert.SerializeObject(response, converters);
-                var payload = new System.Net.Http.StringContent(serializedResponse);
-                payload.Headers.Remove(""Content-Type"");
-
-                Console.WriteLine(serializedResponse);
-
-                try {{
-                    await HttpClient.PutAsync(Request.ResponseURL, payload);
-                    return true;
-                }} catch(Exception e) {{
-                    Console.WriteLine(e.ToString());
-                    return false;
-                }}
-            }} 
-        ";
-
         private string HandlerDefinition {
             get {
-                return String.Format(HANDLER_DEFINITION_TEMPLATE, ResourcePropertiesTypeName, ClassName);
+                return String.Format(@"
+                    public static async System.Threading.Tasks.Task Handle(System.IO.Stream stream, Amazon.Lambda.Core.ILambdaContext context = null) {{
+                        var response = new Response();
+                        var client = HttpClientProvider.Provide();
+
+                        try {{
+                            stream.Seek(0, System.IO.SeekOrigin.Begin);
+
+                            var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Request<{0}>>(stream, SerializerOptions);
+                            var resource = new {1}(request, client);
+
+                            switch(request.RequestType) {{
+                                case RequestType.Create:
+                                    resource.Validate();
+                                    response = await resource.Create();
+                                    break;
+                                case RequestType.Update:
+                                    resource.Validate();
+                                    response = await resource.Update();
+                                    break;
+                                case RequestType.Delete:
+                                    response = await resource.Delete();
+                                    break;
+                                default:
+                                    break;
+                            }}
+
+                            await resource.Respond(response);
+
+                        }} catch(Exception e) {{
+                            stream.Seek(0, System.IO.SeekOrigin.Begin);
+
+                            var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Cythral.CloudFormation.CustomResource.Request<object>>(stream, SerializerOptions);
+                            
+                            response.Status = Cythral.CloudFormation.CustomResource.ResponseStatus.FAILED;
+                            response.Reason = e.Message;
+
+                            await Respond(request, response, client);
+                        }}
+                    }}
+                ", ResourcePropertiesTypeName, ClassName);
             }
         }
 
         private string ConstructorDefinition {
             get {
-                return String.Format(CONSTRUCTOR_DEFINITION_TEMPLATE, ResourcePropertiesTypeName, ClassName);
+                return String.Format(@"
+                    public {1}(Request<{0}> request, System.Net.Http.HttpClient httpClient = null) {{
+                        Request = request;
+                        HttpClient = httpClient ?? new System.Net.Http.HttpClient();
+                    }}
+                ", ResourcePropertiesTypeName, ClassName);
             }
         }
 
         private string RespondDefinition {
             get {
-                return String.Format(RESPOND_DEFINITION_TEMPLATE);
+                return String.Format(@"
+                    public async System.Threading.Tasks.Task<bool> Respond(Response response) {{
+                        return await Respond(Request, response, HttpClient);
+                    }}
+                ", ResourcePropertiesTypeName, ClassName);
+            }
+        }
+
+        private string StaticRespondDefinition {
+            get {
+                return String.Format(@"
+                    public static async System.Threading.Tasks.Task<bool> Respond<T>(Request<T> request, Response response, System.Net.Http.HttpClient client) {{
+                        response.StackId = request.StackId;
+                        response.LogicalResourceId = request.LogicalResourceId;
+                        response.RequestId = request.RequestId;
+                        
+                        if(response.PhysicalResourceId == null) {{
+                            response.PhysicalResourceId = request.PhysicalResourceId;
+                        }}
+                        
+                        var serializedResponse = System.Text.Json.JsonSerializer.Serialize(response, SerializerOptions);
+                        var payload = new System.Net.Http.StringContent(serializedResponse);
+                        payload.Headers.Remove(""Content-Type"");
+
+                        Console.WriteLine(serializedResponse);
+
+                        try {{
+                            await client.PutAsync(request.ResponseURL, payload);
+                            return true;
+                        }} catch(Exception e) {{
+                            Console.WriteLine(e.ToString());
+                            return false;
+                        }}
+                    }}
+                ", ResourcePropertiesTypeName, ClassName);
             }
         }
 
@@ -137,6 +145,20 @@ namespace Cythral.CloudFormation.CustomResource {
         private string HttpClientProviderDefinition {
             get {
                 return String.Format("public static Cythral.CloudFormation.CustomResource.IHttpClientProvider HttpClientProvider = new DefaultHttpClientProvider();");
+            }
+        }
+
+        private string SerializerOptionsDefinition {
+            get {
+                return String.Format(@"
+                    private static System.Text.Json.JsonSerializerOptions SerializerOptions {{
+                        get {{
+                            var options = new System.Text.Json.JsonSerializerOptions();
+                            options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+                            return options;
+                        }}
+                    }}
+                ");
             }
         }
 
@@ -170,6 +192,8 @@ namespace Cythral.CloudFormation.CustomResource {
                     SyntaxFactory.ParseMemberDeclaration(HttpClientProviderDefinition),
                     SyntaxFactory.ParseMemberDeclaration(ConstructorDefinition),
                     SyntaxFactory.ParseMemberDeclaration(RespondDefinition),
+                    SyntaxFactory.ParseMemberDeclaration(StaticRespondDefinition),
+                    SyntaxFactory.ParseMemberDeclaration(SerializerOptionsDefinition),
                     SyntaxFactory.ParseMemberDeclaration(HandlerDefinition),
                     GenerateValidateMethod()
                 );

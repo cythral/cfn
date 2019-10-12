@@ -15,111 +15,61 @@ namespace Tests {
 
     public class ModelWithMaxLengthProps {
         [MaxLength(12)]
-        public string Message;
+        public virtual string Message { get; set; }
     }
 
 
     [CustomResource(typeof(ModelWithMaxLengthProps))]
-    public partial class CustomResourceWithMaxLengthProps {
-        public static bool Passing { get; set; } = true;
-        
-        public Task<Response> Create() {
-            ThrowIfNotPassing();
+    public partial class CustomResourceWithMaxLengthProps : TestCustomResource {       
+        public static MockHttpMessageHandler MockHttp = new MockHttpMessageHandler();
 
-            return Task.FromResult(new Response {
-                Data = new {
-                    Status = "Created"
-                }
-            });
-        }
-
-        public Task<Response> Update() {
-            ThrowIfNotPassing();
-
-            return Task.FromResult(new Response {
-                Data = new {
-                    Status = "Updated"
-                }
-            });
-        }
-
-        public Task<Response> Delete() {
-            ThrowIfNotPassing();
-
-            return Task.FromResult(new Response {
-                Data = new {
-                    Status = "Deleted"
-                }
-            });
-        }
-
-        public void ThrowIfNotPassing() {
-            if(!Passing) {
-                throw new Exception("Expected this error message");
-            }
+        static CustomResourceWithMaxLengthProps() {
+            HttpClientProvider = new FakeHttpClientProvider(MockHttp);
         }
     }
 
     public class MaxLengthAttributeValidationTest {
         [Test]
         public async Task TestHandleShouldFailIfPropDoesntValidate() {
-            var expectedPayload = new Response() {
+            CustomResourceWithMaxLengthProps.MockHttp
+            .Expect("http://example.com")
+            .WithJsonPayload(new Response {
                 Status = ResponseStatus.FAILED,
                 Reason = "The field Message must be a string or array type with a maximum length of '12'.",
-            };
+            });
             
-            var mockHttp = new MockHttpMessageHandler();
-            var httpProvider = new FakeHttpClientProvider(mockHttp);
-            CustomResourceWithMaxLengthProps.HttpClientProvider = httpProvider;
-
-            mockHttp
-                .Expect("http://example.com")
-                .WithContent(Serialize(expectedPayload));
-            
-            var request = new Request<ModelWithMaxLengthProps>() {
+            var request = new Request<ModelWithMaxLengthProps> {
                 RequestType = RequestType.Create,
                 ResponseURL = "http://example.com",
-                ResourceProperties = new ModelWithMaxLengthProps() {
+                ResourceProperties = new ModelWithMaxLengthProps {
                     Message = "This message is waaay too long"
                 }
             };
 
-            await CustomResourceWithMaxLengthProps.Handle(request);
-            mockHttp.VerifyNoOutstandingExpectation();
+            await CustomResourceWithMaxLengthProps.Handle(request.ToStream());
+            CustomResourceWithMaxLengthProps.MockHttp.VerifyNoOutstandingExpectation();
         }
 
         [Test]
         public async Task TestHandleShouldSucceedIfAllPropsMeetExpectations() {
-            var expectedPayload = new Response() {
+            CustomResourceWithMaxLengthProps.MockHttp
+            .Expect("http://example.com")
+            .WithJsonPayload(new Response {
                 Data = new {
                     Status = "Created"
                 }
-            };
+            });
             
-            var mockHttp = new MockHttpMessageHandler();
-            var httpProvider = new FakeHttpClientProvider(mockHttp);
-            CustomResourceWithMaxLengthProps.HttpClientProvider = httpProvider;
-
-            mockHttp
-                .Expect("http://example.com")
-                .WithContent(Serialize(expectedPayload));
-            
-            var request = new Request<ModelWithMaxLengthProps>() {
+            var request = new Request<ModelWithMaxLengthProps> {
                 RequestType = RequestType.Create,
                 ResponseURL = "http://example.com",
-                ResourceProperties = new ModelWithMaxLengthProps() {
+                ResourceProperties = new ModelWithMaxLengthProps {
                     Message = "Test message"
                 }
             };
 
-            await CustomResourceWithMaxLengthProps.Handle(request);
-            mockHttp.VerifyNoOutstandingExpectation();
+            await CustomResourceWithMaxLengthProps.Handle(request.ToStream());
+            CustomResourceWithMaxLengthProps.MockHttp.VerifyNoOutstandingExpectation();
         }
-
-        private string Serialize(object toSerialize) {
-            var serializers = new JsonConverter[] { new StringEnumConverter() };
-            return JsonConvert.SerializeObject(toSerialize, serializers);
-        }
-
     }
 }

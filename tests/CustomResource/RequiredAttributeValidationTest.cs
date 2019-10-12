@@ -15,109 +15,59 @@ namespace Tests {
 
     public class ModelWithRequiredProps {
         [Required(ErrorMessage="Message is required")]
-        public string Message;
+        public virtual string Message { get; set; }
     }
 
 
     [CustomResourceAttribute(typeof(ModelWithRequiredProps))]
-    public partial class CustomResourceWithRequiredProps {
-        public static bool Passing { get; set; } = true;
+    public partial class CustomResourceWithRequiredProps : TestCustomResource {      
+        public static MockHttpMessageHandler MockHttp = new MockHttpMessageHandler();
 
-        public Task<Response> Create() {
-            ThrowIfNotPassing();
-
-            return Task.FromResult(new Response {
-                Data = new {
-                    Status = "Created"
-                }
-            });
-        }
-
-        public Task<Response> Update() {
-            ThrowIfNotPassing();
-
-            return Task.FromResult(new Response {
-                Data = new {
-                    Status = "Updated"
-                }
-            });
-        }
-
-        public Task<Response> Delete() {
-            ThrowIfNotPassing();
-
-            return Task.FromResult(new Response {
-                Data = new {
-                    Status = "Deleted"
-                }
-            });
-        }
-
-        public void ThrowIfNotPassing() {
-            if(!Passing) {
-                throw new Exception("Expected this error message");
-            }
+        static CustomResourceWithRequiredProps() {
+            HttpClientProvider = new FakeHttpClientProvider(MockHttp);
         }
     }
 
     public class CustomResourceWithRequiredPropsTest {
         [Test]
         public async Task TestHandleShouldFailIfRequiredPropIsMissing() {
-            var expectedPayload = new Response() {
+            CustomResourceWithRequiredProps.MockHttp
+            .Expect("http://example.com")
+            .WithJsonPayload(new Response {
                 Status = ResponseStatus.FAILED,
                 Reason = "Message is required",
-            };
+            });
             
-            var mockHttp = new MockHttpMessageHandler();
-            var httpProvider = new FakeHttpClientProvider(mockHttp);
-            CustomResourceWithRequiredProps.HttpClientProvider = httpProvider;
-
-            mockHttp
-                .Expect("http://example.com")
-                .WithContent(Serialize(expectedPayload));
-            
-            var request = new Request<ModelWithRequiredProps>() {
+            var request = new Request<ModelWithRequiredProps> {
                 RequestType = RequestType.Create,
                 ResponseURL = "http://example.com",
                 ResourceProperties = new ModelWithRequiredProps()
             };
 
-            await CustomResourceWithRequiredProps.Handle(request);
-            mockHttp.VerifyNoOutstandingExpectation();
+            await CustomResourceWithRequiredProps.Handle(request.ToStream());
+            CustomResourceWithRequiredProps.MockHttp.VerifyNoOutstandingExpectation();
         }
 
         [Test]
         public async Task TestHandleShouldSucceedIfAllPropsArePresent() {
-            var expectedPayload = new Response() {
+            CustomResourceWithRequiredProps.MockHttp
+            .Expect("http://example.com")
+            .WithJsonPayload(new Response() {
                 Data = new {
                     Status = "Created"
                 }
-            };
+            });
             
-            var mockHttp = new MockHttpMessageHandler();
-            var httpProvider = new FakeHttpClientProvider(mockHttp);
-            CustomResourceWithRequiredProps.HttpClientProvider = httpProvider;
-
-            mockHttp
-                .Expect("http://example.com")
-                .WithContent(Serialize(expectedPayload));
-            
-            var request = new Request<ModelWithRequiredProps>() {
+            var request = new Request<ModelWithRequiredProps> {
                 RequestType = RequestType.Create,
                 ResponseURL = "http://example.com",
-                ResourceProperties = new ModelWithRequiredProps() {
+                ResourceProperties = new ModelWithRequiredProps {
                     Message = "Test message"
                 }
             };
 
-            await CustomResourceWithRequiredProps.Handle(request);
-            mockHttp.VerifyNoOutstandingExpectation();
+            await CustomResourceWithRequiredProps.Handle(request.ToStream());
+            CustomResourceWithRequiredProps.MockHttp.VerifyNoOutstandingExpectation();
         }
-
-        private string Serialize(object toSerialize) {
-            var serializers = new JsonConverter[] { new StringEnumConverter() };
-            return JsonConvert.SerializeObject(toSerialize, serializers);
-        }
-        
     }
 }
