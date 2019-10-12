@@ -31,6 +31,7 @@ namespace Cythral.CloudFormation.CustomResource {
         public Stream ToStream() {
             var options = new JsonSerializerOptions();
             options.Converters.Add(new JsonStringEnumConverter());
+            options.MaxDepth = 32;
 
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -42,6 +43,7 @@ namespace Cythral.CloudFormation.CustomResource {
             return stream;
         }
 
+        [JsonIgnore]
         public IEnumerable<PropertyInfo> ChangedProperties {
             get {
                 if(ResourceProperties == null || OldResourceProperties == null) {
@@ -70,6 +72,7 @@ namespace Cythral.CloudFormation.CustomResource {
             }
         }
 
+        [JsonIgnore]
         public bool RequiresReplacement {
             get {
                 bool PropRequiresReplacement(PropertyInfo prop) {
