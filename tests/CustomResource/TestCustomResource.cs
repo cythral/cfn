@@ -5,9 +5,14 @@ using RichardSzalay.MockHttp;
 
 namespace Tests {
     public abstract class TestCustomResource {
-        public Task<Response> Create() {
-            ThrowIfNotPassing();
+        public bool CreateWasCalled { get; set; }
+        public bool UpdateWasCalled { get; set; }
+        public bool DeleteWasCalled { get; set; }
 
+        public Task<Response> Create() {
+            CreateWasCalled = true;
+            ThrowIfNotPassing();
+            
             return Task.FromResult(new Response {
                 Data = new {
                     Status = "Created"
@@ -16,6 +21,7 @@ namespace Tests {
         }
 
         public Task<Response> Update() {
+            UpdateWasCalled = true;
             ThrowIfNotPassing();
 
             return Task.FromResult(new Response {
@@ -26,6 +32,7 @@ namespace Tests {
         }
 
         public Task<Response> Delete() {
+            DeleteWasCalled = true;
             ThrowIfNotPassing();
 
             return Task.FromResult(new Response {

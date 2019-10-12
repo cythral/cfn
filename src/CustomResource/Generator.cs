@@ -36,7 +36,7 @@ namespace Cythral.CloudFormation.CustomResource {
         private string HandlerDefinition {
             get {
                 return String.Format(@"
-                    public static async System.Threading.Tasks.Task Handle(System.IO.Stream stream, Amazon.Lambda.Core.ILambdaContext context = null) {{
+                    public static async System.Threading.Tasks.Task<{1}> Handle(System.IO.Stream stream, Amazon.Lambda.Core.ILambdaContext context = null) {{
                         var response = new Response();
                         var client = HttpClientProvider.Provide();
 
@@ -53,7 +53,14 @@ namespace Cythral.CloudFormation.CustomResource {
                                     break;
                                 case RequestType.Update:
                                     resource.Validate();
-                                    response = await resource.Update();
+                                    
+                                    if(resource.Request.RequiresReplacement) {{
+                                        response = await resource.Delete();
+                                        response = await resource.Create();
+                                    }} else {{
+                                        response = await resource.Update();
+                                    }}
+                                    
                                     break;
                                 case RequestType.Delete:
                                     response = await resource.Delete();
@@ -63,6 +70,7 @@ namespace Cythral.CloudFormation.CustomResource {
                             }}
 
                             await resource.Respond(response);
+                            return resource;
 
                         }} catch(Exception e) {{
                             stream.Seek(0, System.IO.SeekOrigin.Begin);
@@ -73,6 +81,7 @@ namespace Cythral.CloudFormation.CustomResource {
                             response.Reason = e.Message;
 
                             await Respond(request, response, client);
+                            return null;
                         }}
                     }}
                 ", ResourcePropertiesTypeName, ClassName);

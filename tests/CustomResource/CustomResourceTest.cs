@@ -14,6 +14,8 @@ using Newtonsoft.Json.Converters;
 using Amazon.S3;
 
 namespace Tests {
+    
+
     [CustomResource(typeof(object))]
     public partial class ExampleCustomResource : TestCustomResource {
         public static bool Passing { get; set; } = true;            
@@ -28,6 +30,24 @@ namespace Tests {
             if(!Passing) {
                 throw new Exception("Expected this error message");
             }
+        }
+    }
+
+
+    // used for "update requires replacement" tests
+    public class MessageResourceProperties {
+        [UpdateRequiresReplacement]
+        public string Message { get; set; }
+    }
+
+    [CustomResource(typeof(MessageResourceProperties))]
+    public partial class MessageCustomResource : TestCustomResource {
+        public static bool Passing { get; set; } = true;            
+
+        public static MockHttpMessageHandler MockHttp = new MockHttpMessageHandler();
+
+        static MessageCustomResource() {
+            HttpClientProvider = new FakeHttpClientProvider(MockHttp);
         }
     }
 
@@ -106,6 +126,38 @@ namespace Tests {
             ExampleCustomResource.Passing = false;
             await ExampleCustomResource.Handle(request.ToStream());
             ExampleCustomResource.MockHttp.VerifyNoOutstandingExpectation();
+        }
+        
+
+        [Test]
+        public async Task TestUpdateTriggersReplacement() {
+            MessageCustomResource.MockHttp
+            .Expect("http://example.com")
+            .WithJsonPayload(new Response {
+                Status = ResponseStatus.SUCCESS,
+                Data = new {
+                    Status = "Created"
+                }
+            });
+
+            var request = new Request<MessageResourceProperties> {
+                RequestType = RequestType.Update,
+                ResponseURL = "http://example.com",
+                ResourceProperties = new MessageResourceProperties {
+                    Message = "A"
+                },
+                OldResourceProperties = new MessageResourceProperties {
+                    Message = "B"
+                }
+            };
+
+            var resource = await MessageCustomResource.Handle(request.ToStream());
+            Console.WriteLine(resource.Request.ResourceProperties.Message);
+            MessageCustomResource.MockHttp.VerifyNoOutstandingExpectation();
+            
+            Assert.True(resource.DeleteWasCalled);
+            Assert.True(resource.CreateWasCalled);
+            Assert.False(resource.UpdateWasCalled);
         }
     }
 }
