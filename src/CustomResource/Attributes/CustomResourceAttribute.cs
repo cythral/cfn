@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using CodeGeneration.Roslyn;
 
-namespace Cythral.CloudFormation.CustomResource {
+namespace Cythral.CloudFormation.CustomResource.Attributes {
 
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
     [CodeGenerationAttribute(typeof(Generator))]
@@ -15,5 +15,4 @@ namespace Cythral.CloudFormation.CustomResource {
         }       
          
     }
-
 }

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.ComponentModel.DataAnnotations;
 using Cythral.CloudFormation.CustomResource;
+using Cythral.CloudFormation.CustomResource.Attributes;
 using CodeGeneration.Roslyn.Engine;
 using NUnit.Framework;
 using RichardSzalay.MockHttp;
@@ -13,7 +14,7 @@ using Newtonsoft.Json.Converters;
 using Amazon.S3;
 
 namespace Tests {
-    [CustomResourceAttribute(typeof(object))]
+    [CustomResource(typeof(object))]
     public partial class ExampleCustomResource : TestCustomResource {
         public static bool Passing { get; set; } = true;            
 
