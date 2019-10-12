@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.ComponentModel.DataAnnotations;
 using Cythral.CloudFormation.CustomResource;
+using Cythral.CloudFormation.CustomResource.Attributes;
 using CodeGeneration.Roslyn.Engine;
 using NUnit.Framework;
 using RichardSzalay.MockHttp;
@@ -19,7 +20,7 @@ namespace Tests {
     }
 
 
-    [CustomResourceAttribute(typeof(ModelWithRequiredProps))]
+    [CustomResource(typeof(ModelWithRequiredProps))]
     public partial class CustomResourceWithRequiredProps : TestCustomResource {      
         public static MockHttpMessageHandler MockHttp = new MockHttpMessageHandler();
 

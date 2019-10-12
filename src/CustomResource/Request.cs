@@ -1,7 +1,10 @@
 using System;
+using System.Reflection;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Cythral.CloudFormation.CustomResource.Attributes;
 
 namespace Cythral.CloudFormation.CustomResource {
 
@@ -38,6 +41,57 @@ namespace Cythral.CloudFormation.CustomResource {
             stream.Seek(0, SeekOrigin.Begin);
             return stream;
         }
+
+        public IEnumerable<PropertyInfo> ChangedProperties {
+            get {
+                if(ResourceProperties == null || OldResourceProperties == null) {
+                    yield break;
+                }
+
+                var currentProps = ResourceProperties.GetType().GetProperties();
+                var oldProps = OldResourceProperties.GetType().GetProperties();
+
+                foreach(var prop in currentProps) {
+                    
+                    object current, old;
+
+                    try {
+                        var getter = prop.GetMethod;
+                        current = getter.Invoke(ResourceProperties, new object[] {});
+                        old = getter.Invoke(OldResourceProperties, new object[] {});
+                    } catch(Exception) {
+                        continue;
+                    }
+
+                    if(current != old) {
+                        yield return prop;
+                    }
+                }
+            }
+        }
+
+        public bool RequiresReplacement {
+            get {
+                bool PropRequiresReplacement(PropertyInfo prop) {
+                    foreach(var attr in prop.CustomAttributes) {
+                        if(attr.AttributeType == typeof(UpdateRequiresReplacementAttribute)) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                foreach(var prop in ChangedProperties) {
+                    if(PropRequiresReplacement(prop)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
     }
     
 }
