@@ -3,106 +3,63 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using Cythral.CloudFormation.CustomResource;
 using CodeGeneration.Roslyn.Engine;
 using NUnit.Framework;
 using RichardSzalay.MockHttp;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Tests {
 
     public class ModelWithMinLengthProps {
         [MinLength(4)]
-        public string Message;
+        public virtual string Message { get; set; }
     }
 
 
     [CustomResource(typeof(ModelWithMinLengthProps))]
-    public partial class CustomResourceWithMinLengthProps {
-        public static bool Passing { get; set; } = true;
+    public partial class CustomResourceWithMinLengthProps : TestCustomResource {          
+        public static MockHttpMessageHandler MockHttp = new MockHttpMessageHandler();
 
-        public Task<Response> Create() {
-            ThrowIfNotPassing();
-
-            return Task.FromResult(new Response {
-                Data = new {
-                    Status = "Created"
-                }
-            });
-        }
-
-        public Task<Response> Update() {
-            ThrowIfNotPassing();
-
-            return Task.FromResult(new Response {
-                Data = new {
-                    Status = "Updated"
-                }
-            });
-        }
-
-        public Task<Response> Delete() {
-            ThrowIfNotPassing();
-
-            return Task.FromResult(new Response {
-                Data = new {
-                    Status = "Deleted"
-                }
-            });
-        }
-
-        public void ThrowIfNotPassing() {
-            if(!Passing) {
-                throw new Exception("Expected this error message");
-            }
+        static CustomResourceWithMinLengthProps() {
+            HttpClientProvider = new FakeHttpClientProvider(MockHttp);
         }
     }
 
     public class MinLengthAttributeValidationTest {
         [Test]
         public async Task TestHandleShouldFailIfPropDoesntValidate() {
-            var expectedPayload = new Response() {
+            CustomResourceWithMinLengthProps.MockHttp
+            .Expect("http://example.com")
+            .WithJsonPayload(new Response {
                 Status = ResponseStatus.FAILED,
                 Reason = "The field Message must be a string or array type with a minimum length of '4'."
-            };
+            });
             
-            var mockHttp = new MockHttpMessageHandler();
-            var httpProvider = new FakeHttpClientProvider(mockHttp);
-            CustomResourceWithMinLengthProps.HttpClientProvider = httpProvider;
-
-            mockHttp
-                .Expect("http://example.com")
-                .WithContent(Serialize(expectedPayload));
-            
-            var request = new Request<ModelWithMinLengthProps>() {
+            var request = new Request<ModelWithMinLengthProps> {
                 RequestType = RequestType.Create,
                 ResponseURL = "http://example.com",
-                ResourceProperties = new ModelWithMinLengthProps() {
+                ResourceProperties = new ModelWithMinLengthProps {
                     Message = "tea"
                 }
             };
-
-            await CustomResourceWithMinLengthProps.Handle(request);
-            mockHttp.VerifyNoOutstandingExpectation();
+            
+            await CustomResourceWithMinLengthProps.Handle(request.ToStream());
+            CustomResourceWithMinLengthProps.MockHttp.VerifyNoOutstandingExpectation();
         }
 
         [Test]
         public async Task TestHandleShouldSucceedIfAllPropsMeetExpectations() {
-            var expectedPayload = new Response() {
+            CustomResourceWithMinLengthProps.MockHttp
+            .Expect("http://example.com")
+            .WithJsonPayload(new Response() {
                 Data = new {
                     Status = "Created"
                 }
-            };
-            
-            var mockHttp = new MockHttpMessageHandler();
-            var httpProvider = new FakeHttpClientProvider(mockHttp);
-            CustomResourceWithMinLengthProps.HttpClientProvider = httpProvider;
-
-            mockHttp
-                .Expect("http://example.com")
-                .WithContent(Serialize(expectedPayload));
+            });
             
             var request = new Request<ModelWithMinLengthProps>() {
                 RequestType = RequestType.Create,
@@ -112,14 +69,8 @@ namespace Tests {
                 }
             };
 
-            await CustomResourceWithMinLengthProps.Handle(request);
-            mockHttp.VerifyNoOutstandingExpectation();
+            await CustomResourceWithMinLengthProps.Handle(request.ToStream());
+            CustomResourceWithMinLengthProps.MockHttp.VerifyNoOutstandingExpectation();
         }
-
-        private string Serialize(object toSerialize) {
-            var serializers = new JsonConverter[] { new StringEnumConverter() };
-            return JsonConvert.SerializeObject(toSerialize, serializers);
-        }
-        
     }
 }
