@@ -24,9 +24,20 @@ namespace Cythral.CloudFormation.CustomResource {
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node) {
             try {
-                var type = GetCallingMemberType(node);
-                if(type == null || !IsAmazonType(type)) return;
+                // var testType = context.SemanticModel.GetTypeInfo(node).Type as INamedTypeSymbol;
+                // Permissions.Add(testType.TypeArguments[0].Name);
 
+
+                var type = GetCallingMemberType(node);
+                if(type == null || !IsAmazonResponseType(type)) {
+                    foreach(var child in node.ChildNodes()) {
+                        Visit(child);
+                    }
+
+                    return;
+                }
+                
+                
                 var assembly = LoadAssemblyForType(type);
                 var configClassName = GetConfigClassName(type);
                 var metadataType = assembly.GetType(configClassName);
@@ -35,13 +46,20 @@ namespace Cythral.CloudFormation.CustomResource {
                 var apiCallName = GetApiCallName(node);
 
                 Permissions.Add(iamPrefix + ":" + apiCallName);
-            } catch(Exception) {}
+            } catch(Exception) {
+                foreach(var child in node.ChildNodes()) {
+                    Visit(child);
+                    return;
+                }
+            }
         }
 
         private ITypeSymbol GetCallingMemberType(InvocationExpressionSyntax node) {
             try {
-                var accessExpression = node.Expression as MemberAccessExpressionSyntax;
-                return context.SemanticModel.GetTypeInfo(accessExpression.Expression).Type;
+
+                var symbol = context.SemanticModel.GetTypeInfo(node).Type as INamedTypeSymbol;
+                return symbol.TypeArguments[0];
+                
             } catch(Exception) {
                 return null;
             }
@@ -57,9 +75,10 @@ namespace Cythral.CloudFormation.CustomResource {
             }
         }
 
-        private bool IsAmazonType(ITypeSymbol type) {
+        private bool IsAmazonResponseType(ITypeSymbol type) {
             try {
-                return type.ContainingAssembly.Name.Split('.')[0] == "AWSSDK";
+                return type.ContainingAssembly.Name.Split('.')[0] == "AWSSDK" && 
+                    type.Name.EndsWith("Response");
             } catch(Exception) {
                 return false;
             }
@@ -77,8 +96,9 @@ namespace Cythral.CloudFormation.CustomResource {
 
         private string GetConfigClassName(ITypeSymbol type) {
             var fullNS = type.ContainingNamespace.ToString();
+            var baseNS = string.Join(".", fullNS.Split('.').Take(2));
             var squashedNS = string.Join("", fullNS.Split('.').Take(2));
-            return fullNS + "." + squashedNS + "Config";
+            return baseNS + "." + squashedNS + "Config";
         }
     }
 }

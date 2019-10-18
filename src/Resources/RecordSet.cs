@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Amazon.Route53;
 using Amazon.Route53.Model;
 using Cythral.CloudFormation.CustomResource;
+using Cythral.CloudFormation.CustomResource.Attributes;
 
 namespace Cythral.CloudFormation.Resources {
 
@@ -27,6 +28,7 @@ namespace Cythral.CloudFormation.Resources {
         public Int64? Weight { get; set; }
 
         public ResourceRecordSet ToResourceRecordSet() {
+            var resourceRecords = (from record in ResourceRecords select new ResourceRecord { Value = record }).ToList();
 
             var set = new ResourceRecordSet {
                 AliasTarget = AliasTarget,
@@ -38,21 +40,18 @@ namespace Cythral.CloudFormation.Resources {
                 Type = Type,
                 SetIdentifier = SetIdentifier,
                 TrafficPolicyInstanceId = TrafficPolicyInstanceId,
-                ResourceRecords = (
-                    from record in ResourceRecords 
-                    select new ResourceRecord { Value = record }
-                ).ToList()
+                ResourceRecords = resourceRecords,
             };
 
-            if(TTL != null) set.TTL = (Int64) TTL;
-            if(Weight != null) set.Weight = (Int64) Weight;
-            if(MultiValueAnswer != null) set.MultiValueAnswer = (bool) MultiValueAnswer;
+            if(TTL != null)                 set.TTL = (Int64) TTL;
+            if(Weight != null)              set.Weight = (Int64) Weight;
+            if(MultiValueAnswer != null)    set.MultiValueAnswer = (bool) MultiValueAnswer;
 
             return set;
         }
     }
 
-    [CustomResourceAttribute(typeof(Record))]
+    [CustomResource(typeof(Record))]
     partial class RecordSet {
         
         private AmazonRoute53Client client = new AmazonRoute53Client();
@@ -86,7 +85,5 @@ namespace Cythral.CloudFormation.Resources {
         public async Task<Response> Delete() {
             return new Response();
         }
-
-        public static void Main(string[] args) {}
     }
 }

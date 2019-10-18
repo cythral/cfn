@@ -5,7 +5,7 @@
     <_UtilitiesStackName>cfn-utilities</_UtilitiesStackName>
   </PropertyGroup>
 
-  <Target Name="Deploy" Returns="$(CRS3Bucket)" BeforeTargets="Publish">
+  <Target Name="DeployUtilities" Returns="$(CRS3Bucket)" BeforeTargets="Publish">
     <Exec Command="aws cloudformation deploy --template-file $(_UtilitiesTemplate) --stack-name $(_UtilitiesStackName) --no-fail-on-empty-changeset" />
     <Exec Command="aws cloudformation list-exports --query Exports[?Name==\`cfn-utilities:UtilityBucketName\`].Value --output text" ConsoleToMsBuild="true">
         <Output TaskParameter="ConsoleOutput" PropertyName="CRS3Bucket" />

@@ -39,6 +39,8 @@ Resources:
       ServiceToken: !ImportValue cfn-resources:HostedZoneLambdaArn
       Name: !Ref DomainName
       DelegationSetId: !Ref DelegationSetId
+      HostedZoneConfig:
+        Comment: This is yet another test comment
 
   MoragRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
