@@ -1,40 +1,344 @@
 ﻿using System;
+using System.Text.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 using Amazon.Route53;
 using Amazon.Route53.Model;
 using Cythral.CloudFormation.CustomResource;
+using Cythral.CloudFormation.CustomResource.Attributes;
+
+using static Amazon.Route53.ChangeStatus;
 
 namespace Cythral.CloudFormation.Resources {
 
-    [CustomResourceAttribute(typeof(CreateHostedZoneRequest))]
-    partial class HostedZone {
-
-        private AmazonRoute53Client client = new AmazonRoute53Client();
+    /// <summary>
+    /// Route 53 Hosted Zone Custom Resource accepting a DelegationSetId property
+    /// </summary>
+    [CustomResource(typeof(HostedZone.Properties))]
+    public partial class HostedZone {
         
-        public async Task<Response> Create() {
-            var payload = Request.ResourceProperties;
-            payload.CallerReference = DateTime.Now.ToString();
+        /// <summary>
+        /// Resource properties for Hosted Zones.
+        /// </summary>
+        public class Properties {
+            [UpdateRequiresReplacement]
+            [Required]
+            public string Name { get; set; }
 
-            var result = await client.CreateHostedZoneAsync(payload);
+            [UpdateRequiresReplacement]
+            public string DelegationSetId { get; set; }
+
+            public HostedZoneConfig HostedZoneConfig { get; set; }
+
+            public QueryLoggingConfig QueryLoggingConfig { get; set; }
+
+            public List<Tag> HostedZoneTags { get; set; }
+
+            public List<VPC> VPCs { get; set; }
+        }
+
+        /// <summary>
+        /// Data returned to CloudFormation
+        /// </summary>
+        public class Data {
+            public string Id;
+        }
+
+        /// <summary>
+        /// Client used to make API calls to Route53
+        /// </summary>
+        /// <returns>Route 53 Client</returns>
+        public static Func<IAmazonRoute53> ClientFactory { get; set; } = delegate { return (IAmazonRoute53) new AmazonRoute53Client(); };
+
+        /// <summary>
+        /// Tags that have been updated or inserted since creation or last update
+        /// </summary>
+        /// <value></value>
+        public IEnumerable<Tag> UpsertedTags {
+            get {
+                var oldHashCodes = from tag in Request.OldResourceProperties?.HostedZoneTags ?? new List<Tag>() select tag.Key + "\n" + tag.Value;
+                var newHashCodes = from tag in Request.ResourceProperties?.HostedZoneTags ?? new List<Tag>() select tag.Key + "\n" + tag.Value;
+                var difference = newHashCodes.Except(oldHashCodes);
+
+                foreach(var code in difference) {
+                    yield return new Tag {
+                        Key = code.Substring(0, code.IndexOf("\n")),
+                        Value = code.Substring(code.IndexOf("\n") + 1)
+                    };
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tags that were deleted since creation or last update
+        /// </summary>
+        /// <value>List of names of deleted tags</value>
+        public IEnumerable<string> DeletedTags {
+            get {
+                var oldKeys = from tag in Request.OldResourceProperties?.HostedZoneTags ?? new List<Tag>() select tag.Key;
+                var newKeys = from tag in Request.ResourceProperties?.HostedZoneTags ?? new List<Tag>() select tag.Key;
+
+                return oldKeys.Except(newKeys);                    
+            }
+        }
+
+        public IEnumerable<VPC> AssociatableVPCs {
+            get {
+                var oldVpcs = from vpc in Request.OldResourceProperties?.VPCs ?? new List<VPC>() select vpc.VPCId + "\n" + vpc.VPCRegion;
+                var newVpcs = from vpc in Request.ResourceProperties?.VPCs ?? new List<VPC>() select vpc.VPCId + "\n" + vpc.VPCRegion;
+                var associatable = newVpcs.Except(oldVpcs);
+
+                foreach(var vpc in associatable) {
+                    yield return new VPC {
+                        VPCId = vpc.Substring(0, vpc.IndexOf("\n")),
+                        VPCRegion = vpc.Substring(vpc.IndexOf("\n") + 1)
+                    };
+                }
+            }
+        }
+
+        public IEnumerable<VPC> DisassociatableVPCs {
+            get {
+                var oldVpcs = from vpc in Request.OldResourceProperties?.VPCs ?? new List<VPC>() select vpc.VPCId + "\n" + vpc.VPCRegion;
+                var newVpcs = from vpc in Request.ResourceProperties?.VPCs ?? new List<VPC>() select vpc.VPCId + "\n" + vpc.VPCRegion;
+                var disassociable = oldVpcs.Except(newVpcs);
+
+                foreach(var vpc in disassociable) {
+                    yield return new VPC {
+                        VPCId = vpc.Substring(0, vpc.IndexOf("\n")),
+                        VPCRegion = vpc.Substring(vpc.IndexOf("\n") + 1)
+                    };
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates a new Hosted Zone in Route 53
+        /// </summary>
+        /// <returns>Response to send back to CloudFormation</returns>
+        public async Task<Response> Create() {
+            var props = Request.ResourceProperties;
+            var request = new CreateHostedZoneRequest {
+                CallerReference = DateTime.Now.ToString(),
+                Name = Request.ResourceProperties.Name
+            };
+
+            if(props.DelegationSetId != null)   request.DelegationSetId     = props.DelegationSetId;
+            if(props.HostedZoneConfig != null)  request.HostedZoneConfig    = props.HostedZoneConfig;
+            if(props.VPCs != null)              request.VPC                 = props.VPCs.First();
+
+            var client = ClientFactory();
+            var createHostedZoneResponse = await client.CreateHostedZoneAsync(request);
+            var data = new Data { Id = createHostedZoneResponse.HostedZone.Id };
+            Console.WriteLine(JsonSerializer.Serialize(createHostedZoneResponse));
+
+            // wait until the hosted zone finishes creating
+            var getChangeRequest = new GetChangeRequest { Id = createHostedZoneResponse.ChangeInfo.Id };
+            while((await client.GetChangeAsync(getChangeRequest)).ChangeInfo.Status == PENDING) {
+                var wait = 1;
+                Console.WriteLine($"Create hosted zone still pending... sleeping {wait} seconds");
+                Thread.Sleep(wait * 1000);
+            }
+            
+            Task.WaitAll(new Task[] {
+                // create query logging config
+                Task.Run(async delegate {
+                    if(props.QueryLoggingConfig != null) {
+                        await CreateQueryLoggingConfig(props.QueryLoggingConfig.CloudWatchLogsLogGroupArn, data.Id);   
+                    }
+                }),
+                // add tags
+                Task.Run(async delegate {
+                    if(props.HostedZoneTags != null) {
+                        var tagsResponse = await ClientFactory().ChangeTagsForResourceAsync(new ChangeTagsForResourceRequest {
+                            ResourceId = data.Id,
+                            ResourceType = "hostedzone",
+                            AddTags = props.HostedZoneTags,
+                        });
+
+                        Console.WriteLine("Create Tags Response: " + JsonSerializer.Serialize(tagsResponse));
+                    }
+                }),
+                // associate vpcs
+                Task.Run(async delegate {
+                    if(props.VPCs != null && props.VPCs.Count() > 1) {
+                        var vpcs = props.VPCs.Skip(1);
+                        await AssociateVPCs(vpcs.ToList(), data.Id);
+                    }
+                }),
+            });            
+
             return new Response {
-                PhysicalResourceId = result.HostedZone.Id,
-                Data = result
+                PhysicalResourceId = data.Id,
+                Data = data
             };
         }
 
+        /// <summary>
+        /// Updates a HostedZone in Route 53
+        /// </summary>
+        /// <returns>Response to send back to CloudFormation</returns>
         public async Task<Response> Update() {
-            throw new NotImplementedException("Updates are not yet supported");
+            var oldProps = Request.OldResourceProperties;
+            var newProps = Request.ResourceProperties;
+
+            Task.WaitAll(new Task[] {
+                // update tags
+                Task.Run(async delegate {
+                    if(UpsertedTags.Count() > 0 || DeletedTags.Count() > 0) {
+                        Console.WriteLine("Updating Resource Tags");
+
+                        var tagsResponse = await ClientFactory().ChangeTagsForResourceAsync(new ChangeTagsForResourceRequest {
+                            AddTags = UpsertedTags.ToList(),
+                            RemoveTagKeys = DeletedTags.ToList(),
+                            ResourceId = Request.PhysicalResourceId,
+                            ResourceType = "hostedzone"
+                        });
+
+                        Console.WriteLine("Update Tags Response: " + JsonSerializer.Serialize(tagsResponse));
+                    }
+                }),
+                // update vpcs
+                Task.Run(async delegate {
+                    if(AssociatableVPCs.Count() > 0) {
+                        Console.WriteLine("Associating new VPCs");
+                        await AssociateVPCs(AssociatableVPCs.ToList(), Request.PhysicalResourceId);
+                    }
+
+                    if(DisassociatableVPCs.Count() > 0) {
+                        Console.WriteLine("Disassociating old VPCs");
+                        await DisassociateVPCs(DisassociatableVPCs.ToList(), Request.PhysicalResourceId);
+                    }
+                }),
+                // update comment
+                Task.Run(async delegate {
+                    // ?.?.?.?. this might look weird but so do incredibly long if statements IMO
+                    if(oldProps?.HostedZoneConfig?.Comment != newProps?.HostedZoneConfig?.Comment) {
+                        Console.WriteLine($"Updating the HostedZone Comment");
+                        var comment = (newProps?.HostedZoneConfig?.Comment) ?? "";
+                        var id = Request.PhysicalResourceId;
+                        var updateCommentResponse = ClientFactory().UpdateHostedZoneCommentAsync(
+                            new UpdateHostedZoneCommentRequest {
+                                Comment = comment,
+                                Id = id,
+                            }
+                        );
+
+                        var serialization = JsonSerializer.Serialize(updateCommentResponse);
+                        Console.WriteLine($"Update Hosted Zone Comment Response: {serialization}");
+                    }
+                }),
+                // update query logging config
+                Task.Run(async delegate {
+                    var oldGroup = oldProps?.QueryLoggingConfig?.CloudWatchLogsLogGroupArn;
+                    var newGroup = newProps?.QueryLoggingConfig?.CloudWatchLogsLogGroupArn;
+
+                    if(oldGroup != newGroup) {
+                        Console.WriteLine("Deleting the old Hosted Zone Query Logging Config");
+                        await DeleteQueryLoggingConfig(Request.PhysicalResourceId);
+                        
+                        if(newGroup != null) {
+                            Console.WriteLine("Creating new Hosted Zone Query Logging Config");
+                            await CreateQueryLoggingConfig(newGroup, Request.PhysicalResourceId);
+                        }
+                    }
+                })
+            });
+            
+            return new Response {
+                PhysicalResourceId = Request.PhysicalResourceId,
+                Data = new Data()
+            };
         }
 
+        /// <summary>
+        /// Deletes a HostedZone in Route 53
+        /// </summary>
+        /// <returns></returns>
         public async Task<Response> Delete() {
-            var request = new DeleteHostedZoneRequest() { Id = Request.PhysicalResourceId };
-            var result = await client.DeleteHostedZoneAsync(request);
+            var result = await ClientFactory().DeleteHostedZoneAsync(new DeleteHostedZoneRequest {
+                Id = Request.PhysicalResourceId
+            });
             
             return new Response {
                 Data = result
             };
         }
 
-        public static void Main(string[] args) {}
+        private async Task AssociateVPCs(List<VPC> vpcs, string hostedZoneId) {
+            var vpcTasks = new List<Task>();
+                        
+            foreach(var vpc in vpcs) {
+                vpcTasks.Add(
+                    Task.Run(async delegate {
+                        var vpcRequest = new AssociateVPCWithHostedZoneRequest {
+                            Comment = "",
+                            HostedZoneId = hostedZoneId,
+                            VPC = vpc,
+                        };
+
+                        var vpcResponse = await ClientFactory().AssociateVPCWithHostedZoneAsync(vpcRequest);
+                        Console.WriteLine($"Associate VPC Response: {JsonSerializer.Serialize(vpcResponse)}");
+                    })
+                );
+            }
+
+            Task.WaitAll(vpcTasks.ToArray());
+        }
+
+        private async Task DisassociateVPCs(List<VPC> vpcs, string hostedZoneId) {
+            var vpcTasks = new List<Task>();
+
+            foreach(var vpc in vpcs) {
+                vpcTasks.Add(
+                    Task.Run(async delegate {
+                        var vpcRequest = new DisassociateVPCFromHostedZoneRequest {
+                            Comment = "",
+                            HostedZoneId = hostedZoneId,
+                            VPC = vpc
+                        };
+
+                        var vpcResponse = await ClientFactory().DisassociateVPCFromHostedZoneAsync(vpcRequest);
+                        Console.WriteLine($"Disassociate VPC Response: {JsonSerializer.Serialize(vpcResponse)}");
+                    })
+                );
+            }
+
+            Task.WaitAll(vpcTasks.ToArray());
+        }
+
+        private async Task<string> CreateQueryLoggingConfig(string groupArn, string hostedZoneId) {
+            var queryLoggingResponse = await ClientFactory().CreateQueryLoggingConfigAsync(new CreateQueryLoggingConfigRequest {
+                CloudWatchLogsLogGroupArn = groupArn,
+                HostedZoneId = hostedZoneId,
+            });
+            
+            Console.WriteLine($"Create Query Logging Config Response: {JsonSerializer.Serialize(queryLoggingResponse)}");
+            return queryLoggingResponse.QueryLoggingConfig.Id;
+        }
+
+        private async Task DeleteQueryLoggingConfig(string hostedZoneId) {
+            var listConfigResponse = await ClientFactory().ListQueryLoggingConfigsAsync(new ListQueryLoggingConfigsRequest {
+                HostedZoneId = Request.PhysicalResourceId,
+                MaxResults = "1"
+            });
+
+            var configId = listConfigResponse.QueryLoggingConfigs.First()?.Id;
+            Console.WriteLine($"List Query Logging Config Response: {JsonSerializer.Serialize(listConfigResponse)}");
+            
+            if(configId == null) {
+                Console.WriteLine("No Query Logging Config to delete.");
+                return;
+            }
+
+            var deleteConfigResp = await ClientFactory().DeleteQueryLoggingConfigAsync(new DeleteQueryLoggingConfigRequest {
+                Id = configId
+            });
+
+            Console.WriteLine($"Delete Query Logging Config Response: {JsonSerializer.Serialize(deleteConfigResp)}");
+        }
     }
 }

@@ -31,7 +31,8 @@ namespace Cythral.CloudFormation.CustomResource {
         public Stream ToStream() {
             var options = new JsonSerializerOptions();
             options.Converters.Add(new JsonStringEnumConverter());
-            options.MaxDepth = 32;
+            options.Converters.Add(new AwsConstantClassConverterFactory());
+            options.MaxDepth = 10;
 
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -65,7 +66,7 @@ namespace Cythral.CloudFormation.CustomResource {
                         continue;
                     }
 
-                    if(current != old) {
+                    if(current != null && !current.Equals(old)) {
                         yield return prop;
                     }
                 }

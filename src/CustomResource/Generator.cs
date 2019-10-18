@@ -36,7 +36,7 @@ namespace Cythral.CloudFormation.CustomResource {
         private string HandlerDefinition {
             get {
                 return String.Format(@"
-                    public static async System.Threading.Tasks.Task<{1}> Handle(System.IO.Stream stream, Amazon.Lambda.Core.ILambdaContext context = null) {{
+                    public static async System.Threading.Tasks.Task<System.IO.Stream> Handle(System.IO.Stream stream) {{
                         var response = new Response();
                         var client = HttpClientProvider.Provide();
 
@@ -44,6 +44,7 @@ namespace Cythral.CloudFormation.CustomResource {
                             stream.Seek(0, System.IO.SeekOrigin.Begin);
 
                             var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Request<{0}>>(stream, SerializerOptions);
+                            Console.WriteLine(""Received request: "" + JsonSerializer.Serialize(request));
                             var resource = new {1}(request, client);
 
                             switch(request.RequestType) {{
@@ -58,6 +59,7 @@ namespace Cythral.CloudFormation.CustomResource {
                                         response = await resource.Delete();
                                         response = await resource.Create();
                                     }} else {{
+                                        Console.WriteLine(""Updating Resource: "" + resource.Request.PhysicalResourceId);
                                         response = await resource.Update();
                                     }}
                                     
@@ -70,7 +72,10 @@ namespace Cythral.CloudFormation.CustomResource {
                             }}
 
                             await resource.Respond(response);
-                            return resource;
+
+                            var outStream = new System.IO.MemoryStream();
+                            await System.Text.Json.JsonSerializer.SerializeAsync(outStream, resource);
+                            return outStream;
 
                         }} catch(Exception e) {{
                             stream.Seek(0, System.IO.SeekOrigin.Begin);
@@ -164,6 +169,7 @@ namespace Cythral.CloudFormation.CustomResource {
                         get {{
                             var options = new System.Text.Json.JsonSerializerOptions();
                             options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+                            options.Converters.Add(new Cythral.CloudFormation.CustomResource.AwsConstantClassConverterFactory());
                             return options;
                         }}
                     }}

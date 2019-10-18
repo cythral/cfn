@@ -1,0 +1,17 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  GitHubWebhook:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: Webhook::Cythral.CloudFormation.Webhook.Webhook::Handler
+      Runtime: dotnetcore2.1
+      CodeUri: bin/Debug/netcoreapp2.1
+      Policies:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Events:
+        Github:
+          Type: Api
+          Properties:
+            Path: /webhooks/github
+            Method: post
+            
