@@ -40,7 +40,7 @@ Resources:
       Name: !Ref DomainName
       DelegationSetId: !Ref DelegationSetId
       HostedZoneConfig:
-        Comment: This is yet another test comment
+        Comment: Another test comment
 
   MoragRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
