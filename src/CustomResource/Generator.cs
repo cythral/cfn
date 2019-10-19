@@ -1,3 +1,4 @@
+using System.Reflection.Emit;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -10,6 +11,12 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
+using static Microsoft.CodeAnalysis.SyntaxToken;
+using static Microsoft.CodeAnalysis.SyntaxTrivia;
+
+
 
 using CodeGeneration.Roslyn.Engine;
 using Newtonsoft.Json;
@@ -33,72 +40,13 @@ namespace Cythral.CloudFormation.CustomResource {
 
         private AttributeData Data;
 
-        private string HandlerDefinition {
-            get {
-                return String.Format(@"
-                    public static async System.Threading.Tasks.Task<System.IO.Stream> Handle(System.IO.Stream stream) {{
-                        var response = new Response();
-                        var client = HttpClientProvider.Provide();
-
-                        try {{
-                            stream.Seek(0, System.IO.SeekOrigin.Begin);
-
-                            var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Request<{0}>>(stream, SerializerOptions);
-                            Console.WriteLine(""Received request: "" + JsonSerializer.Serialize(request));
-                            var resource = new {1}(request, client);
-
-                            switch(request.RequestType) {{
-                                case RequestType.Create:
-                                    resource.Validate();
-                                    response = await resource.Create();
-                                    break;
-                                case RequestType.Update:
-                                    resource.Validate();
-                                    
-                                    if(resource.Request.RequiresReplacement) {{
-                                        response = await resource.Delete();
-                                        response = await resource.Create();
-                                    }} else {{
-                                        Console.WriteLine(""Updating Resource: "" + resource.Request.PhysicalResourceId);
-                                        response = await resource.Update();
-                                    }}
-                                    
-                                    break;
-                                case RequestType.Delete:
-                                    response = await resource.Delete();
-                                    break;
-                                default:
-                                    break;
-                            }}
-
-                            await resource.Respond(response);
-
-                            var outStream = new System.IO.MemoryStream();
-                            await System.Text.Json.JsonSerializer.SerializeAsync(outStream, resource);
-                            return outStream;
-
-                        }} catch(Exception e) {{
-                            stream.Seek(0, System.IO.SeekOrigin.Begin);
-
-                            var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Cythral.CloudFormation.CustomResource.Request<object>>(stream, SerializerOptions);
-                            
-                            response.Status = Cythral.CloudFormation.CustomResource.ResponseStatus.FAILED;
-                            response.Reason = e.Message;
-
-                            await Respond(request, response, client);
-                            return null;
-                        }}
-                    }}
-                ", ResourcePropertiesTypeName, ClassName);
-            }
-        }
-
         private string ConstructorDefinition {
             get {
                 return String.Format(@"
-                    public {1}(Request<{0}> request, System.Net.Http.HttpClient httpClient = null) {{
+                    public {1}(Request<{0}> request, System.Net.Http.HttpClient httpClient = null, Amazon.Lambda.Core.ILambdaContext context = null) {{
                         Request = request;
                         HttpClient = httpClient ?? new System.Net.Http.HttpClient();
+                        Context = context;
                     }}
                 ", ResourcePropertiesTypeName, ClassName);
             }
@@ -107,7 +55,7 @@ namespace Cythral.CloudFormation.CustomResource {
         private string RespondDefinition {
             get {
                 return String.Format(@"
-                    public async System.Threading.Tasks.Task<bool> Respond(Response response) {{
+                    public virtual async System.Threading.Tasks.Task<bool> Respond(Response response) {{
                         return await Respond(Request, response, HttpClient);
                     }}
                 ", ResourcePropertiesTypeName, ClassName);
@@ -147,6 +95,12 @@ namespace Cythral.CloudFormation.CustomResource {
         private string RequestPropertyDefinition {
             get {
                 return String.Format("public readonly Cythral.CloudFormation.CustomResource.Request<{0}> Request;", ResourcePropertiesTypeName);
+            }
+        }
+
+        private string ContextPropertyDefinition {
+            get {
+                return String.Format("public readonly Amazon.Lambda.Core.ILambdaContext Context;");
             }
         }
 
@@ -204,12 +158,13 @@ namespace Cythral.CloudFormation.CustomResource {
                 .AddMembers(
                     SyntaxFactory.ParseMemberDeclaration(HttpClientPropertyDefinition),
                     SyntaxFactory.ParseMemberDeclaration(RequestPropertyDefinition),
+                    SyntaxFactory.ParseMemberDeclaration(ContextPropertyDefinition),
                     SyntaxFactory.ParseMemberDeclaration(HttpClientProviderDefinition),
                     SyntaxFactory.ParseMemberDeclaration(ConstructorDefinition),
                     SyntaxFactory.ParseMemberDeclaration(RespondDefinition),
                     SyntaxFactory.ParseMemberDeclaration(StaticRespondDefinition),
                     SyntaxFactory.ParseMemberDeclaration(SerializerOptionsDefinition),
-                    SyntaxFactory.ParseMemberDeclaration(HandlerDefinition),
+                    GenerateHandleMethod(),
                     GenerateValidateMethod()
                 );
 
@@ -282,6 +237,143 @@ namespace Cythral.CloudFormation.CustomResource {
             }
 
             Resources.Add($"{ClassName}Role", role);
+        }
+
+        private MemberDeclarationSyntax GenerateHandleMethod() {
+            var body = Block(GenerateHandleMethodBody());
+            var returnType = ParseTypeName("System.Threading.Tasks.Task<System.IO.Stream>");
+            return MethodDeclaration(returnType, "Handle")
+                .AddModifiers(Token(PublicKeyword), Token(StaticKeyword), Token(AsyncKeyword))
+                .AddParameterListParameters(
+                    //        attribute lists              modifiers              type                                                  identifier              default value
+                    Parameter(List<AttributeListSyntax>(), new SyntaxTokenList(), ParseTypeName("System.IO.Stream"),                    ParseToken("stream"),   null),
+                    Parameter(List<AttributeListSyntax>(), new SyntaxTokenList(), ParseTypeName("Amazon.Lambda.Core.ILambdaContext"),   ParseToken("context"),  EqualsValueClause(ParseExpression("null")))
+
+                )
+                .WithBody(body);
+        }
+
+        private IEnumerable<StatementSyntax> GenerateHandleMethodBody() {
+            yield return ParseStatement("var response = new Response();");
+            yield return ParseStatement("var client = HttpClientProvider.Provide();");
+
+            var catchDeclaration = CatchDeclaration(ParseTypeName("Exception"), ParseToken("e"));
+
+            yield return TryStatement(
+                ParseToken("try"),
+                Block(GenerateHandleMethodTryBlock()),
+                List(new List<CatchClauseSyntax> { 
+                    CatchClause(ParseToken("catch"), catchDeclaration, null, Block(GenerateHandleMethodCatchBlock()))
+                }),
+                null
+            );
+
+        }
+
+        private IEnumerable<StatementSyntax> GenerateHandleMethodTryBlock() {
+            yield return ParseStatement("stream.Seek(0, System.IO.SeekOrigin.Begin);");
+
+            yield return ParseStatement($"var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Request<{ResourcePropertiesTypeName}>>(stream, SerializerOptions);");
+            yield return ParseStatement("Console.WriteLine($\"Received request: {System.Text.Json.JsonSerializer.Serialize(request)}\");");
+            yield return ParseStatement($"var resource = new {ClassName}(request, client, context);");
+            
+            var cases = new List<SwitchSectionSyntax> {
+                GenerateHandleMethodCreateCase(),
+                GenerateHandleMethodUpdateCase(),
+                GenerateHandleMethodDeleteCase()
+            };
+            
+            var methods = OriginalClass.Members.Where(member => member is MethodDeclarationSyntax).Cast<MethodDeclarationSyntax>();
+            if(methods.Any(member => member.Identifier.Text == "Wait")) {
+                cases.Add(GenerateHandleMethodWaitCase());
+            }
+
+            yield return SwitchStatement(
+                ParseExpression("(request.RequestType)"),
+                List(cases)
+            );
+
+            yield return IfStatement(
+                ParseExpression("response != null"),
+                ParseStatement("await resource.Respond(response);")
+            );
+
+            yield return ParseStatement("var outStream = new System.IO.MemoryStream();");
+            yield return ParseStatement("await System.Text.Json.JsonSerializer.SerializeAsync(outStream, resource);");
+            yield return ParseStatement("return outStream;");
+        }
+
+        private SwitchSectionSyntax GenerateHandleMethodCreateCase() {
+            return SwitchSection(
+                List(new List<SwitchLabelSyntax> {
+                    CaseSwitchLabel(ParseExpression("RequestType.Create")),
+                }),
+                List(new List<StatementSyntax> {
+                    ParseStatement("resource.Validate();"),
+                    ParseStatement("response = await resource.Create();"),
+                    ParseStatement("break;")
+                })
+            );
+        }
+
+        private SwitchSectionSyntax GenerateHandleMethodUpdateCase() {
+            return SwitchSection(
+                List(new List<SwitchLabelSyntax> {
+                    CaseSwitchLabel(ParseExpression("RequestType.Update")),
+                }),
+                List(new List<StatementSyntax> {
+                    ParseStatement("resource.Validate();"),
+                    IfStatement(
+                        ParseExpression("resource.Request.RequiresReplacement"),
+                        Block(List(new List<StatementSyntax> {
+                            ParseStatement("Console.WriteLine($\"Resource {resource.Request.PhysicalResourceId} requires replacement. Deleting and re-creating...\");"),
+                            ParseStatement("response = await resource.Delete();"),
+                            ParseStatement("Console.WriteLine($\"Got Delete Response: {System.Text.Json.JsonSerializer.Serialize(response)}\");"),
+                            ParseStatement("response = await resource.Create();")
+                        })),
+                        ElseClause(
+                            Block(List(new List<StatementSyntax> {
+                                ParseStatement("Console.WriteLine($\"Updating Resource: {resource.Request.PhysicalResourceId}\");"),
+                                ParseStatement("response = await resource.Update();")
+                            }))   
+                        )
+                    ),
+                    ParseStatement("break;")
+                })
+            );
+        }
+
+        private SwitchSectionSyntax GenerateHandleMethodDeleteCase() {
+            return SwitchSection(
+                List(new List<SwitchLabelSyntax> {
+                    CaseSwitchLabel(ParseExpression("RequestType.Delete")),
+                }),
+                List(new List<StatementSyntax> {
+                    ParseStatement("response = await resource.Delete();"),
+                    ParseStatement("break;")
+                })
+            );
+        }
+
+        private SwitchSectionSyntax GenerateHandleMethodWaitCase() {
+            return SwitchSection(
+                List(new List<SwitchLabelSyntax> {
+                    CaseSwitchLabel(ParseExpression("RequestType.Wait")),
+                }),
+                List(new List<StatementSyntax> {
+                    ParseStatement("response = await resource.Wait();"),
+                    ParseStatement("break;")
+                })
+            );
+        }
+
+        private IEnumerable<StatementSyntax> GenerateHandleMethodCatchBlock() {
+            yield return ParseStatement("stream.Seek(0, System.IO.SeekOrigin.Begin);");
+            yield return ParseStatement("var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Cythral.CloudFormation.CustomResource.Request<object>>(stream, SerializerOptions);");
+            yield return ParseStatement("response.Status = Cythral.CloudFormation.CustomResource.ResponseStatus.FAILED;");
+            yield return ParseStatement("response.Reason = e.Message;");
+            yield return ParseStatement("await Respond(request, response, client);");
+            yield return ParseStatement("return null;");
         }
 
         private MemberDeclarationSyntax GenerateValidateMethod() {
