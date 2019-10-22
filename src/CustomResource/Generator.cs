@@ -274,7 +274,7 @@ namespace Cythral.CloudFormation.CustomResource {
             yield return ParseStatement("stream.Seek(0, System.IO.SeekOrigin.Begin);");
 
             yield return ParseStatement($"var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Request<{ResourcePropertiesTypeName}>>(stream, SerializerOptions);");
-            yield return ParseStatement("Console.WriteLine($\"Received request: {System.Text.Json.JsonSerializer.Serialize(request)}\");");
+            yield return ParseStatement("Console.WriteLine($\"Received request: {System.Text.Json.JsonSerializer.Serialize(request, SerializerOptions)}\");");
             yield return ParseStatement($"var resource = new {ClassName}(request, client, context);");
             
             var cases = new List<SwitchSectionSyntax> {
@@ -368,6 +368,7 @@ namespace Cythral.CloudFormation.CustomResource {
         }
 
         private IEnumerable<StatementSyntax> GenerateHandleMethodCatchBlock() {
+            yield return ParseStatement("Console.WriteLine(e.Message + \"\n\" + e.StackTrace);");
             yield return ParseStatement("stream.Seek(0, System.IO.SeekOrigin.Begin);");
             yield return ParseStatement("var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Cythral.CloudFormation.CustomResource.Request<object>>(stream, SerializerOptions);");
             yield return ParseStatement("response.Status = Cythral.CloudFormation.CustomResource.ResponseStatus.FAILED;");

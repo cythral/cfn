@@ -12,7 +12,6 @@ namespace Cythral.CloudFormation.CustomResource.Attributes {
 
         public CustomResourceAttribute(Type resourcePropertiesType) {
             ResourcePropertiesType = resourcePropertiesType; 
-        }       
-         
+        } 
     }
 }
