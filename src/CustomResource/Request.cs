@@ -95,7 +95,5 @@ namespace Cythral.CloudFormation.CustomResource {
                 return false;
             }
         }
-
     }
-    
 }

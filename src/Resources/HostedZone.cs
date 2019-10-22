@@ -59,16 +59,14 @@ namespace Cythral.CloudFormation.Resources {
         /// <value></value>
         public IEnumerable<Tag> UpsertedTags {
             get {
-                var oldHashCodes = from tag in Request.OldResourceProperties?.HostedZoneTags ?? new List<Tag>() select tag.Key + "\n" + tag.Value;
-                var newHashCodes = from tag in Request.ResourceProperties?.HostedZoneTags ?? new List<Tag>() select tag.Key + "\n" + tag.Value;
-                var difference = newHashCodes.Except(oldHashCodes);
+                var prev = from tag in Request.OldResourceProperties?.HostedZoneTags ?? new List<Tag>() 
+                            select new { Key = tag.Key, Value = tag.Value };
 
-                foreach(var code in difference) {
-                    yield return new Tag {
-                        Key = code.Substring(0, code.IndexOf("\n")),
-                        Value = code.Substring(code.IndexOf("\n") + 1)
-                    };
-                }
+                var curr = from tag in Request.ResourceProperties?.HostedZoneTags ?? new List<Tag>() 
+                            select new { Key = tag.Key, Value = tag.Value };
+
+                return from tag in curr.Except(prev) 
+                        select new Tag { Key = tag.Key, Value = tag.Value };
             }
         }
 
@@ -87,31 +85,27 @@ namespace Cythral.CloudFormation.Resources {
 
         public IEnumerable<VPC> AssociatableVPCs {
             get {
-                var oldVpcs = from vpc in Request.OldResourceProperties?.VPCs ?? new List<VPC>() select vpc.VPCId + "\n" + vpc.VPCRegion;
-                var newVpcs = from vpc in Request.ResourceProperties?.VPCs ?? new List<VPC>() select vpc.VPCId + "\n" + vpc.VPCRegion;
-                var associatable = newVpcs.Except(oldVpcs);
+                var oldVpcs = from vpc in Request.OldResourceProperties?.VPCs ?? new List<VPC>() 
+                                select new { VPCId = vpc.VPCId, VPCRegion = vpc.VPCRegion };
 
-                foreach(var vpc in associatable) {
-                    yield return new VPC {
-                        VPCId = vpc.Substring(0, vpc.IndexOf("\n")),
-                        VPCRegion = vpc.Substring(vpc.IndexOf("\n") + 1)
-                    };
-                }
+                var newVpcs = from vpc in Request.ResourceProperties?.VPCs ?? new List<VPC>() 
+                                select new { VPCId = vpc.VPCId, VPCRegion = vpc.VPCRegion };
+
+                return from vpc in newVpcs.Except(oldVpcs)
+                        select new VPC { VPCId = vpc.VPCId, VPCRegion = vpc.VPCRegion };
             }
         }
 
         public IEnumerable<VPC> DisassociatableVPCs {
             get {
-                var oldVpcs = from vpc in Request.OldResourceProperties?.VPCs ?? new List<VPC>() select vpc.VPCId + "\n" + vpc.VPCRegion;
-                var newVpcs = from vpc in Request.ResourceProperties?.VPCs ?? new List<VPC>() select vpc.VPCId + "\n" + vpc.VPCRegion;
-                var disassociable = oldVpcs.Except(newVpcs);
+                var oldVpcs = from vpc in Request.OldResourceProperties?.VPCs ?? new List<VPC>() 
+                                select new { VPCId = vpc.VPCId, VPCRegion = vpc.VPCRegion };
 
-                foreach(var vpc in disassociable) {
-                    yield return new VPC {
-                        VPCId = vpc.Substring(0, vpc.IndexOf("\n")),
-                        VPCRegion = vpc.Substring(vpc.IndexOf("\n") + 1)
-                    };
-                }
+                var newVpcs = from vpc in Request.ResourceProperties?.VPCs ?? new List<VPC>()
+                                select new { VPCId = vpc.VPCId, VPCRegion = vpc.VPCRegion };
+
+                return from vpc in oldVpcs.Except(newVpcs)
+                        select new VPC { VPCId = vpc.VPCId, VPCRegion = vpc.VPCRegion };
             }
         }
 

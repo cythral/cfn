@@ -44,8 +44,11 @@ namespace Cythral.CloudFormation.CustomResource {
                 var metadata = (ClientConfig) Activator.CreateInstance(metadataType);
                 var iamPrefix = metadata.AuthenticationServiceName;
                 var apiCallName = GetApiCallName(node);
+                var permission = iamPrefix + ":" + apiCallName;
 
-                Permissions.Add(iamPrefix + ":" + apiCallName);
+                if(permission == "lambda:Invoke") permission = "lambda:InvokeFunction";
+
+                Permissions.Add(permission);
             } catch(Exception) {
                 foreach(var child in node.ChildNodes()) {
                     Visit(child);

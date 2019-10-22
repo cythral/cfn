@@ -1,5 +1,13 @@
 Transform: AWS::Serverless-2016-10-31
 Resources:
+  SSLCertificate:
+    Type: Custom::Certificate
+    Properties:
+      ServiceToken: !ImportValue cfn-resources:CertificateLambdaArn
+      DomainName: cicd.brigh.id
+      HostedZoneId: !ImportValue cfn-dns:HostedZoneId
+      ValidationMethod: DNS
+
   GitHubWebhook:
     Type: AWS::Serverless::Function
     Properties:

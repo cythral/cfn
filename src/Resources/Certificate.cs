@@ -40,6 +40,7 @@ namespace Cythral.CloudFormation.Resources {
 
             public List<Tag> Tags { get; set; }
 
+            [UpdateRequiresReplacement]
             public ValidationMethod ValidationMethod { get; set; } = ValidationMethod.DNS;
 
             [UpdateRequiresReplacement]
@@ -59,6 +60,38 @@ namespace Cythral.CloudFormation.Resources {
         
         public static Func<IAmazonLambda> LambdaClientFactory { get; set; } = delegate { return (IAmazonLambda) new AmazonLambdaClient(); };
 
+        /// <summary>
+        /// Tags that have been updated or inserted since creation or last update
+        /// </summary>
+        /// <value></value>
+        public IEnumerable<Tag> UpsertedTags {
+            get {
+                var prev = from tag in Request.OldResourceProperties?.Tags ?? new List<Tag>() 
+                            select new { Key = tag.Key, Value = tag.Value };
+
+                var curr = from tag in Request.ResourceProperties?.Tags ?? new List<Tag>() 
+                            select new { Key = tag.Key, Value = tag.Value };
+
+                return from tag in curr.Except(prev) 
+                        select new Tag { Key = tag.Key, Value = tag.Value };
+            }
+        }
+
+        /// <summary>
+        /// Tags that were deleted since creation or last update
+        /// </summary>
+        /// <value>List of names of deleted tags</value>
+        public IEnumerable<Tag> DeletedTags {
+            get {
+                var oldKeys = from tag in Request.OldResourceProperties?.Tags ?? new List<Tag>() select tag.Key;
+                var newKeys = from tag in Request.ResourceProperties?.Tags ?? new List<Tag>() select tag.Key;
+
+                return from key in oldKeys.Except(newKeys)
+                        join tag in Request.OldResourceProperties?.Tags ?? new List<Tag>() on key equals tag.Key
+                        select tag;
+            }
+        }
+
         public async Task<Response> Create() {
             var acmClient = AcmClientFactory();
             var route53Client = Route53ClientFactory();
@@ -77,16 +110,147 @@ namespace Cythral.CloudFormation.Resources {
             Console.WriteLine($"Got Request Certificate Response: {JsonSerializer.Serialize(requestCertificateResponse)}");
 
             Request.PhysicalResourceId = requestCertificateResponse.CertificateArn;
+            DescribeCertificateResponse describeCertificateResponse;
+            var describeCertificateRequest = new DescribeCertificateRequest { CertificateArn = Request.PhysicalResourceId };
+            var tasks = new List<Task>();
+            var changes = new List<Change>();
 
-            var describeCertificateResponse = await acmClient.DescribeCertificateAsync(new DescribeCertificateRequest {
+            // For some reason, the domain validation options aren't immediately populated.
+            while(
+                    (describeCertificateResponse = await acmClient.DescribeCertificateAsync(describeCertificateRequest))
+                    .Certificate
+                    .DomainValidationOptions
+                    .Count() == 0
+            ) {
+                Console.WriteLine($"Got Describe Certificate Response: {JsonSerializer.Serialize(describeCertificateResponse)}");
+                Thread.Sleep(5 * 1000);
+            }
+
+            if(props.Tags != null) {
+                tasks.Add(Task.Run(async delegate {
+                    var addTagsResponse = await acmClient.AddTagsToCertificateAsync(new AddTagsToCertificateRequest {
+                        Tags = props.Tags,
+                        CertificateArn = Request.PhysicalResourceId,
+                    });
+
+                    Console.WriteLine($"Got Add Tags Response: {JsonSerializer.Serialize(addTagsResponse)}");
+                }));
+            }
+
+            // add DNS validation records if applicable
+            if(props.ValidationMethod == ValidationMethod.DNS) { 
+                foreach(var option in describeCertificateResponse.Certificate.DomainValidationOptions) {
+                    changes.Add(new Change {
+                        Action = ChangeAction.UPSERT,
+                        ResourceRecordSet = new ResourceRecordSet {
+                            Name = option.ResourceRecord.Name,
+                            Type = new RRType(option.ResourceRecord.Type.Value),
+                            TTL = 60,
+                            ResourceRecords = new List<ResourceRecord> {
+                                new ResourceRecord { Value = option.ResourceRecord.Value }
+                            }
+                        }
+                    });
+                }
+
+                tasks.Add(
+                    Task.Run(async delegate {
+                        var changeRecordsResponse = await route53Client.ChangeResourceRecordSetsAsync(new ChangeResourceRecordSetsRequest {
+                            HostedZoneId = props.HostedZoneId,
+                            ChangeBatch = new ChangeBatch {
+                                Changes = changes
+                            }
+                        });
+
+                        Console.WriteLine($"Got Change Record Sets Response: {JsonSerializer.Serialize(changeRecordsResponse)}");
+                    })
+                );
+            }
+
+            Task.WaitAll(tasks.ToArray());
+            Request.RequestType = RequestType.Wait;
+            return await Wait();
+        }
+
+        public async Task<Response> Wait() {
+            var request = new DescribeCertificateRequest { CertificateArn = Request.PhysicalResourceId };
+            var response = await AcmClientFactory().DescribeCertificateAsync(request);
+            var status = response?.Certificate?.Status?.Value;
+            
+            switch(status) {
+                case "PENDING_VALIDATION":
+                    Thread.Sleep(WaitInterval * 1000);
+
+                    var invokeResponse = await LambdaClientFactory().InvokeAsync(new InvokeRequest {
+                        FunctionName = Context.FunctionName,
+                        Payload = JsonSerializer.Serialize(Request, SerializerOptions),
+                        InvocationType = InvocationType.Event,
+                    });
+
+                    break;
+
+                case "ISSUED":  return new Response { PhysicalResourceId = Request.PhysicalResourceId };
+                default:        throw new Exception($"Certificate could not be issued. (Got status: {status})");
+            }
+
+            return null;
+        }
+
+
+        public async Task<Response> Update() {
+            var oldProps = Request.OldResourceProperties;
+            var newProps = Request.ResourceProperties;
+
+            Task.WaitAll(new Task[] {
+
+                // add new tags
+                Task.Run(async delegate {
+                    var upsertTagsResponse = await AcmClientFactory().AddTagsToCertificateAsync(new AddTagsToCertificateRequest {
+                        Tags = UpsertedTags.ToList(),
+                        CertificateArn = Request.PhysicalResourceId
+                    });
+
+                    Console.WriteLine($"Received upsert tags response: {JsonSerializer.Serialize(upsertTagsResponse)}");
+                }),
+
+                // delete old tags
+                Task.Run(async delegate {
+                    var deleteTagsResponse = await AcmClientFactory().RemoveTagsFromCertificateAsync(new RemoveTagsFromCertificateRequest {
+                        Tags = DeletedTags.ToList(),
+                        CertificateArn = Request.PhysicalResourceId
+                    });
+
+                    Console.WriteLine($"Received delete tags response: {JsonSerializer.Serialize(deleteTagsResponse)}");
+                }),
+
+                // update options
+                Task.Run(async delegate {
+                    if(newProps?.Options?.CertificateTransparencyLoggingPreference != oldProps?.Options?.CertificateTransparencyLoggingPreference) {
+                        var updateOptionsResponse = await AcmClientFactory().UpdateCertificateOptionsAsync(new UpdateCertificateOptionsRequest {
+                            CertificateArn = Request.PhysicalResourceId,
+                            Options = newProps.Options
+                        });
+
+                        Console.WriteLine($"Received update options response: {JsonSerializer.Serialize(updateOptionsResponse)}");
+                    }
+                })
+            });
+
+            return new Response {
+                PhysicalResourceId = Request.PhysicalResourceId
+            };
+        }
+
+        public async Task<Response> Delete() {
+            var describeResponse = await AcmClientFactory().DescribeCertificateAsync(new DescribeCertificateRequest {
                 CertificateArn = Request.PhysicalResourceId,
             });
-            Console.WriteLine($"Got Describe Certificate Response: {JsonSerializer.Serialize(describeCertificateResponse)}");
+            Console.WriteLine($"Got describe certificate response: {JsonSerializer.Serialize(describeResponse)}");
 
             var changes = new List<Change>();
-            foreach(var option in describeCertificateResponse.Certificate.DomainValidationOptions) {
+            foreach(var option in describeResponse.Certificate.DomainValidationOptions) {
                 changes.Add(new Change {
-                    Action = ChangeAction.UPSERT,
+                    Action = ChangeAction.DELETE,
                     ResourceRecordSet = new ResourceRecordSet {
                         Name = option.ResourceRecord.Name,
                         Type = new RRType(option.ResourceRecord.Type.Value),
@@ -98,56 +262,25 @@ namespace Cythral.CloudFormation.Resources {
                 });
             }
 
-            var changeRecordsResponse = await route53Client.ChangeResourceRecordSetsAsync(new ChangeResourceRecordSetsRequest {
-                HostedZoneId = props.HostedZoneId,
-                ChangeBatch = new ChangeBatch {
-                    Changes = changes
-                }
-            });
-            Console.WriteLine($"Got Change Record Sets Response: {JsonSerializer.Serialize(changeRecordsResponse)}");
-            
-            Request.RequestType = RequestType.Wait;
-            return await Wait();
-        }
+            if(changes.Count() != 0) {
+                var changeRecordsResponse = await Route53ClientFactory().ChangeResourceRecordSetsAsync(new ChangeResourceRecordSetsRequest {
+                    HostedZoneId = Request.ResourceProperties.HostedZoneId,
+                    ChangeBatch = new ChangeBatch {
+                        Changes = changes
+                    }
+                });
 
-        public async Task<Response> Wait() {
-            var request = new DescribeCertificateRequest { CertificateArn = Request.PhysicalResourceId };
-            var response = await AcmClientFactory().DescribeCertificateAsync(request);
-            var status = response.Certificate.Status.Value;
-            
-            switch(status) {
-                case "PENDING_VALIDATION":
-                    Thread.Sleep(WaitInterval * 1000);
-
-                    var invokeResponse = await LambdaClientFactory().InvokeAsync(new InvokeRequest {
-                        FunctionName = Context.FunctionName,
-                        Payload = JsonSerializer.Serialize(Request),
-                        InvocationType = InvocationType.Event,
-                    });
-
-                    Console.WriteLine($"Got Lambda Invoke Response: {JsonSerializer.Serialize(invokeResponse)}");
-                    break;
-
-                case "ISSUED":
-                    return new Response { PhysicalResourceId = Request.PhysicalResourceId };
-
-                default:
-                    throw new Exception($"Certificate could not be issued. (Got status: {status})");
+                Console.WriteLine($"Got delete record response: {JsonSerializer.Serialize(changeRecordsResponse)}");
             }
 
-            return null;
-        }
+            var deleteResponse = await AcmClientFactory().DeleteCertificateAsync(new DeleteCertificateRequest {
+                CertificateArn = Request.PhysicalResourceId,
+            });
 
+            Console.WriteLine($"Received delete certificate response: {JsonSerializer.Serialize(deleteResponse)}");
 
-        public async Task<Response> Update() {
             return new Response {
-
-            };
-        }
-
-        public async Task<Response> Delete() {
-            return new Response {
-
+                PhysicalResourceId = Request.PhysicalResourceId
             };
         }
     }
