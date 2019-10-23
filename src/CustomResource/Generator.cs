@@ -326,9 +326,7 @@ namespace Cythral.CloudFormation.CustomResource {
                     IfStatement(
                         ParseExpression("resource.Request.RequiresReplacement"),
                         Block(List(new List<StatementSyntax> {
-                            ParseStatement("Console.WriteLine($\"Resource {resource.Request.PhysicalResourceId} requires replacement. Deleting and re-creating...\");"),
-                            ParseStatement("response = await resource.Delete();"),
-                            ParseStatement("Console.WriteLine($\"Got Delete Response: {System.Text.Json.JsonSerializer.Serialize(response)}\");"),
+                            ParseStatement("Console.WriteLine($\"Resource {resource.Request.PhysicalResourceId} requires replacement. Creating a new one instead of updating...\");"),
                             ParseStatement("response = await resource.Create();")
                         })),
                         ElseClause(
