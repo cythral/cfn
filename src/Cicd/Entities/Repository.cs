@@ -142,15 +142,6 @@ namespace Cythral.CloudFormation.Cicd.Entities {
         [JsonPropertyName("deployments_url")]
         public string DeploymentsUrl { get; set; }
         
-        [JsonPropertyName("created_at")]
-        public DateTime CreatedAt { get; set; }
-        
-        [JsonPropertyName("updated_at")]
-        public DateTime UpdatedAt { get; set; }
-        
-        [JsonPropertyName("pushed_at")]
-        public DateTime PushedAt { get; set; }
-        
         [JsonPropertyName("git_url")]
         public string GitUrl { get; set; }
         
@@ -207,9 +198,6 @@ namespace Cythral.CloudFormation.Cicd.Entities {
         
         [JsonPropertyName("open_issues_count")]
         public int OpenIssuesCount { get; set; }
-        
-        [JsonPropertyName("license")]
-        public string License { get; set; }
         
         [JsonPropertyName("default_branch")]
         public string DefaultBranch { get; set; }

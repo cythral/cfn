@@ -2,27 +2,88 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <BuildTasksLocation>../BuildTasks/bin/$(Configuration)/netcoreapp2.2/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <StackName>cfn-cicd</StackName>
-    <TemplateFile>Cicd.template.yml</TemplateFile>
+    <TemplateFileName>Cicd.template.yml</TemplateFileName>
+    <ConfigFileName>Cicd.config.json</ConfigFileName>
+    <TemplateFile>$(MSBuildThisFileDirectory)$(TemplateFileName)</TemplateFile>
+    <ConfigFile>$(MSBuildThisFileDirectory)$(ConfigFileName)</ConfigFile>
+    <LayerDir>/tmp/github-webhook-dep-layer</LayerDir>
+    <PackagedFile></PackagedFile>
+    <DeploymentBucket></DeploymentBucket>
+    <Package>true</Package>
+    <Deploy>true</Deploy>
   </PropertyGroup>
 
   <ItemGroup>
-    <Capabilities Include="CAPABILITY_IAM" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.ApplicationLoadBalancerEvents" Version="1.0.0" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.103.54" />
+    <PackageReference Include="AWSSDK.KeyManagementService" Version="3.3.101.75" />
+    <PackageReference Include="LambdaNative" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="1.2.0" />
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.6.0" />
     <PackageReference Include="System.Text.Json" Version="4.6.0" />
   </ItemGroup>
-  
-  <Import Project="../Utilities/Utilities.targets" />
 
-  <Target Name="DeployWebhook" AfterTargets="Publish">
-    <Exec Command="aws cloudformation package --template-file $(TemplateFile) --s3-bucket $(CRS3Bucket) --output-template-file $(TemplateFile).packaged" />
-    <Exec Command="aws cloudformation deploy --template-file $(TemplateFile).packaged --stack-name $(StackName) --capabilities @(Capabilities, ',')" />
+  <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.UpdateCodeLocation" AssemblyFile="$(BuildTasksLocation)" />
+  <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.Deploy" AssemblyFile="$(BuildTasksLocation)" />
+
+  <!-- Sets up the configuraiton file -->
+  <Target Name="Configure" Condition="!Exists('Cicd.config.json')">
+    <Exec Command="aws kms encrypt --key-id alias/SecretsKey --plaintext $(GithubToken) --query CiphertextBlob --output text" ConsoleToMsBuild="true">
+        <Output TaskParameter="ConsoleOutput" PropertyName="EncryptedGithubToken" />
+    </Exec>
+
+    <Exec Command="aws kms encrypt --key-id alias/SecretsKey --plaintext $(GithubSigningSecret) --query CiphertextBlob --output text" ConsoleToMsBuild="true">
+        <Output TaskParameter="ConsoleOutput" PropertyName="EncryptedGithubSigningSecret" />
+    </Exec>
+
+    <PropertyGroup>
+        <ConfigLines>
+{
+    "Parameters": {
+        "GithubOwner": "$(GithubOwner)",
+        "GithubToken": "$(EncryptedGithubToken)",
+        "GithubSigningSecret": "$(EncryptedGithubSigningSecret)"
+    }
+}
+        </ConfigLines>
+    </PropertyGroup>
+    
+    <WriteLinesToFile File="Cicd.config.json" Lines="$(ConfigLines)" Overwrite="true" />
   </Target>
+  
+  <!-- Updates the CodeUri properties in the cloudformation template -->
+  <Target Name="UpdateCodeLocation" AfterTargets="Publish">
+    <UpdateCodeLocation TemplateFile="$(TemplateFile)" Location="$(PublishDir)" />
+  </Target>
+  
+  <!-- Upload the code to S3 -->
+  <Target Name="Package" AfterTargets="UpdateCodeLocation" Condition="$(Package) == 'true'">
+
+    <!-- Copy the config file to the same directory as the packaged file (if PackagedFile was set) -->
+    <Copy SourceFiles="$(ConfigFile)" DestinationFiles="$([System.IO.Path]::GetDirectoryName('$(PackagedFile)'))/$(ConfigFileName)" Condition="$(PackagedFile) != ''" />
+
+    <Exec Command="mktemp" ConsoleToMsBuild="true" Condition="$(PackagedFile) == ''">
+        <Output TaskParameter="ConsoleOutput" PropertyName="PackagedFile" />
+    </Exec>
+
+    <!-- Prepare the dependency layer -->
+    <RemoveDir Directories="$(LayerDir)" />
+    <MakeDir Directories="$(LayerDir)" />
+    <Exec Command="dotnet store -m $(MSBuildThisFileFullPath) -r linux-x64 --output $(LayerDir) --skip-optimization" />
+
+    <Exec Command="aws cloudformation package --template-file $(TemplateFile) --s3-bucket $(DeploymentBucket) --output-template-file $(PackagedFile)" />
+    
+    <PropertyGroup>
+      <TemplateFile>$(PackagedFile)</TemplateFile>
+    </PropertyGroup>
+  </Target>
+  
+  <!-- Deploy to CloudFormation -->
+  <Target Name="Deploy" AfterTargets="Package" Condition="$(Deploy) == 'true'" DependsOnTargets="Configure">
+    <Deploy TemplateFile="$(TemplateFile)" StackName="$(StackName)" ConfigFile="$(ConfigFile)" Capabilities="CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND" />
+    </Target>
 </Project>

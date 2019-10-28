@@ -1,25 +1,151 @@
 Transform: AWS::Serverless-2016-10-31
+Parameters:
+  GithubOwner:
+    Type: String
+    Description: Organization/user that owns repositories the CICD webhook will handle.
+
+  GithubToken:
+    Type: String
+    NoEcho: true
+    Description: Encrypted Github token
+
+  GithubSigningSecret:
+    Type: String
+    NoEcho: true
+    Description: Encrypted signing secret Github uses to sign requests with.
+
 Resources:
   SSLCertificate:
     Type: Custom::Certificate
     Properties:
       ServiceToken: !ImportValue cfn-resources:CertificateLambdaArn
-      DomainName: cicd.brigh.id
+      DomainName: brigh.id
       HostedZoneId: !ImportValue cfn-dns:HostedZoneId
       ValidationMethod: DNS
+  
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for web ports 80 and 443
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      VpcId: !ImportValue cfn-utilities:VpcId
+    
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: dualstack
+      SecurityGroups:
+        - !GetAtt WebSecurityGroup.GroupId
+      Subnets: !Split [",", !ImportValue cfn-utilities:SubnetIds]
 
-  GitHubWebhook:
+  HttpListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            StatusCode: HTTP_301
+            Protocol: HTTPS
+            Port: 443
+            Host: "#{host}"
+            Path: "/#{path}"
+            Query: "#{query}"
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  HttpsListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: fixed-response
+          FixedResponseConfig:
+            StatusCode: "404"
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref SSLCertificate
+
+  DnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !ImportValue cfn-dns:HostedZoneId
+      Name: brigh.id
+      Type: A
+      AliasTarget:
+        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+        DNSName: !GetAtt LoadBalancer.DNSName
+
+  GithubWebhookDependencyLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - dotnetcore2.1
+      Content: /tmp/github-webhook-dep-layer/x64/netcoreapp2.1
+
+  GithubWebhook:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: Webhook::Cythral.CloudFormation.Webhook.Webhook::Handler
+      Handler: Cicd::Cythral.CloudFormation.Cicd.Webhook::Handle
       Runtime: dotnetcore2.1
-      CodeUri: bin/Debug/netcoreapp2.1
+      Timeout: 30
+      CodeUri: bin/netcoreapp2.1/publish/
       Policies:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-      Events:
-        Github:
-          Type: Api
-          Properties:
-            Path: /webhooks/github
-            Method: post
+        - AWSLambdaExecute
+        - !ImportValue cfn-utilities:SecretsKeyDecryptPolicyArn
+      Layers:
+        - !Ref GithubWebhookDependencyLayer
+      AutoPublishAlias: GithubWebhook
+      Environment:
+        Variables:
+          GITHUB_OWNER: !Ref GithubOwner
+          GITHUB_TOKEN: !Ref GithubToken
+          GITHUB_SIGNING_SECRET: !Ref GithubSigningSecret
+
+  GithubWebhookPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GithubWebhook.Alias
+      Principal: elasticloadbalancing.amazonaws.com
+      SourceArn: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/cfn-cicd-GithubWebhook/*
+
+  GithubWebhookTarget:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: GithubWebhookPermission
+    Properties:
+      Name: cfn-cicd-GithubWebhook
+      TargetType: lambda
+      TargetGroupAttributes:
+        - Key: lambda.multi_value_headers.enabled
+          Value: false
+      Targets:
+        - Id: !Ref GithubWebhook.Alias
+
+  GithubWebhookListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HttpsListener
+      Priority: 1
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref GithubWebhookTarget
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - brigh.id
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - /webhooks/github
             

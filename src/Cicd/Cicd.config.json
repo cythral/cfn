@@ -1,0 +1,7 @@
+{
+    "Parameters": {
+        "GithubOwner": "cythral",
+        "GithubToken": "AQICAHigcQTeuNL7c9eXAztXx20Z25f9/EsRSveHNqIG//pY1gFlC1/u3J8pZ7JcMFg9mASuAAAAhzCBhAYJKoZIhvcNAQcGoHcwdQIBADBwBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDAYQCUGAsfqb1N8gawIBEIBDvutMfuR7ydN9BvgMkAzDWLtENiauKBZUnz4SYMDGL/Ub1QNAAWXvb7UKlZi2F+3ITq23geNo+8SgTXJabws+ew+aKQ==",
+        "GithubSigningSecret": "AQICAHigcQTeuNL7c9eXAztXx20Z25f9/EsRSveHNqIG//pY1gHIO9nj3gYOCe6Slt2Ax9v9AAAAbDBqBgkqhkiG9w0BBwagXTBbAgEAMFYGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMl57zvriZb76HqtpDAgEQgCm7slC0DLLlZ+vGaTfRbFNioSGYklXttU6RQml8WR2pzY7svRII/0rHjg=="
+    }
+}

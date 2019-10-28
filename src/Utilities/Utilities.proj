@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TemplateName>Utilities.template.yml</TemplateName>
+    <Template>$(MSBuildThisFileDirectory)$(TemplateName)</Template>
+    <StackName Condition="$(StackName) == ''">cfn-utilities</StackName>
+    <Flags>
+        --template-file $(Template)
+        --stack-name $(StackName)
+        --capabilities CAPABILITY_NAMED_IAM
+        --no-fail-on-empty-changeset
+    </Flags>
+  </PropertyGroup>
+
+  <Target Name="Build">
+    <Exec Command="aws cloudformation deploy $(Flags.Replace('&#10;', ''))" />
+  </Target>
+
+  <Target Name="Copy" Condition="$(Dest) != ''">
+    <Copy SourceFiles="$(Template)" DestinationFiles="$(Dest)/$(TemplateName)" />
+  </Target>
+</Project>

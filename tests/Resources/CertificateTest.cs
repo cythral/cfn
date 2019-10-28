@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.Route53;
@@ -88,7 +89,7 @@ namespace Tests {
             Certificate.AcmClientFactory = () => client;
             await Certificate.Handle(request.ToStream());
 
-            client.Received().RequestCertificateAsync(
+            await client.Received().RequestCertificateAsync(
                 Arg.Is<RequestCertificateRequest>(req =>
                     req.DomainName == "example.com" && 
                     req.SubjectAlternativeNames.Any(name => name == "www.example.com") &&
@@ -145,7 +146,7 @@ namespace Tests {
             Certificate.Route53ClientFactory = () => route53Client;
             await Certificate.Handle(request.ToStream());
 
-            acmClient.Received().AddTagsToCertificateAsync(Arg.Is<AddTagsToCertificateRequest>(req =>
+            await acmClient.Received().AddTagsToCertificateAsync(Arg.Is<AddTagsToCertificateRequest>(req =>
                 req.Tags.Any(tag => tag.Key == "Contact" && tag.Value == "Talen Fisher") &&
                 req.Tags.Any(tag => tag.Key == "ContactEmail" && tag.Value == "talen@example.com") &&
                 req.CertificateArn == "arn:aws:acm::1:certificate/example.com"
@@ -190,7 +191,7 @@ namespace Tests {
             Certificate.Route53ClientFactory = () => route53Client;
             await Certificate.Handle(request.ToStream());
 
-            route53Client.Received().ChangeResourceRecordSetsAsync(
+            await route53Client.Received().ChangeResourceRecordSetsAsync(
                 Arg.Is<ChangeResourceRecordSetsRequest>(req => 
                     req.HostedZoneId == "ABC123" &&
                     req.ChangeBatch.Changes.Any(change =>
@@ -232,8 +233,12 @@ namespace Tests {
             var context = new Context { FunctionName = "Certificate" } as ILambdaContext;
             await Certificate.Handle(request.ToStream(), context);
 
-            string expectedPayload = JsonSerializer.Serialize(request);
-            lambdaClient.Received().InvokeAsync(
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new JsonStringEnumConverter());
+            options.Converters.Add(new AwsConstantClassConverterFactory());
+
+            string expectedPayload = JsonSerializer.Serialize(request, options);
+            await lambdaClient.Received().InvokeAsync(
                 Arg.Is<InvokeRequest>(req =>
                     req.FunctionName == "Certificate" &&
                     req.Payload == expectedPayload &&
@@ -374,12 +379,12 @@ namespace Tests {
             Certificate.Route53ClientFactory = () => route53Client;
             await Certificate.Handle(request.ToStream());
 
-            acmClient.Received().AddTagsToCertificateAsync(Arg.Is<AddTagsToCertificateRequest>(req =>
+            await acmClient.Received().AddTagsToCertificateAsync(Arg.Is<AddTagsToCertificateRequest>(req =>
                 req.Tags.Any(tag => tag.Key == "Contact" && tag.Value == "Someone else") &&
                 req.CertificateArn == "arn:aws:acm::1:certificate/example.com"
             ));
             
-            acmClient.Received().RemoveTagsFromCertificateAsync(Arg.Is<RemoveTagsFromCertificateRequest>(req => 
+            await acmClient.Received().RemoveTagsFromCertificateAsync(Arg.Is<RemoveTagsFromCertificateRequest>(req => 
                 req.Tags.Any(tag => tag.Key == "ContactEmail" && tag.Value == "talen@example.com") &&
                 req.CertificateArn == "arn:aws:acm::1:certificate/example.com"
             ));
@@ -422,7 +427,7 @@ namespace Tests {
             Certificate.Route53ClientFactory = () => route53Client;
             await Certificate.Handle(request.ToStream());
 
-            acmClient.Received().UpdateCertificateOptionsAsync(Arg.Is<UpdateCertificateOptionsRequest>(req =>
+            await acmClient.Received().UpdateCertificateOptionsAsync(Arg.Is<UpdateCertificateOptionsRequest>(req =>
                 req.CertificateArn == "arn:aws:acm::1:certificate/example.com" &&
                 req.Options.CertificateTransparencyLoggingPreference == CertificateTransparencyLoggingPreference.ENABLED
             ));
@@ -455,7 +460,7 @@ namespace Tests {
             Certificate.Route53ClientFactory = () => route53Client;
             await Certificate.Handle(request.ToStream());
 
-            acmClient.Received().DeleteCertificateAsync(Arg.Is<DeleteCertificateRequest>(req =>
+            await acmClient.Received().DeleteCertificateAsync(Arg.Is<DeleteCertificateRequest>(req =>
                 req.CertificateArn == "arn:aws:acm::1:certificate/example.com"
             ));
         }
@@ -496,7 +501,7 @@ namespace Tests {
             Certificate.Route53ClientFactory = () => route53Client;
             await Certificate.Handle(request.ToStream());
 
-            route53Client.Received().ChangeResourceRecordSetsAsync(Arg.Is<ChangeResourceRecordSetsRequest>(req =>
+            await route53Client.Received().ChangeResourceRecordSetsAsync(Arg.Is<ChangeResourceRecordSetsRequest>(req =>
                 req.HostedZoneId == "ABC123" &&
                 req.ChangeBatch.Changes.Any(change =>
                     change.Action == ChangeAction.DELETE &&

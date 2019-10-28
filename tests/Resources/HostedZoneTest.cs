@@ -58,7 +58,7 @@ namespace Tests {
         /// OldResourceProperties but not ResourceProperties
         /// </summary>
         [Test]
-        public async Task DeletedTagsTest() {
+        public void DeletedTagsTest() {
             var oldTags = new List<Tag>() {
                 new Tag {
                     Key = "Contact",
@@ -95,7 +95,7 @@ namespace Tests {
         /// at all in OldResourceProperties
         /// </summary>
         [Test]
-        public async Task UpsertableTagsTest() {
+        public void UpsertableTagsTest() {
             var oldTags = new List<Tag> {
                 new Tag {
                     Key = "Contact",
@@ -131,7 +131,7 @@ namespace Tests {
         /// in ResourceProperties but not OldResourceProperties
         /// </summary>
         [Test]
-        public async Task AssociatableVPCsTest() {
+        public void AssociatableVPCsTest() {
             var oldVpcs = new List<VPC> {
                 new VPC { VPCId = "1", VPCRegion = UsEast1 }
             };
@@ -178,7 +178,7 @@ namespace Tests {
 
             await HostedZone.Handle(request.ToStream());
 
-            client.Received().CreateHostedZoneAsync(
+            await client.Received().CreateHostedZoneAsync(
                 Arg.Is<CreateHostedZoneRequest>(req => 
                     req.Name == "example.com." &&
                     req.DelegationSetId == "12345" &&
@@ -211,7 +211,7 @@ namespace Tests {
 
             await HostedZone.Handle(request.ToStream()); 
 
-            client.Received().CreateQueryLoggingConfigAsync(
+            await client.Received().CreateQueryLoggingConfigAsync(
                 Arg.Is<CreateQueryLoggingConfigRequest>(req => 
                     req.HostedZoneId == "ABC123" &&
                     req.CloudWatchLogsLogGroupArn == logGroupArn
@@ -245,7 +245,7 @@ namespace Tests {
 
             await HostedZone.Handle(request.ToStream()); 
 
-            client.Received().AssociateVPCWithHostedZoneAsync(
+            await client.Received().AssociateVPCWithHostedZoneAsync(
                 Arg.Is<AssociateVPCWithHostedZoneRequest>(req => 
                     req.VPC.VPCId == "2" && 
                     req.VPC.VPCRegion == UsEast2
@@ -275,7 +275,7 @@ namespace Tests {
 
             await HostedZone.Handle(request.ToStream()); 
 
-            client.Received().ChangeTagsForResourceAsync(
+            await client.Received().ChangeTagsForResourceAsync(
                 Arg.Is<ChangeTagsForResourceRequest>(req => 
                     req.ResourceId == "ABC123" &&
                     req.ResourceType == "hostedzone" &&
@@ -320,7 +320,7 @@ namespace Tests {
 
             await HostedZone.Handle(request.ToStream()); 
 
-            client.Received().ChangeTagsForResourceAsync(
+            await client.Received().ChangeTagsForResourceAsync(
                 Arg.Is<ChangeTagsForResourceRequest>(req => 
                     req.ResourceId == "ABC123" &&
                     req.ResourceType == "hostedzone" &&

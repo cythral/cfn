@@ -40,7 +40,7 @@ Resources:
       Name: !Ref DomainName
       DelegationSetId: !Ref DelegationSetId
       HostedZoneConfig:
-        Comment: Another test comment
+        Comment: The hosted zone for brigh.id
 
   MoragRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
@@ -62,7 +62,7 @@ Resources:
   NiallRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
     Properties:
-      Comment: Morag resource records
+      Comment: Niall resource records
       HostedZoneId: !Ref HostedZone
       RecordSets: 
       - Name: !Sub niall.${DomainName}

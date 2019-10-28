@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project ToolsVersion="14.0" DefaultTargets="Package" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <SourceDirectory>$(MSBuildThisFileDirectory)../src</SourceDirectory>
+        <UtilitiesStackName>cfn-utilities</UtilitiesStackName>
+        <Destination>$(MSBuildThisFileDirectory)..</Destination>
+        <SkipResources>false</SkipResources>
+        <SkipDns>false</SkipDns>
+        <SkipCicd>false</SkipCicd>
+    </PropertyGroup>
+    
+    <Target Name="Package">
+        <MSBuild 
+            Projects="$(SourceDirectory)/BuildTasks/BuildTasks.csproj" 
+            Targets="Publish" 
+            Properties="Configuration=$(Configuration)" />
+
+        <MSBuild 
+            Projects="$(SourceDirectory)/Utilities/Utilities.proj" 
+            Targets="Copy" 
+            Properties="Configuration=$(Configuration);Dest=$(Destination)" />
+
+        <!-- Get the Utility Bucket name -->
+        <Exec Command="aws cloudformation list-exports --query Exports[?Name==\`cfn-utilities:UtilityBucketName\`].Value --output text" ConsoleToMsBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="UtilityBucket" />
+        </Exec>
+
+        <MSBuild 
+            Condition="$(SkipResources) != 'true'" 
+            Projects="$(SourceDirectory)/Resources/Resources.csproj" 
+            Targets="Publish" 
+            Properties="Deploy=false;DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration);PackagedFile=$(Destination)/Resources.template.yml" />
+
+        <MSBuild 
+            Condition="$(SkipDns) != 'true'" 
+            Projects="$(SourceDirectory)/Dns/Dns.proj" 
+            Targets="Copy" 
+            Properties="Configuration=$(Configuration);Dest=$(Destination)" />
+        
+        <MSBuild 
+            Condition="$(SkipCicd) != 'true'" 
+            Projects="$(SourceDirectory)/Cicd/Cicd.csproj" 
+            Targets="Publish" 
+            Properties="Deploy=false;DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration);PackagedFile=$(Destination)/Cicd.template.yml" />
+    </Target>
+</Project>
