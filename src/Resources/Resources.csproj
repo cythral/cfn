@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <CRStackName>cfn-resources</CRStackName>
+    <StackName>cfn-resources</StackName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,5 +19,4 @@
 
   <Import Project="../CustomResource/build/Cythral.CloudFormation.CustomResource.props" />
   <Import Project="../CustomResource/build/Cythral.CloudFormation.CustomResource.targets" />
-  <Import Project="../Utilities/Utilities.targets" />
 </Project>

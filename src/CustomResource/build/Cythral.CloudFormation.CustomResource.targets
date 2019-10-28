@@ -2,28 +2,35 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <ItemGroup>
         <GeneratorAssemblySearchPaths Include="$(MSBuildThisFileDirectory)../lib" />
+        <GeneratorPropertyNames Include="OutDir" />
+        <GeneratorPropertyNames Include="TargetFrameworkVersion" />
     </ItemGroup>
-    
-    <Target Name="PostPublish" AfterTargets="Publish" DependsOnTargets="Publish">
-        <PropertyGroup>
-            <CRTasksDirectory Condition="$(CRTasksPath) == ''">$(MSBuildThisFileDirectory)../tasks/</CRTasksDirectory>
-            <CRTasksAssemblyName>Cythral.CloudFormation.BuildTasks</CRTasksAssemblyName>
-            <CRTasksNamespace>$(CRTasksAssemblyName)</CRTasksNamespace>
-            <CRTasksPath>$(CRTasksDirectory)$(CRTasksAssemblyName).dll</CRTasksPath>
-            <CRTemplateSrcPath>$(IntermediateOutputPath)/$(AssemblyName).template.yml</CRTemplateSrcPath>
-            <CRTemplateDestPath>$(OutputPath)/$(AssemblyName).template.yml</CRTemplateDestPath>
-            <CRS3Bucket Condition="$(CRS3Bucket) == ''">$(AssemblyName.ToLower())</CRS3Bucket>
-            <CRS3ObjectKey Condition="$(CRS3ObjectKey) == ''">deployment.zip</CRS3ObjectKey>
-            <CRProjectZipPath>$(OutputPath)/$(AssemblyName).zip</CRProjectZipPath>
-        </PropertyGroup>
 
-        <Delete Files="$(CRTemplateDestPath);$(CRProjectZipPath)" />
-        <Exec Command="chmod -R 755 $(PublishDir)" />
-        <Exec Command="cd $(PublishDir) &amp;&amp; zip -r ../$(AssemblyName).zip * **/*" />
+    <PropertyGroup>
+        <DeploymentBucket Condition="$(DeploymentBucket) == ''">$(AssemblyName.ToLower())</DeploymentBucket>
+        <Package>true</Package>
+        <Deploy>true</Deploy>
+    </PropertyGroup>
+
+    <Target Name="SetTemplateFile" BeforeTargets="Build">
+        <PropertyGroup>
+            <TemplateFile Condition="$(TemplateFile) == ''">$([System.IO.Path]::GetFullPath('$(OutDir)'))/$(AssemblyName).template.yml</TemplateFile>
+        </PropertyGroup>
+    </Target>
+    
+    <Target Name="Package" AfterTargets="Publish" DependsOnTargets="Publish" Condition="$(Package) == 'true'">
+        <Exec Command="mktemp" ConsoleToMsBuild="true" Condition="$(PackagedFile) == ''">
+            <Output TaskParameter="ConsoleOutput" PropertyName="PackagedFile" />
+        </Exec>
+
+        <Exec Command="aws cloudformation package --template-file $(TemplateFile) --s3-bucket $(DeploymentBucket) --output-template-file $(PackagedFile)" />
         
-        <Copy SourceFiles="$(CRTemplateSrcPath)" DestinationFiles="$(CRTemplateDestPath)" />
-        <Exec Command="echo $(CRS3Bucket)" />
-        <Exec Condition="$(CRStackName) != ''" Command="aws cloudformation package --template-file $(CRTemplateDestPath) --s3-bucket $(CRS3Bucket) --output-template-file $(CRTemplateDestPath).packaged" />
-        <Exec Condition="$(CRStackName) != ''" Command="aws cloudformation deploy --template-file $(CRTemplateDestPath).packaged --stack-name $(CRStackName) --capabilities CAPABILITY_IAM" />
+        <PropertyGroup>
+            <TemplateFile>$(PackagedFile)</TemplateFile>
+        </PropertyGroup>
+    </Target>
+
+    <Target Name="Deploy" Condition="$(Deploy) == 'true'">
+        <Exec Command="aws cloudformation deploy --template-file $(TemplateFile) --stack-name $(StackName) --capabilities CAPABILITY_IAM" />
     </Target>
 </Project>

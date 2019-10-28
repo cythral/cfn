@@ -174,7 +174,7 @@ namespace Cythral.CloudFormation.CustomResource {
 
         public static void OnComplete(CompilationGenerator context) {
             // todo: handle generating cloudformation templates here
-            var outputDirectory = context.IntermediateOutputDirectory;
+            var outputDirectory = context.BuildProperties["OutDir"];
             var filePath = outputDirectory + "/" + context.AssemblyName + ".template.yml";
 
             try {
@@ -200,14 +200,16 @@ namespace Cythral.CloudFormation.CustomResource {
         private void AddResources(TransformationContext context) {
             AddRoleResource(context);
             
+            var version = context.BuildProperties["TargetFrameworkVersion"].Replace("v", "");
+
             Resources.Add(ClassName + "Lambda", new Resource() {
                 Type = "AWS::Lambda::Function",
                 Properties = new {
                     FunctionName = ClassName,
                     Handler = $"{context.Compilation.Assembly.Name}::{context.ProcessingNode.GetFullName()}::Handle",
                     Role = new GetAttTag() { Name = $"{ClassName}Role", Attribute = "Arn" },
-                    Code = $"{context.Compilation.AssemblyName}.zip",
-                    Runtime = "dotnetcore2.1", // todo: add autodetection here / some way to change this
+                    Code = $"publish",
+                    Runtime = $"dotnetcore{version}",
                     Timeout = 300,
                 }
             });

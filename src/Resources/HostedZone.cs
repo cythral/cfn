@@ -157,10 +157,10 @@ namespace Cythral.CloudFormation.Resources {
                     }
                 }),
                 // associate vpcs
-                Task.Run(async delegate {
+                Task.Run(delegate {
                     if(props.VPCs != null && props.VPCs.Count() > 1) {
                         var vpcs = props.VPCs.Skip(1);
-                        await AssociateVPCs(vpcs.ToList(), data.Id);
+                        AssociateVPCs(vpcs.ToList(), data.Id);
                     }
                 }),
             });            
@@ -175,7 +175,7 @@ namespace Cythral.CloudFormation.Resources {
         /// Updates a HostedZone in Route 53
         /// </summary>
         /// <returns>Response to send back to CloudFormation</returns>
-        public async Task<Response> Update() {
+        public Task<Response> Update() {
             var oldProps = Request.OldResourceProperties;
             var newProps = Request.ResourceProperties;
 
@@ -196,15 +196,15 @@ namespace Cythral.CloudFormation.Resources {
                     }
                 }),
                 // update vpcs
-                Task.Run(async delegate {
+                Task.Run(delegate {
                     if(AssociatableVPCs.Count() > 0) {
                         Console.WriteLine("Associating new VPCs");
-                        await AssociateVPCs(AssociatableVPCs.ToList(), Request.PhysicalResourceId);
+                        AssociateVPCs(AssociatableVPCs.ToList(), Request.PhysicalResourceId);
                     }
 
                     if(DisassociatableVPCs.Count() > 0) {
                         Console.WriteLine("Disassociating old VPCs");
-                        await DisassociateVPCs(DisassociatableVPCs.ToList(), Request.PhysicalResourceId);
+                        DisassociateVPCs(DisassociatableVPCs.ToList(), Request.PhysicalResourceId);
                     }
                 }),
                 // update comment
@@ -214,7 +214,7 @@ namespace Cythral.CloudFormation.Resources {
                         Console.WriteLine($"Updating the HostedZone Comment");
                         var comment = (newProps?.HostedZoneConfig?.Comment) ?? "";
                         var id = Request.PhysicalResourceId;
-                        var updateCommentResponse = ClientFactory().UpdateHostedZoneCommentAsync(
+                        var updateCommentResponse = await ClientFactory().UpdateHostedZoneCommentAsync(
                             new UpdateHostedZoneCommentRequest {
                                 Comment = comment,
                                 Id = id,
@@ -242,10 +242,10 @@ namespace Cythral.CloudFormation.Resources {
                 })
             });
             
-            return new Response {
+            return Task.FromResult(new Response {
                 PhysicalResourceId = Request.PhysicalResourceId,
                 Data = new Data()
-            };
+            });
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace Cythral.CloudFormation.Resources {
             };
         }
 
-        private async Task AssociateVPCs(List<VPC> vpcs, string hostedZoneId) {
+        private void AssociateVPCs(List<VPC> vpcs, string hostedZoneId) {
             var vpcTasks = new List<Task>();
                         
             foreach(var vpc in vpcs) {
@@ -283,7 +283,7 @@ namespace Cythral.CloudFormation.Resources {
             Task.WaitAll(vpcTasks.ToArray());
         }
 
-        private async Task DisassociateVPCs(List<VPC> vpcs, string hostedZoneId) {
+        private void DisassociateVPCs(List<VPC> vpcs, string hostedZoneId) {
             var vpcTasks = new List<Task>();
 
             foreach(var vpc in vpcs) {

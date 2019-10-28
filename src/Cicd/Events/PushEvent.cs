@@ -29,5 +29,8 @@ namespace Cythral.CloudFormation.Cicd.Events {
 
         [JsonPropertyName("sender")]
         public User Sender { get; set; }
+
+        [JsonPropertyName("repository")]
+        public Repository Repository { get; set; }
     }
 }

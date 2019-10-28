@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
@@ -150,13 +151,8 @@ namespace Tests {
                 }
             };
 
-            var resource = await MessageCustomResource.Handle(request.ToStream());
-            Console.WriteLine(resource.Request.ResourceProperties.Message);
+            await MessageCustomResource.Handle(request.ToStream());
             MessageCustomResource.MockHttp.VerifyNoOutstandingExpectation();
-            
-            Assert.True(resource.DeleteWasCalled);
-            Assert.True(resource.CreateWasCalled);
-            Assert.False(resource.UpdateWasCalled);
         }
     }
 }

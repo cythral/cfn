@@ -1,0 +1,320 @@
+Description: Misc tools for storage and simple networking
+Parameters:
+  MasterAccountId:
+    Type: String
+    Default: ""
+
+Conditions:
+  # Master/Shared account - one that has control of "agent" accounts like (dev/staging/prod)
+  IsMasterAccount: 
+    !Equals
+      - !Ref MasterAccountId
+      - ""
+
+  # Agent account (dev/staging/prod)
+  IsAgentAccount: 
+    !Not 
+      - !Equals 
+        - !Ref MasterAccountId
+        - ""
+
+Resources:
+  # Storage
+  # -------------------------------------------
+  # Store whatever you want in here, but it'll mostly be used for deployment templates and artifacts
+
+  UtilityBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: BucketOwnerFullControl
+
+  # Networking
+  # -------------------------------------------
+  # Use this VPC for quick development and/or tools that do not require high availability.
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.1.0.0/16
+  
+  Ipv6CidrBlock:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      AmazonProvidedIpv6CidrBlock: true
+      VpcId: !Ref VPC
+  
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  Ipv4PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  Ipv6PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationIpv6CidrBlock: ::/0
+      GatewayId: !Ref InternetGateway
+  
+  Subnet1:
+    Type: AWS::EC2::Subnet
+    DependsOn: Ipv6CidrBlock
+    Properties:
+      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
+      Ipv6CidrBlock: !Select [0, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
+      AvailabilityZone: !Select [0, !GetAZs us-east-1]
+      VpcId: !Ref VPC
+      MapPublicIpOnLaunch: true
+  
+  Subnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref Subnet1
+
+  Subnet2:
+    Type: AWS::EC2::Subnet
+    DependsOn: Ipv6CidrBlock
+    Properties:
+      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
+      Ipv6CidrBlock: !Select [1, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
+      AvailabilityZone: !Select [1, !GetAZs us-east-1]
+      VpcId: !Ref VPC
+      MapPublicIpOnLaunch: true
+
+  Subnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref Subnet2
+  
+  Subnet3:
+    Type: AWS::EC2::Subnet
+    DependsOn: Ipv6CidrBlock
+    Properties:
+      CidrBlock: !Select [2, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
+      Ipv6CidrBlock: !Select [2, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
+      AvailabilityZone: !Select [2, !GetAZs us-east-1]
+      VpcId: !Ref VPC
+      MapPublicIpOnLaunch: true
+
+  Subnet3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref Subnet3
+
+  Subnet4:
+    Type: AWS::EC2::Subnet
+    DependsOn: Ipv6CidrBlock
+    Properties:
+      CidrBlock: !Select [3, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
+      Ipv6CidrBlock: !Select [3, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
+      AvailabilityZone: !Select [3, !GetAZs us-east-1]
+      VpcId: !Ref VPC
+      MapPublicIpOnLaunch: true
+  
+  Subnet4RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref Subnet4
+
+  # Security - Roles
+  # -------------------------------------------
+
+  MasterRole:
+    Type: AWS::IAM::Role
+    Condition: IsMasterAccount
+    Properties:
+      RoleName: Master
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: 
+                - cloudformation.amazonaws.com
+                - codepipeline.amazonaws.com
+    
+  AgentRole:
+    Type: AWS::IAM::Role
+    Condition: IsAgentAccount
+    Properties:
+      RoleName: Agent
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal: 
+              AWS: !Sub arn:aws:iam::${MasterAccountId}:role/Master
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: 
+                - cloudformation.amazonaws.com
+                - codepipeline.amazonaws.com
+
+  SpectatorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Spectator
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal: 
+              AWS: !GetAtt MasterRole.Arn
+
+  # Security - Encryption
+  # -------------------------------------------
+
+  SecretsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: kms:*
+            Resource: "*"
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+          - Effect: Allow
+            Action: kms:Encrypt
+            Resource: "*"
+            Principal:
+              AWS: !If
+                - IsMasterAccount
+                - !GetAtt SpectatorRole.Arn
+                - - !GetAtt SpectatorRole.Arn
+                  - !Sub arn:aws:iam::${MasterAccountId}:role/Spectator
+                  
+  SecretsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      TargetKeyId: !GetAtt SecretsKey.Arn
+      AliasName: alias/SecretsKey
+  
+  SecretsKeyEncryptPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: SecretsKeyEncryptAccess
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 
+              - kms:Encrypt
+              - kms:ReEncrypt
+            Resource: !GetAtt SecretsKey.Arn
+  
+  SecretsKeyDecryptPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: SecretsKeyDecryptAccess
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource: !GetAtt SecretsKey.Arn
+
+Outputs:
+  UtilityBucketName:
+    Description: Name of the utility bucket
+    Value: !Ref UtilityBucket
+    Export:
+      Name: !Sub ${AWS::StackName}:UtilityBucketName
+
+  VpcId:
+    Description: ID of the VPC
+    Value: !Ref VPC
+    Export:
+      Name: !Sub ${AWS::StackName}:VpcId
+  
+  SubnetIds:
+    Description: Comma-delimited list of Subnet Ids
+    Value: !Join
+      - ","
+      - - !Ref Subnet1
+        - !Ref Subnet2
+        - !Ref Subnet3
+        - !Ref Subnet4
+    Export:
+      Name: !Sub ${AWS::StackName}:SubnetIds
+
+  MasterAccountId:
+    Description: ID of the master account
+    Condition: IsAgentAccount
+    Value: !Ref MasterAccountId
+    Export:
+      Name: !Sub ${AWS::StackName}:MasterAccountId
+
+  MasterRoleArn:
+    Description: ARN of the master role
+    Condition: IsMasterAccount
+    Value: !GetAtt MasterRole.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}:MasterRoleArn
+
+  AgentRoleArn:
+    Description: ARN of the agent role
+    Condition: IsAgentAccount
+    Value: !GetAtt AgentRole.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}:AgentRoleArn
+
+  SpectatorRoleArn:
+    Description: ARN of the spectator role
+    Value: !GetAtt SpectatorRole.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}:SpectatorRoleArn
+
+  SecretsKeyArn:
+    Description: ARN of the secrets key alias
+    Value: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:${SecretsKeyAlias}
+    Export:
+      Name: !Sub ${AWS::StackName}:SecretsKeyArn
+  
+  SecretsKeyEncryptPolicyArn:
+    Description: ARN of the key policy used for allowing secrets to be encrypted
+    Value: !Ref SecretsKeyEncryptPolicy
+    Export:
+      Name: !Sub ${AWS::StackName}:SecretsKeyEncryptPolicyArn
+
+  SecretsKeyDecryptPolicyArn:
+    Description: ARN of the key policy used for allowing secrets to be decrypted
+    Value: !Ref SecretsKeyDecryptPolicy
+    Export:
+      Name: !Sub ${AWS::StackName}:SecretsKeyDecryptPolicyArn
+
+  

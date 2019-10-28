@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project ToolsVersion="14.0" DefaultTargets="Deploy" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <SourceDirectory>$(MSBuildThisFileDirectory)../src</SourceDirectory>
+        <UtilitiesStackName>cfn-utilities</UtilitiesStackName>
+        <SkipResources>false</SkipResources>
+        <SkipDns>false</SkipDns>
+        <SkipCicd>false</SkipCicd>
+    </PropertyGroup>
+    
+    <Target Name="Deploy">
+        <MSBuild 
+            Projects="$(SourceDirectory)/BuildTasks/BuildTasks.csproj" 
+            Targets="Publish" 
+            Properties="Configuration=$(Configuration)" />
+
+        <MSBuild 
+            Projects="$(SourceDirectory)/Utilities/Utilities.proj" 
+            Targets="Build" 
+            Properties="StackName=$(UtilitiesStackName);Configuration=$(Configuration)" />
+
+        <!-- Get the Utility Bucket name -->
+        <Exec Command="aws cloudformation list-exports --query Exports[?Name==\`cfn-utilities:UtilityBucketName\`].Value --output text" ConsoleToMsBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="UtilityBucket" />
+        </Exec>
+
+        <MSBuild 
+            Condition="$(SkipResources) != 'true'" 
+            Projects="$(SourceDirectory)/Resources/Resources.csproj" 
+            Targets="Publish" 
+            Properties="DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration)" />
+
+        <MSBuild 
+            Condition="$(SkipDns) != 'true'" 
+            Projects="$(SourceDirectory)/Dns/Dns.proj" 
+            Targets="Publish" 
+            Properties="Configuration=$(Configuration)" />
+
+        <MSBuild 
+            Condition="$(SkipCicd) != 'true'" 
+            Projects="$(SourceDirectory)/Cicd/Cicd.csproj" 
+            Targets="Publish" 
+            Properties="DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration)" />
+    </Target>
+</Project>

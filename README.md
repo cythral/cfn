@@ -22,3 +22,4 @@ Features to be added in the future:
 
 - [ ] Custom resource that decrypts values with KMS
 - [ ] Password generator custom resource
+- [ ] Move networking out of the utilities stack and 

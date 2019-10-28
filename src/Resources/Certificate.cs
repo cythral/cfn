@@ -197,7 +197,7 @@ namespace Cythral.CloudFormation.Resources {
         }
 
 
-        public async Task<Response> Update() {
+        public Task<Response> Update() {
             var oldProps = Request.OldResourceProperties;
             var newProps = Request.ResourceProperties;
 
@@ -236,9 +236,9 @@ namespace Cythral.CloudFormation.Resources {
                 })
             });
 
-            return new Response {
+            return Task.FromResult(new Response {
                 PhysicalResourceId = Request.PhysicalResourceId
-            };
+            });
         }
 
         public async Task<Response> Delete() {

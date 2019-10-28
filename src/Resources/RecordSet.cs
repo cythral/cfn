@@ -78,12 +78,12 @@ namespace Cythral.CloudFormation.Resources {
             };
         }
 
-        public async Task<Response> Update() {
+        public Task<Response> Update() {
             throw new NotImplementedException("Updates are not yet supported.");
         }
 
-        public async Task<Response> Delete() {
-            return new Response();
+        public Task<Response> Delete() {
+            return Task.FromResult(new Response());
         }
     }
 }
