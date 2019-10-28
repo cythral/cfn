@@ -14,6 +14,14 @@ Parameters:
     NoEcho: true
     Description: Encrypted signing secret Github uses to sign requests with.
 
+  TemplateFilename:
+    Type: String
+    Description: Filename of cicd templates to look for in repositories
+  
+  StackSuffix:
+    Type: String
+    Description: Suffix to append to the repository name when creating cicd stacks
+
 Resources:
   SSLCertificate:
     Type: Custom::Certificate
@@ -110,6 +118,8 @@ Resources:
           GITHUB_OWNER: !Ref GithubOwner
           GITHUB_TOKEN: !Ref GithubToken
           GITHUB_SIGNING_SECRET: !Ref GithubSigningSecret
+          TEMPLATE_FILENAME: !Ref TemplateFilename
+          STACK_SUFFIX: !Ref StackSuffix
 
   GithubWebhookPermission:
     Type: AWS::Lambda::Permission
