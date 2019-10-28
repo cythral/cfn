@@ -109,6 +109,7 @@ Resources:
       CodeUri: bin/netcoreapp2.1/publish/
       Policies:
         - AWSLambdaExecute
+        - !Ref GithubWebhookPolicy
         - !ImportValue cfn-utilities:SecretsKeyDecryptPolicyArn
       Layers:
         - !Ref GithubWebhookDependencyLayer
@@ -120,6 +121,18 @@ Resources:
           GITHUB_SIGNING_SECRET: !Ref GithubSigningSecret
           TEMPLATE_FILENAME: !Ref TemplateFilename
           STACK_SUFFIX: !Ref StackSuffix
+
+  GithubWebhookPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 
+              - cloudformation:DescribeStacks
+              - cloudformation:CreateStack
+              - cloudformation:UpdateStack
 
   GithubWebhookPermission:
     Type: AWS::Lambda::Permission
