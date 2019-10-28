@@ -10,6 +10,7 @@ using Amazon.Lambda.Serialization.Json;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Cythral.CloudFormation.Cicd.Events;
 using Cythral.CloudFormation.Cicd.Exceptions;
+using Cythral.CloudFormation.Cicd.Entities;
 
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
@@ -38,6 +39,8 @@ namespace Cythral.CloudFormation.Cicd {
                 ("GITHUB_OWNER",            false),
                 ("GITHUB_TOKEN",            true),
                 ("GITHUB_SIGNING_SECRET",   true),
+                ("TEMPLATE_FILENAME",       false),
+                ("STACK_SUFFIX",            false),
             });
 
             try {
@@ -47,8 +50,16 @@ namespace Cythral.CloudFormation.Cicd {
                 return CreateResponse(statusCode: e.StatusCode);
             }
 
-            
+            var stackName = $"{payload.Repository.Name}-{Config["STACK_SUFFIX"]}";
+            var contentsUrl = payload.Repository.ContentsUrl;
+            var templateContent = await CommittedFile.FromContentsUrl(contentsUrl, Config["TEMPLATE_FILENAME"], Config);
 
+            if(templateContent == null) {
+                Console.WriteLine($"Couldn't find template for {payload.Repository.Name}");
+                return CreateResponse(statusCode: NotFound);
+            }
+
+            await StackDeployer.Deploy(stackName, templateContent);
             return CreateResponse(statusCode: OK);
         }
 
