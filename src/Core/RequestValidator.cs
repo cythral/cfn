@@ -4,13 +4,13 @@ using System;
 using System.Text.RegularExpressions;
 using System.Net.Http;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
-using Cythral.CloudFormation.Cicd.Events;
-using Cythral.CloudFormation.Cicd.Exceptions;
+using Cythral.CloudFormation.Events;
+using Cythral.CloudFormation.Exceptions;
 
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation.Cicd {
+namespace Cythral.CloudFormation {
     public class RequestValidator {
         public static PushEvent Validate(
             ApplicationLoadBalancerRequest request, 

@@ -7,7 +7,7 @@ using Amazon;
 using Amazon.KeyManagementService;
 using Amazon.KeyManagementService.Model;
 
-namespace Cythral.CloudFormation.Cicd {
+namespace Cythral.CloudFormation {
     public class Config : Dictionary<string,string> {
         public static async Task<Config> Create(IEnumerable<(string,bool)> keys, IEnumerable<string> encryptedKeys = null, IAmazonKeyManagementService kmsClient = null) {
             kmsClient = kmsClient ?? new AmazonKeyManagementServiceClient();

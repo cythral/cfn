@@ -4,9 +4,9 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <BuildTasksLocation>../BuildTasks/bin/$(Configuration)/netcoreapp2.2/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <StackName>cfn-cicd</StackName>
-    <TemplateFileName>Cicd.template.yml</TemplateFileName>
-    <ConfigFileName>Cicd.config.json</ConfigFileName>
+    <StackName>cfn-core</StackName>
+    <TemplateFileName>Core.template.yml</TemplateFileName>
+    <ConfigFileName>Core.config.json</ConfigFileName>
     <TemplateFile>$(MSBuildThisFileDirectory)$(TemplateFileName)</TemplateFile>
     <ConfigFile>$(MSBuildThisFileDirectory)$(ConfigFileName)</ConfigFile>
     <LayerDir>/tmp/github-webhook-dep-layer</LayerDir>
@@ -31,7 +31,7 @@
   <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.Deploy" AssemblyFile="$(BuildTasksLocation)" />
 
   <!-- Sets up the configuraiton file -->
-  <Target Name="Configure" Condition="!Exists('Cicd.config.json')">
+  <Target Name="Configure" Condition="!Exists('$(ConfigFileName)')">
     <Exec Command="aws kms encrypt --key-id alias/SecretsKey --plaintext $(GithubToken) --query CiphertextBlob --output text" ConsoleToMsBuild="true">
         <Output TaskParameter="ConsoleOutput" PropertyName="EncryptedGithubToken" />
     </Exec>
@@ -54,7 +54,7 @@
         </ConfigLines>
     </PropertyGroup>
     
-    <WriteLinesToFile File="Cicd.config.json" Lines="$(ConfigLines)" Overwrite="true" />
+    <WriteLinesToFile File="$(ConfigFileName)" Lines="$(ConfigLines)" Overwrite="true" />
   </Target>
   
   <!-- Updates the CodeUri properties in the cloudformation template -->
@@ -87,5 +87,5 @@
   <!-- Deploy to CloudFormation -->
   <Target Name="Deploy" AfterTargets="Package" Condition="$(Deploy) == 'true'" DependsOnTargets="Configure">
     <Deploy TemplateFile="$(TemplateFile)" StackName="$(StackName)" ConfigFile="$(ConfigFile)" Capabilities="CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND" />
-    </Target>
+  </Target>
 </Project>

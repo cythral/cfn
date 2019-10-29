@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 
-namespace Cythral.CloudFormation.Cicd.Exceptions {
+namespace Cythral.CloudFormation.Exceptions {
     public abstract class RequestValidationException : Exception {
         public abstract HttpStatusCode StatusCode { get; }
 

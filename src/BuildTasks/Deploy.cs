@@ -42,7 +42,12 @@ namespace Cythral.CloudFormation.BuildTasks {
                     var template = await GetTemplateFileContents();
                     var config = await GetConfigFileContents();
                     var describeStacksRequest = new DescribeStacksRequest { StackName = StackName };
-                    var stackExists = (await Client.DescribeStacksAsync()).Stacks.Count() != 0;
+                    var stackExists = false;
+                    
+                    try {
+                        stackExists = (await Client.DescribeStacksAsync(describeStacksRequest)).Stacks.Count() != 0;
+                    } catch(Exception) {}
+                    
                     string status;
 
                     try {

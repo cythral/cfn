@@ -5,7 +5,7 @@
         <UtilitiesStackName>cfn-utilities</UtilitiesStackName>
         <SkipResources>false</SkipResources>
         <SkipDns>false</SkipDns>
-        <SkipCicd>false</SkipCicd>
+        <SkipCore>false</SkipCore>
     </PropertyGroup>
     
     <Target Name="Deploy">
@@ -37,8 +37,8 @@
             Properties="Configuration=$(Configuration)" />
 
         <MSBuild 
-            Condition="$(SkipCicd) != 'true'" 
-            Projects="$(SourceDirectory)/Cicd/Cicd.csproj" 
+            Condition="$(SkipCore) != 'true'" 
+            Projects="$(SourceDirectory)/Core/Core.csproj" 
             Targets="Publish" 
             Properties="DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration)" />
     </Target>

@@ -6,7 +6,7 @@
         <Destination>$(MSBuildThisFileDirectory)..</Destination>
         <SkipResources>false</SkipResources>
         <SkipDns>false</SkipDns>
-        <SkipCicd>false</SkipCicd>
+        <SkipCore>false</SkipCore>
     </PropertyGroup>
     
     <Target Name="Package">
@@ -38,9 +38,9 @@
             Properties="Configuration=$(Configuration);Dest=$(Destination)" />
         
         <MSBuild 
-            Condition="$(SkipCicd) != 'true'" 
-            Projects="$(SourceDirectory)/Cicd/Cicd.csproj" 
+            Condition="$(SkipCore) != 'true'" 
+            Projects="$(SourceDirectory)/Core/Core.csproj" 
             Targets="Publish" 
-            Properties="Deploy=false;DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration);PackagedFile=$(Destination)/Cicd.template.yml" />
+            Properties="Deploy=false;DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration);PackagedFile=$(Destination)/Core.template.yml" />
     </Target>
 </Project>

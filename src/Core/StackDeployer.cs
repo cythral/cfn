@@ -9,7 +9,7 @@ using Amazon.CloudFormation.Model;
 using static Amazon.CloudFormation.OnFailure;
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation.Cicd {
+namespace Cythral.CloudFormation {
     public class StackDeployer {
 
         // maybe this could be an extension method for the cloudformation client instead?
@@ -22,11 +22,17 @@ namespace Cythral.CloudFormation.Cicd {
             capabilities = capabilities ?? new List<string> { "CAPABILITY_IAM", "CAPABILITY_NAMED_IAM" };
             cloudformationClient = cloudformationClient ?? new AmazonCloudFormationClient();
 
-            var describeStacksRequest = new DescribeStacksRequest { StackName = stackName };
-            var describeStacksResponse = await cloudformationClient.DescribeStacksAsync(describeStacksRequest);
-            Console.WriteLine($"Got describe stacks response: {Serialize(describeStacksResponse)}");
+            bool stackExists = false;
 
-            if(describeStacksResponse.Stacks.Count() == 0) {
+            try {
+                var describeStacksRequest = new DescribeStacksRequest { StackName = stackName };
+                var describeStacksResponse = await cloudformationClient.DescribeStacksAsync(describeStacksRequest);
+                Console.WriteLine($"Got describe stacks response: {Serialize(describeStacksResponse)}");
+
+                stackExists = describeStacksResponse.Stacks.Count() != 0;
+            } catch(Exception) {} // describestacksasync unusually has been throwing an exception
+
+            if(!stackExists) {
                 var createStackRequest = new CreateStackRequest {
                     StackName =  stackName,
                     TemplateBody = template,

@@ -113,7 +113,6 @@ namespace Cythral.CloudFormation.Resources {
             DescribeCertificateResponse describeCertificateResponse;
             var describeCertificateRequest = new DescribeCertificateRequest { CertificateArn = Request.PhysicalResourceId };
             var tasks = new List<Task>();
-            var changes = new List<Change>();
 
             // For some reason, the domain validation options aren't immediately populated.
             while(
@@ -137,7 +136,10 @@ namespace Cythral.CloudFormation.Resources {
                 }));
             }
 
+            
+
             // add DNS validation records if applicable
+            var changes = new List<Change>();
             if(props.ValidationMethod == ValidationMethod.DNS) { 
                 foreach(var option in describeCertificateResponse.Certificate.DomainValidationOptions) {
                     changes.Add(new Change {
