@@ -6,7 +6,7 @@ phases:
   build:
     commands:
       - dotnet test -c Release
-      - dotnet msbuild tools/package.proj -c Release
+      - dotnet msbuild tools/package.proj -p:Configuration=Release
 artifacts:
   discard-paths: yes
   files:
