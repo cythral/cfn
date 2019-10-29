@@ -25,15 +25,17 @@ Resources:
     Properties:
       Bucket: !Ref ArtifactStore
       PolicyDocument:
-        Effect: Allow
-        Action: s3:*Object
-        Resource:
-          - !Sub arn:aws:s3:::${ArtifactStore}
-          - !Sub arn:aws:s3:::${ArtifactStore}/*
-        Principal:
-          AWS: 
-            - !ImportValue cfn-utilities:BuilderRoleArn
-            - !ImportValue cfn-utilities:MasterRoleArn
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: s3:*Object
+            Resource:
+              - !Sub arn:aws:s3:::${ArtifactStore}
+              - !Sub arn:aws:s3:::${ArtifactStore}/*
+            Principal:
+              AWS: 
+                - !ImportValue cfn-utilities:BuilderRoleArn
+                - !ImportValue cfn-utilities:MasterRoleArn
 
   ArtifactKey:
     Type: AWS::KMS::Key
