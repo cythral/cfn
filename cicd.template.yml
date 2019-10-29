@@ -33,7 +33,7 @@ Resources:
               - !Sub arn:aws:s3:::${ArtifactStore}
               - !Sub arn:aws:s3:::${ArtifactStore}/*
             Principal:
-              Service: !ImportValue cfn-utilities:BuilderRoleArn
+              AWS: !ImportValue cfn-utilities:BuilderRoleArn
 
   BuildProject:
     Type: AWS::CodeBuild::Project
