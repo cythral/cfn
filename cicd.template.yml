@@ -12,6 +12,7 @@ Resources:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Sub ${AWS::StackName}-build
+      ServiceRole: !ImportValue cfn-utilities:MasterRoleArn
       Environment:
         Image: aws/codebuild/standard:2.0
         ComputeType: BUILD_GENERAL1_SMALL
