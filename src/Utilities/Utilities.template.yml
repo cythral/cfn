@@ -194,11 +194,13 @@ Resources:
 
   BuilderRole:
     Type: AWS::IAM::Role
+    Condition: IsMasterAccount
     Properties:
       RoleName: Builder
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -262,6 +264,34 @@ Resources:
             Action:
               - kms:Decrypt
             Resource: !GetAtt SecretsKey.Arn
+
+  ArtifactKey:
+    Type: AWS::KMS::Key
+    Condition: IsMasterAccount
+    Properties:
+      Description: Key used for encrypting/decrypting build artifacts
+      KeyPolicy:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: kms:*
+            Resource: "*"
+            Principal:
+              AWS: !Ref AWS::AccountId
+          - Effect: Allow
+            Action: 
+              - kms:Encrypt
+              - kms:Decrypt
+            Resource: "*"
+            Principal:
+              AWS: !GetAtt BuilderRole.Arn
+
+  ArtifactKeyAlias:
+    Type: AWS::KMS::Alias
+    Condition: IsMasterAccount
+    Properties:
+      TargetKeyId: !GetAtt ArtifactKey.Arn
+      AliasName: alias/ArtifactKey
 
 Outputs:
   UtilityBucketName:
@@ -337,5 +367,12 @@ Outputs:
     Value: !Ref SecretsKeyDecryptPolicy
     Export:
       Name: !Sub ${AWS::StackName}:SecretsKeyDecryptPolicyArn
+
+  ArtifactKeyArn:
+    Description: ARN of the artifact key alias
+    Condition: IsMasterAccount
+    Value: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:${ArtifactKeyAlias}
+    Export:
+      Name: !Sub ${AWS::StackName}:ArtifactKeyArn
 
   
