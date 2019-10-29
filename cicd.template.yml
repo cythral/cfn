@@ -37,32 +37,14 @@ Resources:
   #               - !ImportValue cfn-utilities:BuilderRoleArn
   #               - !ImportValue cfn-utilities:MasterRoleArn
 
-  ArtifactKey:
-    Type: AWS::KMS::Key
-    Properties:
-      Description: Key used for encrypting/decrypting cfn build artifacts
-      KeyPolicy:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action: kms:*
-            Resource: "*"
-            Principal:
-              AWS: !Ref AWS::AccountId
-          - Effect: Allow
-            Action: 
-              - kms:Encrypt
-              - kms:Decrypt
-            Resource: "*"
-            Principal:
-              AWS: !ImportValue cfn-utilities:BuilderRoleArn
+  
 
   BuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Sub ${AWS::StackName}-build
       ServiceRole: !ImportValue cfn-utilities:BuilderRoleArn
-      EncryptionKey: !GetAtt ArtifactKey.Arn
+      EncryptionKey: !ImportValue cfn-utilities:ArtifactKeyArn
       Environment:
         Image: aws/codebuild/standard:2.0
         ComputeType: BUILD_GENERAL1_SMALL
@@ -83,7 +65,7 @@ Resources:
         Type: S3
         Location: !Ref ArtifactStore
         EncryptionKey: 
-          Id: !GetAtt ArtifactKey.Arn
+          Id: !ImportValue cfn-utilities:ArtifactKeyArn
           Type: KMS
       RoleArn: !ImportValue cfn-utilities:MasterRoleArn
       RestartExecutionOnUpdate: true
