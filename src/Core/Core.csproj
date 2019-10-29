@@ -5,7 +5,7 @@
     <AssemblyName>bootstrap</AssemblyName>
     <RuntimeIdentifier>rhel.7.2-x64</RuntimeIdentifier>
     <PublishReadyToRun>true</PublishReadyToRun>
-    <PublishTrimmed>true</PublishTrimmed>
+    <!-- <PublishTrimmed>true</PublishTrimmed> -->
     <PublishSingleFile>true</PublishSingleFile>
     <OutputType>Exe</OutputType>
     <BuildTasksLocation>../BuildTasks/bin/$(Configuration)/netcoreapp3.0/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
