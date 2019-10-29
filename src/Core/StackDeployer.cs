@@ -16,6 +16,7 @@ namespace Cythral.CloudFormation {
         public static async Task Deploy(
             string stackName, 
             string template,
+            IEnumerable<Parameter> parameters = null,
             IEnumerable<string> capabilities = null, 
             IAmazonCloudFormation cloudformationClient = null
         ) {
@@ -36,6 +37,7 @@ namespace Cythral.CloudFormation {
                 var createStackRequest = new CreateStackRequest {
                     StackName =  stackName,
                     TemplateBody = template,
+                    Parameters = (List<Parameter>) parameters,
                     Capabilities = (List<string>) capabilities,
                     OnFailure = DELETE
                 };
@@ -46,6 +48,7 @@ namespace Cythral.CloudFormation {
                 var updateStackRequest = new UpdateStackRequest {
                     StackName = stackName,
                     TemplateBody = template,
+                    Parameters = (List<Parameter>) parameters,
                     Capabilities = (List<string>) capabilities
                 };
 

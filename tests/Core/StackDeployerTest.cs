@@ -29,6 +29,9 @@ namespace Cythral.CloudFormation.Tests {
             var stackName = "test-stack";
             var exampleTemplate = "this is a bad example template.";
             var cloudformationClient = Substitute.For<IAmazonCloudFormation>();
+            var parameters = new List<Parameter> {
+                new Parameter { ParameterKey = "GithubToken", ParameterValue = "this is definitely the token" }
+            };
             
             cloudformationClient
             .DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
@@ -42,12 +45,13 @@ namespace Cythral.CloudFormation.Tests {
             .CreateStackAsync(Arg.Any<CreateStackRequest>())
             .Returns(new CreateStackResponse {});
 
-            await StackDeployer.Deploy(stackName, exampleTemplate, cloudformationClient: cloudformationClient);
+            await StackDeployer.Deploy(stackName, exampleTemplate, parameters, cloudformationClient: cloudformationClient);
             await cloudformationClient
             .Received()
             .CreateStackAsync(Arg.Is<CreateStackRequest>(req =>
                 req.StackName == stackName &&
                 req.TemplateBody == exampleTemplate &&
+                req.Parameters.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == "this is definitely the token") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_IAM") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_NAMED_IAM") &&
                 req.OnFailure == DELETE
@@ -59,6 +63,9 @@ namespace Cythral.CloudFormation.Tests {
             var stackName = "test-stack";
             var exampleTemplate = "this is a bad example template.";
             var cloudformationClient = Substitute.For<IAmazonCloudFormation>();
+            var parameters = new List<Parameter> {
+                new Parameter { ParameterKey = "GithubToken", ParameterValue = "this is definitely the token" }
+            };
             
             cloudformationClient
             .DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
@@ -76,12 +83,13 @@ namespace Cythral.CloudFormation.Tests {
             .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
             .Returns(new UpdateStackResponse {});
 
-            await StackDeployer.Deploy(stackName, exampleTemplate, cloudformationClient: cloudformationClient);
+            await StackDeployer.Deploy(stackName, exampleTemplate, parameters, cloudformationClient: cloudformationClient);
             await cloudformationClient
             .Received()
             .UpdateStackAsync(Arg.Is<UpdateStackRequest>(req =>
                 req.StackName == stackName &&
                 req.TemplateBody == exampleTemplate &&
+                req.Parameters.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == "this is definitely the token") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_IAM") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_NAMED_IAM")
             ));

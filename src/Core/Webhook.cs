@@ -8,6 +8,8 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization;
 using Amazon.Lambda.Serialization.Json;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
+using Amazon.CloudFormation;
+using Amazon.CloudFormation.Model;
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Exceptions;
 using Cythral.CloudFormation.Entities;
@@ -58,8 +60,15 @@ namespace Cythral.CloudFormation {
                 Console.WriteLine($"Couldn't find template for {payload.Repository.Name}");
                 return CreateResponse(statusCode: NotFound);
             }
+            
+            var parameters = new List<Parameter> {
+                new Parameter { ParameterKey = "GithubToken", ParameterValue = Config["GITHUB_TOKEN"] },
+                new Parameter { ParameterKey = "GithubOwner", ParameterValue = payload.Repository.Owner.Name },
+                new Parameter { ParameterKey = "GithubRepo", ParameterValue = payload.Repository.Name },
+                new Parameter { ParameterKey = "GithubBranch", ParameterValue = payload.Repository.DefaultBranch }
+            };
 
-            await StackDeployer.Deploy(stackName, templateContent);
+            await StackDeployer.Deploy(stackName, templateContent, parameters);
             return CreateResponse(statusCode: OK);
         }
 
