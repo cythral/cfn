@@ -93,13 +93,6 @@ Resources:
         HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
         DNSName: !GetAtt LoadBalancer.DNSName
 
-  GithubWebhookDependencyLayer:
-    Type: AWS::Lambda::LayerVersion
-    Properties:
-      CompatibleRuntimes:
-        - dotnetcore2.1
-      Content: /tmp/github-webhook-dep-layer/x64/netcoreapp2.1
-
   GithubWebhook:
     Type: AWS::Serverless::Function
     Properties:
