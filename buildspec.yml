@@ -8,9 +8,11 @@ phases:
       - dotnet test -c Release
       - dotnet msbuild tools/package.proj -c Release
 artifacts:
-  - "Core.template.yml"
-  - "Core.config.json"
-  - "Utilities.template.yml"
-  - "Resources.template.yml"
-  - "Dns.template.yml"
-  - "Dns.config.json"
+  discard-paths: yes
+  files:
+    - "Core.template.yml"
+    - "Core.config.json"
+    - "Utilities.template.yml"
+    - "Resources.template.yml"
+    - "Dns.template.yml"
+    - "Dns.config.json"
