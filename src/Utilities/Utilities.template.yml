@@ -283,6 +283,7 @@ Resources:
             Action: 
               - kms:Encrypt
               - kms:Decrypt
+              - kms:GenerateDataKey
             Resource: "*"
             Principal:
               AWS: !GetAtt BuilderRole.Arn
