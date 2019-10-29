@@ -4,10 +4,11 @@ phases:
     runtime-versions:
       dotnet: 2.2
     commands:
-      - yum install -y libunwind
+      - yum install -yd libunwind
       - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet --version 3.0.0 --install-dir /usr/share/dotnet
   build:
     commands:
+      - dotnet --info
       - dotnet test -c Release
       - dotnet msbuild tools/package.proj -p:Configuration=Release -p:Optimize=true
 artifacts:
