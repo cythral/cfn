@@ -4,15 +4,41 @@ Parameters:
     NoEcho: true
     Description: OAuth token for the Github organization.  Needs read/write access to repos and repo hooks
 
+  GithubOwner:
+    Type: String
+    Description: Owner of the github repository to track
+
+  GithubRepo:
+    Type: String
+    Description: Name of the github repository to track
+
+  GithubBranch:
+    Type: String
+    Description: Name of the github branch to track
+
 Resources:
   ArtifactStore:
     Type: AWS::S3::Bucket
+
+  ArtifactKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: Key used for encrypting/decrypting cfn build artifacts
+      KeyPolicy:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: kms:*
+            Resource: "*"
+            Principal:
+              AWS: !Ref AWS::AccountId
 
   BuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Sub ${AWS::StackName}-build
       ServiceRole: !ImportValue cfn-utilities:BuilderRoleArn
+      EncryptionKey: !GetAtt ArtifactKey.Arn
       Environment:
         Image: aws/codebuild/standard:2.0
         ComputeType: BUILD_GENERAL1_SMALL
@@ -25,3 +51,44 @@ Resources:
       Source:
         Type: CODEPIPELINE
       
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub ${AWS::StackName}-pipeline
+      ArtifactStore:
+        - Type: S3
+          Location: !Ref ArtifactStore
+          EncryptionKey: !GetAtt ArtifactKey.Arn
+      RoleArn: !ImportValue cfn-utilities:MasterRoleArn
+      RestartExecutionOnUpdate: true
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              ActionTypeId:
+                Category: Source
+                Provider: GitHub
+                Owner: ThirdParty
+                Version: 1
+              OutputArtifacts:
+                - Name: sourceCode
+              Configuration:
+                Owner: !Ref GithubOwner
+                Repo: !Ref GithubRepo
+                Branch: !Ref GithubBranch
+                OAuthToken: !Ref GithubToken
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Provider: CodeBuild
+                Owner: AWS
+                Version: 1
+              InputArtifacts:
+                - Name: sourceCode
+              OutputArtifacts:
+                - Name: buildResults
+              Configuration:
+                ProjectName: !Ref BuildProject
+
