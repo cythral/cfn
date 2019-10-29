@@ -10,9 +10,9 @@ phases:
   build:
     commands:
       - dotnet --info
-      - dotnet restore
+      - dotnet test -c Release
       - dotnet msbuild tools/package.proj -p:Configuration=Release
-      - dotnet test -c Release --no-build
+      
       
 artifacts:
   discard-paths: yes
