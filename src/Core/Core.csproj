@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <BuildTasksLocation>../BuildTasks/bin/$(Configuration)/netcoreapp2.2/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
+    <BuildTasksLocation>../BuildTasks/bin/$(Configuration)/netcoreapp2.1/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <StackName>cfn-core</StackName>
     <TemplateFileName>Core.template.yml</TemplateFileName>
