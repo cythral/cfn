@@ -1,4 +1,4 @@
-# CloudFormation
+# CloudFormation (CFN)
 Utilities, custom resources, and a GitHub webhook for deploying CloudFormation stacks.  This is currently a work-in-progress.  The plan is to have at least the following in the initial release:
 
 ### Utilities
