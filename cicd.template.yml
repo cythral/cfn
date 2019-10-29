@@ -19,7 +19,7 @@ Parameters:
 Resources:
   ArtifactStore:
     Type: AWS::S3::Bucket
-    
+
   BuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -95,4 +95,21 @@ Resources:
                 - Name: buildResults
               Configuration:
                 ProjectName: !Ref BuildProject
+        - Name: Deploy
+          Actions:
+            - Name: Utilities
+              RunOrder: 1
+              ActionTypeId:
+                Category: Deploy
+                Provider: CloudFormation
+                Owner: AWS
+                Version: 1
+              InputArtifacts:
+                - Name: buildResults
+              Configuration:
+                StackName: cfn-utilities
+                ActionMode: CREATE_UPDATE
+                TemplatePath: buildResults::Utilities.template.yml
+                RoleArn: !ImportValue cfn-utilities:MasterRoleArn
+                Capabilities: CAPABILITY_NAMED_IAM
 
