@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <AssemblyName>bootstrap</AssemblyName>
-    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <RuntimeIdentifier>rhel.7.2-x64</RuntimeIdentifier>
     <OutputType>Exe</OutputType>
     <SelfContained>true</SelfContained>
     <BuildTasksLocation>../BuildTasks/bin/$(Configuration)/netcoreapp3.0/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>

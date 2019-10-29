@@ -106,7 +106,7 @@ Resources:
       Handler: Core::Cythral.CloudFormation.Webhook::Handle
       Runtime: provided
       Timeout: 60
-      CodeUri: bin/netcoreapp2.1/publish/
+      CodeUri: bin/Debug/netcoreapp3.0/linux-x64/publish/
       Policies:
         - AWSLambdaExecute
         - AdministratorAccess
