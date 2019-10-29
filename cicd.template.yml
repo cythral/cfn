@@ -6,4 +6,4 @@ Parameters:
 
 Resources:
   ArtifactStore:
-    Type: AWS::S3::Bucket
+    Type: AWS::S3::Bucket 
