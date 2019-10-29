@@ -5,7 +5,7 @@ phases:
       dotnet: 2.2
     commands:
       - yum install -y libunwind
-      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet --version 3.0.0 --install-dir /usr/share/dotnet
+      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet --version 2.2.7 --install-dir /usr/share/dotnet
   build:
     commands:
       - dotnet --info
