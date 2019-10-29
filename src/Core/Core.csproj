@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <BuildTasksLocation>../BuildTasks/bin/$(Configuration)/netcoreapp2.1/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <BuildTasksLocation>../BuildTasks/bin/$(Configuration)/netcoreapp3.0/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <StackName>cfn-core</StackName>
     <TemplateFileName>Core.template.yml</TemplateFileName>
@@ -26,17 +26,6 @@
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.6.0" />
     <PackageReference Include="System.Text.Json" Version="4.6.0" />
-  </ItemGroup>
-
-  <!-- Args passed to dotnet store -->
-  <ItemGroup>
-    <StoreArgs Include="-r linux-x64" Condition="$(Optimize) != 'true'" />
-    <StoreArgs Include="-r rhel.7.2-x64" Condition="$(Optimize) == 'true'" />
-    <StoreArgs Include="-m $(MSBuildThisFileFullPath)" />
-    <StoreArgs Include="-f netcoreapp2.1" />
-    <StoreArgs Include="--framework-version 2.1" />
-    <StoreArgs Include="--output $(LayerDir)" />
-    <StoreArgs Include="--skip-optimization" Condition="$(Optimize) != 'true'" />
   </ItemGroup>
 
   <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.UpdateCodeLocation" AssemblyFile="$(BuildTasksLocation)" />
@@ -83,13 +72,6 @@
     <Exec Command="mktemp" ConsoleToMsBuild="true" Condition="$(PackagedFile) == ''">
         <Output TaskParameter="ConsoleOutput" PropertyName="PackagedFile" />
     </Exec>
-
-    <!-- Prepare the dependency layer -->
-    <RemoveDir Directories="$(LayerDir)" />
-    <MakeDir Directories="$(LayerDir)" />
-    <Exec Command="dotnet store @(StoreArgs, ' ')" />
-
-    <Exec Command="aws cloudformation package --template-file $(TemplateFile) --s3-bucket $(DeploymentBucket) --output-template-file $(PackagedFile)" />
     
     <PropertyGroup>
       <TemplateFile>$(PackagedFile)</TemplateFile>

@@ -6,6 +6,12 @@
         <GeneratorPropertyNames Include="TargetFrameworkVersion" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="bootstrap">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
     <PropertyGroup>
         <DeploymentBucket Condition="$(DeploymentBucket) == ''">$(AssemblyName.ToLower())</DeploymentBucket>
         <Package>true</Package>
