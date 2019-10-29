@@ -1,3 +1,9 @@
+Parameters:
+  GithubToken:
+    Type: String
+    NoEcho: true
+    Description: OAuth token for the Github organization.  Needs read/write access to repos and repo hooks
+
 Resources:
   ArtifactStore:
     Type: AWS::S3::Bucket
