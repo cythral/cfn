@@ -43,7 +43,7 @@ namespace Cythral.CloudFormation {
                 };
 
                 var createStackResponse = await cloudformationClient.CreateStackAsync(createStackRequest);
-                Console.WriteLine($"Got create stack response: {createStackResponse}");
+                Console.WriteLine($"Got create stack response: {Serialize(createStackResponse)}");
             } else {
                 var updateStackRequest = new UpdateStackRequest {
                     StackName = stackName,
@@ -53,7 +53,7 @@ namespace Cythral.CloudFormation {
                 };
 
                 var updateStackResponse = await cloudformationClient.UpdateStackAsync(updateStackRequest);
-                Console.WriteLine($"Got update stack response: {updateStackResponse}");
+                Console.WriteLine($"Got update stack response: {Serialize(updateStackResponse)}");
             }
         }
     }
