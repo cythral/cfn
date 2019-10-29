@@ -20,7 +20,7 @@ Resources:
             Value: !Ref ArtifactStore
         Type: LINUX_CONTAINER
       Artifacts:
-        - Type: CODEPIPELINE
+        Type: CODEPIPELINE
       Source:
-        - Type: CODEPIPELINE
+        Type: CODEPIPELINE
       
