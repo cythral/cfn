@@ -112,4 +112,51 @@ Resources:
                 TemplatePath: buildResults::Utilities.template.yml
                 RoleArn: !ImportValue cfn-utilities:MasterRoleArn
                 Capabilities: CAPABILITY_NAMED_IAM
+            - Name: Resources
+              RunOrder: 2
+              ActionTypeId:
+                Category: Deploy
+                Provider: CloudFormation
+                Owner: AWS
+                Version: 1
+              InputArtifacts:
+                - Name: buildResults
+              Configuration:
+                StackName: cfn-resources
+                ActionMode: CREATE_UPDATE
+                TemplatePath: buildResults::Resources.template.yml
+                RoleArn: !ImportValue cfn-utilities:MasterRoleArn
+                Capabilities: CAPABILITY_IAM
+            - Name: DNS
+              RunOrder: 3
+              ActionTypeId:
+                Category: Deploy
+                Provider: CloudFormation
+                Owner: AWS
+                Version: 1
+              InputArtifacts:
+                - Name: buildResults
+              Configuration:
+                StackName: cfn-dns
+                ActionMode: CREATE_UPDATE
+                TemplatePath: buildResults::Dns.template.yml
+                TemplateConfiguration: buildResults::Dns.config.json
+                RoleArn: !ImportValue cfn-utilities:MasterRoleArn
+                Capabilities: CAPABILITY_IAM
+            - Name: Core
+              RunOrder: 4
+              ActionTypeId:
+                Category: Deploy
+                Provider: CloudFormation
+                Owner: AWS
+                Version: 1
+              InputArtifacts:
+                - Name: buildResults
+              Configuration:
+                StackName: cfn-core
+                ActionMode: CREATE_UPDATE
+                TemplatePath: buildResults::Core.template.yml
+                TemplateConfiguration: buildResults::Core.config.json
+                RoleArn: !ImportValue cfn-utilities:MasterRoleArn
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
 
