@@ -28,7 +28,7 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Action: s3:*
+            Action: s3:*Object
             Resource:
               - !Sub arn:aws:s3:::${ArtifactStore}
               - !Sub arn:aws:s3:::${ArtifactStore}/*
@@ -49,6 +49,13 @@ Resources:
             Resource: "*"
             Principal:
               AWS: !Ref AWS::AccountId
+          - Effect: Allow
+            Action: 
+              - kms:Encrypt
+              - kms:Decrypt
+            Resource: "*"
+            Principal:
+              AWS: !ImportValue cfn-utilities:BuilderRoleArn
 
   BuildProject:
     Type: AWS::CodeBuild::Project
