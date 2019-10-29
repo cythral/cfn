@@ -192,6 +192,21 @@ Resources:
             Principal: 
               AWS: !GetAtt MasterRole.Arn
 
+  BuilderRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Builder
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: codebuild.amazonaws.com
+
   # Security - Encryption
   # -------------------------------------------
 
@@ -298,6 +313,12 @@ Outputs:
     Value: !GetAtt SpectatorRole.Arn
     Export:
       Name: !Sub ${AWS::StackName}:SpectatorRoleArn
+
+  BuilderRoleArn:
+    Description: ARN of the builder role
+    Value: !GetAtt BuilderRole.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}:BuilderRoleArn
 
   SecretsKeyArn:
     Description: ARN of the secrets key alias
