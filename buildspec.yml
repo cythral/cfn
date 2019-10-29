@@ -1,0 +1,16 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      dotnet: 2.2
+  build:
+    commands:
+      - dotnet test -c Release
+      - dotnet msbuild tools/package.proj -c Release
+artifacts:
+  - "Core.template.yml"
+  - "Core.config.json"
+  - "Utilities.template.yml"
+  - "Resources.template.yml"
+  - "Dns.template.yml"
+  - "Dns.config.json"
