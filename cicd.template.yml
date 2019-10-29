@@ -54,7 +54,7 @@ Resources:
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: !Sub ${AWS::StackName}-pipeline
+      Name: !Sub ${AWS::StackName}-pipeline 
       ArtifactStore:
         Type: S3
         Location: !Ref ArtifactStore
