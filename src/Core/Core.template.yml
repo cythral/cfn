@@ -104,7 +104,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: Core::Cythral.CloudFormation.Webhook::Handle
-      Runtime: dotnetcore2.1
+      Runtime: provided
       Timeout: 60
       CodeUri: bin/netcoreapp2.1/publish/
       Policies:
