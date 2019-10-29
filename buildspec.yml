@@ -6,7 +6,7 @@ phases:
     commands:
       - rm -rf /usr/share/dotnet && mkdir -p /usr/share/dotnet
       - yum install -y libunwind
-      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version 2.1.12 --install-dir /usr/share/dotnet
+      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version 2.1.508 --install-dir /usr/share/dotnet
   build:
     commands:
       - dotnet --info
