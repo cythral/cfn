@@ -30,7 +30,8 @@
 
   <!-- Args passed to dotnet store -->
   <ItemGroup>
-    <StoreArgs Include="-r linux-x64" />
+    <StoreArgs Include="-r linux-x64" Condition="$(Optimize) != 'true'" />
+    <StoreArgs Include="-r rhel.7.2-x64" Condition="$(Optimize) == 'true'" />
     <StoreArgs Include="-m $(MSBuildThisFileFullPath)" />
     <StoreArgs Include="--output $(LayerDir)" />
     <StoreArgs Include="--skip-optimization" Condition="$(Optimize) != 'true'" />
