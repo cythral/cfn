@@ -3,6 +3,8 @@ phases:
   install:
     runtime-versions:
       dotnet: 2.2
+    commands:
+      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet --version 2.1
   build:
     commands:
       - dotnet test -c Release
