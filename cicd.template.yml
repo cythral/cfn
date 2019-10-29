@@ -58,7 +58,9 @@ Resources:
       ArtifactStore:
         Type: S3
         Location: !Ref ArtifactStore
-        EncryptionKey: !GetAtt ArtifactKey.Arn
+        EncryptionKey: 
+          Id: !GetAtt ArtifactKey.Arn
+          Type: KMS
       RoleArn: !ImportValue cfn-utilities:MasterRoleArn
       RestartExecutionOnUpdate: true
       Stages:
