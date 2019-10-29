@@ -4,6 +4,7 @@
         <SourceDirectory>$(MSBuildThisFileDirectory)../src</SourceDirectory>
         <UtilitiesStackName>cfn-utilities</UtilitiesStackName>
         <Destination>$(MSBuildThisFileDirectory)..</Destination>
+        <Optimize>false</Optimize>
         <SkipResources>false</SkipResources>
         <SkipDns>false</SkipDns>
         <SkipCore>false</SkipCore>
@@ -41,6 +42,6 @@
             Condition="$(SkipCore) != 'true'" 
             Projects="$(SourceDirectory)/Core/Core.csproj" 
             Targets="Publish" 
-            Properties="Deploy=false;DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration);PackagedFile=$(Destination)/Core.template.yml" />
+            Properties="Deploy=false;DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration);PackagedFile=$(Destination)/Core.template.yml;Optimize=$(Optimize)" />
     </Target>
 </Project>
