@@ -10,10 +10,10 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Cythral.CloudFormation.Cicd;
-using Cythral.CloudFormation.Cicd.Events;
-using Cythral.CloudFormation.Cicd.Entities;
-using Cythral.CloudFormation.Cicd.Exceptions;
+using Cythral.CloudFormation;
+using Cythral.CloudFormation.Events;
+using Cythral.CloudFormation.Entities;
+using Cythral.CloudFormation.Exceptions;
 using Amazon.KeyManagementService;
 using Amazon.KeyManagementService.Model;
 using FluentAssertions;
@@ -23,7 +23,7 @@ using RichardSzalay.MockHttp;
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation.Tests.Cicd.Entities {
+namespace Cythral.CloudFormation.Tests.Entities {
     public class CommittedFileTest {
         [Test]
         public async Task FromContentsUrlRequestsFileViaHttp() {
@@ -40,11 +40,12 @@ namespace Cythral.CloudFormation.Tests.Cicd.Entities {
             mockHttp
             .Expect($"https://api.github.com/repos/Codertocat/Hello-World/contents/{templateName}")
             .WithHeaders("Authorization", $"token {githubToken}")
+            .WithHeaders("Accept", "application/vnd.github.VERSION.raw")
             .Respond("text/plain", templateContents);
             
             var template = await CommittedFile.FromContentsUrl(contentsUrl, templateName, config, httpFactory);
 
-            Assert.That(template.ToString(), Is.EqualTo(templateContents));
+            Assert.That(template?.ToString(), Is.EqualTo(templateContents));
             mockHttp.VerifyNoOutstandingExpectation();
         }
 

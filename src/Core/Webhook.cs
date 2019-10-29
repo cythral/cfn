@@ -8,18 +8,18 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization;
 using Amazon.Lambda.Serialization.Json;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
-using Cythral.CloudFormation.Cicd.Events;
-using Cythral.CloudFormation.Cicd.Exceptions;
-using Cythral.CloudFormation.Cicd.Entities;
+using Cythral.CloudFormation.Events;
+using Cythral.CloudFormation.Exceptions;
+using Cythral.CloudFormation.Entities;
 
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
-using WebhookConfig = Cythral.CloudFormation.Cicd.Config;
+using WebhookConfig = Cythral.CloudFormation.Config;
 
 [assembly:LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
-namespace Cythral.CloudFormation.Cicd {
+namespace Cythral.CloudFormation {
     public class Webhook {
         public static WebhookConfig Config { get; set; }
 

@@ -1,10 +1,14 @@
 using System.Net;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace Cythral.CloudFormation.Cicd.Entities {
+using static System.Net.Http.HttpMethod;
+using static System.Text.Json.JsonSerializer;
+
+namespace Cythral.CloudFormation.Entities {
     public class CommittedFile {
         public string Contents { get; private set; }
         public bool Exists { get; private set; } = true;
@@ -15,15 +19,21 @@ namespace Cythral.CloudFormation.Cicd.Entities {
             
             var httpClient = httpClientFactory();
             var baseUrl = contentsUrl.Replace("{+path}", "").TrimEnd(new char[] { '/' });
-            var request = new HttpRequestMessage { RequestUri = new Uri(baseUrl + "/" + filename) };
+            var request = new HttpRequestMessage { Method = Get, RequestUri = new Uri(baseUrl + "/" + filename) };
+            
+            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("brighid", "v1"));
             request.Headers.Authorization = new AuthenticationHeaderValue("token", config["GITHUB_TOKEN"]);
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github.VERSION.raw"));
 
             var result = await httpClient.SendAsync(request);
+            var body = await result.Content?.ReadAsStringAsync();
+
             if(result.StatusCode != HttpStatusCode.OK) {
+                Console.WriteLine($"Unexpected response code {(int) result.StatusCode}: {body}");
                 return null;
             }
 
-            var body = await result.Content.ReadAsStringAsync();
+            
             return new CommittedFile { Contents = body };
         }
 
