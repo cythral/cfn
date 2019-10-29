@@ -56,9 +56,9 @@ Resources:
     Properties:
       Name: !Sub ${AWS::StackName}-pipeline
       ArtifactStore:
-        - Type: S3
-          Location: !Ref ArtifactStore
-          EncryptionKey: !GetAtt ArtifactKey.Arn
+        Type: S3
+        Location: !Ref ArtifactStore
+        EncryptionKey: !GetAtt ArtifactKey.Arn
       RoleArn: !ImportValue cfn-utilities:MasterRoleArn
       RestartExecutionOnUpdate: true
       Stages:
