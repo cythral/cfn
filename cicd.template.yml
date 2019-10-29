@@ -19,26 +19,7 @@ Parameters:
 Resources:
   ArtifactStore:
     Type: AWS::S3::Bucket
-
-  # ArtifactStorePolicy:
-  #   Type: AWS::S3::BucketPolicy
-  #   Properties:
-  #     Bucket: !Ref ArtifactStore
-  #     PolicyDocument:
-  #       Version: 2012-10-17
-  #       Statement:
-  #         - Effect: Allow
-  #           Action: s3:*Object
-  #           Resource:
-  #             - !Sub arn:aws:s3:::${ArtifactStore}
-  #             - !Sub arn:aws:s3:::${ArtifactStore}/*
-  #           Principal:
-  #             AWS: 
-  #               - !ImportValue cfn-utilities:BuilderRoleArn
-  #               - !ImportValue cfn-utilities:MasterRoleArn
-
-  
-
+    
   BuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
