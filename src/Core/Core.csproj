@@ -9,6 +9,7 @@
     <ConfigFileName>Core.config.json</ConfigFileName>
     <TemplateFile>$(MSBuildThisFileDirectory)$(TemplateFileName)</TemplateFile>
     <ConfigFile>$(MSBuildThisFileDirectory)$(ConfigFileName)</ConfigFile>
+    <Optimize>false</Optimize>
     <LayerDir>/tmp/github-webhook-dep-layer</LayerDir>
     <PackagedFile></PackagedFile>
     <DeploymentBucket></DeploymentBucket>
@@ -25,6 +26,14 @@
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.6.0" />
     <PackageReference Include="System.Text.Json" Version="4.6.0" />
+  </ItemGroup>
+
+  <!-- Args passed to dotnet store -->
+  <ItemGroup>
+    <StoreArgs Include="-r linux-x64" />
+    <StoreArgs Include="-m $(MSBuildThisFileFullPath)" />
+    <StoreArgs Include="--output $(LayerDir)" />
+    <StoreArgs Include="--skip-optimization" Condition="$(Optimize) != 'true'" />
   </ItemGroup>
 
   <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.UpdateCodeLocation" AssemblyFile="$(BuildTasksLocation)" />
@@ -75,7 +84,7 @@
     <!-- Prepare the dependency layer -->
     <RemoveDir Directories="$(LayerDir)" />
     <MakeDir Directories="$(LayerDir)" />
-    <Exec Command="dotnet store -m $(MSBuildThisFileFullPath) -r linux-x64 --output $(LayerDir) --skip-optimization" />
+    <Exec Command="dotnet store @(StoreArgs, ' ')" />
 
     <Exec Command="aws cloudformation package --template-file $(TemplateFile) --s3-bucket $(DeploymentBucket) --output-template-file $(PackagedFile)" />
     
