@@ -104,8 +104,6 @@ Resources:
         - AWSLambdaExecute
         - AdministratorAccess
         - !ImportValue cfn-utilities:SecretsKeyDecryptPolicyArn
-      Layers:
-        - !Ref GithubWebhookDependencyLayer
       AutoPublishAlias: GithubWebhook
       Environment:
         Variables:
