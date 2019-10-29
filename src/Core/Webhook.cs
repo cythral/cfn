@@ -10,6 +10,7 @@ using Amazon.Lambda.Serialization.Json;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
+using Amazon.Lambda.RuntimeSupport;
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Exceptions;
 using Cythral.CloudFormation.Entities;
@@ -18,8 +19,6 @@ using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
 using WebhookConfig = Cythral.CloudFormation.Config;
-
-[assembly:LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
 namespace Cythral.CloudFormation {
     public class Webhook {
@@ -94,6 +93,16 @@ namespace Cythral.CloudFormation {
                 Body = body,
                 IsBase64Encoded = false,
             };
+        }
+
+        public static async Task Main(string[] args) {
+            var serializer = new Amazon.Lambda.Serialization.Json.JsonSerializer();
+            Func<ApplicationLoadBalancerRequest, ILambdaContext, Task<ApplicationLoadBalancerResponse>> func = Handle;
+
+            using(var wrapper = HandlerWrapper.GetHandlerWrapper(func, serializer))
+            using(var bootstrap = new LambdaBootstrap(wrapper)) {
+                await bootstrap.RunAsync();
+            }   
         }
     }
 }
