@@ -35,7 +35,7 @@ Resources:
 
   # Networking
   # -------------------------------------------
-  # Use this VPC for quick development and/or tools that do not require high availability.
+  # Use this VPC for quick development and/or tools that do not require extremely high availability 
 
   VPC:
     Type: AWS::EC2::VPC
@@ -144,11 +144,12 @@ Resources:
 
   NetworkShare:
     Type: AWS::RAM::ResourceShare
-    Condition: IsAgentAccount
+    Condition: IsMasterAccount
     Properties:
       Name: primary-network-share
       Principals:
-        - !Ref MasterAccountId
+        - "{{resolve:ssm:DevAccountId:1}}"
+        - "{{resolve:ssm:ProdAccountId:1}}"
       ResourceArns:
         - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${Subnet1}
         - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${Subnet2}
