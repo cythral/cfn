@@ -174,7 +174,9 @@ Resources:
                 StackName: cfn-utilities
                 ActionMode: CREATE_UPDATE
                 TemplatePath: buildResults::Utilities.template.yml
-                RoleArn: '{{resolve:ssm:DevAgentRoleArn}}'
+                RoleArn: arn:aws:iam::{{resolve:ssm:DevAccountId}}:role/Agent
                 ParameterOverrides: !Sub |
-                  \{ "MasterAccountId": "${!ImportValue cfn-utilities:MasterRoleArn}" \}
+                  {
+                    "MasterAccountId": "${!ImportValue cfn-utilities:MasterAccountId}"
+                  }
                 Capabilities: CAPABILITY_NAMED_IAM
