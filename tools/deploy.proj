@@ -14,7 +14,7 @@
             Targets="Publish" 
             Properties="Configuration=$(Configuration)" />
 
-        <MSBuild 
+        <MSBuild    
             Projects="$(SourceDirectory)/Utilities/Utilities.proj" 
             Targets="Build" 
             Properties="StackName=$(UtilitiesStackName);Configuration=$(Configuration)" />
@@ -40,6 +40,6 @@
             Condition="$(SkipCore) != 'true'" 
             Projects="$(SourceDirectory)/Core/Core.csproj" 
             Targets="Publish" 
-            Properties="DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration)" />
+            Properties="DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration);GithubOwner=$(GithubOwner);GithubToken=$(GithubToken);GithubSigningSecret=$(GithubSigningSecret)" />
     </Target>
 </Project>
