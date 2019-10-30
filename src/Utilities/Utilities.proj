@@ -4,16 +4,19 @@
     <TemplateName>Utilities.template.yml</TemplateName>
     <Template>$(MSBuildThisFileDirectory)$(TemplateName)</Template>
     <StackName Condition="$(StackName) == ''">cfn-utilities</StackName>
-    <Flags>
-        --template-file $(Template)
-        --stack-name $(StackName)
-        --capabilities CAPABILITY_NAMED_IAM
-        --no-fail-on-empty-changeset
-    </Flags>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Flags Include="--template-file $(Template)" />
+    <Flags Include="--stack-name $(StackName)" />
+    <Flags Include="--capabilities CAPABILITY_NAMED_IAM" />
+    <Flags Include="--no-fail-on-empty-changeset" />
+    <Flags Include="--parameter-overrides MasterAccountId=$(MasterAccountId)" Condition="$(MasterAccountId) != ''" />
+    <Flags Include="--profile $(Profile)" Condition="$(Profile) != ''" />
+  </ItemGroup>
+
   <Target Name="Build">
-    <Exec Command="aws cloudformation deploy $(Flags.Replace('&#10;', ''))" />
+    <Exec Command="aws cloudformation deploy @(Flags, ' ')" />
   </Target>
 
   <Target Name="Copy" Condition="$(Dest) != ''">
