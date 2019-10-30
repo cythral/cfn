@@ -100,7 +100,6 @@ Resources:
       Runtime: provided
       Timeout: 60
       CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
-      MemorySize: 256
       Policies:
         - AWSLambdaExecute
         - AdministratorAccess
