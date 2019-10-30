@@ -300,6 +300,13 @@ Resources:
             Resource: "*"
             Principal:
               AWS: !GetAtt BuilderRole.Arn
+          - Effect: Allow
+            Action: kms:Decrypt
+            Resource: "*"
+            Principal:
+              AWS:
+                - "{{resolve:ssm:DevAccountId:1}}"
+                - "{{resolve:ssm:ProdAccountId:1}}"
 
   ArtifactKeyAlias:
     Type: AWS::KMS::Alias
