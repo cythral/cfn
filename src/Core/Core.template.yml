@@ -173,3 +173,10 @@ Resources:
           PathPatternConfig:
             Values:
               - /webhooks/github
+
+Outputs:
+  HttpsListenerArn:
+    Value: !Ref HttpsListener
+    Description: ARN of the primary load balancer's HTTPS listener
+    Export:
+      Name: !Sub ${AWS::StackName}:HttpsListenerArn
