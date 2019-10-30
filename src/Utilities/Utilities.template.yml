@@ -4,6 +4,11 @@ Parameters:
     Type: String
     Default: ""
 
+  NetworkCidr:
+    Type: String
+    Description: Cidr to use for the VPC
+    Default: 10.1.0.0/16
+
 Conditions:
   # Master/Shared account - one that has control of "agent" accounts like (dev/staging/prod)
   IsMasterAccount: 
@@ -35,7 +40,7 @@ Resources:
   VPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: 10.1.0.0/16
+      CidrBlock: !Ref NetworkCidr
   
   Ipv6CidrBlock:
     Type: AWS::EC2::VPCCidrBlock
