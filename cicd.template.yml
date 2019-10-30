@@ -176,5 +176,5 @@ Resources:
                 TemplatePath: buildResults::Utilities.template.yml
                 RoleArn: "{{resolve:ssm:DevAgentRoleArn}}"
                 ParameterOverrides: !Sub |
-                  { "MasterAccountId": "${!ImportValue cfn-utilities:MasterRoleArn}" }
+                  \{ "MasterAccountId": "${!ImportValue cfn-utilities:MasterRoleArn}" \}
                 Capabilities: CAPABILITY_NAMED_IAM
