@@ -162,7 +162,7 @@ Resources:
         - Name: Dev
           Actions:
             - Name: Utilities
-              RoleArn: !ImportValue cfn-utilities:MasterRoleArn
+              RoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
               ActionTypeId:
                 Category: Deploy
                 Provider: CloudFormation
@@ -175,5 +175,23 @@ Resources:
                 ActionMode: CREATE_UPDATE
                 TemplatePath: buildResults::Utilities.template.yml
                 RoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
+                ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}" }'
+                Capabilities: CAPABILITY_NAMED_IAM
+        - Name: Prod
+          Actions:
+            - Name: Utilities
+              RoleArn: "{{resolve:ssm:ProdAgentRoleArn:1}}"
+              ActionTypeId:
+                Category: Deploy
+                Provider: CloudFormation
+                Owner: AWS
+                Version: 1
+              InputArtifacts:
+                - Name: sourceCode
+              Configuration:
+                StackName: cfn-utilities
+                ActionMode: CREATE_UPDATE
+                TemplatePath: buildResults::Utilities.template.yml
+                RoleArn: "{{resolve:ssm:ProdAgentRoleArn:1}}"
                 ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}" }'
                 Capabilities: CAPABILITY_NAMED_IAM
