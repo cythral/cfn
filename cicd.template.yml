@@ -162,7 +162,6 @@ Resources:
         - Name: Dev
           Actions:
             - Name: Utilities
-              RoleArn: !ImportValue cfn-utilities:MasterRoleArn
               ActionTypeId:
                 Category: Deploy
                 Provider: CloudFormation
