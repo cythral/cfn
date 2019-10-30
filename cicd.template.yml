@@ -19,6 +19,8 @@ Parameters:
 Resources:
   ArtifactStore:
     Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: BucketOwnerFullControl
 
   BuildProject:
     Type: AWS::CodeBuild::Project
