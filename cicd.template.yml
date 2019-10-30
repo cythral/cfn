@@ -205,7 +205,7 @@ Resources:
                 Owner: AWS
                 Version: 1
               InputArtifacts:
-                - Name: sourceCode
+                - Name: buildResults
               Configuration:
                 StackName: cfn-utilities
                 ActionMode: CREATE_UPDATE
