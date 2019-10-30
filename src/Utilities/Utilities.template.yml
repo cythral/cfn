@@ -190,7 +190,7 @@ Resources:
           - Effect: Allow
             Action: sts:AssumeRole
             Principal: 
-              AWS: !GetAtt MasterRole.Arn
+              AWS: !If [IsMasterAccount, !GetAtt MasterRole.Arn, !GetAtt AgentRole.Arn]
 
   BuilderRole:
     Type: AWS::IAM::Role
@@ -348,6 +348,7 @@ Outputs:
 
   BuilderRoleArn:
     Description: ARN of the builder role
+    Condition: IsMasterAccount
     Value: !GetAtt BuilderRole.Arn
     Export:
       Name: !Sub ${AWS::StackName}:BuilderRoleArn
