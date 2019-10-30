@@ -193,7 +193,7 @@ Resources:
                 ActionMode: CREATE_UPDATE
                 TemplatePath: buildResults::Utilities.template.yml
                 RoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
-                ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}" }'
+                ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}", "NetworkCidr": "10.2.0.0/16" }'
                 Capabilities: CAPABILITY_NAMED_IAM
         - Name: Prod
           Actions:
@@ -211,5 +211,5 @@ Resources:
                 ActionMode: CREATE_UPDATE
                 TemplatePath: buildResults::Utilities.template.yml
                 RoleArn: "{{resolve:ssm:ProdAgentRoleArn:1}}"
-                ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}" }'
+                ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}", "NetworkCidr": "10.3.0.0/16" }'
                 Capabilities: CAPABILITY_NAMED_IAM
