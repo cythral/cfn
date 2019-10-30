@@ -137,6 +137,19 @@ Resources:
       RouteTableId: !Ref RouteTable
       SubnetId: !Ref Subnet4
 
+  NetworkShare:
+    Type: AWS::RAM::ResourceShare
+    Condition: IsAgentAccount
+    Properties:
+      Name: primary-network-share
+      Principals:
+        - !Ref MasterAccountId
+      ResourceArns:
+        - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${Subnet1}
+        - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${Subnet2}
+        - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${Subnet3}
+        - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${Subnet4}
+        
   # Security - Roles
   # -------------------------------------------
 
