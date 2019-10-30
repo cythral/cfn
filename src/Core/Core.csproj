@@ -22,10 +22,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <RuntimeHostConfigurationOption Include="System.Globalization.Invariant" Value="true" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Amazon.Lambda.ApplicationLoadBalancerEvents" Version="1.0.0" />
     <PackageReference Include="Amazon.Lambda.RuntimeSupport" Version="1.0.0" />
     <PackageReference Include="AWSSDK.CloudFormation" Version="3.3.100.90" />

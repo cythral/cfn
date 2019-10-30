@@ -1,4 +1,8 @@
 version: 0.2
+env:
+  variables:
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: "true"
+
 phases:
   install:
     runtime-versions:
