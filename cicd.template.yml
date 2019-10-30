@@ -175,8 +175,8 @@ Resources:
                 ActionMode: CREATE_UPDATE
                 TemplatePath: buildResults::Utilities.template.yml
                 RoleArn: arn:aws:iam::694042977401:role/Agent
-                ParameterOverrides: 
+                ParameterOverrides: !Sub |
                   {
-                    "MasterAccountId": !ImportValue cfn-utilities:MasterAccountId
+                    "MasterAccountId": "{!ImportValue cfn-utilities:MasterAccountId}"
                   }
                 Capabilities: CAPABILITY_NAMED_IAM
