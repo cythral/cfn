@@ -151,4 +151,3 @@ Resources:
           PathPatternConfig:
             Values:
               - /webhooks/github
-            
