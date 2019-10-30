@@ -175,7 +175,6 @@ Resources:
                 ActionMode: CREATE_UPDATE
                 TemplatePath: buildResults::Utilities.template.yml
                 RoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
-                ParameterOverrides: !Sub |
-                  - '{ "MasterAccountId": "${AccountId}" }'
-                  - AccountId: !ImportValue cfn-utilities:MasterAccountId
+                ParameterOverrides:
+                  MasterAccountId: !ImportValue cfn-utilities:MasterAccountId
                 Capabilities: CAPABILITY_NAMED_IAM
