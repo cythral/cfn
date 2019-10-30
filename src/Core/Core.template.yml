@@ -30,6 +30,8 @@ Resources:
       DomainName: brigh.id
       HostedZoneId: !ImportValue cfn-dns:HostedZoneId
       ValidationMethod: DNS
+      SubjectAlternativeNames:
+        - dev.brigh.id
   
   WebSecurityGroup:
     Type: AWS::EC2::SecurityGroup
