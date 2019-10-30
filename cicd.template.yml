@@ -160,5 +160,23 @@ Resources:
                 TemplatePath: buildResults::Core.template.yml
                 TemplateConfiguration: buildResults::Core.config.json
                 RoleArn: !ImportValue cfn-utilities:MasterRoleArn
-                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-
+                Capabilities: CAPABILITY_IAM, CAPABILITY_AUTO_EXPAND
+        - Name: Dev
+          Actions:
+            - Name: Utilities
+              RoleArn: !ImportValue cfn-utilities:MasterRoleArn
+              ActionTypeId:
+                Category: Deploy
+                Provider: CloudFormation
+                Owner: AWS
+                Version: 1
+              InputArtifacts:
+                - Name: buildResults
+              Configuration:
+                StackName: cfn-utilities
+                ActionMode: CREATE_UPDATE
+                TemplatePath: buildResults::Utilities.template.yml
+                RoleArn: {{resolve:ssm:DevAgentRoleArn}}
+                ParameterOverrides:
+                  MasterAccountId: !ImportValue cfn-utilities:MasterRoleArn
+                Capabilities: CAPABILITY_NAMED_IAM
