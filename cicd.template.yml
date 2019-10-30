@@ -175,6 +175,5 @@ Resources:
                 ActionMode: CREATE_UPDATE
                 TemplatePath: buildResults::Utilities.template.yml
                 RoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
-                ParameterOverrides:
-                  MasterAccountId: !Sub "${AWS::AccountId}"
+                ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}" }'
                 Capabilities: CAPABILITY_NAMED_IAM
