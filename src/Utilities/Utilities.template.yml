@@ -206,13 +206,15 @@ Resources:
         - Type: fixed-response
           FixedResponseConfig:
             StatusCode: "200"
-            ContentType: text/plain
-            MessageBody: OK
       Conditions:
         - Field: path-pattern
           PathPatternConfig:
             Values:
               - /healthcheck
+        - Field: source-ip
+          SourceIpConfig:
+            Values:
+              - !Ref MasterAccountCidr
 
   WebSecurityGroup:
     Type: AWS::EC2::SecurityGroup
