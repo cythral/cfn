@@ -173,16 +173,25 @@ Resources:
     Properties:
       GroupDescription: Security group for web ports 80 and 443
       SecurityGroupIngress:
+        # Port 80
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
           CidrIpv6: ::/0
+        # Port 443
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
           CidrIpv6: ::/0
+          
       VpcId: !Ref VPC
         
   # Security - Roles
