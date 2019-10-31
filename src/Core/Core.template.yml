@@ -263,6 +263,18 @@ Resources:
               - /webhooks/github
 
 Outputs:
+  LoadBalancerCanonicalHostedZoneId:
+    Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
+    Description: ID of the canonical hosted zone for the primary load balancer
+    Export:
+      Name: !Sub ${AWS::StackName}:LoadBalancerCanonicalHostedZoneId
+
+  LoadBalancerDnsName:
+    Value: !GetAtt LoadBalancer.DNSName
+    Description: DNS name of the primary load balancer
+    Export:
+      Name: !Sub ${AWS::StackName}:LoadBalancerDnsName
+
   HttpsListenerArn:
     Value: !Ref HttpsListener
     Description: ARN of the primary load balancer's HTTPS listener
