@@ -19,7 +19,7 @@ namespace Cythral.CloudFormation {
         private static async Task Bootstrap<T>(T handler) {
             var serializer = new JsonSerializer();
 
-            using(var wrapper = HandlerWrapper.GetHandlerWrapper(func, serializer))
+            using(var wrapper = HandlerWrapper.GetHandlerWrapper(handler, serializer))
             using(var bootstrap = new LambdaBootstrap(wrapper)) {
                 await bootstrap.RunAsync();
             }   
