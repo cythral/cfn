@@ -507,7 +507,7 @@ Outputs:
   HttpListenerArn:
     Description: ARN of the http listener for the internal load balancer
     Condition: IsAgentAccount
-    Value: !Ref LoadBalancer
+    Value: !Ref HttpListener
     Export:
       Name: !Sub ${AWS::StackName}:HttpListenerArn
   
