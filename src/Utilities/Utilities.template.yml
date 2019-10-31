@@ -191,7 +191,6 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIpv6: ::/0
-          
       VpcId: !Ref VPC
         
   # Security - Roles
