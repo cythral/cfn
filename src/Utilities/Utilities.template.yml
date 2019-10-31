@@ -146,7 +146,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Condition: IsAgentAccount
     Properties:
-      IpAddressType: dualstack
+      IpAddressType: ipv4
       Scheme: internal
       SecurityGroups:
         - !GetAtt WebSecurityGroup.GroupId
@@ -177,10 +177,12 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+          CidrIpv6: ::/0
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
+          CidrIpv6: ::/0
       VpcId: !Ref VPC
         
   # Security - Roles
