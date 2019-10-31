@@ -94,15 +94,5 @@ namespace Cythral.CloudFormation {
                 IsBase64Encoded = false,
             };
         }
-
-        public static async Task Main(string[] args) {
-            var serializer = new Amazon.Lambda.Serialization.Json.JsonSerializer();
-            Func<ApplicationLoadBalancerRequest, ILambdaContext, Task<ApplicationLoadBalancerResponse>> func = Handle;
-
-            using(var wrapper = HandlerWrapper.GetHandlerWrapper(func, serializer))
-            using(var bootstrap = new LambdaBootstrap(wrapper)) {
-                await bootstrap.RunAsync();
-            }   
-        }
     }
 }
