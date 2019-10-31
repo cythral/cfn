@@ -22,6 +22,10 @@ Parameters:
     Type: String
     Description: Suffix to append to the repository name when creating cicd stacks
 
+  DevVpcId:
+    Type: String
+    Description: ID of the VPC to peer to in dev
+
 Resources:
   SSLCertificate:
     Type: Custom::Certificate
@@ -69,6 +73,21 @@ Resources:
       Protocol: HTTPS
       Certificates:
         - CertificateArn: !Ref SSLCertificate
+
+  DevPeeringConnection:
+    Type: AWS::EC2::VPCPeeringConnection
+    Properties:
+      PeerOwnerId: "{{resolve:ssm:DevAccountId:1}}"
+      PeerRoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
+      PeerVpcId: !Ref DevVpcId
+      VpcId: !ImportValue cfn-utilities:VpcId
+
+  DevPeeringRoute:
+    Type: AWS::EC2::Route
+    Properties:
+     DestinationCidrBlock: 0.0.0.0/0
+     RouteTableId: !ImportValue cfn-utilities:RouteTableId
+     VpcPeeringConnectionId: !Ref DevPeeringConnection
 
   DevListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule

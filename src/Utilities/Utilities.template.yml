@@ -388,6 +388,12 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:WebSecurityGroupId
 
+  RouteTableId:
+    Description: ID of the vpc's route table
+    Value: !Ref RouteTable
+    Export:
+      Name: !Sub ${AWS::StackName}:RouteTableId
+
   MasterAccountId:
     Description: ID of the master account
     Condition: IsAgentAccount
