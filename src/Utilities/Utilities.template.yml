@@ -142,6 +142,21 @@ Resources:
       RouteTableId: !Ref RouteTable
       SubnetId: !Ref Subnet4
 
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for web ports 80 and 443
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VPC
+
   NetworkShare:
     Type: AWS::RAM::ResourceShare
     Condition: IsMasterAccount
@@ -344,6 +359,12 @@ Outputs:
         - !Ref Subnet4
     Export:
       Name: !Sub ${AWS::StackName}:SubnetIds
+
+  WebSecurityGroupId:
+    Description: Group ID for the public-web security group
+    Value: !GetAtt WebSecurityGroup.GroupId
+    Export:
+      Name: !Sub ${AWS::StackId}:WebSecurityGroupId
 
   MasterAccountId:
     Description: ID of the master account

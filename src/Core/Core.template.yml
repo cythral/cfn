@@ -32,28 +32,13 @@ Resources:
       ValidationMethod: DNS
       SubjectAlternativeNames:
         - dev.brigh.id
-  
-  WebSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security group for web ports 80 and 443
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-      VpcId: !ImportValue cfn-utilities:VpcId
     
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       IpAddressType: dualstack
       SecurityGroups:
-        - !GetAtt WebSecurityGroup.GroupId
+        - !ImportValue cfn-utilities:WebSecurityGroupId
       Subnets: !Split [",", !ImportValue cfn-utilities:SubnetIds]
 
   HttpListener:
