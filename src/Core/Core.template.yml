@@ -24,7 +24,11 @@ Parameters:
 
   DevVpcId:
     Type: String
+    Default: ""
     Description: ID of the VPC to peer to in dev
+
+Conditions:
+  SetupDevAccount: !Not [ !Equals [ !Ref DevVpcId, "" ] ]
 
 Resources:
   SSLCertificate:
@@ -76,6 +80,7 @@ Resources:
 
   DevPeeringConnection:
     Type: AWS::EC2::VPCPeeringConnection
+    Condition: SetupDevAccount
     Properties:
       PeerOwnerId: "{{resolve:ssm:DevAccountId:1}}"
       PeerRoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
@@ -84,6 +89,7 @@ Resources:
 
   DevPeeringRoute:
     Type: AWS::EC2::Route
+    Condition: SetupDevAccount
     Properties:
      DestinationCidrBlock: 10.2.0.0/16
      RouteTableId: !ImportValue cfn-utilities:RouteTableId
@@ -91,6 +97,7 @@ Resources:
 
   DevListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Condition: SetupDevAccount
     Properties:
       ListenerArn: !Ref HttpsListener
       Priority: 2
@@ -105,6 +112,7 @@ Resources:
 
   DevTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Condition: SetupDevAccount
     Properties:
       TargetType: ip
       VpcId: !ImportValue cfn-utilities:VpcId
@@ -116,6 +124,7 @@ Resources:
 
   DevDnsRecords:
     Type: AWS::Route53::RecordSetGroup
+    Condition: SetupDevAccount
     Properties:
       HostedZoneId: !ImportValue cfn-dns:HostedZoneId
       RecordSets:
@@ -211,3 +220,9 @@ Outputs:
     Description: ARN of the primary load balancer's HTTPS listener
     Export:
       Name: !Sub ${AWS::StackName}:HttpsListenerArn
+
+  PeeringConnectionId:
+    Value: !Ref PeeringConnectionId
+    Description: Id of the peering connection to the agent accounts
+    Export:
+      Name: !Sub ${AWS::StackName}:PeeringConnectionId
