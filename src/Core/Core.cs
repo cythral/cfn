@@ -1,9 +1,13 @@
 using System;
+using System.Threading.Tasks;
+using Amazon;
+using Amazon.Lambda.RuntimeSupport;
+using Amazon.Lambda.Serialization.Json;
 
 namespace Cythral.CloudFormation {
     public class Core {
         public static async Task Main(string[] args) {
-            var serializer = new Amazon.Lambda.Serialization.Json.JsonSerializer();
+            
             var handler = Environment.GetEnvironmentVariable("_HANDLER");
 
             switch(handler) {
@@ -13,6 +17,8 @@ namespace Cythral.CloudFormation {
         }
 
         private static async Task Bootstrap<T>(T handler) {
+            var serializer = new JsonSerializer();
+
             using(var wrapper = HandlerWrapper.GetHandlerWrapper(func, serializer))
             using(var bootstrap = new LambdaBootstrap(wrapper)) {
                 await bootstrap.RunAsync();
