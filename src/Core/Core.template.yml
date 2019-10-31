@@ -127,6 +127,7 @@ Resources:
         - Field: host-header
           HostHeaderConfig:
             Values:
+              - "dev.*"
               - "*.dev.*"
 
   DevTargetGroup:
