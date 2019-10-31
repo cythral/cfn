@@ -27,8 +27,23 @@ Parameters:
     Default: ""
     Description: ID of the VPC to peer to in dev
 
+  ProdVpcId:
+    Type: String
+    Default: ""
+    Description: ID of the VPC to peer to in prod
+
 Conditions:
-  SetupDevAccount: !Not [ !Equals [ !Ref DevVpcId, "" ] ]
+  SetupDevAccount: 
+    !Not 
+      - !Equals 
+          - !Ref DevVpcId
+          - ""
+
+  SetupProdAccount: 
+    !Not
+      - !Equals 
+          - !Ref ProdVpcId
+          - ""
 
 Resources:
   SSLCertificate:
@@ -69,9 +84,13 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
-        - Type: fixed-response
-          FixedResponseConfig:
-            StatusCode: "404"
+        - !If
+            - SetupProdAccount
+            - Type: forward
+              TargetGroupArn: !Ref ProdTargetGroup
+            - Type: fixed-response
+              FixedResponseConfig:
+                StatusCode: "404"
       LoadBalancerArn: !Ref LoadBalancer
       Port: 443
       Protocol: HTTPS
@@ -108,7 +127,7 @@ Resources:
         - Field: host-header
           HostHeaderConfig:
             Values:
-              - dev.*
+              - "*.dev.*"
 
   DevTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -138,6 +157,23 @@ Resources:
           AliasTarget:
             HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
             DNSName: !GetAtt LoadBalancer.DNSName
+
+  ProdPeeringConnection:
+    Type: AWS::EC2::VPCPeeringConnection
+    Condition: SetupProdAccount
+    Properties:
+      PeerOwnerId: "{{resolve:ssm:ProdAccountId:1}}"
+      PeerRoleArn: "{{resolve:ssm:ProdAgentRoleArn:1}}"
+      PeerVpcId: !Ref ProdVpcId
+      VpcId: !ImportValue cfn-utilities:VpcId
+
+  ProdPeeringRoute:
+    Type: AWS::EC2::Route
+    Condition: SetupProdAccount
+    Properties:
+     DestinationCidrBlock: 10.3.0.0/16
+     RouteTableId: !ImportValue cfn-utilities:RouteTableId
+     VpcPeeringConnectionId: !Ref ProdPeeringConnection
 
   ProdDnsRecords:
     Type: AWS::Route53::RecordSetGroup
@@ -221,8 +257,16 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:HttpsListenerArn
 
-  PeeringConnectionId:
-    Value: !Ref PeeringConnectionId
-    Description: Id of the peering connection to the agent accounts
+  DevPeeringConnectionId:
+    Value: !Ref DevPeeringConnection
+    Condition: SetupDevAccount
+    Description: Id of the peering connection with the dev account
     Export:
-      Name: !Sub ${AWS::StackName}:PeeringConnectionId
+      Name: !Sub ${AWS::StackName}:DevPeeringConnectionId
+
+  ProdPeeringConnectionId:
+    Value: !Ref ProdPeeringConnection
+    Condition: SetupProdAccount
+    Description: Id of the peering connection with the prod account
+    Export:
+      Name: !Sub ${AWS::StackName}:ProdPeeringConnectionId
