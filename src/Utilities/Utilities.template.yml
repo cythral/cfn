@@ -196,6 +196,26 @@ Resources:
       Port: 80
       Protocol: HTTP
 
+  HealthcheckListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Condition: IsAgentAccount
+    Properties:
+      ListenerArn: !Ref HttpListener
+      Priority: 1
+      Actions:
+        - Type: fixed-response
+          FixedResponseConfig:
+            StatusCode: "200"
+      Condition:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - /healthcheck
+        - Field: source-ip
+          SourceIpConfig:
+            Values:
+              - !Ref MasterAccountCidr
+
   WebSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
