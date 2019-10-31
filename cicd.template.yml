@@ -113,9 +113,9 @@ Resources:
                 - Name: buildResults
               Configuration:
                 ProjectName: !Ref BuildProject
-        - Name: Deploy
+        - Name: Utilities
           Actions:
-            - Name: Utilities
+            - Name: Shared
               RunOrder: 1
               ActionTypeId:
                 Category: Deploy
@@ -130,8 +130,50 @@ Resources:
                 TemplatePath: buildResults::Utilities.template.yml
                 RoleArn: !ImportValue cfn-utilities:MasterRoleArn
                 Capabilities: CAPABILITY_NAMED_IAM
-            - Name: Resources
+            - Name: Dev
               RunOrder: 2
+              RoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
+              ActionTypeId:
+                Category: Deploy
+                Provider: CloudFormation
+                Owner: AWS
+                Version: 1
+              InputArtifacts:
+                - Name: buildResults
+              OutputArtifacts:
+                - Name: devUtilityExports
+              Configuration:
+                StackName: cfn-utilities
+                ActionMode: CREATE_UPDATE
+                TemplatePath: buildResults::Utilities.template.yml
+                RoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
+                ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}", "NetworkCidr": "10.2.0.0/16" }'
+                Capabilities: CAPABILITY_NAMED_IAM
+                OutputFileName: utility-output.json
+            - Name: Prod
+              RunOrder: 3
+              RoleArn: "{{resolve:ssm:ProdAgentRoleArn:1}}"
+              ActionTypeId:
+                Category: Deploy
+                Provider: CloudFormation
+                Owner: AWS
+                Version: 1
+              InputArtifacts:
+                - Name: buildResults
+              OutputArtifacts:
+                - Name: prodUtilityExports
+              Configuration:
+                StackName: cfn-utilities
+                ActionMode: CREATE_UPDATE
+                TemplatePath: buildResults::Utilities.template.yml
+                RoleArn: "{{resolve:ssm:ProdAgentRoleArn:1}}"
+                ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}", "NetworkCidr": "10.3.0.0/16" }'
+                Capabilities: CAPABILITY_NAMED_IAM
+                OutputFileName: utility-output.json
+          Name: Shared
+          Actions:
+            - Name: Resources
+              RunOrder: 1
               ActionTypeId:
                 Category: Deploy
                 Provider: CloudFormation
@@ -146,7 +188,7 @@ Resources:
                 RoleArn: !ImportValue cfn-utilities:MasterRoleArn
                 Capabilities: CAPABILITY_IAM
             - Name: DNS
-              RunOrder: 3
+              RunOrder: 2
               ActionTypeId:
                 Category: Deploy
                 Provider: CloudFormation
@@ -162,7 +204,7 @@ Resources:
                 RoleArn: !ImportValue cfn-utilities:MasterRoleArn
                 Capabilities: CAPABILITY_IAM
             - Name: Core
-              RunOrder: 4
+              RunOrder: 3
               ActionTypeId:
                 Category: Deploy
                 Provider: CloudFormation
@@ -170,6 +212,8 @@ Resources:
                 Version: 1
               InputArtifacts:
                 - Name: buildResults
+                - Name: devUtilityExports
+                - Name: prodUtilityExports
               Configuration:
                 StackName: cfn-core
                 ActionMode: CREATE_UPDATE
@@ -177,39 +221,8 @@ Resources:
                 TemplateConfiguration: buildResults::Core.config.json
                 RoleArn: !ImportValue cfn-utilities:MasterRoleArn
                 Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-        - Name: Dev
-          Actions:
-            - Name: Utilities
-              RoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
-              ActionTypeId:
-                Category: Deploy
-                Provider: CloudFormation
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: buildResults
-              Configuration:
-                StackName: cfn-utilities
-                ActionMode: CREATE_UPDATE
-                TemplatePath: buildResults::Utilities.template.yml
-                RoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
-                ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}", "NetworkCidr": "10.2.0.0/16" }'
-                Capabilities: CAPABILITY_NAMED_IAM
-        - Name: Prod
-          Actions:
-            - Name: Utilities
-              RoleArn: "{{resolve:ssm:ProdAgentRoleArn:1}}"
-              ActionTypeId:
-                Category: Deploy
-                Provider: CloudFormation
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: buildResults
-              Configuration:
-                StackName: cfn-utilities
-                ActionMode: CREATE_UPDATE
-                TemplatePath: buildResults::Utilities.template.yml
-                RoleArn: "{{resolve:ssm:ProdAgentRoleArn:1}}"
-                ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}", "NetworkCidr": "10.3.0.0/16" }'
-                Capabilities: CAPABILITY_NAMED_IAM
+                ParameterOverrides: |
+                  {
+                    "DevVpcId": { "Fn::GetParam": [ "devUtilityExports", "networking-output.json", "VpcId" ] }
+                  }
+            
