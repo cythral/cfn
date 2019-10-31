@@ -181,6 +181,7 @@ Resources:
     Properties:
       TargetType: ip
       VpcId: !ImportValue cfn-utilities:VpcId
+      HealthCheckPath: /healthcheck
       Port: 80
       Protocol: HTTP
 
