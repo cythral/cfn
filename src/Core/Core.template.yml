@@ -175,6 +175,15 @@ Resources:
      RouteTableId: !ImportValue cfn-utilities:RouteTableId
      VpcPeeringConnectionId: !Ref ProdPeeringConnection
 
+  ProdTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Condition: SetupProdAccount
+    Properties:
+      TargetType: ip
+      VpcId: !ImportValue cfn-utilities:VpcId
+      Port: 80
+      Protocol: HTTP
+
   ProdDnsRecords:
     Type: AWS::Route53::RecordSetGroup # Prod DNS records setup regardless of if peering or not
     Properties:
