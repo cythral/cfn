@@ -364,7 +364,7 @@ Outputs:
     Description: Group ID for the public-web security group
     Value: !GetAtt WebSecurityGroup.GroupId
     Export:
-      Name: !Sub ${AWS::StackId}:WebSecurityGroupId
+      Name: !Sub ${AWS::StackName}:WebSecurityGroupId
 
   MasterAccountId:
     Description: ID of the master account
