@@ -170,7 +170,7 @@ Resources:
                 ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}", "NetworkCidr": "10.3.0.0/16" }'
                 Capabilities: CAPABILITY_NAMED_IAM
                 OutputFileName: utility-output.json
-          Name: Shared
+        - Name: Shared
           Actions:
             - Name: Resources
               RunOrder: 1
