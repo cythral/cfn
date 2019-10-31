@@ -147,7 +147,12 @@ Resources:
                 ActionMode: CREATE_UPDATE
                 TemplatePath: buildResults::Utilities.template.yml
                 RoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
-                ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}", "NetworkCidr": "10.2.0.0/16" }'
+                ParameterOverrides: !Sub |
+                  { 
+                    "MasterAccountId": "${AWS::AccountId}", 
+                    "NetworkCidr": "10.2.0.0/16",
+                    "PeeringConnectionId": { "Fn::GetParam": [ "buildResults", "Networking.config.json", "PeeringConnectionId" ] }
+                  }
                 Capabilities: CAPABILITY_NAMED_IAM
                 OutputFileName: utility-output.json
             - Name: Prod
@@ -167,7 +172,12 @@ Resources:
                 ActionMode: CREATE_UPDATE
                 TemplatePath: buildResults::Utilities.template.yml
                 RoleArn: "{{resolve:ssm:ProdAgentRoleArn:1}}"
-                ParameterOverrides: !Sub '{ "MasterAccountId": "${AWS::AccountId}", "NetworkCidr": "10.3.0.0/16" }'
+                ParameterOverrides: !Sub |
+                  { 
+                    "MasterAccountId": "${AWS::AccountId}", 
+                    "NetworkCidr": "10.3.0.0/16",
+                    "PeeringConnectionId": { "Fn::GetParam": [ "buildResults", "Networking.config.json", "PeeringConnectionId" ] }
+                  }
                 Capabilities: CAPABILITY_NAMED_IAM
                 OutputFileName: utility-output.json
         - Name: Shared
