@@ -176,7 +176,7 @@ Resources:
      VpcPeeringConnectionId: !Ref ProdPeeringConnection
 
   ProdDnsRecords:
-    Type: AWS::Route53::RecordSetGroup
+    Type: AWS::Route53::RecordSetGroup # Prod DNS records setup regardless of if peering or not
     Properties:
       HostedZoneId: !ImportValue cfn-dns:HostedZoneId
       RecordSets:
