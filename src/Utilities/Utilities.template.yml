@@ -206,7 +206,7 @@ Resources:
         - Type: fixed-response
           FixedResponseConfig:
             StatusCode: "200"
-      Condition:
+      Conditions:
         - Field: path-pattern
           PathPatternConfig:
             Values:
