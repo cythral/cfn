@@ -213,10 +213,6 @@ Resources:
           PathPatternConfig:
             Values:
               - /healthcheck
-        - Field: source-ip
-          SourceIpConfig:
-            Values:
-              - !Ref MasterAccountCidr
 
   WebSecurityGroup:
     Type: AWS::EC2::SecurityGroup
