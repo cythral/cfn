@@ -151,7 +151,7 @@ Resources:
                   { 
                     "MasterAccountId": "${AWS::AccountId}", 
                     "NetworkCidr": "10.2.0.0/16",
-                    "PeeringConnectionId": { "Fn::GetParam": [ "buildResults", "Networking.config.json", "PeeringConnectionId" ] }
+                    "PeeringConnectionId": { "Fn::GetParam": [ "buildResults", "Networking.config.json", "DevPeeringConnectionId" ] }
                   }
                 Capabilities: CAPABILITY_NAMED_IAM
                 OutputFileName: utility-output.json
@@ -176,7 +176,7 @@ Resources:
                   { 
                     "MasterAccountId": "${AWS::AccountId}", 
                     "NetworkCidr": "10.3.0.0/16",
-                    "PeeringConnectionId": { "Fn::GetParam": [ "buildResults", "Networking.config.json", "PeeringConnectionId" ] }
+                    "PeeringConnectionId": { "Fn::GetParam": [ "buildResults", "Networking.config.json", "ProdPeeringConnectionId" ] }
                   }
                 Capabilities: CAPABILITY_NAMED_IAM
                 OutputFileName: utility-output.json
