@@ -342,12 +342,8 @@ Resources:
               - kms:GenerateDataKey
             Resource: "*"
             Principal:
-              AWS: !GetAtt BuilderRole.Arn
-          - Effect: Allow
-            Action: kms:Decrypt
-            Resource: "*"
-            Principal:
-              AWS:
+              AWS: 
+                - !GetAtt BuilderRole.Arn
                 - "{{resolve:ssm:DevAccountId:1}}"
                 - "{{resolve:ssm:ProdAccountId:1}}"
 
