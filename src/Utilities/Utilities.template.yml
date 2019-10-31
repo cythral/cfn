@@ -142,6 +142,32 @@ Resources:
       RouteTableId: !Ref RouteTable
       SubnetId: !Ref Subnet4
 
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Condition: IsAgentAccount
+    Properties:
+      IpAddressType: dualstack
+      Scheme: internal
+      SecurityGroups:
+        - !GetAtt WebSecurityGroup.GroupId
+      Subnets:
+        - !Ref Subnet1
+        - !Ref Subnet2
+        - !Ref Subnet3
+        - !Ref Subnet4
+
+  HttpListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: IsAgentAccount
+    Properties:
+      DefaultActions:
+        - Type: fixed-response
+          FixedResponseConfig:
+            StatusCode: "404"
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+
   WebSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -156,20 +182,6 @@ Resources:
           ToPort: 443
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
-
-  NetworkShare:
-    Type: AWS::RAM::ResourceShare
-    Condition: IsMasterAccount
-    Properties:
-      Name: primary-network-share
-      Principals:
-        - "{{resolve:ssm:DevAccountId:1}}"
-        - "{{resolve:ssm:ProdAccountId:1}}"
-      ResourceArns:
-        - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${Subnet1}
-        - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${Subnet2}
-        - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${Subnet3}
-        - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/${Subnet4}
         
   # Security - Roles
   # -------------------------------------------
@@ -425,4 +437,17 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:ArtifactKeyArn
 
+  LoadBalancerArn:
+    Description: ARN of the internal load balancer
+    Condition: IsAgentAccount
+    Value: !Ref LoadBalancer
+    Export:
+      Name: !Sub ${AWS::StackName}:LoadBalancerArn
+
+  HttpListenerArn:
+    Description: ARN of the http listener for the internal load balancer
+    Condition: IsAgentAccount
+    Value: !Ref LoadBalancer
+    Export:
+      Name: !Sub ${AWS::StackName}:HttpListenerArn
   
