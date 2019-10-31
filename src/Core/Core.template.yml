@@ -93,6 +93,7 @@ Resources:
       Protocol: HTTP
       Targets:
         - Id: 10.2.12.92
+          AvailabilityZone: all
 
   DevDnsRecords:
     Type: AWS::Route53::RecordSetGroup
