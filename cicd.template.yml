@@ -223,6 +223,6 @@ Resources:
                 Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
                 ParameterOverrides: |
                   {
-                    "DevVpcId": { "Fn::GetParam": [ "devUtilityExports", "networking-output.json", "VpcId" ] }
+                    "DevVpcId": { "Fn::GetParam": [ "devUtilityExports", "utility-output.json", "VpcId" ] }
                   }
             
