@@ -70,6 +70,30 @@ Resources:
       Certificates:
         - CertificateArn: !Ref SSLCertificate
 
+  DevListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HttpsListener
+      Priority: 2
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref DevTargetGroup
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - dev.*
+
+  DevTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      TargetType: ip
+      VpcId: !ImportValue cfn-utilities:VpcId
+      Port: 80
+      Protocol: HTTP
+      Targets:
+        - Id: 10.2.12.92
+
   DevDnsRecords:
     Type: AWS::Route53::RecordSetGroup
     Properties:
