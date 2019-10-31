@@ -9,6 +9,19 @@ Parameters:
     Description: Cidr to use for the VPC
     Default: 10.1.0.0/16
 
+  # DO NOT SET THIS MANUALLY
+  # This value should only be controlled by CI/CD CodePipeline.
+  # Setting this adds a route to the master account's VPC
+  PeeringConnectionId:
+    Type: String
+    Description: Connection ID of the peering connection setup between master and agent accounts
+    Default: ""
+
+  MasterAccountCidr:
+    Type: String
+    Description: Master account cidr block. A route to the peering connection is setup with this range
+    Default: 10.1.0.0/16
+    
 Conditions:
   # Master/Shared account - one that has control of "agent" accounts like (dev/staging/prod)
   IsMasterAccount: 
@@ -21,6 +34,13 @@ Conditions:
     !Not 
       - !Equals 
         - !Ref MasterAccountId
+        - ""
+
+  # Whether or not to vpc setup peering with the master account.
+  SetupPeeringRoute:
+    !Not 
+      - !Equals
+        - !Ref PeeringConnectionId
         - ""
 
 Resources:
@@ -77,6 +97,14 @@ Resources:
       RouteTableId: !Ref RouteTable
       DestinationIpv6CidrBlock: ::/0
       GatewayId: !Ref InternetGateway
+
+  PeeringRoute:
+    Type: AWS::EC2::Route
+    Condition: SetupPeeringRoute
+    Properties:
+      DestinationCidrBlock: !Ref MasterAccountCidr
+      RouteTableId: !Ref RouteTable
+      VpcPeeringConnectionId: !Ref PeeringConnectionId
   
   Subnet1:
     Type: AWS::EC2::Subnet
