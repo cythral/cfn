@@ -1,0 +1,50 @@
+Parameters:
+  DevAccountId:
+    Type: String
+    Description: ID of the development account
+
+  ProdAccountId:
+    Type: String
+    Description: ID of the production account
+
+Resources:
+  MetadataPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: cloudformation:ListExports
+            Resource: "*"
+
+Outputs:
+  MetadataPolicyArn:
+    Value: !Ref MetadataPolicy
+    Description: ARN of the metadata policy (allows read access to stack exports)
+    Export:
+      Name: !Sub ${AWS::StackName}:MetadataPolicyArn
+
+  DevAccountId:
+    Value: !Ref DevAccountId
+    Description: ID of the development account
+    Export:
+      Name: !Sub ${AWS::StackName}:DevAccountId
+  
+  DevAgentRoleArn:
+    Value: !Sub arn:aws:iam::${DevAccountId}:role/Agent
+    Description: ARN of the development account agent role
+    Export:
+      Name: !Sub ${AWS::StackName}:DevAgentRoleArn
+
+  ProdAccountId:
+    Value: !Ref ProdAccountId
+    Description: ID of the production account
+    Export:
+      Name: !Sub ${AWS::StackName}:ProdAccountId
+
+  ProdAgentRoleArn:
+    Value: !Sub arn:aws:iam::${ProdAccountId}:role/Agent
+    Description: ARN of the production account agent role
+    Export:
+      Name: !Sub ${AWS::StackName}:ProdAgentRoleArn

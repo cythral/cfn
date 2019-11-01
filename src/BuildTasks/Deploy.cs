@@ -28,8 +28,7 @@ namespace Cythral.CloudFormation.BuildTasks {
 
         [Required]
         public string TemplateFile { get; set; }
-
-        [Required]
+        
         public string ConfigFile { get; set; }
 
         public string Capabilities { get; set; }
