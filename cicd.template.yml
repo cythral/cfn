@@ -129,12 +129,13 @@ Resources:
                 TemplatePath: buildResults::Metadata.template.yml
                 RoleArn: !ImportValue cfn-utilities:MasterRoleArn
                 ParameterOverrides: !Sub
-                  - {
-                      "DevAccountId": "${DevAccountId}",
-                      "ProdAccountId": "${ProdAccountId}"
-                    }
-                  - DevAccountId: !ImportValue cfn-metadata:DevAccountId
-                    ProdAccountId: !ImportValue cfn-metadata:ProdAccountId
+                - |
+                  {
+                    "DevAccountId": "${DevAccountId}",
+                    "ProdAccountId": "${ProdAccountId}"
+                  }
+                - DevAccountId: !ImportValue cfn-metadata:DevAccountId
+                  ProdAccountId: !ImportValue cfn-metadata:ProdAccountId
                 Capabilities: CAPABILITY_IAM
         - Name: Utilities
           Actions:
