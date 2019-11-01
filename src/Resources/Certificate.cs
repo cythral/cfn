@@ -122,7 +122,7 @@ namespace Cythral.CloudFormation.Resources {
                     .Count() == 0
             ) {
                 Console.WriteLine($"Got Describe Certificate Response: {JsonSerializer.Serialize(describeCertificateResponse)}");
-                Thread.Sleep(5 * 1000);
+                Thread.Sleep(1000);
             }
 
             if(props.Tags != null) {
@@ -139,14 +139,24 @@ namespace Cythral.CloudFormation.Resources {
             
 
             // add DNS validation records if applicable
+            var names = new HashSet<string>();
             var changes = new List<Change>();
-            if(props.ValidationMethod == ValidationMethod.DNS) { 
+
+            if(props.ValidationMethod == ValidationMethod.DNS) {
                 foreach(var option in describeCertificateResponse.Certificate.DomainValidationOptions) {
+                    var query = from name in names where name == option.ResourceRecord.Name select name;
+
+                    if(query.Count() != 0) {
+                        continue;
+                    }
+
+                    names.Add(option.ResourceRecord.Name);
                     changes.Add(new Change {
                         Action = ChangeAction.UPSERT,
                         ResourceRecordSet = new ResourceRecordSet {
                             Name = option.ResourceRecord.Name,
                             Type = new RRType(option.ResourceRecord.Type.Value),
+                            SetIdentifier = Request.PhysicalResourceId, 
                             TTL = 60,
                             ResourceRecords = new List<ResourceRecord> {
                                 new ResourceRecord { Value = option.ResourceRecord.Value }
@@ -249,13 +259,23 @@ namespace Cythral.CloudFormation.Resources {
             });
             Console.WriteLine($"Got describe certificate response: {JsonSerializer.Serialize(describeResponse)}");
 
+            var names = new HashSet<string>();
             var changes = new List<Change>();
+
             foreach(var option in describeResponse.Certificate.DomainValidationOptions) {
+                var query = from name in names where name == option.ResourceRecord.Name select name;
+
+                if(query.Count() != 0) {
+                    continue;
+                }
+
+                names.Add(option.ResourceRecord.Name);
                 changes.Add(new Change {
                     Action = ChangeAction.DELETE,
                     ResourceRecordSet = new ResourceRecordSet {
                         Name = option.ResourceRecord.Name,
                         Type = new RRType(option.ResourceRecord.Type.Value),
+                        SetIdentifier = Request.PhysicalResourceId,
                         TTL = 60,
                         ResourceRecords = new List<ResourceRecord> {
                             new ResourceRecord { Value = option.ResourceRecord.Value }
