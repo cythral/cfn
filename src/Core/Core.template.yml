@@ -54,7 +54,7 @@ Resources:
       HostedZoneId: !ImportValue cfn-dns:HostedZoneId
       ValidationMethod: DNS
       SubjectAlternativeNames:
-        - dev.brigh.id
+        - "*.brigh.id"
     
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
