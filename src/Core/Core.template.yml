@@ -55,6 +55,7 @@ Resources:
       ValidationMethod: DNS
       SubjectAlternativeNames:
         - "*.brigh.id"
+        - "*.dev.brigh.id"
     
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
