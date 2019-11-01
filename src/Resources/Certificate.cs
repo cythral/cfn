@@ -157,6 +157,7 @@ namespace Cythral.CloudFormation.Resources {
                             Name = option.ResourceRecord.Name,
                             Type = new RRType(option.ResourceRecord.Type.Value),
                             SetIdentifier = Request.PhysicalResourceId, 
+                            Weight = 1,
                             TTL = 60,
                             ResourceRecords = new List<ResourceRecord> {
                                 new ResourceRecord { Value = option.ResourceRecord.Value }
@@ -276,6 +277,7 @@ namespace Cythral.CloudFormation.Resources {
                         Name = option.ResourceRecord.Name,
                         Type = new RRType(option.ResourceRecord.Type.Value),
                         SetIdentifier = Request.PhysicalResourceId,
+                        Weight = 1,
                         TTL = 60,
                         ResourceRecords = new List<ResourceRecord> {
                             new ResourceRecord { Value = option.ResourceRecord.Value }
