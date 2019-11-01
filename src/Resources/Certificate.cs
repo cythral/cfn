@@ -114,6 +114,8 @@ namespace Cythral.CloudFormation.Resources {
             var describeCertificateRequest = new DescribeCertificateRequest { CertificateArn = Request.PhysicalResourceId };
             var tasks = new List<Task>();
 
+            Thread.Sleep(500);
+
             // For some reason, the domain validation options aren't immediately populated.
             while(
                     (describeCertificateResponse = await acmClient.DescribeCertificateAsync(describeCertificateRequest))
@@ -135,8 +137,6 @@ namespace Cythral.CloudFormation.Resources {
                     Console.WriteLine($"Got Add Tags Response: {JsonSerializer.Serialize(addTagsResponse)}");
                 }));
             }
-
-            
 
             // add DNS validation records if applicable
             var names = new HashSet<string>();
