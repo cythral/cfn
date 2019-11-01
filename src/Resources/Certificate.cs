@@ -290,14 +290,18 @@ namespace Cythral.CloudFormation.Resources {
             }
 
             if(changes.Count() != 0) {
-                var changeRecordsResponse = await Route53ClientFactory().ChangeResourceRecordSetsAsync(new ChangeResourceRecordSetsRequest {
-                    HostedZoneId = Request.ResourceProperties.HostedZoneId,
-                    ChangeBatch = new ChangeBatch {
-                        Changes = changes
-                    }
-                });
+                try {
+                    var changeRecordsResponse = await Route53ClientFactory().ChangeResourceRecordSetsAsync(new ChangeResourceRecordSetsRequest {
+                        HostedZoneId = Request.ResourceProperties.HostedZoneId,
+                        ChangeBatch = new ChangeBatch {
+                            Changes = changes
+                        }
+                    });
 
-                Console.WriteLine($"Got delete record response: {JsonSerializer.Serialize(changeRecordsResponse)}");
+                    Console.WriteLine($"Got delete record response: {JsonSerializer.Serialize(changeRecordsResponse)}");
+                } catch(Exception e) {
+                    Console.WriteLine($"Error deleting old resource records: {e.Message} {e.StackTrace}");
+                }
             }
 
             var deleteResponse = await AcmClientFactory().DeleteCertificateAsync(new DeleteCertificateRequest {
