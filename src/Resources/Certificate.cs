@@ -110,20 +110,23 @@ namespace Cythral.CloudFormation.Resources {
             Console.WriteLine($"Got Request Certificate Response: {JsonSerializer.Serialize(requestCertificateResponse)}");
 
             Request.PhysicalResourceId = requestCertificateResponse.CertificateArn;
-            DescribeCertificateResponse describeCertificateResponse;
             var describeCertificateRequest = new DescribeCertificateRequest { CertificateArn = Request.PhysicalResourceId };
             var tasks = new List<Task>();
 
             Thread.Sleep(500);
+            bool foundValidationOptions = false;
+            List<DomainValidation> validationOptions = new List<DomainValidation>();
 
             // For some reason, the domain validation options aren't immediately populated.
-            while(
-                    (describeCertificateResponse = await acmClient.DescribeCertificateAsync(describeCertificateRequest))
-                    .Certificate
-                    .DomainValidationOptions
-                    .Count() == 0
-            ) {
+            while(!foundValidationOptions) {
+                var describeCertificateResponse = await acmClient.DescribeCertificateAsync(describeCertificateRequest);
                 Console.WriteLine($"Got Describe Certificate Response: {JsonSerializer.Serialize(describeCertificateResponse)}");
+
+                validationOptions = describeCertificateResponse.Certificate.DomainValidationOptions;
+                if(validationOptions.Count() > 0 && validationOptions[0]?.ResourceRecord?.Name != null) {
+                    foundValidationOptions = true;
+                }
+                
                 Thread.Sleep(1000);
             }
 
@@ -143,7 +146,7 @@ namespace Cythral.CloudFormation.Resources {
             var changes = new List<Change>();
 
             if(props.ValidationMethod == ValidationMethod.DNS) {
-                foreach(var option in describeCertificateResponse.Certificate.DomainValidationOptions) {
+                foreach(var option in validationOptions) {
                     var query = from name in names where name == option.ResourceRecord.Name select name;
 
                     if(query.Count() != 0) {
