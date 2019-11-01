@@ -3,3 +3,4 @@
 **/lib/
 **/tasks/
 nuget.config
+**/Metadata.config.json

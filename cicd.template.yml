@@ -35,8 +35,8 @@ Resources:
             Principal:
               AWS:
                 - !Ref AWS::AccountId
-                - "{{resolve:ssm:DevAgentRoleArn:1}}"
-                - "{{resolve:ssm:ProdAgentRoleArn:1}}"
+                - !ImportValue cfn-metadata:DevAgentRoleArn
+                - !ImportValue cfn-metadata:ProdAgentRoleArn
 
   BuildProject:
     Type: AWS::CodeBuild::Project
@@ -113,6 +113,29 @@ Resources:
                 - Name: buildResults
               Configuration:
                 ProjectName: !Ref BuildProject
+        - Name: Metadata
+          Actions:
+            - Name: Deploy
+              ActionTypeId:
+                Category: Deploy
+                Provider: CloudFormation
+                Owner: AWS
+                Version: 1
+              InputArtifacts:
+                - Name: buildResults
+              Configuration:
+                StackName: cfn-metadata
+                ActionMode: CREATE_UPDATE
+                TemplatePath: buildResults::Metadata.template.yml
+                RoleArn: !ImportValue cfn-utilities:MasterRoleArn
+                ParameterOverrides: !Sub
+                  - {
+                      "DevAccountId": "${DevAccountId}",
+                      "ProdAccountId": "${ProdAccountId}"
+                    }
+                  - DevAccountId: !ImportValue cfn-metadata:DevAccountId
+                    ProdAccountId: !ImportValue cfn-metadata:ProdAccountId
+                Capabilities: CAPABILITY_IAM
         - Name: Utilities
           Actions:
             - Name: Shared
@@ -132,7 +155,7 @@ Resources:
                 Capabilities: CAPABILITY_NAMED_IAM
             - Name: Dev
               RunOrder: 2
-              RoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
+              RoleArn: !ImportValue cfn-metadata:DevAgentRoleArn
               ActionTypeId:
                 Category: Deploy
                 Provider: CloudFormation
@@ -146,7 +169,7 @@ Resources:
                 StackName: cfn-utilities
                 ActionMode: CREATE_UPDATE
                 TemplatePath: buildResults::Utilities.template.yml
-                RoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
+                RoleArn: !ImportValue cfn-metadata:DevAgentRoleArn
                 ParameterOverrides: !Sub |
                   { 
                     "MasterAccountId": "${AWS::AccountId}", 
@@ -157,7 +180,7 @@ Resources:
                 OutputFileName: utility-output.json
             - Name: Prod
               RunOrder: 3
-              RoleArn: "{{resolve:ssm:ProdAgentRoleArn:1}}"
+              RoleArn: !ImportValue cfn-metadata:ProdAgentRoleArn
               ActionTypeId:
                 Category: Deploy
                 Provider: CloudFormation
@@ -171,7 +194,7 @@ Resources:
                 StackName: cfn-utilities
                 ActionMode: CREATE_UPDATE
                 TemplatePath: buildResults::Utilities.template.yml
-                RoleArn: "{{resolve:ssm:ProdAgentRoleArn:1}}"
+                RoleArn: !ImportValue cfn-metadata:ProdAgentRoleArn
                 ParameterOverrides: !Sub |
                   { 
                     "MasterAccountId": "${AWS::AccountId}", 
@@ -180,7 +203,7 @@ Resources:
                   }
                 Capabilities: CAPABILITY_NAMED_IAM
                 OutputFileName: utility-output.json
-        - Name: Shared
+        - Name: Features
           Actions:
             - Name: Resources
               RunOrder: 1

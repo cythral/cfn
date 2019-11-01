@@ -392,8 +392,8 @@ Resources:
             Principal:
               AWS: 
                 - !GetAtt BuilderRole.Arn
-                - "{{resolve:ssm:DevAccountId:1}}"
-                - "{{resolve:ssm:ProdAccountId:1}}"
+                - !ImportValue cfn-metadata:DevAccountId
+                - !ImportValue cfn-metadata:ProdAccountId
 
   ArtifactKeyAlias:
     Type: AWS::KMS::Alias
