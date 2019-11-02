@@ -67,4 +67,3 @@ Notable features to be added in the future:
 - [ ] Custom resource that decrypts values with KMS
 - [ ] Password generator custom resource
 - [ ] Customize which accounts can invoke the custom resources
-- [ ] Custom resource for VPC/Subnet sharing
