@@ -20,7 +20,7 @@ Requirements for all Custom Resources:
 Webhook capable of deploying CloudFormation stacks on github repository push events. This would be used for setting up pipeline stacks. 
 
 ## Installation
-An effort to automate most of these steps (save #1, #7) will be made at some point in the future. Once installed, there is no need to manually deploy any of these projects again unless any of the stacks get deleted.  
+An effort to automate most of these steps (save #1, #6) will be made at some point in the future. Once installed, there is no need to manually deploy any of these projects again unless any of the stacks get deleted.  
 
 1. Create master (shared/central) and agent (dev/qual/prod) AWS accounts (best left unautomated).
 2. Create AWS CLI profiles for each of these accounts in `~/.aws/credentials`
