@@ -7,28 +7,56 @@
         <SkipDns>false</SkipDns>
         <SkipCore>false</SkipCore>
     </PropertyGroup>
-    
-    <Target Name="Deploy">
+
+    <PropertyGroup>
+        <GetAccountIdCommand>aws sts get-caller-identity --query Account --output text</GetAccountIdCommand>
+        <GetUtilityBucketCommand>aws cloudformation list-exports --query Exports[?Name==\`cfn-utilities:UtilityBucketName\`].Value --output text</GetUtilityBucketCommand>
+    </PropertyGroup>
+
+    <Target Name="Prepare" BeforeTargets="Deploy">
+        <!-- Get Metadata -->
+        <Exec Command="$(GetAccountIdCommand) --profile dev" ConsoleToMsBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="DevAccountId" />
+        </Exec>
+
+        <Exec Command="$(GetAccountIdCommand) --profile prod" ConsoleToMsBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="ProdAccountId" />
+        </Exec>
+
         <MSBuild 
             Projects="$(SourceDirectory)/BuildTasks/BuildTasks.csproj" 
             Targets="Publish" 
             Properties="Configuration=$(Configuration)" />
-
+    </Target>
+    
+    <Target Name="Deploy">
         <MSBuild
             Projects="$(SourceDirectory)/Metadata/Metadata.proj"
             Targets="Publish"
             Properties="Configuration=$(Configuration);DevAccountId=$(DevAccountId);ProdAccountId=$(ProdAccountId)" />
 
+        <!-- Deploy Utilities to all accounts -->
         <MSBuild    
             Projects="$(SourceDirectory)/Utilities/Utilities.proj" 
             Targets="Build" 
             Properties="StackName=$(UtilitiesStackName);Configuration=$(Configuration)" />
 
-        <!-- Get the Utility Bucket name -->
-        <Exec Command="aws cloudformation list-exports --query Exports[?Name==\`cfn-utilities:UtilityBucketName\`].Value --output text" ConsoleToMsBuild="true">
+        <MSBuild    
+            Projects="$(SourceDirectory)/Utilities/Utilities.proj" 
+            Targets="Build" 
+            Properties="StackName=$(UtilitiesStackName);Configuration=$(Configuration);Profile=dev" />
+        
+        <MSBuild    
+            Projects="$(SourceDirectory)/Utilities/Utilities.proj" 
+            Targets="Build" 
+            Properties="StackName=$(UtilitiesStackName);Configuration=$(Configuration);Profile=prod" />
+
+        <!-- Get Utility Outputs -->
+        <Exec Command="$(GetUtilityBucketCommand)" ConsoleToMsBuild="true">
             <Output TaskParameter="ConsoleOutput" PropertyName="UtilityBucket" />
         </Exec>
 
+        <!-- Deploy "Feature" Projects -->
         <MSBuild 
             Condition="$(SkipResources) != 'true'" 
             Projects="$(SourceDirectory)/Resources/Resources.csproj" 
@@ -45,6 +73,11 @@
             Condition="$(SkipCore) != 'true'" 
             Projects="$(SourceDirectory)/Core/Core.csproj" 
             Targets="Publish" 
-            Properties="DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration);GithubOwner=$(GithubOwner);GithubToken=$(GithubToken);GithubSigningSecret=$(GithubSigningSecret)" />
+            Properties="
+                DeploymentBucket=$(UtilityBucket);
+                Configuration=$(Configuration);
+                GithubOwner=$(GithubOwner);
+                GithubToken=$(GithubToken);
+                GithubSigningSecret=$(GithubSigningSecret);" />
     </Target>
 </Project>
