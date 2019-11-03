@@ -102,8 +102,8 @@ Resources:
     Type: AWS::EC2::VPCPeeringConnection
     Condition: SetupDevAccount
     Properties:
-      PeerOwnerId: "{{resolve:ssm:DevAccountId:1}}"
-      PeerRoleArn: "{{resolve:ssm:DevAgentRoleArn:1}}"
+      PeerOwnerId: !ImportValue cfn-metadata:DevAccountId
+      PeerRoleArn: !ImportValue cfn-metadata:DevAgentRoleArn
       PeerVpcId: !Ref DevVpcId
       VpcId: !ImportValue cfn-utilities:VpcId
 
@@ -165,8 +165,8 @@ Resources:
     Type: AWS::EC2::VPCPeeringConnection
     Condition: SetupProdAccount
     Properties:
-      PeerOwnerId: "{{resolve:ssm:ProdAccountId:1}}"
-      PeerRoleArn: "{{resolve:ssm:ProdAgentRoleArn:1}}"
+      PeerOwnerId: !ImportValue cfn-metadata:ProdAccountId
+      PeerRoleArn: !ImportValue cfn-metadata:ProdAgentRoleArn
       PeerVpcId: !Ref ProdVpcId
       VpcId: !ImportValue cfn-utilities:VpcId
 
