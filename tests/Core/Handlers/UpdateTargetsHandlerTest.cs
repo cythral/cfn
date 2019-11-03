@@ -28,8 +28,18 @@ using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.Tests.Handlers {
     public class UpdateTargetsHandlerTest {
-        private IAmazonElasticLoadBalancingV2 CreateElbClient(string targetGroupArn) {
+        private IAmazonElasticLoadBalancingV2 CreateElbClient(string targetGroupArn, List<TargetHealthDescription> targets = null) {
             var elbClient = Substitute.For<IAmazonElasticLoadBalancingV2>();
+            targets = targets ?? new List<TargetHealthDescription> {
+                new TargetHealthDescription {
+                    Target = new TargetDescription { Id = "10.0.0.1" },
+                    TargetHealth = new TargetHealth { State = Unhealthy }
+                },
+                new TargetHealthDescription {
+                    Target = new TargetDescription { Id = "10.0.0.2" },
+                    TargetHealth = new TargetHealth { State = Healthy }
+                }
+            };
 
             elbClient
             .DescribeTargetHealthAsync(
@@ -38,16 +48,7 @@ namespace Cythral.CloudFormation.Tests.Handlers {
                 )
             )
             .Returns(new DescribeTargetHealthResponse {
-                TargetHealthDescriptions = new List<TargetHealthDescription> {
-                    new TargetHealthDescription {
-                        Target = new TargetDescription { Id = "10.0.0.1" },
-                        TargetHealth = new TargetHealth { State = Unhealthy }
-                    },
-                    new TargetHealthDescription {
-                        Target = new TargetDescription { Id = "10.0.0.2" },
-                        TargetHealth = new TargetHealth { State = Healthy }
-                    }
-                }
+                TargetHealthDescriptions = targets
             });
 
             return elbClient;
@@ -160,6 +161,76 @@ namespace Cythral.CloudFormation.Tests.Handlers {
                     )
                 )
             );
+        }
+
+        [Test]
+        public async Task HandleDoesntCallDeregisterWhenAllTargetsHealthy() {
+            var targets = new List<TargetHealthDescription> {
+                new TargetHealthDescription {
+                    TargetHealth = new TargetHealth { State = Healthy },
+                    Target = new TargetDescription { Id = "10.0.0.1" }
+                }
+            };
+
+            var dnsResolver = Substitute.For<IDnsResolver>();
+            var dnsName = "http://example.com";
+            var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
+            var elbClient = CreateElbClient(targetGroupArn, targets);
+            var request = new UpdateTargetsHandler.Request {
+                TargetGroupArn = targetGroupArn,
+                TargetDnsName = dnsName,
+            };
+
+            dnsResolver
+            .Resolve(Arg.Is<string>(hostname => hostname == dnsName))
+            .Returns(new IPHostEntry());
+
+            await UpdateTargetsHandler.Handle(
+                request:        request,
+                resolver:       dnsResolver,
+                elbClient:      elbClient
+            );
+
+            await elbClient
+            .DidNotReceive()
+            .DeregisterTargetsAsync(Arg.Any<DeregisterTargetsRequest>());
+        }
+
+        [Test]
+        public async Task HandleDoesntCallRegisterWhenNoNewTargets() {
+            var targets = new List<TargetHealthDescription> {
+                new TargetHealthDescription {
+                    TargetHealth = new TargetHealth { State = Healthy },
+                    Target = new TargetDescription { Id = "10.0.0.1" }
+                }
+            };
+
+            var dnsResolver = Substitute.For<IDnsResolver>();
+            var dnsName = "http://example.com";
+            var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
+            var elbClient = CreateElbClient(targetGroupArn, targets);
+            var request = new UpdateTargetsHandler.Request {
+                TargetGroupArn = targetGroupArn,
+                TargetDnsName = dnsName,
+            };
+
+            dnsResolver
+            .Resolve(Arg.Is<string>(hostname => hostname == dnsName))
+            .Returns(new IPHostEntry {
+                AddressList = new IPAddress[] {
+                    IPAddress.Parse("10.0.0.1")
+                }
+            });
+
+            await UpdateTargetsHandler.Handle(
+                request:        request,
+                resolver:       dnsResolver,
+                elbClient:      elbClient
+            );
+
+            await elbClient
+            .DidNotReceive()
+            .RegisterTargetsAsync(Arg.Any<RegisterTargetsRequest>());
         }
     }
 }

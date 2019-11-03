@@ -54,14 +54,15 @@ namespace Cythral.CloudFormation.Handlers {
             var targetHealthDescriptions = targetHealthResponse.TargetHealthDescriptions;
             var healthyTargets = from target in targetHealthDescriptions where target.TargetHealth.State != Unhealthy select target.Target;
             var unhealthyTargets = from target in targetHealthDescriptions where target.TargetHealth.State == Unhealthy select target.Target;
-            var unhealthyTargetList = unhealthyTargets.ToList();
             
-            var deregisterTargetsResponse = await elbClient.DeregisterTargetsAsync(new DeregisterTargetsRequest {
-                TargetGroupArn = request.TargetGroupArn,
-                Targets = unhealthyTargetList
-            });
+            if(unhealthyTargets.Count() > 0) {
+                var deregisterTargetsResponse = await elbClient.DeregisterTargetsAsync(new DeregisterTargetsRequest {
+                    TargetGroupArn = request.TargetGroupArn,
+                    Targets = unhealthyTargets.ToList()
+                });
 
-            Console.WriteLine($"Got deregister targets response: {Serialize(deregisterTargetsResponse)}");
+                Console.WriteLine($"Got deregister targets response: {Serialize(deregisterTargetsResponse)}");
+            }
 
             var newTargets = from address in addresses 
                 where healthyTargets.All(target => !IPAddress.Parse(target.Id).Equals(address))
@@ -70,13 +71,15 @@ namespace Cythral.CloudFormation.Handlers {
                     AvailabilityZone = "all",
                     Port = 80
                 };
-
-            var registerTargetsResponse = await elbClient.RegisterTargetsAsync(new RegisterTargetsRequest {
-                TargetGroupArn = request.TargetGroupArn,
-                Targets = newTargets.ToList()
-            });
             
-            Console.WriteLine($"Got register targets response: {Serialize(registerTargetsResponse)}");
+            if(newTargets.Count() > 0) {
+                var registerTargetsResponse = await elbClient.RegisterTargetsAsync(new RegisterTargetsRequest {
+                    TargetGroupArn = request.TargetGroupArn,
+                    Targets = newTargets.ToList()
+                });
+            
+                Console.WriteLine($"Got register targets response: {Serialize(registerTargetsResponse)}");
+            }
 
             return new Response {
                 Success = true
