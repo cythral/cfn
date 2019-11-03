@@ -42,6 +42,7 @@ namespace Cythral.CloudFormation {
                 ("GITHUB_SIGNING_SECRET",   true),
                 ("TEMPLATE_FILENAME",       false),
                 ("STACK_SUFFIX",            false),
+                ("ROLE_ARN",                false),
             });
 
             try {
@@ -54,6 +55,7 @@ namespace Cythral.CloudFormation {
             var stackName = $"{payload.Repository.Name}-{Config["STACK_SUFFIX"]}";
             var contentsUrl = payload.Repository.ContentsUrl;
             var templateContent = await CommittedFile.FromContentsUrl(contentsUrl, Config["TEMPLATE_FILENAME"], Config);
+            var roleArn = Config["ROLE_ARN"];
 
             if(templateContent == null) {
                 Console.WriteLine($"Couldn't find template for {payload.Repository.Name}");
@@ -67,7 +69,7 @@ namespace Cythral.CloudFormation {
                 new Parameter { ParameterKey = "GithubBranch", ParameterValue = payload.Repository.DefaultBranch }
             };
 
-            await StackDeployer.Deploy(stackName, templateContent, parameters);
+            await StackDeployer.Deploy(stackName, templateContent, roleArn, parameters);
             return CreateResponse(statusCode: OK);
         }
 

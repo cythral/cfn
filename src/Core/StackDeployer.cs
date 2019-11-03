@@ -16,6 +16,7 @@ namespace Cythral.CloudFormation {
         public static async Task Deploy(
             string stackName, 
             string template,
+            string roleArn = null,
             IEnumerable<Parameter> parameters = null,
             IEnumerable<string> capabilities = null, 
             IAmazonCloudFormation cloudformationClient = null
@@ -39,6 +40,7 @@ namespace Cythral.CloudFormation {
                     TemplateBody = template,
                     Parameters = (List<Parameter>) parameters,
                     Capabilities = (List<string>) capabilities,
+                    RoleARN = roleArn,
                     OnFailure = DELETE
                 };
 
@@ -49,7 +51,8 @@ namespace Cythral.CloudFormation {
                     StackName = stackName,
                     TemplateBody = template,
                     Parameters = (List<Parameter>) parameters,
-                    Capabilities = (List<string>) capabilities
+                    Capabilities = (List<string>) capabilities,
+                    RoleARN = roleArn
                 };
 
                 var updateStackResponse = await cloudformationClient.UpdateStackAsync(updateStackRequest);

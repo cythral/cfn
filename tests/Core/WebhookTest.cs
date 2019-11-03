@@ -29,7 +29,8 @@ namespace Cythral.CloudFormation.Tests {
                 ["TEMPLATE_FILENAME"] = "cicd.template.yml",
                 ["CONFIG_FILENAME"] = "cicd.config.yml",
                 ["STACK_SUFFIX"] = "cicd",
-                ["GITHUB_SIGNING_SECRET"] = ""
+                ["GITHUB_SIGNING_SECRET"] = "",
+                ["ROLE_ARN"] = "arn:aws:iam::1:role/Facade",
             };
             
             var contentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}";
