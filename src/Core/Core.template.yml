@@ -280,6 +280,30 @@ Resources:
             Values:
               - /webhooks/github
 
+  UpdateTargetsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: UpdateTargets
+      Runtime: provided
+      Timeout: 30
+      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      Policies:
+        - AWSLambdaExecute
+        - !Ref UpdateTargetsPolicy
+
+  UpdateTargetsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - elasticloadbalancing:DescribeTargetHealth
+              - elasticloadbalancing:RegisterTargets
+              - elasticloadbalancing:DeregisterTargets
+            Resource: "*"
+            
 Outputs:
   LoadBalancerCanonicalHostedZoneId:
     Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
