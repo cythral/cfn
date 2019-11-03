@@ -17,8 +17,6 @@ phases:
       - dotnet --info
       - dotnet test -c Release
       - dotnet msbuild tools/package.proj -p:Configuration=Release
-
-      # Get networking configuration 
       - ./tools/create-networking-config.sh > Networking.config.json
 
 artifacts:
