@@ -23,7 +23,9 @@ Webhook capable of deploying CloudFormation stacks on github repository push eve
 An effort to automate most of these steps (save #1, #6) will be made at some point in the future. Once installed, there is no need to manually deploy any of these projects again unless any of the stacks get deleted.  
 
 1. Create master (shared/central) and agent (dev/qual/prod) AWS accounts (best left unautomated).
-2. Create AWS CLI profiles for each of these accounts in `~/.aws/credentials`
+2. Create AWS CLI profiles for each of these accounts in `~/.aws/credentials`. 
+    * Use the shared account credentials as the default profile.
+    * Dev and prod should have profiles with their lowercase names
 3. Create a reusable delegation set in the master account
    1. Register a domain (where your webhook will live)
    2.  [Follow this guide](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/white-label-name-servers.html)

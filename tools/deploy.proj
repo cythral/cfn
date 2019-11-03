@@ -7,6 +7,29 @@
         <SkipDns>false</SkipDns>
         <SkipCore>false</SkipCore>
     </PropertyGroup>
+
+    <PropertyGroup>
+        <GetAccountIdCommand>aws sts get-caller-identity --query Account --output text</GetAccountIdCommand>
+        <GetLoadBalancerDnsNameCommand>aws cloudformation list-exports --query Exports[?Name==\`$(UtilitiesStackName):LoadBalancerDnsName\`].Value --output text</GetLoadBalancerDnsNameCommand>
+    </PropertyGroup>
+
+    <Target Name="GetMetadata" BeforeTargets="Deploy">
+        <Exec Command="$(GetAccountIdCommand) --profile dev" ConsoleToMsBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="DevAccountId" />
+        </Exec>
+
+        <Exec Command="$(GetLoadBalancerDnsNameCommand) --profile dev" ConsoleToMsBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="DevLoadBalancerDnsName" />
+        </Exec>
+
+        <Exec Command="$(GetAccountIdCommand) --profile prod" ConsoleToMsBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="ProdAccountId" />
+        </Exec>
+
+        <Exec Command="$(GetLoadBalancerDnsNameCommand) --profile prod" ConsoleToMsBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="ProdLoadBalancerDnsName" />
+        </Exec>
+    </Target>
     
     <Target Name="Deploy">
         <MSBuild 
@@ -17,7 +40,12 @@
         <MSBuild
             Projects="$(SourceDirectory)/Metadata/Metadata.proj"
             Targets="Publish"
-            Properties="Configuration=$(Configuration);DevAccountId=$(DevAccountId);ProdAccountId=$(ProdAccountId)" />
+            Properties="
+                Configuration=$(Configuration);
+                DevAccountId=$(DevAccountId);
+                DevLoadBalancerDnsName=$(DevLoadBalancerDnsName);
+                ProdAccountId=$(ProdAccountId);
+                ProdLoadBalancerDnsName=$(ProdLoadBalancerDnsName)" />
 
         <MSBuild    
             Projects="$(SourceDirectory)/Utilities/Utilities.proj" 

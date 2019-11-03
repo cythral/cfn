@@ -16,7 +16,9 @@
 {
     "Parameters": {
         "DevAccountId": "$(DevAccountId)",
-        "ProdAccountId": "$(ProdAccountId)"
+        "DevLoadBalancerDnsName": "$(DevLoadBalancerDnsName)",
+        "ProdAccountId": "$(ProdAccountId)",
+        "ProdLoadBalancerDnsName": "$(ProdLoadBalancerDnsName)"
     }
 }
             </ConfigFileContents>
