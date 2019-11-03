@@ -3,17 +3,9 @@ Parameters:
     Type: String
     Description: ID of the development account
 
-  DevLoadBalancerDnsName:
-    Type: String
-    Description: DNS name of the dev load balancer
-
   ProdAccountId:
     Type: String
     Description: ID of the production account
-
-  ProdLoadBalancerDnsName:
-    Type: String
-    Description: DNS name of the prod load balancer
 
 Resources:
   MetadataPolicy:
@@ -45,12 +37,6 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:DevAgentRoleArn
 
-  DevLoadBalancerDnsName:
-    Value: !Ref DevLoadBalancerDnsName
-    Description: DNS name of the dev load balancer
-    Export:
-      Name: !Sub ${AWS::StackName}:DevLoadBalancerDnsName
-
   ProdAccountId:
     Value: !Ref ProdAccountId
     Description: ID of the production account
@@ -62,9 +48,3 @@ Outputs:
     Description: ARN of the production account agent role
     Export:
       Name: !Sub ${AWS::StackName}:ProdAgentRoleArn
-
-  ProdLoadBalancerDnsName:
-    Value: !Ref ProdLoadBalancerDnsName
-    Description: DNS name of the prod load balancer
-    Export:
-      Name: !Sub ${AWS::StackName}:ProdLoadBalancerDnsName
