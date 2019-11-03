@@ -18,13 +18,8 @@ phases:
       - dotnet test -c Release
       - dotnet msbuild tools/package.proj -p:Configuration=Release
 
-      # Get networking configuration
-      - devPeeringConnectionId=$(aws cloudformation list-exports --query Exports[?Name==\`cfn-core:DevPeeringConnectionId\`].Value --output text)
-      - prodPeeringConnectionId=$(aws cloudformation list-exports --query Exports[?Name==\`cfn-core:ProdPeeringConnectionId\`].Value --output text)
-      - config={}
-      - config=$(echo $config | jq ".DevPeeringConnectionId=\"$devPeeringConnectionId\"") 
-      - config=$(echo $config | jq ".ProdPeeringConnectionId=\"$prodPeeringConnectionId\"") 
-      - echo $config > Networking.config.json
+      # Get networking configuration 
+      - ./tools/create-networking-config.sh > Networking.config.json
 
 artifacts:
   discard-paths: yes
