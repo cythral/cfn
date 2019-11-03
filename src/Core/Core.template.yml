@@ -140,9 +140,34 @@ Resources:
       Port: 80
       HealthCheckPath: /healthcheck
       Protocol: HTTP
-      Targets:
-        - Id: 10.2.12.92
-          AvailabilityZone: all
+
+  DevTargetGroupAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Condition: SetupDevAccount
+    Properties:
+      Threshold: 2.0
+      EvaluationPeriods: 1
+      ComparisonOperator: LessThanOrEqualToThreshold
+      Metrics:
+        - Id: healthyfactor
+          Expression: min(healthy - unhealthy, unhealthy)
+          ReturnData: true
+        - Id: unhealthy
+          MetricStat:
+            Metric:
+              Namespace: AWS/ApplicationELB
+              MetricName: UnHealthyHostCount
+            Stat: Maximum
+            Period: 60
+          ReturnData: false
+        - Id: healthy
+          MetricStat:
+            Metric:
+              Namespace: AWS/ApplicationELB
+              MetricName: HealthyHostCount
+            Stat: Maximum
+            Period: 60
+          ReturnData: false
 
   DevDnsRecords:
     Type: AWS::Route53::RecordSetGroup
@@ -303,6 +328,8 @@ Resources:
               - elasticloadbalancing:RegisterTargets
               - elasticloadbalancing:DeregisterTargets
             Resource: "*"
+
+  
             
 Outputs:
   LoadBalancerCanonicalHostedZoneId:
