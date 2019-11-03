@@ -28,6 +28,7 @@ namespace Cythral.CloudFormation.Tests {
         public async Task DeployCallsCreateStackIfNotExists() {
             var stackName = "test-stack";
             var exampleTemplate = "this is a bad example template.";
+            var roleArn = "arn:aws:iam::1:role/Facade";
             var cloudformationClient = Substitute.For<IAmazonCloudFormation>();
             var parameters = new List<Parameter> {
                 new Parameter { ParameterKey = "GithubToken", ParameterValue = "this is definitely the token" }
@@ -45,12 +46,13 @@ namespace Cythral.CloudFormation.Tests {
             .CreateStackAsync(Arg.Any<CreateStackRequest>())
             .Returns(new CreateStackResponse {});
 
-            await StackDeployer.Deploy(stackName, exampleTemplate, parameters, cloudformationClient: cloudformationClient);
+            await StackDeployer.Deploy(stackName, exampleTemplate, roleArn, parameters, cloudformationClient: cloudformationClient);
             await cloudformationClient
             .Received()
             .CreateStackAsync(Arg.Is<CreateStackRequest>(req =>
                 req.StackName == stackName &&
                 req.TemplateBody == exampleTemplate &&
+                req.RoleARN == roleArn &&
                 req.Parameters.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == "this is definitely the token") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_IAM") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_NAMED_IAM") &&
@@ -62,6 +64,7 @@ namespace Cythral.CloudFormation.Tests {
         public async Task DeployCallsUpdateStackIfExists() {
             var stackName = "test-stack";
             var exampleTemplate = "this is a bad example template.";
+            var roleArn = "arn:aws:iam::1:role/Facade";
             var cloudformationClient = Substitute.For<IAmazonCloudFormation>();
             var parameters = new List<Parameter> {
                 new Parameter { ParameterKey = "GithubToken", ParameterValue = "this is definitely the token" }
@@ -83,12 +86,13 @@ namespace Cythral.CloudFormation.Tests {
             .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
             .Returns(new UpdateStackResponse {});
 
-            await StackDeployer.Deploy(stackName, exampleTemplate, parameters, cloudformationClient: cloudformationClient);
+            await StackDeployer.Deploy(stackName, exampleTemplate, roleArn, parameters, cloudformationClient: cloudformationClient);
             await cloudformationClient
             .Received()
             .UpdateStackAsync(Arg.Is<UpdateStackRequest>(req =>
                 req.StackName == stackName &&
                 req.TemplateBody == exampleTemplate &&
+                req.RoleARN == roleArn &&
                 req.Parameters.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == "this is definitely the token") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_IAM") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_NAMED_IAM")
