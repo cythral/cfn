@@ -132,7 +132,9 @@ Resources:
                 - |
                   {
                     "DevAccountId": "${DevAccountId}",
-                    "ProdAccountId": "${ProdAccountId}"
+                    "ProdAccountId": "${ProdAccountId}",
+                    "DevLoadBalancerDnsName": { "Fn::GetParam": [ "buildResults", "Networking.config.json", "DevLoadBalancerDnsName" ] },
+                    "ProdLoadBalancerDnsName": { "Fn::GetParam": [ "buildResults", "Networking.config.json", "ProdLoadBalancerDnsName" ] }
                   }
                 - DevAccountId: !ImportValue cfn-metadata:DevAccountId
                   ProdAccountId: !ImportValue cfn-metadata:ProdAccountId
