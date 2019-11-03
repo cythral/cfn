@@ -26,13 +26,15 @@ namespace Cythral.CloudFormation {
 
             bool stackExists = false;
 
-            try {
+            try { // if this throws, assume the stack does not exist.
                 var describeStacksRequest = new DescribeStacksRequest { StackName = stackName };
                 var describeStacksResponse = await cloudformationClient.DescribeStacksAsync(describeStacksRequest);
                 Console.WriteLine($"Got describe stacks response: {Serialize(describeStacksResponse)}");
 
                 stackExists = describeStacksResponse.Stacks.Count() != 0;
-            } catch(Exception) {} // describestacksasync unusually has been throwing an exception
+            } catch(Exception e) {
+                Console.WriteLine($"Describe stacks failure: {e.Message}\n{e.StackTrace}");
+            } 
 
             if(!stackExists) {
                 var createStackRequest = new CreateStackRequest {
