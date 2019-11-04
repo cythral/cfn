@@ -21,10 +21,17 @@ using Cythral.CloudFormation.Handlers;
 using Amazon;
 using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
+using Amazon.Lambda;
+using Amazon.Lambda.SNSEvents;
+using Amazon.CloudWatch;
+using Amazon.CloudWatch.Model;
 
 using static System.Net.HttpStatusCode;
 using static Amazon.ElasticLoadBalancingV2.TargetHealthStateEnum;
 using static System.Text.Json.JsonSerializer;
+
+using SNSRecord = Amazon.Lambda.SNSEvents.SNSEvent.SNSRecord;
+using SNSMessage = Amazon.Lambda.SNSEvents.SNSEvent.SNSMessage;
 
 namespace Cythral.CloudFormation.Tests.Handlers {
     public class UpdateTargetsHandlerTest {
@@ -231,6 +238,47 @@ namespace Cythral.CloudFormation.Tests.Handlers {
             await elbClient
             .DidNotReceive()
             .RegisterTargetsAsync(Arg.Any<RegisterTargetsRequest>());
+        }
+
+        [Test]
+        public async Task FromSnsEventReturnsRequest() {
+            var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
+            var dnsName = "http://example.com";
+            var alarm = new MetricAlarm {
+                Metrics = new List<MetricDataQuery> {
+                    new MetricDataQuery {
+                        Id = "customdata",
+                        MetricStat = new MetricStat {
+                            Metric = new Metric {
+                                Dimensions = new List<Dimension> {
+                                    new Dimension {
+                                        Name = "TargetGroupArn",
+                                        Value = targetGroupArn
+                                    },
+                                    new Dimension {
+                                        Name ="TargetDnsName",
+                                        Value = dnsName
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var evnt = new SNSEvent {
+                Records = new List<SNSRecord> {
+                    new SNSRecord {
+                        Sns = new SNSMessage {
+                            Message = Serialize(alarm)
+                        }
+                    }
+                }
+            };
+
+            var request = UpdateTargetsHandler.Request.FromSnsEvent(evnt);
+            Assert.That(request.TargetGroupArn, Is.EqualTo(targetGroupArn));
+            Assert.That(request.TargetDnsName, Is.EqualTo(dnsName));
         }
     }
 }
