@@ -350,6 +350,12 @@ Resources:
       Policies:
         - AWSLambdaExecute
         - !Ref UpdateTargetsPolicy
+      Events:
+        SNS:
+          Type: SNS
+          Properties:
+            Topic: !Ref UpdateTargetsTopic
+            Region: !Ref AWS::Region
 
   UpdateTargetsTopic:
     Type: AWS::SNS::Topic
@@ -366,8 +372,6 @@ Resources:
               - elasticloadbalancing:RegisterTargets
               - elasticloadbalancing:DeregisterTargets
             Resource: "*"
-
-  
             
 Outputs:
   LoadBalancerCanonicalHostedZoneId:

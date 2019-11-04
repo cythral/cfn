@@ -7,6 +7,7 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.RuntimeSupport;
 using Amazon.Lambda.Serialization.Json;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
+using Amazon.Lambda.SNSEvents;
 
 using Cythral.CloudFormation.Handlers;
 
@@ -27,7 +28,7 @@ namespace Cythral.CloudFormation {
                     break;
 
                 case "UpdateTargets":
-                    Func<UpdateTargetsHandler.Request, ILambdaContext, Task<UpdateTargetsHandler.Response>> targetsHandler = UpdateTargetsHandler.Handle;
+                    Func<SNSEvent, ILambdaContext, Task<UpdateTargetsHandler.Response>> targetsHandler = UpdateTargetsHandler.Handle;
                     using(var wrapper = HandlerWrapper.GetHandlerWrapper(targetsHandler, serializer))
                     using(var bootstrap = new LambdaBootstrap(wrapper)) {
                         await bootstrap.RunAsync();
