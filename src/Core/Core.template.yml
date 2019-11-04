@@ -248,6 +248,59 @@ Resources:
       Port: 80
       Protocol: HTTP
 
+  ProdTargetGroupAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Condition: SetupProdAccount
+    Properties:
+      AlarmActions:
+        - !Ref UpdateTargetsTopic
+      Threshold: 2.0
+      EvaluationPeriods: 1
+      ComparisonOperator: LessThanOrEqualToThreshold
+      Metrics:
+        - Id: healthyfactor
+          Expression: MIN([healthy - unhealthy, unhealthy])
+          ReturnData: true
+        - Id: unhealthy
+          MetricStat:
+            Metric:
+              Namespace: AWS/ApplicationELB
+              MetricName: UnHealthyHostCount
+              Dimensions:
+                - Name: LoadBalancer
+                  Value: !GetAtt LoadBalancer.LoadBalancerName
+                - Name: TargetGroup
+                  Value: !GetAtt ProdTargetGroup.TargetGroupName
+            Stat: Maximum
+            Period: 60
+          ReturnData: false
+        - Id: healthy
+          MetricStat:
+            Metric:
+              Namespace: AWS/ApplicationELB
+              MetricName: HealthyHostCount
+              Dimensions:
+                - Name: LoadBalancer
+                  Value: !GetAtt LoadBalancer.LoadBalancerFullName
+                - Name: TargetGroup
+                  Value: !GetAtt ProdTargetGroup.TargetGroupFullName
+            Stat: Maximum
+            Period: 60
+          ReturnData: false
+        - Id: customdata
+          MetricStat:
+            Metric:
+              Namespace: CustomData
+              MetricName: CustomData
+              Dimensions:
+                - Name: TargetGroupArn
+                  Value: !Ref ProdTargetGroup
+                - Name: TargetDnsName
+                  Value: !Ref ProdLoadBalancerDnsName
+            Stat: Maximum
+            Period: 60
+          ReturnData: false
+
   ProdDnsRecords:
     Type: AWS::Route53::RecordSetGroup # Prod DNS records setup regardless of if peering or not
     Properties:
