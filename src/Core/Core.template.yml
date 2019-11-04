@@ -155,12 +155,14 @@ Resources:
     Type: AWS::CloudWatch::Alarm
     Condition: SetupDevAccount
     Properties:
+      AlarmActions:
+        - !Ref UpdateTargetsTopic
       Threshold: 2.0
       EvaluationPeriods: 1
       ComparisonOperator: LessThanOrEqualToThreshold
       Metrics:
         - Id: healthyfactor
-          Expression: min(healthy - unhealthy, unhealthy)
+          Expression: MIN(healthy - unhealthy, unhealthy)
           ReturnData: true
         - Id: unhealthy
           MetricStat:
@@ -185,6 +187,19 @@ Resources:
                   Value: !GetAtt LoadBalancer.LoadBalancerName
                 - Name: TargetGroup
                   Value: !GetAtt DevTargetGroup.TargetGroupName
+            Stat: Maximum
+            Period: 60
+          ReturnData: false
+        - Id: customdata
+          MetricStat:
+            Metric:
+              Namespace: CustomData
+              MetricName: CustomData
+              Dimensions:
+                - Name: TargetGroupArn
+                  Value: !Ref DevTargetGroup
+                - Name: LoadBalancerDnsName
+                  Value: !Ref DevLoadBalancerDnsName
             Stat: Maximum
             Period: 60
           ReturnData: false
@@ -335,6 +350,9 @@ Resources:
       Policies:
         - AWSLambdaExecute
         - !Ref UpdateTargetsPolicy
+
+  UpdateTargetsTopic:
+    Type: AWS::SNS::Topic
 
   UpdateTargetsPolicy:
     Type: AWS::IAM::ManagedPolicy
