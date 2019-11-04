@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 using Amazon;
 using Amazon.Lambda;
 using Amazon.Lambda.Core;
+using Amazon.Lambda.SNSEvents;
 using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
+using Amazon.CloudWatch;
+using Amazon.CloudWatch.Model;
 
 using Cythral;
 using Cythral.CloudFormation;
@@ -22,6 +25,25 @@ namespace Cythral.CloudFormation.Handlers {
         public class Request {
             public string TargetGroupArn { get; set; }
             public string TargetDnsName { get; set; }
+
+            public static Request FromSnsEvent(SNSEvent evnt) {
+                var message = Deserialize<MetricAlarm>(evnt.Records[0].Sns.Message);
+                var request = new Request();
+
+                foreach(var metric in message.Metrics) {
+                    if(metric.Id != "customdata") continue;
+
+                    foreach(var dimension in metric.MetricStat.Metric.Dimensions) {
+                        switch(dimension.Name) {
+                            case "TargetGroupArn": request.TargetGroupArn = dimension.Value; break;
+                            case "TargetDnsName": request.TargetDnsName = dimension.Value; break;
+                            default: break;
+                        }
+                    }
+                }
+
+                return request;
+            }
         }
 
         public class Response {
@@ -29,13 +51,15 @@ namespace Cythral.CloudFormation.Handlers {
         }
 
         public static async Task<Response> Handle(
-            Request request,
+            SNSEvent snsRequest,
             ILambdaContext context
         ) {
             var resolver = new DnsResolver();   
             var elbClient = new AmazonElasticLoadBalancingV2Client();
+            var request = Request.FromSnsEvent(snsRequest);
+
             return await Handle(request, resolver, elbClient, context);
-        }
+        }        
 
         public static async Task<Response> Handle(
             Request request, 
