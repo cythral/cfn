@@ -158,6 +158,7 @@ Resources:
       AlarmActions:
         - !Ref UpdateTargetsTopic
       Threshold: 2.0
+      TreatMissingData: breaching
       EvaluationPeriods: 1
       ComparisonOperator: LessThanOrEqualToThreshold
       Metrics:
@@ -256,6 +257,7 @@ Resources:
         - !Ref UpdateTargetsTopic
       Threshold: 2.0
       EvaluationPeriods: 1
+      TreatMissingData: breaching
       ComparisonOperator: LessThanOrEqualToThreshold
       Metrics:
         - Id: healthyfactor
