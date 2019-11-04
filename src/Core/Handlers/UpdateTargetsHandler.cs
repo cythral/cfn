@@ -58,6 +58,7 @@ namespace Cythral.CloudFormation.Handlers {
             var elbClient = new AmazonElasticLoadBalancingV2Client();
             var request = Request.FromSnsEvent(snsRequest);
 
+            Console.WriteLine($"Received SNS request: {Serialize(snsRequest)}");
             return await Handle(request, resolver, elbClient, context);
         }        
 
@@ -69,7 +70,9 @@ namespace Cythral.CloudFormation.Handlers {
         ) {
             resolver = resolver ?? new DnsResolver();
             elbClient = elbClient ?? new AmazonElasticLoadBalancingV2Client();
-            
+
+            Console.WriteLine($"Received transformed request: {Serialize(request)}");
+
             var addresses = resolver.Resolve(request.TargetDnsName).AddressList ?? new IPAddress[] {};
             var targetHealthRequest = new DescribeTargetHealthRequest { TargetGroupArn = request.TargetGroupArn };
             var targetHealthResponse = await elbClient.DescribeTargetHealthAsync(targetHealthRequest);
