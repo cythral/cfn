@@ -8,13 +8,13 @@ using Amazon;
 using Amazon.Lambda;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SNSEvents;
+using Amazon.Lambda.Serialization.Json;
 using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
-using Amazon.CloudWatch;
-using Amazon.CloudWatch.Model;
 
 using Cythral;
 using Cythral.CloudFormation;
+using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Facades;
 
 using static System.Text.Json.JsonSerializer;
@@ -27,10 +27,10 @@ namespace Cythral.CloudFormation.Handlers {
             public string TargetDnsName { get; set; }
 
             public static Request FromSnsEvent(SNSEvent evnt) {
-                var message = Deserialize<MetricAlarm>(evnt.Records[0].Sns.Message);
+                var message = Deserialize<AlarmEvent>(evnt.Records[0].Sns.Message);
                 var request = new Request();
 
-                foreach(var metric in message.Metrics) {
+                foreach(var metric in message.Trigger.Metrics) {
                     if(metric.Id != "customdata") continue;
 
                     foreach(var dimension in metric.MetricStat.Metric.Dimensions) {
