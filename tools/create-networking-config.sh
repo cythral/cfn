@@ -12,6 +12,6 @@ prodPeeringConnectionId=$(get_export cfn-core ProdPeeringConnectionId)
 
 config={}
 config=$(echo $config | jq ".DevPeeringConnectionId=\"$devPeeringConnectionId\"") 
-config=$(echo $config | jq ".ProdPeeringConnectionId=\"$prodPeeringConnectionId\"")) 
+config=$(echo $config | jq ".ProdPeeringConnectionId=\"$prodPeeringConnectionId\"")
 
 echo $config
