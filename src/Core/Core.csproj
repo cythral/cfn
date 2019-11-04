@@ -26,11 +26,10 @@
     <PackageReference Include="Amazon.Lambda.RuntimeSupport" Version="1.0.0" />
     <PackageReference Include="Amazon.Lambda.SNSEvents" Version="1.1.0" />
     <PackageReference Include="AWSSDK.CloudFormation" Version="3.3.100.90" />
-    <PackageReference Include="AWSSDK.CloudWatch" Version="3.3.103.6" />
     <PackageReference Include="AWSSDK.ElasticLoadBalancingV2" Version="3.3.102.56" />
     <PackageReference Include="AWSSDK.KeyManagementService" Version="3.3.101.75" />
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
-    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.6.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.7.0" />
   </ItemGroup>
 
   <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.UpdateCodeLocation" AssemblyFile="$(BuildTasksLocation)" />
