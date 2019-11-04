@@ -259,7 +259,7 @@ Resources:
                   {
                     "DevVpcId": { "Fn::GetParam": [ "devUtilityExports", "utility-output.json", "VpcId" ] },
                     "ProdVpcId": { "Fn::GetParam": [ "prodUtilityExports", "utility-output.json", "VpcId" ] },
-                    "DevLoadBalancerDnsName": { "Fn::GetParam": [ "buildResults", "Networking.config.json", "DevLoadBalancerDnsName" ] },
-                    "ProdLoadBalancerDnsName": { "Fn::GetParam": [ "buildResults", "Networking.config.json", "ProdLoadBalancerDnsName" ] }
+                    "DevLoadBalancerDnsName": { "Fn::GetParam": [ "devUtilityExports", "utility-output.json", "DevLoadBalancerDnsName" ] },
+                    "ProdLoadBalancerDnsName": { "Fn::GetParam": [ "prodUtilityExports", "utility-output.json", "ProdLoadBalancerDnsName" ] }
                   }
             
