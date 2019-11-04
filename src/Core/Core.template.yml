@@ -162,7 +162,7 @@ Resources:
       ComparisonOperator: LessThanOrEqualToThreshold
       Metrics:
         - Id: healthyfactor
-          Expression: MIN(healthy - unhealthy, unhealthy)
+          Expression: MIN([healthy - unhealthy, unhealthy])
           ReturnData: true
         - Id: unhealthy
           MetricStat:
