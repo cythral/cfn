@@ -186,7 +186,7 @@ Resources:
                 - Name: LoadBalancer
                   Value: !GetAtt LoadBalancer.LoadBalancerFullName
                 - Name: TargetGroup
-                  Value: !GetAtt DevTargetGroup.TargetGroupName
+                  Value: !GetAtt DevTargetGroup.TargetGroupFullName
             Stat: Maximum
             Period: 60
           ReturnData: false
