@@ -184,7 +184,7 @@ Resources:
               MetricName: HealthyHostCount
               Dimensions:
                 - Name: LoadBalancer
-                  Value: !GetAtt LoadBalancer.LoadBalancerName
+                  Value: !GetAtt LoadBalancer.LoadBalancerFullName
                 - Name: TargetGroup
                   Value: !GetAtt DevTargetGroup.TargetGroupName
             Stat: Maximum
