@@ -198,7 +198,7 @@ Resources:
               Dimensions:
                 - Name: TargetGroupArn
                   Value: !Ref DevTargetGroup
-                - Name: LoadBalancerDnsName
+                - Name: TargetDnsName
                   Value: !Ref DevLoadBalancerDnsName
             Stat: Maximum
             Period: 60
