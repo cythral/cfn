@@ -32,6 +32,16 @@ Parameters:
     Default: ""
     Description: ID of the VPC to peer to in prod
 
+  DevLoadBalancerDnsName:
+    Type: String
+    Default: ""
+    Description: DNS name of the dev load balancer
+
+  ProdLoadBalancerDnsName:
+    Type: String
+    Default: ""
+    Description: DNS name of the prod load balancer
+
 Conditions:
   SetupDevAccount: 
     !Not 
@@ -157,6 +167,11 @@ Resources:
             Metric:
               Namespace: AWS/ApplicationELB
               MetricName: UnHealthyHostCount
+              Dimensions:
+                - Name: LoadBalancer
+                  Value: !GetAtt LoadBalancer.LoadBalancerName
+                - Name: TargetGroup
+                  Value: !GetAtt DevTargetGroup.TargetGroupName
             Stat: Maximum
             Period: 60
           ReturnData: false
@@ -165,6 +180,11 @@ Resources:
             Metric:
               Namespace: AWS/ApplicationELB
               MetricName: HealthyHostCount
+              Dimensions:
+                - Name: LoadBalancer
+                  Value: !GetAtt LoadBalancer.LoadBalancerName
+                - Name: TargetGroup
+                  Value: !GetAtt DevTargetGroup.TargetGroupName
             Stat: Maximum
             Period: 60
           ReturnData: false
