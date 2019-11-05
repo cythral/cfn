@@ -123,10 +123,14 @@ namespace Cythral.CloudFormation.Resources {
                 Console.WriteLine($"Got Describe Certificate Response: {JsonSerializer.Serialize(describeCertificateResponse)}");
 
                 validationOptions = describeCertificateResponse.Certificate.DomainValidationOptions;
-                if(validationOptions.Count() > 0 && validationOptions[0]?.ResourceRecord?.Name != null) {
-                    foundValidationOptions = true;
-                }
+                foundValidationOptions = true;
+
+                if(validationOptions.Count() == 0) foundValidationOptions = false;
                 
+                foreach(var option in validationOptions) {
+                    if(option.ResourceRecord?.Name == null) foundValidationOptions = false;
+                }
+
                 Thread.Sleep(1000);
             }
 
