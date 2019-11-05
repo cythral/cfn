@@ -19,7 +19,7 @@ namespace Tests {
     }
 
 
-    [CustomResource(typeof(ModelWithRequiredProps))]
+    [CustomResource(ResourcePropertiesType=typeof(ModelWithRequiredProps))]
     public partial class CustomResourceWithRequiredProps : TestCustomResource {      
         public static MockHttpMessageHandler MockHttp = new MockHttpMessageHandler();
 

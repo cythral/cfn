@@ -24,7 +24,7 @@ namespace Cythral.CloudFormation.Resources {
     /// <summary>
     /// Certificate Custom Resource supporting automatic dns validation
     /// </summary>
-    [CustomResource(typeof(Certificate.Properties))]
+    [CustomResource(ResourcePropertiesType=typeof(Certificate.Properties))]
     public partial class Certificate {
 
         public class Properties {

@@ -7,11 +7,12 @@ namespace Cythral.CloudFormation.CustomResource.Attributes {
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
     [CodeGenerationAttribute(typeof(Generator))]
     public class CustomResourceAttribute : System.Attribute {
+        public CustomResourceAttribute() {} 
         
-        private Type ResourcePropertiesType;
+        public Type ResourcePropertiesType { get; set; }
 
-        public CustomResourceAttribute(Type resourcePropertiesType) {
-            ResourcePropertiesType = resourcePropertiesType; 
-        } 
+        public object[] Grantees { get; set; }
+
+        public GranteeType GranteeType { get; set; }
     }
 }

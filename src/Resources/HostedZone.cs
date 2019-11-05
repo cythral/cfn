@@ -17,7 +17,7 @@ namespace Cythral.CloudFormation.Resources {
     /// <summary>
     /// Route 53 Hosted Zone Custom Resource accepting a DelegationSetId property
     /// </summary>
-    [CustomResource(typeof(HostedZone.Properties))]
+    [CustomResource(ResourcePropertiesType = typeof(HostedZone.Properties))]
     public partial class HostedZone {
         
         /// <summary>
