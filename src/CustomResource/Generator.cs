@@ -34,6 +34,10 @@ namespace Cythral.CloudFormation.CustomResource {
 
         private string ResourcePropertiesTypeName;
 
+        private object[] Grantees { get; set; }
+
+        private GranteeType GranteeType { get; set; } = GranteeType.Literal;
+
         private ClassDeclarationSyntax OriginalClass;
 
         private string ClassName => OriginalClass.Identifier.ValueText;
@@ -138,13 +142,28 @@ namespace Cythral.CloudFormation.CustomResource {
         public Generator(AttributeData attributeData) {
             Requires.NotNull(attributeData, nameof(attributeData));
             Data = attributeData;
-            ResourcePropertiesTypeName = Data.ConstructorArguments[0].Value.ToString();
-            ResourcePropertiesType = (INamedTypeSymbol) Data.ConstructorArguments[0].Value;
+
+            foreach(var arg in Data.NamedArguments) {
+
+                switch(arg.Key) {
+                    case "Grantees": 
+                        Grantees = (from typeConstant in arg.Value.Values select typeConstant.Value).ToArray();
+                        break;
+
+                    case "GranteeType":
+                        GranteeType = (GranteeType) arg.Value.Value;
+                        break;
+                    
+                    case "ResourcePropertiesType": 
+                        ResourcePropertiesTypeName = arg.Value.Value.ToString();
+                        ResourcePropertiesType = (INamedTypeSymbol) arg.Value.Value; 
+                        break;
+                }
+            }   
         }
 
         public Task<SyntaxList<MemberDeclarationSyntax>> GenerateAsync(TransformationContext context, IProgress<Diagnostic> progress, CancellationToken cancellationToken) {
             var result = GeneratePartialClass();
-
             OriginalClass = (ClassDeclarationSyntax) context.ProcessingNode;
             AddResources(context);
 
@@ -184,6 +203,7 @@ namespace Cythral.CloudFormation.CustomResource {
                 .WithTagMapping("!Sub", typeof(SubTag))
                 .WithTypeConverter(new GetAttTagConverter())
                 .WithTypeConverter(new SubTagConverter())
+                .WithTypeConverter(new ImportValueTagConverter())
                 .Build();
 
                 var yaml = serializer.Serialize(new { 
@@ -202,7 +222,7 @@ namespace Cythral.CloudFormation.CustomResource {
             
             var version = context.BuildProperties["TargetFrameworkVersion"].Replace("v", "");
 
-            Resources.Add(ClassName + "Lambda", new Resource() {
+            Resources.Add(ClassName + "Lambda", new Resource {
                 Type = "AWS::Lambda::Function",
                 Properties = new {
                     FunctionName = ClassName,
@@ -213,6 +233,22 @@ namespace Cythral.CloudFormation.CustomResource {
                     Timeout = 300,
                 }
             });
+
+            if(Grantees != null && Grantees?.Count() > 0) {
+                for(int i = 0; i < Grantees.Count(); i++) {
+                    var grantee = Grantees[i];
+
+                    Resources.Add($"{ClassName}Permission{i}", new Resource {
+                        Type = "AWS::Lambda::Permission",
+                        Properties = new {
+                            FunctionName = new GetAttTag { Name = $"{ClassName}Lambda", Attribute = "Arn" },
+                            Principal = "cloudformation.amazonaws.com",
+                            SourceAccount = GranteeType == GranteeType.Import ? (object) new ImportValueTag((string) grantee) : grantee,
+                            Action = "lambda:InvokeFunction"
+                        }
+                    });
+                }
+            }
 
             Outputs.Add(ClassName + "LambdaArn", new Output(
                 value: new GetAttTag { Name = $"{ClassName}Lambda", Attribute = "Arn" },

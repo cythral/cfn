@@ -21,7 +21,7 @@ namespace Tests {
     }
 
 
-    [CustomResource(typeof(ModelWithMinLengthProps))]
+    [CustomResource(ResourcePropertiesType=typeof(ModelWithMinLengthProps))]
     public partial class CustomResourceWithMinLengthProps : TestCustomResource {          
         public static MockHttpMessageHandler MockHttp = new MockHttpMessageHandler();
 

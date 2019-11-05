@@ -19,7 +19,7 @@ namespace Tests {
     }
 
 
-    [CustomResource(typeof(ModelWithMaxLengthProps))]
+    [CustomResource(ResourcePropertiesType=typeof(ModelWithMaxLengthProps))]
     public partial class CustomResourceWithMaxLengthProps : TestCustomResource {       
         public static MockHttpMessageHandler MockHttp = new MockHttpMessageHandler();
 

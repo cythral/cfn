@@ -16,7 +16,7 @@ using Amazon.S3;
 namespace Tests {
     
 
-    [CustomResource(typeof(object))]
+    [CustomResource(ResourcePropertiesType=typeof(object))]
     public partial class ExampleCustomResource : TestCustomResource {
         public static bool Passing { get; set; } = true;            
 
@@ -40,7 +40,7 @@ namespace Tests {
         public string Message { get; set; }
     }
 
-    [CustomResource(typeof(MessageResourceProperties))]
+    [CustomResource(ResourcePropertiesType=typeof(MessageResourceProperties))]
     public partial class MessageCustomResource : TestCustomResource {
         public static bool Passing { get; set; } = true;            
 
