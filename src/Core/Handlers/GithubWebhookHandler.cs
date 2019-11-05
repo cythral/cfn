@@ -4,16 +4,19 @@ using System.Net;
 using System.Text.Json;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+
+using Amazon.CloudFormation;
+using Amazon.CloudFormation.Model;
 using Amazon.Lambda.Core;
+using Amazon.Lambda.RuntimeSupport;
 using Amazon.Lambda.Serialization;
 using Amazon.Lambda.Serialization.Json;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
-using Amazon.CloudFormation;
-using Amazon.CloudFormation.Model;
-using Amazon.Lambda.RuntimeSupport;
+
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Exceptions;
 using Cythral.CloudFormation.Entities;
+using Cythral.CloudFormation.Facades;
 
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
@@ -21,7 +24,7 @@ using static System.Text.Json.JsonSerializer;
 using WebhookConfig = Cythral.CloudFormation.Config;
 
 namespace Cythral.CloudFormation {
-    public class Webhook {
+    public class GithubWebhookHandler {
         public static WebhookConfig Config { get; set; }
 
         /// <summary>

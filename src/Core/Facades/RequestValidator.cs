@@ -10,7 +10,7 @@ using Cythral.CloudFormation.Exceptions;
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation {
+namespace Cythral.CloudFormation.Facades {
     public class RequestValidator {
         public static PushEvent Validate(
             ApplicationLoadBalancerRequest request, 

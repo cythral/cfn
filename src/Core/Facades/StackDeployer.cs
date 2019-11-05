@@ -9,7 +9,7 @@ using Amazon.CloudFormation.Model;
 using static Amazon.CloudFormation.OnFailure;
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation {
+namespace Cythral.CloudFormation.Facades {
     public class StackDeployer {
 
         // maybe this could be an extension method for the cloudformation client instead?

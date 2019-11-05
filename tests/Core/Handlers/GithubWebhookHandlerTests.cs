@@ -11,6 +11,7 @@ using Cythral.CloudFormation;
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Exceptions;
+using Cythral.CloudFormation.Facades;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using FluentAssertions;
 using NSubstitute;
@@ -20,10 +21,10 @@ using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.Tests {
-    public class WebhookTest {
+    public class GithubWebhookHandlerTest {
         [Test]
         public async Task HandleReturns400IfNoTemplate() {
-            Webhook.Config = new Config() {
+            GithubWebhookHandler.Config = new Config() {
                 ["GITHUB_TOKEN"] = "exampletoken",
                 ["GITHUB_OWNER"] = "Codertocat",
                 ["TEMPLATE_FILENAME"] = "cicd.template.yml",
@@ -55,7 +56,7 @@ namespace Cythral.CloudFormation.Tests {
             .Expect($"https://api.github.com/repos/Codertocat/Hello-World/contents/cicd.template.yml")
             .Respond(HttpStatusCode.NotFound, "text/plain", "Template not found");
 
-            var response = await Webhook.Handle(request);
+            var response = await GithubWebhookHandler.Handle(request);
             Assert.That(response.StatusCode, Is.EqualTo((int) NotFound));
         }
     }

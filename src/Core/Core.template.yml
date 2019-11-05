@@ -155,6 +155,7 @@ Resources:
     Type: AWS::CloudWatch::Alarm
     Condition: SetupDevAccount
     Properties:
+      AlarmDescription: Dev load balancer target health
       AlarmActions:
         - !Ref UpdateTargetsTopic
       Threshold: 2.0
@@ -253,6 +254,7 @@ Resources:
     Type: AWS::CloudWatch::Alarm
     Condition: SetupProdAccount
     Properties:
+      AlarmDescription: Prod load balancer target health
       AlarmActions:
         - !Ref UpdateTargetsTopic
       Threshold: 2.0

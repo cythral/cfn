@@ -9,6 +9,8 @@ using Amazon.Lambda.Serialization.Json;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.Lambda.SNSEvents;
 
+using Cythral;
+using Cythral.CloudFormation;
 using Cythral.CloudFormation.Handlers;
 
 namespace Cythral.CloudFormation {
@@ -19,7 +21,7 @@ namespace Cythral.CloudFormation {
 
             switch(handler) {
                 case "GithubWebhook":
-                    Func<ApplicationLoadBalancerRequest, ILambdaContext, Task<ApplicationLoadBalancerResponse>> webhookHandler = Webhook.Handle;
+                    Func<ApplicationLoadBalancerRequest, ILambdaContext, Task<ApplicationLoadBalancerResponse>> webhookHandler = GithubWebhookHandler.Handle;
                     using(var wrapper = HandlerWrapper.GetHandlerWrapper(webhookHandler, serializer))
                     using(var bootstrap = new LambdaBootstrap(wrapper)) {
                         await bootstrap.RunAsync();
