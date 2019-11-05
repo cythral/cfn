@@ -132,7 +132,7 @@ namespace Cythral.CloudFormation.Resources {
                 }
 
                 Thread.Sleep(1000);
-            }
+            } 
 
             if(props.Tags != null) {
                 tasks.Add(Task.Run(async delegate {
