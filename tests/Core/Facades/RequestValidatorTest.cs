@@ -10,6 +10,7 @@ using Cythral.CloudFormation;
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Exceptions;
+using Cythral.CloudFormation.Facades;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using FluentAssertions;
 using NSubstitute;
@@ -17,7 +18,7 @@ using NSubstitute;
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation.Tests {
+namespace Cythral.CloudFormation.Tests.Facades {
     class RequestValidatorTest {
         [Test]
         public void NonPostRequestsThrowMethodNotAllowed([Values("GET", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS")] string method) {

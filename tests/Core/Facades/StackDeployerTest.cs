@@ -11,6 +11,7 @@ using Cythral.CloudFormation;
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Exceptions;
+using Cythral.CloudFormation.Facades;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
@@ -22,7 +23,7 @@ using static Amazon.CloudFormation.OnFailure;
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation.Tests {
+namespace Cythral.CloudFormation.Tests.Facades {
     public class StackDeployerTest {
         [Test]
         public async Task DeployCallsCreateStackIfNotExists() {
