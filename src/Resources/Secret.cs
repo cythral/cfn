@@ -18,7 +18,7 @@ using static Cythral.CloudFormation.CustomResource.GranteeType;
 namespace Cythral.CloudFormation.Resources {
     [CustomResource(
         ResourcePropertiesType=typeof(Secret.Properties),
-        Grantees = new string[] { "cfn-metadata:DevAccountId", "cfn-metadata:ProdAccountId" },
+        Grantees = new string[] { "cfn-metadata:DevAgentRoleArn", "cfn-metadata:ProdAgentRoleArn" },
         GranteeType = Import
     )]
     public partial class Secret {
@@ -34,6 +34,7 @@ namespace Cythral.CloudFormation.Resources {
             var plaintext = await Decrypt(Request.ResourceProperties.Ciphertext);
 
             return new Response {
+                PhysicalResourceId = DateTime.Now.ToString(),
                 Data = new {
                     Plaintext = plaintext
                 }
