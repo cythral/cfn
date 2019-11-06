@@ -314,6 +314,20 @@ Resources:
             Principal:
               Service: codebuild.amazonaws.com
 
+    DecryptorRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: Decryptor
+        ManagedPolicyArns:
+          - !Ref SecretsKeyDecryptPolicy
+        AssumeRolePolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action: sts:AssumeRole
+              Principal:
+                AWS: !Ref arn:aws:iam:
+
   # Security - Encryption
   # -------------------------------------------
 
@@ -328,7 +342,11 @@ Resources:
             Action: kms:*
             Resource: "*"
             Principal:
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+              AWS: !If
+                - IsMasterAccount
+                - - !Sub arn:aws:iam::${AWS::AccountId}:root
+                - - !Sub arn:aws:iam::${AWS::AccountId}:root
+                  - !Sub arn:aws:iam::${MasterAccountId}:root
           - Effect: Allow
             Action: kms:Encrypt
             Resource: "*"
