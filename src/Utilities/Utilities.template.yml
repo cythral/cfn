@@ -229,7 +229,7 @@ Resources:
   WebSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security group for web ports 80 and 443
+      GroupDescription: Security group for common web services (http, https, mysql)
       SecurityGroupIngress:
         # Port 80 - HTTP
         - IpProtocol: tcp
@@ -255,6 +255,13 @@ Resources:
           ToPort: 3306
           CidrIp: !Ref NetworkCidr
       VpcId: !Ref VPC
+
+  DBSecurityGroup:
+    Type: AWS::RDS::DBSecurityGroup
+    Properties:
+      GroupDescription: Security group for mysql/aurora
+      DBSecurityGroupIngress:
+        - CIDRIP: !Ref NetworkCidr
         
   # Security - Roles
   # -------------------------------------------
@@ -456,6 +463,12 @@ Outputs:
     Value: !GetAtt WebSecurityGroup.GroupId
     Export:
       Name: !Sub ${AWS::StackName}:WebSecurityGroupId
+
+  DBSecurityGroupName:
+    Description: Name of the database security group
+    Value: !Ref DBSecurityGroup
+    Export:
+      Name: !Sub ${AWS::StackName}:DBSecurityGroup
 
   RouteTableId:
     Description: ID of the vpc's route table
