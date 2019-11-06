@@ -249,19 +249,17 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIpv6: ::/0
-        # Port 3306 - MySQL
+      VpcId: !Ref VPC
+
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for mysql/aurora
+      SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 3306
           ToPort: 3306
           CidrIp: !Ref NetworkCidr
-      VpcId: !Ref VPC
-
-  DBSecurityGroup:
-    Type: AWS::RDS::DBSecurityGroup
-    Properties:
-      GroupDescription: Security group for mysql/aurora instances
-      DBSecurityGroupIngress:
-        - CIDRIP: !Ref NetworkCidr
         
   # Security - Roles
   # -------------------------------------------
@@ -464,11 +462,11 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:WebSecurityGroupId
 
-  DBSecurityGroupName:
-    Description: Name of the database security group
-    Value: !Ref DBSecurityGroup
+  DBSecurityGroupId:
+    Description: ID of the mysql/aurora security group
+    Value: !GetATt DBSecurityGroup.GroupId
     Export:
-      Name: !Sub ${AWS::StackName}:DBSecurityGroup
+      Name: !Sub ${AWS::StackName}:DBSecurityGroupId
 
   RouteTableId:
     Description: ID of the vpc's route table
