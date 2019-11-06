@@ -242,8 +242,7 @@ namespace Cythral.CloudFormation.CustomResource {
                         Type = "AWS::Lambda::Permission",
                         Properties = new {
                             FunctionName = new GetAttTag { Name = $"{ClassName}Lambda", Attribute = "Arn" },
-                            Principal = "cloudformation.amazonaws.com",
-                            SourceAccount = GranteeType == GranteeType.Import ? (object) new ImportValueTag((string) grantee) : grantee,
+                            Principal = GranteeType == GranteeType.Import ? (object) new ImportValueTag((string) grantee) : grantee,
                             Action = "lambda:InvokeFunction"
                         }
                     });
