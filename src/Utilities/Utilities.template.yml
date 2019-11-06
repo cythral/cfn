@@ -221,7 +221,7 @@ Resources:
     Properties:
       GroupDescription: Security group for web ports 80 and 443
       SecurityGroupIngress:
-        # Port 80
+        # Port 80 - HTTP
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
@@ -230,7 +230,7 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIpv6: ::/0
-        # Port 443
+        # Port 443 - HTTPS
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
@@ -239,6 +239,11 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIpv6: ::/0
+        # Port 3306 - MySQL
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: !Ref NetworkCidr
       VpcId: !Ref VPC
         
   # Security - Roles
