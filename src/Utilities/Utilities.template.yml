@@ -314,20 +314,6 @@ Resources:
             Principal:
               Service: codebuild.amazonaws.com
 
-    DecryptorRole:
-      Type: AWS::IAM::Role
-      Properties:
-        RoleName: Decryptor
-        ManagedPolicyArns:
-          - !Ref SecretsKeyDecryptPolicy
-        AssumeRolePolicyDocument:
-          Version: 2012-10-17
-          Statement:
-            - Effect: Allow
-              Action: sts:AssumeRole
-              Principal:
-                AWS: !Ref arn:aws:iam:
-
   # Security - Encryption
   # -------------------------------------------
 
