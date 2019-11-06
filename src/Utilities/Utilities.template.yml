@@ -260,6 +260,7 @@ Resources:
           FromPort: 3306
           ToPort: 3306
           CidrIp: !Ref NetworkCidr
+      VpcId: !Ref VPC
         
   # Security - Roles
   # -------------------------------------------
