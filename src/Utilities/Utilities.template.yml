@@ -251,7 +251,7 @@ Resources:
           CidrIpv6: ::/0
       VpcId: !Ref VPC
 
-  DBSecurityGroup:
+  DatabaseSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for mysql/aurora
@@ -462,11 +462,11 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:WebSecurityGroupId
 
-  DBSecurityGroupId:
+  DatabaseSecurityGroupId:
     Description: ID of the mysql/aurora security group
-    Value: !GetAtt DBSecurityGroup.GroupId
+    Value: !GetAtt DatabaseSecurityGroup.GroupId
     Export:
-      Name: !Sub ${AWS::StackName}:DBSecurityGroupId
+      Name: !Sub ${AWS::StackName}:DatabaseSecurityGroupId
 
   RouteTableId:
     Description: ID of the vpc's route table
