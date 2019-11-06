@@ -229,7 +229,7 @@ Resources:
   WebSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security group for common web services (http, https, mysql)
+      GroupDescription: Security group for web ports 80 and 443
       SecurityGroupIngress:
         # Port 80 - HTTP
         - IpProtocol: tcp
@@ -259,7 +259,7 @@ Resources:
   DBSecurityGroup:
     Type: AWS::RDS::DBSecurityGroup
     Properties:
-      GroupDescription: Security group for mysql/aurora
+      GroupDescription: Security group for mysql/aurora instances
       DBSecurityGroupIngress:
         - CIDRIP: !Ref NetworkCidr
         
