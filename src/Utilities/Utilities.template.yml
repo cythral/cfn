@@ -464,7 +464,7 @@ Outputs:
 
   DBSecurityGroupId:
     Description: ID of the mysql/aurora security group
-    Value: !GetATt DBSecurityGroup.GroupId
+    Value: !GetAtt DBSecurityGroup.GroupId
     Export:
       Name: !Sub ${AWS::StackName}:DBSecurityGroupId
 
