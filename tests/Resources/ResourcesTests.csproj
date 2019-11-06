@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.CertificateManager" Version="3.3.100.88" />
-    <PackageReference Include="AWSSDK.Core" Version="3.3.103.52" />
     <PackageReference Include="AWSSDK.Lambda" Version="3.3.103.19" />
     <PackageReference Include="AWSSDK.Route53" Version="3.3.102.33" />
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
