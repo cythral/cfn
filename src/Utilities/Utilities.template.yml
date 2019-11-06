@@ -170,6 +170,16 @@ Resources:
       RouteTableId: !Ref RouteTable
       SubnetId: !Ref Subnet4
 
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Database subnet group for the primary VPC
+      SubnetIds:
+        - !Ref Subnet1
+        - !Ref Subnet2
+        - !Ref Subnet3
+        - !Ref Subnet4
+
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Condition: IsAgentAccount
@@ -434,6 +444,12 @@ Outputs:
         - !Ref Subnet4
     Export:
       Name: !Sub ${AWS::StackName}:SubnetIds
+
+  DBSubnetGroupName:
+    Description: Name of the db subnet group for the primary VPC
+    Value: !Ref DBSubnetGroup
+    Export:
+      Name: !Sub ${AWS::StackName}:DBSubnetGroupName
 
   WebSecurityGroupId:
     Description: Group ID for the public-web security group
