@@ -61,6 +61,49 @@ Resources:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref NetworkCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  VPCFlowLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 14
+
+  VPCFlowLogger:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: vpc-flow-logs.amazonaws.com
+  
+  VPCFlowLoggingPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Roles:
+        - !Ref VPCFlowLogger
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - logs:DescribeLogGroups
+              - logs:DescribeLogStreams
+            Resource: !GetAtt VPCFlowLogGroup.Arn
+
+  VPCFlowLog:
+    Type: AWS::EC2::FlowLog
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt VPCFlowLogger.Arn
+      LogGroupName: !Ref VPCFlowLogGroup
+      ResourceId: !Ref VPC
+      ResourceType: VPC
+      TrafficType: REJECT
   
   Ipv6CidrBlock:
     Type: AWS::EC2::VPCCidrBlock
@@ -334,6 +377,7 @@ Resources:
             Action: sts:AssumeRole
             Principal:
               Service: codebuild.amazonaws.com
+
 
   # Security - Encryption
   # -------------------------------------------
