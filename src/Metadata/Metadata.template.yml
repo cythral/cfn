@@ -16,7 +16,9 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Action: cloudformation:ListExports
+            Action: 
+              - cloudformation:ListExports
+              - cloudformation:DescribeStacks
             Resource: "*"
 
 Outputs:
