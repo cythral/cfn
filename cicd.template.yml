@@ -1,3 +1,4 @@
+Description: CICD pipeline for cfn
 Parameters:
   GithubToken:
     Type: String

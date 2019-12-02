@@ -4,10 +4,12 @@
         <GeneratorAssemblySearchPaths Include="$(MSBuildThisFileDirectory)../lib" />
         <GeneratorPropertyNames Include="OutDir" />
         <GeneratorPropertyNames Include="TargetFrameworkVersion" />
+        <GeneratorPropertyNames Include="StackDescription" />
     </ItemGroup>
 
     <PropertyGroup>
         <DeploymentBucket Condition="$(DeploymentBucket) == ''">$(AssemblyName.ToLower())</DeploymentBucket>
+        <StackDescription Condition="$(StackDescription) == ''">Custom Resources for CloudFormation</StackDescription>
         <Package>true</Package>
         <Deploy>true</Deploy>
     </PropertyGroup>
