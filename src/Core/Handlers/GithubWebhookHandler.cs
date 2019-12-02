@@ -72,8 +72,12 @@ namespace Cythral.CloudFormation {
                 new Parameter { ParameterKey = "GithubBranch", ParameterValue = payload.Repository.DefaultBranch }
             };
 
-            await StackDeployer.Deploy(stackName, templateContent, roleArn, parameters);
-            return CreateResponse(statusCode: OK);
+            try {
+                await StackDeployer.Deploy(stackName, templateContent, roleArn, parameters);
+                return CreateResponse(statusCode: OK);
+            } catch(Exception e) {
+                Console.WriteLine($"Failed to create/update stack: {e.Message}");
+            }
         }
 
         private static ApplicationLoadBalancerResponse CreateResponse(HttpStatusCode statusCode, string contentType = "text/plain", string body = "") {
