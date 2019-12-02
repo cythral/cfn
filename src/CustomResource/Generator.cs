@@ -192,8 +192,8 @@ namespace Cythral.CloudFormation.CustomResource {
         }
 
         public static void OnComplete(CompilationGenerator context) {
-            // todo: handle generating cloudformation templates here
             var outputDirectory = context.BuildProperties["OutDir"];
+            var description = context.BuildProperties["StackDescription"];
             var filePath = outputDirectory + "/" + context.AssemblyName + ".template.yml";
 
             try {
@@ -207,6 +207,7 @@ namespace Cythral.CloudFormation.CustomResource {
                 .Build();
 
                 var yaml = serializer.Serialize(new { 
+                    Description = description,
                     Resources = Resources,
                     Outputs = Outputs
                 });

@@ -1,3 +1,4 @@
+Description: General metadata for CloudFormation stacks (account IDs, role ARNs, etc.)
 Parameters:
   DevAccountId:
     Type: String
