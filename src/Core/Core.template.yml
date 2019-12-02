@@ -1,3 +1,4 @@
+Description: Core CloudFormation services including webhooks and alarms
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   GithubOwner:
