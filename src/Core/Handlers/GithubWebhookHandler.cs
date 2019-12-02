@@ -57,7 +57,7 @@ namespace Cythral.CloudFormation {
 
             var stackName = $"{payload.Repository.Name}-{Config["STACK_SUFFIX"]}";
             var contentsUrl = payload.Repository.ContentsUrl;
-            var templateContent = await CommittedFile.FromContentsUrl(contentsUrl, Config["TEMPLATE_FILENAME"], Config);
+            var templateContent = await CommittedFile.FromContentsUrl(contentsUrl, Config["TEMPLATE_FILENAME"], Config, payload.Ref);
             var roleArn = Config["ROLE_ARN"];
 
             if(templateContent == null) {
