@@ -26,9 +26,9 @@ namespace Cythral.CloudFormation.Resources {
         public List<string> ResourceRecords { get; set; }
         public string SetIdentifier { get; set; }
         public string TrafficPolicyInstanceId { get; set; }
-        public Int64? TTL { get; set; }
+        public long? TTL { get; set; }
         public RRType Type { get; set; }
-        public Int64? Weight { get; set; }
+        public long? Weight { get; set; }
 
         public ResourceRecordSet ToResourceRecordSet() {
             var resourceRecords = (from record in ResourceRecords select new ResourceRecord { Value = record }).ToList();
@@ -46,8 +46,8 @@ namespace Cythral.CloudFormation.Resources {
                 ResourceRecords = resourceRecords,
             };
 
-            if(TTL != null)                 set.TTL = (Int64) TTL;
-            if(Weight != null)              set.Weight = (Int64) Weight;
+            if(TTL != null)                 set.TTL = (long) TTL;
+            if(Weight != null)              set.Weight = (long) Weight;
             if(MultiValueAnswer != null)    set.MultiValueAnswer = (bool) MultiValueAnswer;
 
             return set;
