@@ -78,6 +78,8 @@ namespace Cythral.CloudFormation {
             } catch(Exception e) {
                 Console.WriteLine($"Failed to create/update stack: {e.Message}");
             }
+
+            return CreateResponse(statusCode: BadRequest);
         }
 
         private static ApplicationLoadBalancerResponse CreateResponse(HttpStatusCode statusCode, string contentType = "text/plain", string body = "") {
