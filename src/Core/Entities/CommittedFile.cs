@@ -14,12 +14,19 @@ namespace Cythral.CloudFormation.Entities {
         public bool Exists { get; private set; } = true;
         public static Func<HttpClient> DefaultHttpClientFactory { get; set; } = () => new HttpClient();
 
-        public static async Task<CommittedFile> FromContentsUrl(string contentsUrl, string filename, Config config, Func<HttpClient> httpClientFactory = null) {
+        public static async Task<CommittedFile> FromContentsUrl(
+            string contentsUrl, 
+            string filename, 
+            Config config, 
+            string gitRef = null,
+            Func<HttpClient> httpClientFactory = null
+        ) {
             httpClientFactory = httpClientFactory ?? DefaultHttpClientFactory;
             
             var httpClient = httpClientFactory();
             var baseUrl = contentsUrl.Replace("{+path}", "").TrimEnd(new char[] { '/' });
-            var request = new HttpRequestMessage { Method = Get, RequestUri = new Uri(baseUrl + "/" + filename) };
+            var uri = gitRef == null ? $"{baseUrl}/{filename}" : $"{baseUrl}/{filename}?ref={gitRef}";
+            var request = new HttpRequestMessage { Method = Get, RequestUri = new Uri(uri) };
             
             request.Headers.UserAgent.Add(new ProductInfoHeaderValue("brighid", "v1"));
             request.Headers.Authorization = new AuthenticationHeaderValue("token", config["GITHUB_TOKEN"]);
