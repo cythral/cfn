@@ -130,7 +130,7 @@ Resources:
     Properties:
       ServiceToken: !ImportValue cfn-resources:RecordSetLambdaArn
       HostedZoneId: !Ref HostedZone
-      Comment: Start of Authority Record Set (SOA)
+      Comment: Start Of Authority Record Set (SOA)
       Name: !Ref DomainName
       Type: SOA
       TTL: 60
