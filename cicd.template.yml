@@ -20,6 +20,8 @@ Parameters:
 Resources:
   ArtifactStore:
     Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: BucketOwnerFullControl
 
   ArtifactStorePolicy:
     Type: AWS::S3::BucketPolicy
