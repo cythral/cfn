@@ -1,6 +1,6 @@
 # TODO: Create a script that generates this file and updates the proj properties automatically
 # (after creating a delegation set and assigning nice names to each nameserver)
-Description: DNS Resources for the core CloudFormation services
+Description: DNS resources for CloudFormation services
 Parameters:
   DelegationSetId:
     Type: String
