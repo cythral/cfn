@@ -1,5 +1,7 @@
-namespace Cythral.CloudFormation.Resources {
-    public class Resources {
-        public static void Main(string[] args) {}
+namespace Cythral.CloudFormation.Resources
+{
+    public class Resources
+    {
+        public static void Main(string[] args) { }
     }
 }

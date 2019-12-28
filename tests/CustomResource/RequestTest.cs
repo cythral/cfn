@@ -1,8 +1,10 @@
 using System;
 using System.Reflection;
-using NUnit.Framework;
+
 using Cythral.CloudFormation.CustomResource;
 using Cythral.CloudFormation.CustomResource.Attributes;
+
+using NUnit.Framework;
 
 namespace Tests {
     public class RequestTest {

@@ -1,11 +1,9 @@
-using System;
-
-using Cythral;
-using Cythral.CloudFormation;
 using Cythral.CloudFormation.Entities;
 
-namespace Cythral.CloudFormation.Events {
-    public class AlarmEvent {
+namespace Cythral.CloudFormation.Events
+{
+    public class AlarmEvent
+    {
         public string AlarmName { get; set; }
         public string AlarmDescription { get; set; }
         public string AWSAccountId { get; set; }

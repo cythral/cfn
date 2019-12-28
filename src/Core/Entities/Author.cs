@@ -1,9 +1,9 @@
-using System;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Cythral.CloudFormation.Entities {
-    public class Author {
+namespace Cythral.CloudFormation.Entities
+{
+    public class Author
+    {
         [JsonPropertyName("name")]
         public string Name { get; set; }
 

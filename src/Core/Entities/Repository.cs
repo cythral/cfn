@@ -1,9 +1,9 @@
-using System;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Cythral.CloudFormation.Entities {
-    public class Repository {
+namespace Cythral.CloudFormation.Entities
+{
+    public class Repository
+    {
         [JsonPropertyName("id")]
         public long Id { get; set; }
 
@@ -141,52 +141,52 @@ namespace Cythral.CloudFormation.Entities {
 
         [JsonPropertyName("deployments_url")]
         public string DeploymentsUrl { get; set; }
-        
+
         [JsonPropertyName("git_url")]
         public string GitUrl { get; set; }
-        
+
         [JsonPropertyName("ssh_url")]
         public string SshUrl { get; set; }
-        
+
         [JsonPropertyName("clone_url")]
         public string CloneUrl { get; set; }
-        
+
         [JsonPropertyName("svn_url")]
         public string SvnUrl { get; set; }
-        
+
         [JsonPropertyName("mirror_url")]
         public string MirrorUrl { get; set; }
-        
+
         [JsonPropertyName("homepage")]
         public string Homepage { get; set; }
-        
+
         [JsonPropertyName("size")]
         public long Size { get; set; }
-        
+
         [JsonPropertyName("stargazers_count")]
         public int StargazersCount { get; set; }
-        
+
         [JsonPropertyName("watchers_count")]
         public int WatchersCount { get; set; }
-        
+
         [JsonPropertyName("forks_count")]
         public int ForksCount { get; set; }
-        
+
         [JsonPropertyName("language")]
         public string Language { get; set; }
-        
+
         [JsonPropertyName("has_issues")]
         public bool HasIssues { get; set; }
-        
+
         [JsonPropertyName("has_projects")]
         public bool HasProjects { get; set; }
-        
+
         [JsonPropertyName("has_downloads")]
         public bool HasDownloads { get; set; }
-        
+
         [JsonPropertyName("has_wiki")]
         public bool HasWiki { get; set; }
-        
+
         [JsonPropertyName("has_pages")]
         public bool HasPages { get; set; }
 
@@ -195,10 +195,10 @@ namespace Cythral.CloudFormation.Entities {
 
         [JsonPropertyName("disabled")]
         public bool Disabled { get; set; }
-        
+
         [JsonPropertyName("open_issues_count")]
         public int OpenIssuesCount { get; set; }
-        
+
         [JsonPropertyName("default_branch")]
         public string DefaultBranch { get; set; }
     }

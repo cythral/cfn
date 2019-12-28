@@ -19,5 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/Resources/Resources.csproj" />
+    <ProjectReference Include="../../src/CustomResource/CustomResource.csproj" />
   </ItemGroup>
 </Project>
