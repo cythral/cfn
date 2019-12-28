@@ -62,6 +62,28 @@ namespace Tests
                 CertificateArn = "arn:aws:acm::1:certificate/example.com"
             });
 
+            client
+            .DescribeCertificateAsync(Arg.Is<DescribeCertificateRequest>(req =>
+                req.CertificateArn == "arn:aws:acm::1:certificate/example.com"
+            ))
+            .Returns(new DescribeCertificateResponse
+            {
+                Certificate = new CertificateDetail
+                {
+                    Status = CertificateStatus.ISSUED, // don't test wait
+                    DomainValidationOptions = new List<DomainValidation> {
+                        new DomainValidation {
+                            DomainName = "example.com",
+                            ResourceRecord = new ResourceRecord {
+                                Name = "_x1.example.com",
+                                Type = RecordType.CNAME,
+                                Value = "example-com.acm-validations.aws"
+                            }
+                        }
+                    }
+                }
+            });
+
             return client;
         }
 
@@ -175,32 +197,131 @@ namespace Tests
         }
 
         [Test]
+        public async Task CreateResponseShouldHavePhysicalResourceIdIfDescribeFails()
+        {
+            var acmClient = CreateAcmClient();
+            var mockHttp = new MockHttpMessageHandler();
+
+            acmClient
+            .When(x => x.DescribeCertificateAsync(Arg.Any<DescribeCertificateRequest>()))
+            .Do(x => { throw new Exception(); });
+
+            mockHttp
+            .Expect("http://example.com")
+            .WithJsonPayload(new Response
+            {
+                Status = ResponseStatus.FAILED,
+                PhysicalResourceId = "arn:aws:acm::1:certificate/example.com",
+                Reason = "Exception of type \u0027System.Exception\u0027 was thrown."
+            });
+
+            var request = new Request<Certificate.Properties>
+            {
+                RequestType = RequestType.Create,
+                ResponseURL = "http://example.com",
+                ResourceProperties = new Certificate.Properties
+                {
+                    DomainName = "example.com",
+                    HostedZoneId = "ABC123"
+                }
+            };
+
+            Certificate.HttpClientProvider = new FakeHttpClientProvider(mockHttp);
+            Certificate.AcmClientFactory = () => acmClient;
+
+            await Certificate.Handle(request.ToStream());
+            mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        [Test]
+        public async Task CreateResponseShouldHavePhysicalResourceIdIfChangeResourceRecordsFails()
+        {
+            var acmClient = CreateAcmClient();
+            var route53Client = CreateRoute53Client();
+            var mockHttp = new MockHttpMessageHandler();
+
+            route53Client
+            .When(x => x.ChangeResourceRecordSetsAsync(Arg.Any<ChangeResourceRecordSetsRequest>()))
+            .Do(x => { throw new Exception(); });
+
+            mockHttp
+            .Expect("http://example.com")
+            .WithJsonPayload(new Response
+            {
+                Status = ResponseStatus.FAILED,
+                PhysicalResourceId = "arn:aws:acm::1:certificate/example.com",
+                Reason = "One or more errors occurred. (Exception of type \u0027System.Exception\u0027 was thrown.)"
+            });
+
+            var request = new Request<Certificate.Properties>
+            {
+                RequestType = RequestType.Create,
+                ResponseURL = "http://example.com",
+                ResourceProperties = new Certificate.Properties
+                {
+                    DomainName = "example.com",
+                    HostedZoneId = "ABC123"
+                }
+            };
+
+            Certificate.HttpClientProvider = new FakeHttpClientProvider(mockHttp);
+            Certificate.AcmClientFactory = () => acmClient;
+            Certificate.Route53ClientFactory = () => route53Client;
+
+            await Certificate.Handle(request.ToStream());
+            mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        [Test]
+        public async Task CreateResponseShouldHavePhysicalResourceIdIfAddingTagsFails()
+        {
+            var acmClient = CreateAcmClient();
+            var route53Client = CreateRoute53Client();
+            var mockHttp = new MockHttpMessageHandler();
+
+            acmClient
+            .When(x => x.AddTagsToCertificateAsync(Arg.Any<AddTagsToCertificateRequest>()))
+            .Do(x => { throw new Exception(); });
+
+            mockHttp
+            .Expect("http://example.com")
+            .WithJsonPayload(new Response
+            {
+                Status = ResponseStatus.FAILED,
+                PhysicalResourceId = "arn:aws:acm::1:certificate/example.com",
+                Reason = "One or more errors occurred. (Exception of type \u0027System.Exception\u0027 was thrown.)"
+            });
+
+            var request = new Request<Certificate.Properties>
+            {
+                RequestType = RequestType.Create,
+                ResponseURL = "http://example.com",
+                ResourceProperties = new Certificate.Properties
+                {
+                    DomainName = "example.com",
+                    HostedZoneId = "ABC123",
+                    Tags = new List<Tag> {
+                        new Tag {
+                            Key = "Contact",
+                            Value = "Talen Fisher"
+                        }
+                    }
+                }
+            };
+
+            Certificate.HttpClientProvider = new FakeHttpClientProvider(mockHttp);
+            Certificate.AcmClientFactory = () => acmClient;
+            Certificate.Route53ClientFactory = () => route53Client;
+
+            await Certificate.Handle(request.ToStream());
+            mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        [Test]
         public async Task CreateCallsChangeResourceRecordSets()
         {
             var acmClient = CreateAcmClient();
             var route53Client = CreateRoute53Client();
-
-            acmClient
-            .DescribeCertificateAsync(Arg.Is<DescribeCertificateRequest>(req =>
-                req.CertificateArn == "arn:aws:acm::1:certificate/example.com"
-            ))
-            .Returns(new DescribeCertificateResponse
-            {
-                Certificate = new CertificateDetail
-                {
-                    Status = CertificateStatus.ISSUED, // don't test wait
-                    DomainValidationOptions = new List<DomainValidation> {
-                        new DomainValidation {
-                            DomainName = "example.com",
-                            ResourceRecord = new ResourceRecord {
-                                Name = "_x1.example.com",
-                                Type = RecordType.CNAME,
-                                Value = "example-com.acm-validations.aws"
-                            }
-                        }
-                    }
-                }
-            });
 
             var request = new Request<Certificate.Properties>
             {

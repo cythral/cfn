@@ -120,8 +120,8 @@ namespace Cythral.CloudFormation.Resources
             var requestCertificateResponse = await acmClient.RequestCertificateAsync(request);
             Console.WriteLine($"Got Request Certificate Response: {JsonSerializer.Serialize(requestCertificateResponse)}");
 
-            Request.PhysicalResourceId = requestCertificateResponse.CertificateArn;
-            var describeCertificateRequest = new DescribeCertificateRequest { CertificateArn = Request.PhysicalResourceId };
+            PhysicalResourceId = requestCertificateResponse.CertificateArn;
+            var describeCertificateRequest = new DescribeCertificateRequest { CertificateArn = PhysicalResourceId };
             var tasks = new List<Task>();
 
             Thread.Sleep(500);
@@ -154,7 +154,7 @@ namespace Cythral.CloudFormation.Resources
                     var addTagsResponse = await acmClient.AddTagsToCertificateAsync(new AddTagsToCertificateRequest
                     {
                         Tags = props.Tags,
-                        CertificateArn = Request.PhysicalResourceId,
+                        CertificateArn = PhysicalResourceId,
                     });
 
                     Console.WriteLine($"Got Add Tags Response: {JsonSerializer.Serialize(addTagsResponse)}");
@@ -184,7 +184,7 @@ namespace Cythral.CloudFormation.Resources
                         {
                             Name = option.ResourceRecord.Name,
                             Type = new RRType(option.ResourceRecord.Type.Value),
-                            SetIdentifier = Request.PhysicalResourceId,
+                            SetIdentifier = PhysicalResourceId,
                             Weight = 1,
                             TTL = 60,
                             ResourceRecords = new List<ResourceRecord> {
@@ -212,7 +212,10 @@ namespace Cythral.CloudFormation.Resources
             }
 
             Task.WaitAll(tasks.ToArray());
+
+            Request.PhysicalResourceId = PhysicalResourceId;
             Request.RequestType = RequestType.Wait;
+
             return await Wait();
         }
 
@@ -236,7 +239,7 @@ namespace Cythral.CloudFormation.Resources
 
                     break;
 
-                case "ISSUED": return new Response { PhysicalResourceId = Request.PhysicalResourceId };
+                case "ISSUED": return new Response();
                 default: throw new Exception($"Certificate could not be issued. (Got status: {status})");
             }
 

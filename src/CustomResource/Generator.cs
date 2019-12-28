@@ -45,12 +45,11 @@ namespace Cythral.CloudFormation.CustomResource
             get
             {
                 return String.Format(@"
-                    public {1}(Request<{0}> request, System.Net.Http.HttpClient httpClient = null, Amazon.Lambda.Core.ILambdaContext context = null) {{
-                        Request = request;
+                    public {0}(System.Net.Http.HttpClient httpClient = null, Amazon.Lambda.Core.ILambdaContext context = null) {{
                         HttpClient = httpClient ?? new System.Net.Http.HttpClient();
                         Context = context;
                     }}
-                ", ResourcePropertiesTypeName, ClassName);
+                ", ClassName);
             }
         }
 
@@ -102,7 +101,7 @@ namespace Cythral.CloudFormation.CustomResource
         {
             get
             {
-                return String.Format("public readonly Cythral.CloudFormation.CustomResource.Request<{0}> Request;", ResourcePropertiesTypeName);
+                return String.Format("public Cythral.CloudFormation.CustomResource.Request<{0}> Request {{ get; set; }}", ResourcePropertiesTypeName);
             }
         }
 
@@ -200,6 +199,7 @@ namespace Cythral.CloudFormation.CustomResource
                     SyntaxFactory.ParseMemberDeclaration(RespondDefinition),
                     SyntaxFactory.ParseMemberDeclaration(StaticRespondDefinition),
                     SyntaxFactory.ParseMemberDeclaration(SerializerOptionsDefinition),
+                    GeneratePhysicalResourceIdProperty(),
                     GenerateHandleMethod(),
                     GenerateValidateMethod()
                 );
@@ -329,6 +329,7 @@ namespace Cythral.CloudFormation.CustomResource
         {
             yield return ParseStatement("var response = new Response();");
             yield return ParseStatement("var client = HttpClientProvider.Provide();");
+            yield return ParseStatement($"var resource = new {ClassName}(client, context);");
 
             var catchDeclaration = CatchDeclaration(ParseTypeName("Exception"), ParseToken("e"));
 
@@ -349,7 +350,7 @@ namespace Cythral.CloudFormation.CustomResource
 
             yield return ParseStatement($"var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Request<{ResourcePropertiesTypeName}>>(stream, SerializerOptions);");
             yield return ParseStatement("Console.WriteLine($\"Received request: {System.Text.Json.JsonSerializer.Serialize(request, SerializerOptions)}\");");
-            yield return ParseStatement($"var resource = new {ClassName}(request, client, context);");
+            yield return ParseStatement("resource.Request = request;");
 
             var cases = new List<SwitchSectionSyntax> {
                 GenerateHandleMethodCreateCase(),
@@ -370,7 +371,10 @@ namespace Cythral.CloudFormation.CustomResource
 
             yield return IfStatement(
                 ParseExpression("response != null"),
-                ParseStatement("await resource.Respond(response);")
+                Block(new StatementSyntax[] {
+                    ParseStatement("response.PhysicalResourceId = response.PhysicalResourceId ?? resource.PhysicalResourceId;"),
+                    ParseStatement("await resource.Respond(response);")
+                })
             );
 
             yield return ParseStatement("var outStream = new System.IO.MemoryStream();");
@@ -451,6 +455,7 @@ namespace Cythral.CloudFormation.CustomResource
             yield return ParseStatement("var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Cythral.CloudFormation.CustomResource.Request<object>>(stream, SerializerOptions);");
             yield return ParseStatement("response.Status = Cythral.CloudFormation.CustomResource.ResponseStatus.FAILED;");
             yield return ParseStatement("response.Reason = e.Message;");
+            yield return ParseStatement("response.PhysicalResourceId = resource.PhysicalResourceId;");
             yield return ParseStatement("await Respond(request, response, client);");
             yield return ParseStatement("return null;");
         }
@@ -484,6 +489,28 @@ namespace Cythral.CloudFormation.CustomResource
                     yield return statement;
                 }
             }
+        }
+
+        private MemberDeclarationSyntax GeneratePhysicalResourceIdProperty()
+        {
+            return PropertyDeclaration(
+                List<AttributeListSyntax>(),
+                TokenList(
+                    Token(PublicKeyword)
+                ),
+                ParseTypeName("string"),
+                null,
+                ParseToken("PhysicalResourceId"),
+                AccessorList(
+                    Token(OpenBraceToken),
+                    List(new List<AccessorDeclarationSyntax>
+                    {
+                        AccessorDeclaration(SyntaxKind.GetAccessorDeclaration, List<AttributeListSyntax>(), TokenList(), Token(GetKeyword), null, null, Token(SemicolonToken)),
+                        AccessorDeclaration(SyntaxKind.SetAccessorDeclaration, List<AttributeListSyntax>(), TokenList(), Token(SetKeyword), null, null, Token(SemicolonToken)),
+                    }),
+                    Token(CloseBraceToken)
+                )
+            );
         }
     }
 

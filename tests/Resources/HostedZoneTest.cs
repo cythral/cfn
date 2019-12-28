@@ -90,7 +90,8 @@ namespace Tests
                 }
             };
 
-            var resource = new HostedZone(new Request<HostedZone.Properties>
+            var resource = new HostedZone();
+            resource.Request = new Request<HostedZone.Properties>
             {
                 ResourceProperties = new HostedZone.Properties
                 {
@@ -100,8 +101,7 @@ namespace Tests
                 {
                     HostedZoneTags = oldTags
                 }
-            });
-
+            };
             resource.DeletedTags.Should().BeEquivalentTo("Contact");
         }
 
@@ -131,7 +131,8 @@ namespace Tests
                 }
             };
 
-            var resource = new HostedZone(new Request<HostedZone.Properties>
+            var resource = new HostedZone();
+            resource.Request = new Request<HostedZone.Properties>
             {
                 ResourceProperties = new HostedZone.Properties
                 {
@@ -141,8 +142,7 @@ namespace Tests
                 {
                     HostedZoneTags = oldTags
                 }
-            });
-
+            };
             resource.UpsertedTags.Should().BeEquivalentTo(newTags);
         }
 
@@ -162,7 +162,8 @@ namespace Tests
                 new VPC { VPCId = "2", VPCRegion = UsEast1 }
             };
 
-            var resource = new HostedZone(new Request<HostedZone.Properties>
+            var resource = new HostedZone();
+            resource.Request = new Request<HostedZone.Properties>
             {
                 ResourceProperties = new HostedZone.Properties
                 {
@@ -172,8 +173,7 @@ namespace Tests
                 {
                     VPCs = oldVpcs,
                 },
-            });
-
+            };
             resource.AssociatableVPCs.Should().BeEquivalentTo(new List<VPC> {
                 new VPC { VPCId = "2", VPCRegion = UsEast1 }
             });
@@ -249,6 +249,148 @@ namespace Tests
                 )
             );
         }
+
+        /// <summary>
+        /// Test that the PhysicalResourceId is in the response if the call to turn on Query Logging
+        /// fails in HostedZone.Create.
+        /// </summary>
+        [Test]
+        public async Task CreateShouldReturnPhysicalResourceIdIfTurningOnQueryLoggingFails()
+        {
+            var responseURL = "https://example.com";
+            var mockHttp = new MockHttpMessageHandler();
+            var client = CreateClient();
+
+            client
+            .When(x => x.CreateQueryLoggingConfigAsync(Arg.Any<CreateQueryLoggingConfigRequest>()))
+            .Do(x => { throw new Exception(); });
+
+            mockHttp
+            .Expect(responseURL)
+            .WithJsonPayload(new Response
+            {
+                Status = ResponseStatus.FAILED,
+                PhysicalResourceId = "ABC123",
+                Reason = "One or more errors occurred. (Exception of type \u0027System.Exception\u0027 was thrown.)"
+            });
+
+            HostedZone.ClientFactory = () => client;
+            HostedZone.HttpClientProvider = new FakeHttpClientProvider(mockHttp);
+
+            var request = new Request<HostedZone.Properties>
+            {
+                ResponseURL = responseURL,
+                RequestType = RequestType.Create,
+                ResourceProperties = new HostedZone.Properties
+                {
+                    Name = "example.com",
+                    QueryLoggingConfig = new QueryLoggingConfig
+                    {
+                        CloudWatchLogsLogGroupArn = "test"
+                    }
+                }
+            };
+
+            await HostedZone.Handle(request.ToStream());
+            mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        /// <summary>
+        /// /// Test that the PhysicalResourceId is included in the response even if adding tags fails in HostedZone.Create.
+        /// </summary>
+        [Test]
+        public async Task CreateShouldReturnPhysicalResourceIdIfAddingTagsFails()
+        {
+            var responseURL = "https://example.com";
+            var mockHttp = new MockHttpMessageHandler();
+            var client = CreateClient();
+
+            client
+            .When(x => x.ChangeTagsForResourceAsync(Arg.Any<ChangeTagsForResourceRequest>()))
+            .Do(x => { throw new Exception(); });
+
+            mockHttp
+            .Expect(responseURL)
+            .WithJsonPayload(new Response
+            {
+                Status = ResponseStatus.FAILED,
+                PhysicalResourceId = "ABC123",
+                Reason = "One or more errors occurred. (Exception of type \u0027System.Exception\u0027 was thrown.)"
+            });
+
+            HostedZone.ClientFactory = () => client;
+            HostedZone.HttpClientProvider = new FakeHttpClientProvider(mockHttp);
+
+            var request = new Request<HostedZone.Properties>
+            {
+                ResponseURL = responseURL,
+                RequestType = RequestType.Create,
+                ResourceProperties = new HostedZone.Properties
+                {
+                    Name = "example.com",
+                    HostedZoneTags = new List<Tag> {
+                        new Tag {
+                            Key = "Contact",
+                            Value = "Talen Fisher"
+                        }
+                    }
+                }
+            };
+
+            await HostedZone.Handle(request.ToStream());
+            mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        /// <summary>
+        /// Test that the PhysicalResourceId is included in the response even if the call to associate vpcs fails in HostedZone.Create
+        /// </summary>
+        [Test]
+        public async Task CreateShouldReturnPhysicalResourceIdIfAssociatingVPCsFails()
+        {
+            var responseURL = "https://example.com";
+            var mockHttp = new MockHttpMessageHandler();
+            var client = CreateClient();
+
+            client
+            .When(x => x.AssociateVPCWithHostedZoneAsync(Arg.Any<AssociateVPCWithHostedZoneRequest>()))
+            .Do(x => { throw new Exception(); });
+
+            mockHttp
+            .Expect(responseURL)
+            .WithJsonPayload(new Response
+            {
+                Status = ResponseStatus.FAILED,
+                PhysicalResourceId = "ABC123",
+                Reason = "One or more errors occurred. (One or more errors occurred. (Exception of type \u0027System.Exception\u0027 was thrown.))"
+            });
+
+            HostedZone.ClientFactory = () => client;
+            HostedZone.HttpClientProvider = new FakeHttpClientProvider(mockHttp);
+
+            var request = new Request<HostedZone.Properties>
+            {
+                ResponseURL = responseURL,
+                RequestType = RequestType.Create,
+                ResourceProperties = new HostedZone.Properties
+                {
+                    Name = "example.com",
+                    VPCs = new List<VPC> {
+                        new VPC {
+                            VPCId = "BCD234",
+                            VPCRegion = "us-east-1"
+                        },
+                        new VPC {
+                            VPCId = "CDF345",
+                            VPCRegion = "us-west-2"
+                        }
+                    }
+                }
+            };
+
+            await HostedZone.Handle(request.ToStream());
+            mockHttp.VerifyNoOutstandingExpectation();
+        }
+
 
         /// <summary>
         /// Tests to see if all VPCs were associated with Route53:AssociateVPCWithHostedZone
