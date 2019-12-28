@@ -1,31 +1,36 @@
-using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Cythral.CloudFormation.CustomResource.Yaml {
-    public class Role : Resource {
+namespace Cythral.CloudFormation.CustomResource.Yaml
+{
+    public class Role : Resource
+    {
         public override string Type { get; set; } = "AWS::IAM::Role";
 
         public override object Properties { get; set; } = new PropertiesDefinition();
 
-        public class PropertiesDefinition {
+        public class PropertiesDefinition
+        {
             public List<string> ManagedPolicyArns { get; set; } = new List<string>();
             public List<Policy> Policies { get; set; } = new List<Policy>();
-            public PolicyDocument AssumeRolePolicyDocument { get; set; }     
+            public PolicyDocument AssumeRolePolicyDocument { get; set; }
         }
 
-        public Role AddPolicy(Policy policy) {
-            ((PropertiesDefinition) Properties).Policies.Add(policy);
+        public Role AddPolicy(Policy policy)
+        {
+            ((PropertiesDefinition)Properties).Policies.Add(policy);
             return this;
         }
 
-        public Role AddTrustedAWSEntity(string principal) {
+        public Role AddTrustedAWSEntity(string principal)
+        {
             InitializeAssumeRolePolicyDocument();
 
             var props = Properties as PropertiesDefinition;
             var trustStatement = props.AssumeRolePolicyDocument.Statement.First().Principal;
 
-            if(trustStatement.AWS == null) {
+            if (trustStatement.AWS == null)
+            {
                 trustStatement.AWS = new HashSet<string>();
             }
 
@@ -33,13 +38,15 @@ namespace Cythral.CloudFormation.CustomResource.Yaml {
             return this;
         }
 
-        public Role AddTrustedServiceEntity(string principal) {
+        public Role AddTrustedServiceEntity(string principal)
+        {
             InitializeAssumeRolePolicyDocument();
 
             var props = Properties as PropertiesDefinition;
             var trustStatement = props.AssumeRolePolicyDocument.Statement.First().Principal;
 
-            if(trustStatement.Service == null) {
+            if (trustStatement.Service == null)
+            {
                 trustStatement.Service = new HashSet<string>();
             }
 
@@ -47,17 +54,21 @@ namespace Cythral.CloudFormation.CustomResource.Yaml {
             return this;
         }
 
-        public Role AddManagedPolicy(string arn) {
-            ((PropertiesDefinition) Properties).ManagedPolicyArns.Add(arn);
+        public Role AddManagedPolicy(string arn)
+        {
+            ((PropertiesDefinition)Properties).ManagedPolicyArns.Add(arn);
             return this;
         }
 
-        private void InitializeAssumeRolePolicyDocument() {
+        private void InitializeAssumeRolePolicyDocument()
+        {
             var props = Properties as PropertiesDefinition;
 
-            if(props.AssumeRolePolicyDocument == null) {
+            if (props.AssumeRolePolicyDocument == null)
+            {
                 props.AssumeRolePolicyDocument = new PolicyDocument();
-                props.AssumeRolePolicyDocument.Statement.Add(new PolicyStatement() {
+                props.AssumeRolePolicyDocument.Statement.Add(new PolicyStatement()
+                {
                     Effect = "Allow",
                     Action = new HashSet<string>() { "sts:AssumeRole" },
                     Principal = new Principal()

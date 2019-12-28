@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Cythral.CloudFormation.Entities;
 
-namespace Cythral.CloudFormation.Events {
-    public class PushEvent {
+namespace Cythral.CloudFormation.Events
+{
+    public class PushEvent
+    {
         [JsonPropertyName("ref")]
         public string Ref { get; set; }
 

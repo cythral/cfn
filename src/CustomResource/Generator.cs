@@ -1,10 +1,7 @@
-using System.Reflection.Emit;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
-using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,22 +10,21 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
-using static Microsoft.CodeAnalysis.SyntaxToken;
-using static Microsoft.CodeAnalysis.SyntaxTrivia;
-
-
 
 using CodeGeneration.Roslyn.Engine;
-using Newtonsoft.Json;
+
 using Validation;
+
 using YamlDotNet.Serialization;
 
-namespace Cythral.CloudFormation.CustomResource {
+namespace Cythral.CloudFormation.CustomResource
+{
 
     using Yaml;
 
-    
-    public class Generator : ICodeGenerator {
+
+    public class Generator : ICodeGenerator
+    {
 
         private INamedTypeSymbol ResourcePropertiesType;
 
@@ -44,8 +40,10 @@ namespace Cythral.CloudFormation.CustomResource {
 
         private AttributeData Data;
 
-        private string ConstructorDefinition {
-            get {
+        private string ConstructorDefinition
+        {
+            get
+            {
                 return String.Format(@"
                     public {1}(Request<{0}> request, System.Net.Http.HttpClient httpClient = null, Amazon.Lambda.Core.ILambdaContext context = null) {{
                         Request = request;
@@ -56,8 +54,10 @@ namespace Cythral.CloudFormation.CustomResource {
             }
         }
 
-        private string RespondDefinition {
-            get {
+        private string RespondDefinition
+        {
+            get
+            {
                 return String.Format(@"
                     public virtual async System.Threading.Tasks.Task<bool> Respond(Response response) {{
                         return await Respond(Request, response, HttpClient);
@@ -66,8 +66,10 @@ namespace Cythral.CloudFormation.CustomResource {
             }
         }
 
-        private string StaticRespondDefinition {
-            get {
+        private string StaticRespondDefinition
+        {
+            get
+            {
                 return String.Format(@"
                     public static async System.Threading.Tasks.Task<bool> Respond<T>(Request<T> request, Response response, System.Net.Http.HttpClient client) {{
                         response.StackId = request.StackId;
@@ -96,32 +98,42 @@ namespace Cythral.CloudFormation.CustomResource {
             }
         }
 
-        private string RequestPropertyDefinition {
-            get {
+        private string RequestPropertyDefinition
+        {
+            get
+            {
                 return String.Format("public readonly Cythral.CloudFormation.CustomResource.Request<{0}> Request;", ResourcePropertiesTypeName);
             }
         }
 
-        private string ContextPropertyDefinition {
-            get {
+        private string ContextPropertyDefinition
+        {
+            get
+            {
                 return String.Format("public readonly Amazon.Lambda.Core.ILambdaContext Context;");
             }
         }
 
-        private string HttpClientPropertyDefinition {
-            get {
+        private string HttpClientPropertyDefinition
+        {
+            get
+            {
                 return String.Format("public readonly System.Net.Http.HttpClient HttpClient;");
             }
         }
 
-        private string HttpClientProviderDefinition {
-            get {
+        private string HttpClientProviderDefinition
+        {
+            get
+            {
                 return String.Format("public static Cythral.CloudFormation.CustomResource.IHttpClientProvider HttpClientProvider = new DefaultHttpClientProvider();");
             }
         }
 
-        private string SerializerOptionsDefinition {
-            get {
+        private string SerializerOptionsDefinition
+        {
+            get
+            {
                 return String.Format(@"
                     private static System.Text.Json.JsonSerializerOptions SerializerOptions {{
                         get {{
@@ -135,41 +147,46 @@ namespace Cythral.CloudFormation.CustomResource {
             }
         }
 
-        public static Dictionary<string,Resource> Resources = new Dictionary<string,Resource>();
+        public static Dictionary<string, Resource> Resources = new Dictionary<string, Resource>();
 
-        public static Dictionary<string,Output> Outputs = new Dictionary<string,Output>();
+        public static Dictionary<string, Output> Outputs = new Dictionary<string, Output>();
 
-        public Generator(AttributeData attributeData) {
+        public Generator(AttributeData attributeData)
+        {
             Requires.NotNull(attributeData, nameof(attributeData));
             Data = attributeData;
 
-            foreach(var arg in Data.NamedArguments) {
+            foreach (var arg in Data.NamedArguments)
+            {
 
-                switch(arg.Key) {
-                    case "Grantees": 
+                switch (arg.Key)
+                {
+                    case "Grantees":
                         Grantees = (from typeConstant in arg.Value.Values select typeConstant.Value).ToArray();
                         break;
 
                     case "GranteeType":
-                        GranteeType = (GranteeType) arg.Value.Value;
+                        GranteeType = (GranteeType)arg.Value.Value;
                         break;
-                    
-                    case "ResourcePropertiesType": 
+
+                    case "ResourcePropertiesType":
                         ResourcePropertiesTypeName = arg.Value.Value.ToString();
-                        ResourcePropertiesType = (INamedTypeSymbol) arg.Value.Value; 
+                        ResourcePropertiesType = (INamedTypeSymbol)arg.Value.Value;
                         break;
                 }
-            }   
+            }
         }
 
-        public Task<SyntaxList<MemberDeclarationSyntax>> GenerateAsync(TransformationContext context, IProgress<Diagnostic> progress, CancellationToken cancellationToken) {
+        public Task<SyntaxList<MemberDeclarationSyntax>> GenerateAsync(TransformationContext context, IProgress<Diagnostic> progress, CancellationToken cancellationToken)
+        {
             var result = GeneratePartialClass();
-            OriginalClass = (ClassDeclarationSyntax) context.ProcessingNode;
+            OriginalClass = (ClassDeclarationSyntax)context.ProcessingNode;
             AddResources(context);
 
             return Task.FromResult(SyntaxFactory.List(result));
 
-            IEnumerable<MemberDeclarationSyntax> GeneratePartialClass() {
+            IEnumerable<MemberDeclarationSyntax> GeneratePartialClass()
+            {
                 var partialClass = SyntaxFactory
                 .ClassDeclaration(ClassName)
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword))
@@ -191,14 +208,16 @@ namespace Cythral.CloudFormation.CustomResource {
             }
         }
 
-        public static void OnComplete(CompilationGenerator context) {
+        public static void OnComplete(CompilationGenerator context)
+        {
             var outputDirectory = context.BuildProperties["OutDir"];
             var description = context.BuildProperties["StackDescription"];
             var filePath = outputDirectory + "/" + context.AssemblyName + ".template.yml";
 
-            try {
+            try
+            {
                 var yamlDotNet = Assembly.Load("YamlDotNet");
-                var serializer = ((SerializerBuilder) yamlDotNet.CreateInstance("YamlDotNet.Serialization.SerializerBuilder"))
+                var serializer = ((SerializerBuilder)yamlDotNet.CreateInstance("YamlDotNet.Serialization.SerializerBuilder"))
                 .WithTagMapping("!GetAtt", typeof(GetAttTag))
                 .WithTagMapping("!Sub", typeof(SubTag))
                 .WithTypeConverter(new GetAttTagConverter())
@@ -206,26 +225,32 @@ namespace Cythral.CloudFormation.CustomResource {
                 .WithTypeConverter(new ImportValueTagConverter())
                 .Build();
 
-                var yaml = serializer.Serialize(new { 
+                var yaml = serializer.Serialize(new
+                {
                     Description = description,
                     Resources = Resources,
                     Outputs = Outputs
                 });
 
                 System.IO.File.WriteAllText(filePath, yaml);
-            } catch(Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.IO.File.WriteAllText(filePath, e.Message);
             }
         }
 
-        private void AddResources(TransformationContext context) {
+        private void AddResources(TransformationContext context)
+        {
             AddRoleResource(context);
-            
+
             var version = context.BuildProperties["TargetFrameworkVersion"].Replace("v", "");
 
-            Resources.Add(ClassName + "Lambda", new Resource {
+            Resources.Add(ClassName + "Lambda", new Resource
+            {
                 Type = "AWS::Lambda::Function",
-                Properties = new {
+                Properties = new
+                {
                     FunctionName = ClassName,
                     Handler = $"{context.Compilation.Assembly.Name}::{context.ProcessingNode.GetFullName()}::Handle",
                     Role = new GetAttTag() { Name = $"{ClassName}Role", Attribute = "Arn" },
@@ -235,15 +260,19 @@ namespace Cythral.CloudFormation.CustomResource {
                 }
             });
 
-            if(Grantees != null && Grantees?.Count() > 0) {
-                for(int i = 0; i < Grantees.Count(); i++) {
+            if (Grantees != null && Grantees?.Count() > 0)
+            {
+                for (int i = 0; i < Grantees.Count(); i++)
+                {
                     var grantee = Grantees[i];
 
-                    Resources.Add($"{ClassName}Permission{i}", new Resource {
+                    Resources.Add($"{ClassName}Permission{i}", new Resource
+                    {
                         Type = "AWS::Lambda::Permission",
-                        Properties = new {
+                        Properties = new
+                        {
                             FunctionName = new GetAttTag { Name = $"{ClassName}Lambda", Attribute = "Arn" },
-                            Principal = GranteeType == GranteeType.Import ? (object) new ImportValueTag((string) grantee) : grantee,
+                            Principal = GranteeType == GranteeType.Import ? (object)new ImportValueTag((string)grantee) : grantee,
                             Action = "lambda:InvokeFunction"
                         }
                     });
@@ -256,18 +285,22 @@ namespace Cythral.CloudFormation.CustomResource {
             ));
         }
 
-        private void AddRoleResource(TransformationContext context) {
+        private void AddRoleResource(TransformationContext context)
+        {
             var role = new Role()
             .AddTrustedServiceEntity("lambda.amazonaws.com")
             .AddManagedPolicy("arn:aws:iam::aws:policy/AWSLambdaExecute");
-            
+
             var collector = new PermissionsCollector(context);
 
-            try {
+            try
+            {
                 collector.Visit(context.ProcessingNode);
-            } catch(Exception) {}
-            
-            if(collector.Permissions.Count() > 0) {
+            }
+            catch (Exception) { }
+
+            if (collector.Permissions.Count() > 0)
+            {
                 role.AddPolicy(
                     new Policy($"{ClassName}PrimaryPolicy")
                     .AddStatement(Action: collector.Permissions)
@@ -277,21 +310,23 @@ namespace Cythral.CloudFormation.CustomResource {
             Resources.Add($"{ClassName}Role", role);
         }
 
-        private MemberDeclarationSyntax GenerateHandleMethod() {
+        private MemberDeclarationSyntax GenerateHandleMethod()
+        {
             var body = Block(GenerateHandleMethodBody());
             var returnType = ParseTypeName("System.Threading.Tasks.Task<System.IO.Stream>");
             return MethodDeclaration(returnType, "Handle")
                 .AddModifiers(Token(PublicKeyword), Token(StaticKeyword), Token(AsyncKeyword))
                 .AddParameterListParameters(
                     //        attribute lists              modifiers              type                                                  identifier              default value
-                    Parameter(List<AttributeListSyntax>(), new SyntaxTokenList(), ParseTypeName("System.IO.Stream"),                    ParseToken("stream"),   null),
-                    Parameter(List<AttributeListSyntax>(), new SyntaxTokenList(), ParseTypeName("Amazon.Lambda.Core.ILambdaContext"),   ParseToken("context"),  EqualsValueClause(ParseExpression("null")))
+                    Parameter(List<AttributeListSyntax>(), new SyntaxTokenList(), ParseTypeName("System.IO.Stream"), ParseToken("stream"), null),
+                    Parameter(List<AttributeListSyntax>(), new SyntaxTokenList(), ParseTypeName("Amazon.Lambda.Core.ILambdaContext"), ParseToken("context"), EqualsValueClause(ParseExpression("null")))
 
                 )
                 .WithBody(body);
         }
 
-        private IEnumerable<StatementSyntax> GenerateHandleMethodBody() {
+        private IEnumerable<StatementSyntax> GenerateHandleMethodBody()
+        {
             yield return ParseStatement("var response = new Response();");
             yield return ParseStatement("var client = HttpClientProvider.Provide();");
 
@@ -300,7 +335,7 @@ namespace Cythral.CloudFormation.CustomResource {
             yield return TryStatement(
                 ParseToken("try"),
                 Block(GenerateHandleMethodTryBlock()),
-                List(new List<CatchClauseSyntax> { 
+                List(new List<CatchClauseSyntax> {
                     CatchClause(ParseToken("catch"), catchDeclaration, null, Block(GenerateHandleMethodCatchBlock()))
                 }),
                 null
@@ -308,21 +343,23 @@ namespace Cythral.CloudFormation.CustomResource {
 
         }
 
-        private IEnumerable<StatementSyntax> GenerateHandleMethodTryBlock() {
+        private IEnumerable<StatementSyntax> GenerateHandleMethodTryBlock()
+        {
             yield return ParseStatement("stream.Seek(0, System.IO.SeekOrigin.Begin);");
 
             yield return ParseStatement($"var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Request<{ResourcePropertiesTypeName}>>(stream, SerializerOptions);");
             yield return ParseStatement("Console.WriteLine($\"Received request: {System.Text.Json.JsonSerializer.Serialize(request, SerializerOptions)}\");");
             yield return ParseStatement($"var resource = new {ClassName}(request, client, context);");
-            
+
             var cases = new List<SwitchSectionSyntax> {
                 GenerateHandleMethodCreateCase(),
                 GenerateHandleMethodUpdateCase(),
                 GenerateHandleMethodDeleteCase()
             };
-            
+
             var methods = OriginalClass.Members.Where(member => member is MethodDeclarationSyntax).Cast<MethodDeclarationSyntax>();
-            if(methods.Any(member => member.Identifier.Text == "Wait")) {
+            if (methods.Any(member => member.Identifier.Text == "Wait"))
+            {
                 cases.Add(GenerateHandleMethodWaitCase());
             }
 
@@ -341,7 +378,8 @@ namespace Cythral.CloudFormation.CustomResource {
             yield return ParseStatement("return outStream;");
         }
 
-        private SwitchSectionSyntax GenerateHandleMethodCreateCase() {
+        private SwitchSectionSyntax GenerateHandleMethodCreateCase()
+        {
             return SwitchSection(
                 List(new List<SwitchLabelSyntax> {
                     CaseSwitchLabel(ParseExpression("RequestType.Create")),
@@ -354,7 +392,8 @@ namespace Cythral.CloudFormation.CustomResource {
             );
         }
 
-        private SwitchSectionSyntax GenerateHandleMethodUpdateCase() {
+        private SwitchSectionSyntax GenerateHandleMethodUpdateCase()
+        {
             return SwitchSection(
                 List(new List<SwitchLabelSyntax> {
                     CaseSwitchLabel(ParseExpression("RequestType.Update")),
@@ -371,7 +410,7 @@ namespace Cythral.CloudFormation.CustomResource {
                             Block(List(new List<StatementSyntax> {
                                 ParseStatement("Console.WriteLine($\"Updating Resource: {resource.Request.PhysicalResourceId}\");"),
                                 ParseStatement("response = await resource.Update();")
-                            }))   
+                            }))
                         )
                     ),
                     ParseStatement("break;")
@@ -379,7 +418,8 @@ namespace Cythral.CloudFormation.CustomResource {
             );
         }
 
-        private SwitchSectionSyntax GenerateHandleMethodDeleteCase() {
+        private SwitchSectionSyntax GenerateHandleMethodDeleteCase()
+        {
             return SwitchSection(
                 List(new List<SwitchLabelSyntax> {
                     CaseSwitchLabel(ParseExpression("RequestType.Delete")),
@@ -391,7 +431,8 @@ namespace Cythral.CloudFormation.CustomResource {
             );
         }
 
-        private SwitchSectionSyntax GenerateHandleMethodWaitCase() {
+        private SwitchSectionSyntax GenerateHandleMethodWaitCase()
+        {
             return SwitchSection(
                 List(new List<SwitchLabelSyntax> {
                     CaseSwitchLabel(ParseExpression("RequestType.Wait")),
@@ -403,7 +444,8 @@ namespace Cythral.CloudFormation.CustomResource {
             );
         }
 
-        private IEnumerable<StatementSyntax> GenerateHandleMethodCatchBlock() {
+        private IEnumerable<StatementSyntax> GenerateHandleMethodCatchBlock()
+        {
             yield return ParseStatement("Console.WriteLine(e.Message + \"\n\" + e.StackTrace);");
             yield return ParseStatement("stream.Seek(0, System.IO.SeekOrigin.Begin);");
             yield return ParseStatement("var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Cythral.CloudFormation.CustomResource.Request<object>>(stream, SerializerOptions);");
@@ -413,7 +455,8 @@ namespace Cythral.CloudFormation.CustomResource {
             yield return ParseStatement("return null;");
         }
 
-        private MemberDeclarationSyntax GenerateValidateMethod() {
+        private MemberDeclarationSyntax GenerateValidateMethod()
+        {
             var bodyStatements = GenerateValidationCalls();
             var body = SyntaxFactory.Block(bodyStatements);
             return SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), "Validate")
@@ -421,14 +464,19 @@ namespace Cythral.CloudFormation.CustomResource {
                 .WithBody(body);
         }
 
-        private IEnumerable<StatementSyntax> GenerateValidationCalls() {
-            foreach(var symbol in ResourcePropertiesType.GetMembers()) {
-                if(symbol.Kind != SymbolKind.Property && symbol.Kind != SymbolKind.Field) {
+        private IEnumerable<StatementSyntax> GenerateValidationCalls()
+        {
+            foreach (var symbol in ResourcePropertiesType.GetMembers())
+            {
+                if (symbol.Kind != SymbolKind.Property && symbol.Kind != SymbolKind.Field)
+                {
                     continue;
                 }
 
-                foreach(var attribute in symbol.GetAttributes()) {
-                    if(attribute.AttributeClass.BaseType.Name != "ValidationAttribute") {
+                foreach (var attribute in symbol.GetAttributes())
+                {
+                    if (attribute.AttributeClass.BaseType.Name != "ValidationAttribute")
+                    {
                         continue;
                     }
 

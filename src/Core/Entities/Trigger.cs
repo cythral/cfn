@@ -1,9 +1,9 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 
-namespace Cythral.CloudFormation.Entities {
-    public class Trigger {
+namespace Cythral.CloudFormation.Entities
+{
+    public class Trigger
+    {
         public int Period { get; set; }
         public int EvaluationPeriods { get; set; }
         public string ComparisonOperator { get; set; }

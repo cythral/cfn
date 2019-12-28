@@ -6,28 +6,37 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Amazon.Route53;
-using Amazon.Route53.Model;
+
 using Amazon.CertificateManager;
 using Amazon.CertificateManager.Model;
 using Amazon.Lambda;
-using Amazon.Lambda.Model;
 using Amazon.Lambda.Core;
-using NUnit.Framework;
+using Amazon.Lambda.Model;
+using Amazon.Route53;
+using Amazon.Route53.Model;
+
 using Cythral.CloudFormation.CustomResource;
 using Cythral.CloudFormation.Resources;
-using RichardSzalay.MockHttp;
+
 using FluentAssertions;
+
 using NSubstitute;
+
+using NUnit.Framework;
+
+using RichardSzalay.MockHttp;
 
 using Tag = Amazon.CertificateManager.Model.Tag;
 using ResourceRecord = Amazon.CertificateManager.Model.ResourceRecord;
 
 
-namespace Tests {
-    public class CertificateTest {
+namespace Tests
+{
+    public class CertificateTest
+    {
 
-        private class Context : ILambdaContext {
+        private class Context : ILambdaContext
+        {
             public string AwsRequestId { get; set; }
             public IClientContext ClientContext { get; set; }
             public string FunctionName { get; set; }
@@ -42,44 +51,51 @@ namespace Tests {
 
         }
 
-        public IAmazonCertificateManager CreateAcmClient() {
+        public IAmazonCertificateManager CreateAcmClient()
+        {
             var client = Substitute.For<IAmazonCertificateManager>();
-            
+
             client
             .RequestCertificateAsync(Arg.Any<RequestCertificateRequest>())
-            .Returns(new RequestCertificateResponse {
+            .Returns(new RequestCertificateResponse
+            {
                 CertificateArn = "arn:aws:acm::1:certificate/example.com"
             });
 
             return client;
         }
 
-        public IAmazonRoute53 CreateRoute53Client() {
+        public IAmazonRoute53 CreateRoute53Client()
+        {
             var client = Substitute.For<IAmazonRoute53>();
-            
+
             client
             .ChangeResourceRecordSetsAsync(Arg.Any<ChangeResourceRecordSetsRequest>())
-            .Returns(new ChangeResourceRecordSetsResponse {});
+            .Returns(new ChangeResourceRecordSetsResponse { });
 
             return client;
         }
 
-        public IAmazonLambda CreateLambdaClient() {
+        public IAmazonLambda CreateLambdaClient()
+        {
             var client = Substitute.For<IAmazonLambda>();
 
             client
             .InvokeAsync(Arg.Any<InvokeRequest>())
-            .Returns(new InvokeResponse {});
+            .Returns(new InvokeResponse { });
 
             return client;
         }
 
         [Test]
-        public async Task CreateCallsRequestCertificate() {
+        public async Task CreateCallsRequestCertificate()
+        {
             var client = CreateAcmClient();
-            var request = new Request<Certificate.Properties> {
+            var request = new Request<Certificate.Properties>
+            {
                 RequestType = RequestType.Create,
-                ResourceProperties = new Certificate.Properties {
+                ResourceProperties = new Certificate.Properties
+                {
                     DomainName = "example.com",
                     SubjectAlternativeNames = new List<string> { "www.example.com" },
                     ValidationMethod = ValidationMethod.DNS
@@ -91,7 +107,7 @@ namespace Tests {
 
             await client.Received().RequestCertificateAsync(
                 Arg.Is<RequestCertificateRequest>(req =>
-                    req.DomainName == "example.com" && 
+                    req.DomainName == "example.com" &&
                     req.SubjectAlternativeNames.Any(name => name == "www.example.com") &&
                     req.ValidationMethod == ValidationMethod.DNS
                 )
@@ -99,16 +115,19 @@ namespace Tests {
         }
 
         [Test]
-        public async Task CreateAddsTags() {
+        public async Task CreateAddsTags()
+        {
             var acmClient = CreateAcmClient();
             var route53Client = CreateRoute53Client();
-            
+
             acmClient
             .DescribeCertificateAsync(Arg.Is<DescribeCertificateRequest>(req =>
                 req.CertificateArn == "arn:aws:acm::1:certificate/example.com"
             ))
-            .Returns(new DescribeCertificateResponse {
-                Certificate = new CertificateDetail {
+            .Returns(new DescribeCertificateResponse
+            {
+                Certificate = new CertificateDetail
+                {
                     Status = CertificateStatus.ISSUED, // don't test wait
                     DomainValidationOptions = new List<DomainValidation> {
                         new DomainValidation {
@@ -123,9 +142,11 @@ namespace Tests {
                 }
             });
 
-            var request = new Request<Certificate.Properties> {
+            var request = new Request<Certificate.Properties>
+            {
                 RequestType = RequestType.Create,
-                ResourceProperties = new Certificate.Properties {
+                ResourceProperties = new Certificate.Properties
+                {
                     DomainName = "example.com",
                     HostedZoneId = "ABC123",
                     Tags = new List<Tag> {
@@ -154,16 +175,19 @@ namespace Tests {
         }
 
         [Test]
-        public async Task CreateCallsChangeResourceRecordSets() {
+        public async Task CreateCallsChangeResourceRecordSets()
+        {
             var acmClient = CreateAcmClient();
             var route53Client = CreateRoute53Client();
-            
+
             acmClient
             .DescribeCertificateAsync(Arg.Is<DescribeCertificateRequest>(req =>
                 req.CertificateArn == "arn:aws:acm::1:certificate/example.com"
             ))
-            .Returns(new DescribeCertificateResponse {
-                Certificate = new CertificateDetail {
+            .Returns(new DescribeCertificateResponse
+            {
+                Certificate = new CertificateDetail
+                {
                     Status = CertificateStatus.ISSUED, // don't test wait
                     DomainValidationOptions = new List<DomainValidation> {
                         new DomainValidation {
@@ -178,9 +202,11 @@ namespace Tests {
                 }
             });
 
-            var request = new Request<Certificate.Properties> {
+            var request = new Request<Certificate.Properties>
+            {
                 RequestType = RequestType.Create,
-                ResourceProperties = new Certificate.Properties {
+                ResourceProperties = new Certificate.Properties
+                {
                     DomainName = "example.com",
                     HostedZoneId = "ABC123"
                 }
@@ -192,7 +218,7 @@ namespace Tests {
             await Certificate.Handle(request.ToStream());
 
             await route53Client.Received().ChangeResourceRecordSetsAsync(
-                Arg.Is<ChangeResourceRecordSetsRequest>(req => 
+                Arg.Is<ChangeResourceRecordSetsRequest>(req =>
                     req.HostedZoneId == "ABC123" &&
                     req.ChangeBatch.Changes.Any(change =>
                         change.Action == ChangeAction.UPSERT &&
@@ -207,21 +233,26 @@ namespace Tests {
         }
 
         [Test]
-        public async Task WaitCallsInvokeIfStatusIsPending() {
+        public async Task WaitCallsInvokeIfStatusIsPending()
+        {
             var acmClient = CreateAcmClient();
             var lambdaClient = CreateLambdaClient();
 
             acmClient
             .DescribeCertificateAsync(Arg.Any<DescribeCertificateRequest>())
-            .Returns(new DescribeCertificateResponse {
-                Certificate = new CertificateDetail {
+            .Returns(new DescribeCertificateResponse
+            {
+                Certificate = new CertificateDetail
+                {
                     Status = CertificateStatus.PENDING_VALIDATION
                 }
             });
 
-            var request = new Request<Certificate.Properties> {
+            var request = new Request<Certificate.Properties>
+            {
                 RequestType = RequestType.Wait,
-                ResourceProperties = new Certificate.Properties {
+                ResourceProperties = new Certificate.Properties
+                {
                     DomainName = "example.com"
                 }
             };
@@ -248,22 +279,27 @@ namespace Tests {
         }
 
         [Test]
-        public async Task WaitRespondsWhenCertIsIssued() {
+        public async Task WaitRespondsWhenCertIsIssued()
+        {
             var acmClient = CreateAcmClient();
             var mockHttp = new MockHttpMessageHandler();
-            var request = new Request<Certificate.Properties> {
+            var request = new Request<Certificate.Properties>
+            {
                 RequestType = RequestType.Wait,
                 ResponseURL = "http://example.com",
                 PhysicalResourceId = "arn:aws:acm::1:certificate/example.com",
-                ResourceProperties = new Certificate.Properties {
+                ResourceProperties = new Certificate.Properties
+                {
                     DomainName = "example.com"
                 }
             };
 
             acmClient
             .DescribeCertificateAsync(Arg.Any<DescribeCertificateRequest>())
-            .Returns(new DescribeCertificateResponse {
-                Certificate = new CertificateDetail {
+            .Returns(new DescribeCertificateResponse
+            {
+                Certificate = new CertificateDetail
+                {
                     Status = CertificateStatus.ISSUED
                 }
             });
@@ -273,7 +309,8 @@ namespace Tests {
 
             mockHttp
             .Expect("http://example.com")
-            .WithJsonPayload(new Response {
+            .WithJsonPayload(new Response
+            {
                 Status = ResponseStatus.SUCCESS,
                 PhysicalResourceId = "arn:aws:acm::1:certificate/example.com"
             });
@@ -283,22 +320,27 @@ namespace Tests {
         }
 
         [Test]
-        public async Task WaitRespondsWithErrorOnFailure() {
+        public async Task WaitRespondsWithErrorOnFailure()
+        {
             var acmClient = CreateAcmClient();
             var mockHttp = new MockHttpMessageHandler();
-            var request = new Request<Certificate.Properties> {
+            var request = new Request<Certificate.Properties>
+            {
                 RequestType = RequestType.Wait,
                 ResponseURL = "http://example.com",
                 PhysicalResourceId = "arn:aws:acm::1:certificate/example.com",
-                ResourceProperties = new Certificate.Properties {
+                ResourceProperties = new Certificate.Properties
+                {
                     DomainName = "example.com"
                 }
             };
 
             acmClient
             .DescribeCertificateAsync(Arg.Any<DescribeCertificateRequest>())
-            .Returns(new DescribeCertificateResponse {
-                Certificate = new CertificateDetail {
+            .Returns(new DescribeCertificateResponse
+            {
+                Certificate = new CertificateDetail
+                {
                     Status = CertificateStatus.VALIDATION_TIMED_OUT
                 }
             });
@@ -308,7 +350,8 @@ namespace Tests {
 
             mockHttp
             .Expect("http://example.com")
-            .WithJsonPayload(new Response {
+            .WithJsonPayload(new Response
+            {
                 Status = ResponseStatus.FAILED,
                 PhysicalResourceId = "arn:aws:acm::1:certificate/example.com",
                 Reason = "Certificate could not be issued. (Got status: VALIDATION_TIMED_OUT)"
@@ -320,16 +363,19 @@ namespace Tests {
 
 
         [Test]
-        public async Task UpdateCallsAddAndDeleteTags() {
+        public async Task UpdateCallsAddAndDeleteTags()
+        {
             var acmClient = CreateAcmClient();
             var route53Client = CreateRoute53Client();
-            
+
             acmClient
             .DescribeCertificateAsync(Arg.Is<DescribeCertificateRequest>(req =>
                 req.CertificateArn == "arn:aws:acm::1:certificate/example.com"
             ))
-            .Returns(new DescribeCertificateResponse {
-                Certificate = new CertificateDetail {
+            .Returns(new DescribeCertificateResponse
+            {
+                Certificate = new CertificateDetail
+                {
                     Status = CertificateStatus.ISSUED, // don't test wait
                     DomainValidationOptions = new List<DomainValidation> {
                         new DomainValidation {
@@ -344,10 +390,12 @@ namespace Tests {
                 }
             });
 
-            var request = new Request<Certificate.Properties> {
+            var request = new Request<Certificate.Properties>
+            {
                 RequestType = RequestType.Update,
                 PhysicalResourceId = "arn:aws:acm::1:certificate/example.com",
-                OldResourceProperties = new Certificate.Properties {
+                OldResourceProperties = new Certificate.Properties
+                {
                     DomainName = "example.com",
                     HostedZoneId = "ABC123",
                     Tags = new List<Tag> {
@@ -361,7 +409,8 @@ namespace Tests {
                         }
                     }
                 },
-                ResourceProperties = new Certificate.Properties {
+                ResourceProperties = new Certificate.Properties
+                {
                     DomainName = "example.com",
                     HostedZoneId = "ABC123",
                     Tags = new List<Tag> {
@@ -369,7 +418,7 @@ namespace Tests {
                             Key = "Contact",
                             Value = "Someone else"
                         },
-                        
+
                     }
                 }
             };
@@ -383,40 +432,47 @@ namespace Tests {
                 req.Tags.Any(tag => tag.Key == "Contact" && tag.Value == "Someone else") &&
                 req.CertificateArn == "arn:aws:acm::1:certificate/example.com"
             ));
-            
-            await acmClient.Received().RemoveTagsFromCertificateAsync(Arg.Is<RemoveTagsFromCertificateRequest>(req => 
+
+            await acmClient.Received().RemoveTagsFromCertificateAsync(Arg.Is<RemoveTagsFromCertificateRequest>(req =>
                 req.Tags.Any(tag => tag.Key == "ContactEmail" && tag.Value == "talen@example.com") &&
                 req.CertificateArn == "arn:aws:acm::1:certificate/example.com"
             ));
         }
 
         [Test]
-        public async Task UpdateCallsUpdateOptions() {
+        public async Task UpdateCallsUpdateOptions()
+        {
             var acmClient = CreateAcmClient();
             var route53Client = CreateRoute53Client();
-            
+
             acmClient
             .DescribeCertificateAsync(Arg.Is<DescribeCertificateRequest>(req =>
                 req.CertificateArn == "arn:aws:acm::1:certificate/example.com"
             ))
-            .Returns(new DescribeCertificateResponse {
-                Certificate = new CertificateDetail {
+            .Returns(new DescribeCertificateResponse
+            {
+                Certificate = new CertificateDetail
+                {
                     Status = CertificateStatus.ISSUED, // don't test wait
                     DomainValidationOptions = new List<DomainValidation>()
                 }
             });
 
-            var request = new Request<Certificate.Properties> {
+            var request = new Request<Certificate.Properties>
+            {
                 RequestType = RequestType.Update,
                 PhysicalResourceId = "arn:aws:acm::1:certificate/example.com",
-                OldResourceProperties = new Certificate.Properties {
+                OldResourceProperties = new Certificate.Properties
+                {
                     DomainName = "example.com",
                     HostedZoneId = "ABC123"
                 },
-                ResourceProperties = new Certificate.Properties {
+                ResourceProperties = new Certificate.Properties
+                {
                     DomainName = "example.com",
                     HostedZoneId = "ABC123",
-                    Options = new CertificateOptions {
+                    Options = new CertificateOptions
+                    {
                         CertificateTransparencyLoggingPreference = CertificateTransparencyLoggingPreference.ENABLED
                     }
                 }
@@ -434,22 +490,27 @@ namespace Tests {
         }
 
         [Test]
-        public async Task DeleteCallsDeleteCertificate() {
+        public async Task DeleteCallsDeleteCertificate()
+        {
             var acmClient = CreateAcmClient();
             var route53Client = CreateRoute53Client();
 
             acmClient
             .DescribeCertificateAsync(Arg.Any<DescribeCertificateRequest>())
-            .Returns(new DescribeCertificateResponse {
-                Certificate = new CertificateDetail {
-                    DomainValidationOptions = new List<DomainValidation> {}
+            .Returns(new DescribeCertificateResponse
+            {
+                Certificate = new CertificateDetail
+                {
+                    DomainValidationOptions = new List<DomainValidation> { }
                 }
             });
 
-            var request = new Request<Certificate.Properties> {
+            var request = new Request<Certificate.Properties>
+            {
                 RequestType = RequestType.Delete,
                 PhysicalResourceId = "arn:aws:acm::1:certificate/example.com",
-                ResourceProperties = new Certificate.Properties {
+                ResourceProperties = new Certificate.Properties
+                {
                     DomainName = "example.com",
                     HostedZoneId = "ABC123",
                 }
@@ -466,14 +527,17 @@ namespace Tests {
         }
 
         [Test]
-        public async Task DeleteCallsChangeRecordSets() {
+        public async Task DeleteCallsChangeRecordSets()
+        {
             var acmClient = CreateAcmClient();
             var route53Client = CreateRoute53Client();
 
             acmClient
             .DescribeCertificateAsync(Arg.Any<DescribeCertificateRequest>())
-            .Returns(new DescribeCertificateResponse {
-                Certificate = new CertificateDetail {
+            .Returns(new DescribeCertificateResponse
+            {
+                Certificate = new CertificateDetail
+                {
                     DomainValidationOptions = new List<DomainValidation> {
                         new DomainValidation {
                             DomainName = "example.com",
@@ -487,10 +551,12 @@ namespace Tests {
                 }
             });
 
-            var request = new Request<Certificate.Properties> {
+            var request = new Request<Certificate.Properties>
+            {
                 RequestType = RequestType.Delete,
                 PhysicalResourceId = "arn:aws:acm::1:certificate/example.com",
-                ResourceProperties = new Certificate.Properties {
+                ResourceProperties = new Certificate.Properties
+                {
                     DomainName = "example.com",
                     HostedZoneId = "ABC123",
                 }

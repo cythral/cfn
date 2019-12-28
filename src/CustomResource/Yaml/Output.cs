@@ -1,20 +1,22 @@
-using System;
+namespace Cythral.CloudFormation.CustomResource.Yaml
+{
 
-namespace Cythral.CloudFormation.CustomResource.Yaml {
-    
-    public class Output {
+    public class Output
+    {
 
-        public Output(object value, object name) {
+        public Output(object value, object name)
+        {
             Value = value;
             Export = new Export { Name = name };
         }
-        
+
         public object Value;
         public Export Export;
 
     }
 
-    public class Export {
+    public class Export
+    {
         public object Name;
     }
 }

@@ -1,8 +1,8 @@
-using System;
+namespace Cythral.CloudFormation.CustomResource
+{
 
-namespace Cythral.CloudFormation.CustomResource {
-
-    public class Response {
+    public class Response
+    {
 
         public ResponseStatus Status { get; set; } = ResponseStatus.SUCCESS;
 
@@ -15,9 +15,9 @@ namespace Cythral.CloudFormation.CustomResource {
         public string RequestId { get; set; }
 
         public string Reason { get; set; } = "";
-        
+
         public object Data { get; set; }
-        
+
     }
-    
+
 }
