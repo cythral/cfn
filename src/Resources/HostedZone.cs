@@ -144,6 +144,8 @@ namespace Cythral.CloudFormation.Resources
             var client = ClientFactory();
             var createHostedZoneResponse = await client.CreateHostedZoneAsync(request);
             var data = new Data { Id = createHostedZoneResponse.HostedZone.Id };
+            
+            PhysicalResourceId = data.Id;
             Console.WriteLine(JsonSerializer.Serialize(createHostedZoneResponse));
 
             // wait until the hosted zone finishes creating
@@ -185,7 +187,6 @@ namespace Cythral.CloudFormation.Resources
 
             return new Response
             {
-                PhysicalResourceId = data.Id,
                 Data = data
             };
         }
