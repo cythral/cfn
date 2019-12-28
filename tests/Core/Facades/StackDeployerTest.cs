@@ -1,32 +1,25 @@
-using System;
-using System.Net;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
-using Cythral.CloudFormation;
-using Cythral.CloudFormation.Events;
-using Cythral.CloudFormation.Entities;
-using Cythral.CloudFormation.Exceptions;
-using Cythral.CloudFormation.Facades;
-using Amazon.Lambda.ApplicationLoadBalancerEvents;
+
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
-using FluentAssertions;
+
+using Cythral.CloudFormation.Facades;
+
 using NSubstitute;
-using RichardSzalay.MockHttp;
+
+using NUnit.Framework;
 
 using static Amazon.CloudFormation.OnFailure;
-using static System.Net.HttpStatusCode;
-using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation.Tests.Facades {
-    public class StackDeployerTest {
+namespace Cythral.CloudFormation.Tests.Facades
+{
+    public class StackDeployerTest
+    {
         [Test]
-        public async Task DeployCallsCreateStackIfNotExists() {
+        public async Task DeployCallsCreateStackIfNotExists()
+        {
             var stackName = "test-stack";
             var exampleTemplate = "this is a bad example template.";
             var roleArn = "arn:aws:iam::1:role/Facade";
@@ -34,18 +27,19 @@ namespace Cythral.CloudFormation.Tests.Facades {
             var parameters = new List<Parameter> {
                 new Parameter { ParameterKey = "GithubToken", ParameterValue = "this is definitely the token" }
             };
-            
+
             cloudformationClient
             .DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
                 req.StackName == stackName
             ))
-            .Returns(new DescribeStacksResponse {
+            .Returns(new DescribeStacksResponse
+            {
                 Stacks = new List<Stack>()
-            }); 
+            });
 
             cloudformationClient
             .CreateStackAsync(Arg.Any<CreateStackRequest>())
-            .Returns(new CreateStackResponse {});
+            .Returns(new CreateStackResponse { });
 
             await StackDeployer.Deploy(stackName, exampleTemplate, roleArn, parameters, cloudformationClient: cloudformationClient);
             await cloudformationClient
@@ -62,7 +56,8 @@ namespace Cythral.CloudFormation.Tests.Facades {
         }
 
         [Test]
-        public async Task DeployCallsUpdateStackIfExists() {
+        public async Task DeployCallsUpdateStackIfExists()
+        {
             var stackName = "test-stack";
             var exampleTemplate = "this is a bad example template.";
             var roleArn = "arn:aws:iam::1:role/Facade";
@@ -70,22 +65,23 @@ namespace Cythral.CloudFormation.Tests.Facades {
             var parameters = new List<Parameter> {
                 new Parameter { ParameterKey = "GithubToken", ParameterValue = "this is definitely the token" }
             };
-            
+
             cloudformationClient
             .DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
                 req.StackName == stackName
             ))
-            .Returns(new DescribeStacksResponse {
+            .Returns(new DescribeStacksResponse
+            {
                 Stacks = new List<Stack> {
                     new Stack {
                         StackName = stackName
                     }
                 }
-            }); 
+            });
 
             cloudformationClient
             .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
-            .Returns(new UpdateStackResponse {});
+            .Returns(new UpdateStackResponse { });
 
             await StackDeployer.Deploy(stackName, exampleTemplate, roleArn, parameters, cloudformationClient: cloudformationClient);
             await cloudformationClient

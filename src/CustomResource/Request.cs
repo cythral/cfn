@@ -1,14 +1,17 @@
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using Cythral.CloudFormation.CustomResource.Attributes;
 
-namespace Cythral.CloudFormation.CustomResource {
+namespace Cythral.CloudFormation.CustomResource
+{
 
-    public class Request<T> {
+    public class Request<T>
+    {
 
         public virtual RequestType RequestType { get; set; }
 
@@ -25,10 +28,11 @@ namespace Cythral.CloudFormation.CustomResource {
         public virtual string PhysicalResourceId { get; set; }
 
         public virtual T ResourceProperties { get; set; }
-        
+
         public virtual T OldResourceProperties { get; set; }
 
-        public Stream ToStream() {
+        public Stream ToStream()
+        {
             var options = new JsonSerializerOptions();
             options.Converters.Add(new JsonStringEnumConverter());
             options.Converters.Add(new AwsConstantClassConverterFactory());
@@ -45,28 +49,36 @@ namespace Cythral.CloudFormation.CustomResource {
         }
 
         [JsonIgnore]
-        public IEnumerable<PropertyInfo> ChangedProperties {
-            get {
-                if(ResourceProperties == null || OldResourceProperties == null) {
+        public IEnumerable<PropertyInfo> ChangedProperties
+        {
+            get
+            {
+                if (ResourceProperties == null || OldResourceProperties == null)
+                {
                     yield break;
                 }
 
                 var currentProps = ResourceProperties.GetType().GetProperties();
                 var oldProps = OldResourceProperties.GetType().GetProperties();
 
-                foreach(var prop in currentProps) {
-                    
+                foreach (var prop in currentProps)
+                {
+
                     object current, old;
 
-                    try {
+                    try
+                    {
                         var getter = prop.GetMethod;
-                        current = getter.Invoke(ResourceProperties, new object[] {});
-                        old = getter.Invoke(OldResourceProperties, new object[] {});
-                    } catch(Exception) {
+                        current = getter.Invoke(ResourceProperties, new object[] { });
+                        old = getter.Invoke(OldResourceProperties, new object[] { });
+                    }
+                    catch (Exception)
+                    {
                         continue;
                     }
 
-                    if(current != null && !current.Equals(old)) {
+                    if (current != null && !current.Equals(old))
+                    {
                         yield return prop;
                     }
                 }
@@ -74,11 +86,16 @@ namespace Cythral.CloudFormation.CustomResource {
         }
 
         [JsonIgnore]
-        public bool RequiresReplacement {
-            get {
-                bool PropRequiresReplacement(PropertyInfo prop) {
-                    foreach(var attr in prop.CustomAttributes) {
-                        if(attr.AttributeType == typeof(UpdateRequiresReplacementAttribute)) {
+        public bool RequiresReplacement
+        {
+            get
+            {
+                bool PropRequiresReplacement(PropertyInfo prop)
+                {
+                    foreach (var attr in prop.CustomAttributes)
+                    {
+                        if (attr.AttributeType == typeof(UpdateRequiresReplacementAttribute))
+                        {
                             return true;
                         }
                     }
@@ -86,8 +103,10 @@ namespace Cythral.CloudFormation.CustomResource {
                     return false;
                 }
 
-                foreach(var prop in ChangedProperties) {
-                    if(PropRequiresReplacement(prop)) {
+                foreach (var prop in ChangedProperties)
+                {
+                    if (PropRequiresReplacement(prop))
+                    {
                         return true;
                     }
                 }

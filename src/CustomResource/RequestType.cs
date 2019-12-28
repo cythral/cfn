@@ -1,12 +1,12 @@
-using System;
+namespace Cythral.CloudFormation.CustomResource
+{
 
-namespace Cythral.CloudFormation.CustomResource {
-
-    public enum RequestType {
+    public enum RequestType
+    {
         Create,
         Wait,
         Update,
         Delete
     }
-    
+
 }

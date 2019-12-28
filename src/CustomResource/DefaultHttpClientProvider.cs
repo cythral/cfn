@@ -1,15 +1,16 @@
-using System;
-using System.Net;
 using System.Net.Http;
 
-namespace Cythral.CloudFormation.CustomResource {
+namespace Cythral.CloudFormation.CustomResource
+{
 
-    public class DefaultHttpClientProvider : IHttpClientProvider {
+    public class DefaultHttpClientProvider : IHttpClientProvider
+    {
 
-        public HttpClient Provide() {
+        public HttpClient Provide()
+        {
             return new HttpClient();
         }
-        
+
     }
-    
+
 }

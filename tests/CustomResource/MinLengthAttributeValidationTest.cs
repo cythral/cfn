@@ -1,71 +1,89 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
+
+using CodeGeneration.Roslyn.Engine;
+
 using Cythral.CloudFormation.CustomResource;
 using Cythral.CloudFormation.CustomResource.Attributes;
-using CodeGeneration.Roslyn.Engine;
+
 using NUnit.Framework;
+
 using RichardSzalay.MockHttp;
 
-namespace Tests {
+namespace Tests
+{
 
-    public class ModelWithMinLengthProps {
+    public class ModelWithMinLengthProps
+    {
         [MinLength(4)]
         public virtual string Message { get; set; }
     }
 
 
-    [CustomResource(ResourcePropertiesType=typeof(ModelWithMinLengthProps))]
-    public partial class CustomResourceWithMinLengthProps : TestCustomResource {          
+    [CustomResource(ResourcePropertiesType = typeof(ModelWithMinLengthProps))]
+    public partial class CustomResourceWithMinLengthProps : TestCustomResource
+    {
         public static MockHttpMessageHandler MockHttp = new MockHttpMessageHandler();
 
-        static CustomResourceWithMinLengthProps() {
+        static CustomResourceWithMinLengthProps()
+        {
             HttpClientProvider = new FakeHttpClientProvider(MockHttp);
         }
     }
 
-    public class MinLengthAttributeValidationTest {
+    public class MinLengthAttributeValidationTest
+    {
         [Test]
-        public async Task TestHandleShouldFailIfPropDoesntValidate() {
+        public async Task TestHandleShouldFailIfPropDoesntValidate()
+        {
             CustomResourceWithMinLengthProps.MockHttp
             .Expect("http://example.com")
-            .WithJsonPayload(new Response {
+            .WithJsonPayload(new Response
+            {
                 Status = ResponseStatus.FAILED,
                 Reason = "The field Message must be a string or array type with a minimum length of '4'."
             });
-            
-            var request = new Request<ModelWithMinLengthProps> {
+
+            var request = new Request<ModelWithMinLengthProps>
+            {
                 RequestType = RequestType.Create,
                 ResponseURL = "http://example.com",
-                ResourceProperties = new ModelWithMinLengthProps {
+                ResourceProperties = new ModelWithMinLengthProps
+                {
                     Message = "tea"
                 }
             };
-            
+
             await CustomResourceWithMinLengthProps.Handle(request.ToStream());
             CustomResourceWithMinLengthProps.MockHttp.VerifyNoOutstandingExpectation();
         }
 
         [Test]
-        public async Task TestHandleShouldSucceedIfAllPropsMeetExpectations() {
+        public async Task TestHandleShouldSucceedIfAllPropsMeetExpectations()
+        {
             CustomResourceWithMinLengthProps.MockHttp
             .Expect("http://example.com")
-            .WithJsonPayload(new Response() {
-                Data = new {
+            .WithJsonPayload(new Response()
+            {
+                Data = new
+                {
                     Status = "Created"
                 }
             });
-            
-            var request = new Request<ModelWithMinLengthProps>() {
+
+            var request = new Request<ModelWithMinLengthProps>()
+            {
                 RequestType = RequestType.Create,
                 ResponseURL = "http://example.com",
-                ResourceProperties = new ModelWithMinLengthProps() {
+                ResourceProperties = new ModelWithMinLengthProps()
+                {
                     Message = "Test message"
                 }
             };

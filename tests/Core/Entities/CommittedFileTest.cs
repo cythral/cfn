@@ -1,32 +1,21 @@
-using System.Net;
-using System.Text;
-using System.IO;
-using System.Data;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net;
 using System.Net.Http;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
-using Cythral.CloudFormation;
-using Cythral.CloudFormation.Events;
+
 using Cythral.CloudFormation.Entities;
-using Cythral.CloudFormation.Exceptions;
-using Amazon.KeyManagementService;
-using Amazon.KeyManagementService.Model;
-using FluentAssertions;
-using NSubstitute;
+
+using NUnit.Framework;
+
 using RichardSzalay.MockHttp;
 
-using static System.Net.HttpStatusCode;
-using static System.Text.Json.JsonSerializer;
-
-namespace Cythral.CloudFormation.Tests.Entities {
-    public class CommittedFileTest {
+namespace Cythral.CloudFormation.Tests.Entities
+{
+    public class CommittedFileTest
+    {
         [Test]
-        public async Task FromContentsUrlRequestsFileViaHttp() {
+        public async Task FromContentsUrlRequestsFileViaHttp()
+        {
             var contentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}";
             var mockHttp = new MockHttpMessageHandler();
             Func<HttpClient> httpFactory = () => new HttpClient(mockHttp);
@@ -42,7 +31,7 @@ namespace Cythral.CloudFormation.Tests.Entities {
             .WithHeaders("Authorization", $"token {githubToken}")
             .WithHeaders("Accept", "application/vnd.github.VERSION.raw")
             .Respond("text/plain", templateContents);
-            
+
             var template = await CommittedFile.FromContentsUrl(contentsUrl, templateName, config, null, httpFactory);
 
             Assert.That(template?.ToString(), Is.EqualTo(templateContents));
@@ -50,13 +39,14 @@ namespace Cythral.CloudFormation.Tests.Entities {
         }
 
         [Test]
-        public async Task FromContentsUrlRequestsGitRef() {
+        public async Task FromContentsUrlRequestsGitRef()
+        {
             var contentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}";
             var mockHttp = new MockHttpMessageHandler();
             Func<HttpClient> httpFactory = () => new HttpClient(mockHttp);
             var templateName = "cicd.template.yml";
             var githubToken = "xx508xx63817x752xx74004x30705xx92x58349x5x78f5xx34xxxxx51";
-            var templateContents ="example template";
+            var templateContents = "example template";
             var gitRef = "develop";
 
             var config = new Config();
@@ -75,13 +65,14 @@ namespace Cythral.CloudFormation.Tests.Entities {
         }
 
         [Test]
-        public async Task FromContentsUrlDoesNotThrow() {
+        public async Task FromContentsUrlDoesNotThrow()
+        {
             var contentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}";
             var mockHttp = new MockHttpMessageHandler();
             Func<HttpClient> httpFactory = () => new HttpClient(mockHttp);
             var templateName = "cicd.template.yml";
             var githubToken = "xx508xx63817x752xx74004x30705xx92x58349x5x78f5xx34xxxxx51";
-            
+
             var config = new Config();
             config["GITHUB_TOKEN"] = githubToken;
 

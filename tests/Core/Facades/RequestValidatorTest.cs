@@ -1,53 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using NUnit.Framework;
-using Cythral.CloudFormation;
-using Cythral.CloudFormation.Events;
+﻿using System.Collections.Generic;
+
+using Amazon.Lambda.ApplicationLoadBalancerEvents;
+
 using Cythral.CloudFormation.Entities;
+using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Exceptions;
 using Cythral.CloudFormation.Facades;
-using Amazon.Lambda.ApplicationLoadBalancerEvents;
-using FluentAssertions;
-using NSubstitute;
 
-using static System.Net.HttpStatusCode;
+using NUnit.Framework;
+
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation.Tests.Facades {
-    class RequestValidatorTest {
+namespace Cythral.CloudFormation.Tests.Facades
+{
+    class RequestValidatorTest
+    {
         [Test]
-        public void NonPostRequestsThrowMethodNotAllowed([Values("GET", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS")] string method) {
+        public void NonPostRequestsThrowMethodNotAllowed([Values("GET", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS")] string method)
+        {
             var request = new ApplicationLoadBalancerRequest { HttpMethod = method };
             Assert.Throws(Is.InstanceOf<MethodNotAllowedException>(), () => RequestValidator.Validate(request, validateSignature: false));
         }
 
         [Test]
-        public void PostRequestsDontThrowMethodNotAllowed() {
+        public void PostRequestsDontThrowMethodNotAllowed()
+        {
             var request = new ApplicationLoadBalancerRequest { HttpMethod = "POST" };
             Assert.Throws(Is.Not.InstanceOf<MethodNotAllowedException>(), () => RequestValidator.Validate(request, validateSignature: false));
         }
 
         [Test]
-        public void NonPushEventsThrowEventNotAllowed([Values("PR_OPENED")] string evnt) {
-            var request = new ApplicationLoadBalancerRequest {
+        public void NonPushEventsThrowEventNotAllowed([Values("PR_OPENED")] string evnt)
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string,string> { ["x-github-event"] = evnt },
+                Headers = new Dictionary<string, string> { ["x-github-event"] = evnt },
                 Body = "{}"
             };
-            
+
             Assert.Throws(Is.InstanceOf<EventNotAllowedException>(), () => RequestValidator.Validate(request, validateSignature: false));
         }
 
         [Test]
-        public void PushEventsDontThrowEventNotAllowed() {
-            var request = new ApplicationLoadBalancerRequest {
+        public void PushEventsDontThrowEventNotAllowed()
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string,string> { ["x-github-event"] = "push" },
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "push" },
                 Body = "{}"
             };
 
@@ -55,10 +56,12 @@ namespace Cythral.CloudFormation.Tests.Facades {
         }
 
         [Test]
-        public void NonJsonRequestsThrowBodyNotJson([Values("{badjson", "thisis: yaml")] string body) {
-            var request = new ApplicationLoadBalancerRequest {
+        public void NonJsonRequestsThrowBodyNotJson([Values("{badjson", "thisis: yaml")] string body)
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string,string> { ["x-github-event"] = "push" },
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "push" },
                 Body = body
             };
 
@@ -66,10 +69,12 @@ namespace Cythral.CloudFormation.Tests.Facades {
         }
 
         [Test]
-        public void JsonRequestsDontThrowBodyNotJson() {
-            var request = new ApplicationLoadBalancerRequest {
+        public void JsonRequestsDontThrowBodyNotJson()
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string,string> { ["x-github-event"] = "push" },
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "push" },
                 Body = "{}"
             };
 
@@ -77,12 +82,15 @@ namespace Cythral.CloudFormation.Tests.Facades {
         }
 
         [Test]
-        public void RequestsWithoutContentsThrowException() {
-            var request = new ApplicationLoadBalancerRequest {
+        public void RequestsWithoutContentsThrowException()
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string,string> { ["x-github-event"] = "push" },
-                Body = Serialize(new PushEvent {
-                    Repository = new Repository {}
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "push" },
+                Body = Serialize(new PushEvent
+                {
+                    Repository = new Repository { }
                 })
             };
 
@@ -90,12 +98,16 @@ namespace Cythral.CloudFormation.Tests.Facades {
         }
 
         [Test]
-        public void RequestsWithContentsUrlsDontThrowException() {
-            var request = new ApplicationLoadBalancerRequest {
+        public void RequestsWithContentsUrlsDontThrowException()
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string,string> { ["x-github-event"] = "push" },
-                Body = Serialize(new PushEvent {
-                    Repository = new Repository {
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "push" },
+                Body = Serialize(new PushEvent
+                {
+                    Repository = new Repository
+                    {
                         ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}"
                     }
                 })
@@ -104,22 +116,29 @@ namespace Cythral.CloudFormation.Tests.Facades {
             Assert.Throws(Is.Not.InstanceOf<NoContentsUrlException>(), () => RequestValidator.Validate(request, validateSignature: false));
         }
 
-        public static IEnumerable<ApplicationLoadBalancerRequest> UnexpectedOwnerRequests() {
-            yield return new ApplicationLoadBalancerRequest {
+        public static IEnumerable<ApplicationLoadBalancerRequest> UnexpectedOwnerRequests()
+        {
+            yield return new ApplicationLoadBalancerRequest
+            {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string,string> { ["x-github-event"] = "push" },
-                Body = Serialize(new PushEvent {
-                    Repository = new Repository {
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "push" },
+                Body = Serialize(new PushEvent
+                {
+                    Repository = new Repository
+                    {
                         ContentsUrl = "https://api.github.com/repos/MaliciousUser/Hello-World/contents/{+path}"
                     }
                 })
             };
 
-            yield return new ApplicationLoadBalancerRequest {
+            yield return new ApplicationLoadBalancerRequest
+            {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string,string> { ["x-github-event"] = "push" },
-                Body = Serialize(new PushEvent {
-                    Repository = new Repository {
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "push" },
+                Body = Serialize(new PushEvent
+                {
+                    Repository = new Repository
+                    {
                         Owner = new User { Name = "MaliciousUser" },
                         ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}"
                     }
@@ -128,17 +147,22 @@ namespace Cythral.CloudFormation.Tests.Facades {
         }
 
         [Test]
-        public void RequestsWithUnexpectedOwnerThrowException([ValueSource("UnexpectedOwnerRequests")] ApplicationLoadBalancerRequest request) {
+        public void RequestsWithUnexpectedOwnerThrowException([ValueSource("UnexpectedOwnerRequests")] ApplicationLoadBalancerRequest request)
+        {
             Assert.Throws(Is.InstanceOf<UnexpectedOwnerException>(), () => RequestValidator.Validate(request, "Codertocat", validateSignature: false));
         }
 
         [Test]
-        public void RequestsWithOkOwnerDontThrowException() {
-            var request = new ApplicationLoadBalancerRequest {
+        public void RequestsWithOkOwnerDontThrowException()
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string,string> { ["x-github-event"] = "push" },
-                Body = Serialize(new PushEvent {
-                    Repository = new Repository {
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "push" },
+                Body = Serialize(new PushEvent
+                {
+                    Repository = new Repository
+                    {
                         Owner = new User { Name = "Codertocat" },
                         ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}"
                     }
@@ -149,12 +173,16 @@ namespace Cythral.CloudFormation.Tests.Facades {
         }
 
         [Test]
-        public void RequestsWithNoSignatureThrowException() {
-            var request = new ApplicationLoadBalancerRequest {
+        public void RequestsWithNoSignatureThrowException()
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string,string> { ["x-github-event"] = "push" },
-                Body = Serialize(new PushEvent {
-                    Repository = new Repository {
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "push" },
+                Body = Serialize(new PushEvent
+                {
+                    Repository = new Repository
+                    {
                         ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}"
                     }
                 })
@@ -164,15 +192,20 @@ namespace Cythral.CloudFormation.Tests.Facades {
         }
 
         [Test]
-        public void RequestsWithBadSignatureThrowException() {
-            var request = new ApplicationLoadBalancerRequest {
+        public void RequestsWithBadSignatureThrowException()
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string,string> {
+                Headers = new Dictionary<string, string>
+                {
                     ["x-github-event"] = "push",
                     ["x-hub-signature"] = "sha1=81e2a24bcf4284e90324378736dcb27a43cc79ed"
                 },
-                Body = Serialize(new PushEvent {
-                    Repository = new Repository {
+                Body = Serialize(new PushEvent
+                {
+                    Repository = new Repository
+                    {
                         ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}"
                     }
                 })
@@ -182,15 +215,20 @@ namespace Cythral.CloudFormation.Tests.Facades {
         }
 
         [Test]
-        public void RequestWithGoodSignatureDoesntThrow() {
-            var request = new ApplicationLoadBalancerRequest {
+        public void RequestWithGoodSignatureDoesntThrow()
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string,string> {
+                Headers = new Dictionary<string, string>
+                {
                     ["x-github-event"] = "push",
                     ["x-hub-signature"] = "sha1=ca7acf8d405303b2e4a08486a005ef29a730c69b"
                 },
-                Body = Serialize(new PushEvent {
-                    Repository = new Repository {
+                Body = Serialize(new PushEvent
+                {
+                    Repository = new Repository
+                    {
                         ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}"
                     }
                 })

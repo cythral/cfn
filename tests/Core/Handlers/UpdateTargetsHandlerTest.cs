@@ -1,39 +1,32 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
+
+using Amazon.ElasticLoadBalancingV2;
+using Amazon.ElasticLoadBalancingV2.Model;
+using Amazon.Lambda.SNSEvents;
+
+using Cythral.CloudFormation.Entities;
+using Cythral.CloudFormation.Events;
+using Cythral.CloudFormation.Handlers;
+
 using NSubstitute;
-using RichardSzalay.MockHttp;
 
 using NUnit.Framework;
 
-using Cythral.CloudFormation;
-using Cythral.CloudFormation.Events;
-using Cythral.CloudFormation.Entities;
-using Cythral.CloudFormation.Exceptions;
-using Cythral.CloudFormation.Handlers;
-
-using Amazon;
-using Amazon.ElasticLoadBalancingV2;
-using Amazon.ElasticLoadBalancingV2.Model;
-using Amazon.Lambda;
-using Amazon.Lambda.SNSEvents;
-
-using static System.Net.HttpStatusCode;
 using static Amazon.ElasticLoadBalancingV2.TargetHealthStateEnum;
 using static System.Text.Json.JsonSerializer;
 
 using SNSRecord = Amazon.Lambda.SNSEvents.SNSEvent.SNSRecord;
 using SNSMessage = Amazon.Lambda.SNSEvents.SNSEvent.SNSMessage;
 
-namespace Cythral.CloudFormation.Tests.Handlers {
-    public class UpdateTargetsHandlerTest {
-        private IAmazonElasticLoadBalancingV2 CreateElbClient(string targetGroupArn, List<TargetHealthDescription> targets = null) {
+namespace Cythral.CloudFormation.Tests.Handlers
+{
+    public class UpdateTargetsHandlerTest
+    {
+        private IAmazonElasticLoadBalancingV2 CreateElbClient(string targetGroupArn, List<TargetHealthDescription> targets = null)
+        {
             var elbClient = Substitute.For<IAmazonElasticLoadBalancingV2>();
             targets = targets ?? new List<TargetHealthDescription> {
                 new TargetHealthDescription {
@@ -52,20 +45,23 @@ namespace Cythral.CloudFormation.Tests.Handlers {
                     req.TargetGroupArn == targetGroupArn
                 )
             )
-            .Returns(new DescribeTargetHealthResponse {
+            .Returns(new DescribeTargetHealthResponse
+            {
                 TargetHealthDescriptions = targets
             });
 
             return elbClient;
         }
 
-        [Test] 
-        public async Task HandleCallsResolve() {
+        [Test]
+        public async Task HandleCallsResolve()
+        {
             var dnsResolver = Substitute.For<IDnsResolver>();
             var dnsName = "http://example.com";
             var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
             var elbClient = CreateElbClient(targetGroupArn);
-            var request = new UpdateTargetsHandler.Request {
+            var request = new UpdateTargetsHandler.Request
+            {
                 TargetGroupArn = targetGroupArn,
                 TargetDnsName = dnsName,
             };
@@ -75,9 +71,9 @@ namespace Cythral.CloudFormation.Tests.Handlers {
             .Returns(new IPHostEntry());
 
             await UpdateTargetsHandler.Handle(
-                request:        request,
-                resolver:       dnsResolver,
-                elbClient:      elbClient
+                request: request,
+                resolver: dnsResolver,
+                elbClient: elbClient
             );
 
             dnsResolver
@@ -88,12 +84,14 @@ namespace Cythral.CloudFormation.Tests.Handlers {
         }
 
         [Test]
-        public async Task HandleDeregistersUnhealthyTargets() {
+        public async Task HandleDeregistersUnhealthyTargets()
+        {
             var dnsResolver = Substitute.For<IDnsResolver>();
             var dnsName = "http://example.com";
             var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
             var elbClient = CreateElbClient(targetGroupArn);
-            var request = new UpdateTargetsHandler.Request {
+            var request = new UpdateTargetsHandler.Request
+            {
                 TargetGroupArn = targetGroupArn,
                 TargetDnsName = dnsName,
             };
@@ -103,15 +101,15 @@ namespace Cythral.CloudFormation.Tests.Handlers {
             .Returns(new IPHostEntry());
 
             await UpdateTargetsHandler.Handle(
-                request:        request,
-                resolver:       dnsResolver,
-                elbClient:      elbClient
+                request: request,
+                resolver: dnsResolver,
+                elbClient: elbClient
             );
 
             await elbClient
             .Received()
             .DeregisterTargetsAsync(
-                Arg.Is<DeregisterTargetsRequest>(req => 
+                Arg.Is<DeregisterTargetsRequest>(req =>
                     req.TargetGroupArn == targetGroupArn &&
                     req.Targets.Any(target => target.Id == "10.0.0.1") &&
                     req.Targets.All(target => target.Id != "10.0.0.2")
@@ -120,19 +118,22 @@ namespace Cythral.CloudFormation.Tests.Handlers {
         }
 
         [Test]
-        public async Task HandleRegistersNewTargets() {
+        public async Task HandleRegistersNewTargets()
+        {
             var dnsResolver = Substitute.For<IDnsResolver>();
             var dnsName = "http://example.com";
             var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
             var elbClient = CreateElbClient(targetGroupArn);
-            var request = new UpdateTargetsHandler.Request {
+            var request = new UpdateTargetsHandler.Request
+            {
                 TargetGroupArn = targetGroupArn,
                 TargetDnsName = dnsName,
             };
 
             dnsResolver
             .Resolve(Arg.Is<string>(hostname => hostname == dnsName))
-            .Returns(new IPHostEntry {
+            .Returns(new IPHostEntry
+            {
                 AddressList = new IPAddress[] {
                     IPAddress.Parse("10.0.0.2"),
                     IPAddress.Parse("10.0.0.3"),
@@ -141,9 +142,9 @@ namespace Cythral.CloudFormation.Tests.Handlers {
             });
 
             await UpdateTargetsHandler.Handle(
-                request:        request,
-                resolver:       dnsResolver,
-                elbClient:      elbClient
+                request: request,
+                resolver: dnsResolver,
+                elbClient: elbClient
             );
 
             await elbClient
@@ -151,10 +152,10 @@ namespace Cythral.CloudFormation.Tests.Handlers {
             .RegisterTargetsAsync(
                 Arg.Is<RegisterTargetsRequest>(req =>
                     req.TargetGroupArn == targetGroupArn &&
-                    req.Targets.All(target => 
+                    req.Targets.All(target =>
                         target.Id != "10.0.0.2"
                     ) &&
-                    req.Targets.Any(target => 
+                    req.Targets.Any(target =>
                         target.Id == "10.0.0.3" &&
                         target.AvailabilityZone == "all" &&
                         target.Port == 80
@@ -169,7 +170,8 @@ namespace Cythral.CloudFormation.Tests.Handlers {
         }
 
         [Test]
-        public async Task HandleDoesntCallDeregisterWhenAllTargetsHealthy() {
+        public async Task HandleDoesntCallDeregisterWhenAllTargetsHealthy()
+        {
             var targets = new List<TargetHealthDescription> {
                 new TargetHealthDescription {
                     TargetHealth = new TargetHealth { State = Healthy },
@@ -181,7 +183,8 @@ namespace Cythral.CloudFormation.Tests.Handlers {
             var dnsName = "http://example.com";
             var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
             var elbClient = CreateElbClient(targetGroupArn, targets);
-            var request = new UpdateTargetsHandler.Request {
+            var request = new UpdateTargetsHandler.Request
+            {
                 TargetGroupArn = targetGroupArn,
                 TargetDnsName = dnsName,
             };
@@ -191,9 +194,9 @@ namespace Cythral.CloudFormation.Tests.Handlers {
             .Returns(new IPHostEntry());
 
             await UpdateTargetsHandler.Handle(
-                request:        request,
-                resolver:       dnsResolver,
-                elbClient:      elbClient
+                request: request,
+                resolver: dnsResolver,
+                elbClient: elbClient
             );
 
             await elbClient
@@ -202,7 +205,8 @@ namespace Cythral.CloudFormation.Tests.Handlers {
         }
 
         [Test]
-        public async Task HandleDoesntCallRegisterWhenNoNewTargets() {
+        public async Task HandleDoesntCallRegisterWhenNoNewTargets()
+        {
             var targets = new List<TargetHealthDescription> {
                 new TargetHealthDescription {
                     TargetHealth = new TargetHealth { State = Healthy },
@@ -214,23 +218,25 @@ namespace Cythral.CloudFormation.Tests.Handlers {
             var dnsName = "http://example.com";
             var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
             var elbClient = CreateElbClient(targetGroupArn, targets);
-            var request = new UpdateTargetsHandler.Request {
+            var request = new UpdateTargetsHandler.Request
+            {
                 TargetGroupArn = targetGroupArn,
                 TargetDnsName = dnsName,
             };
 
             dnsResolver
             .Resolve(Arg.Is<string>(hostname => hostname == dnsName))
-            .Returns(new IPHostEntry {
+            .Returns(new IPHostEntry
+            {
                 AddressList = new IPAddress[] {
                     IPAddress.Parse("10.0.0.1")
                 }
             });
 
             await UpdateTargetsHandler.Handle(
-                request:        request,
-                resolver:       dnsResolver,
-                elbClient:      elbClient
+                request: request,
+                resolver: dnsResolver,
+                elbClient: elbClient
             );
 
             await elbClient
@@ -239,11 +245,14 @@ namespace Cythral.CloudFormation.Tests.Handlers {
         }
 
         [Test]
-        public async Task FromSnsEventReturnsRequest() {
+        public void FromSnsEventReturnsRequest()
+        {
             var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
             var dnsName = "http://example.com";
-            var alarm = new AlarmEvent {
-                Trigger = new Trigger {
+            var alarm = new AlarmEvent
+            {
+                Trigger = new Trigger
+                {
                     Metrics = new List<MetricDataQuery> {
                         new MetricDataQuery {
                             Id = "healthy",
@@ -269,7 +278,8 @@ namespace Cythral.CloudFormation.Tests.Handlers {
                 }
             };
 
-            var evnt = new SNSEvent {
+            var evnt = new SNSEvent
+            {
                 Records = new List<SNSRecord> {
                     new SNSRecord {
                         Sns = new SNSMessage {

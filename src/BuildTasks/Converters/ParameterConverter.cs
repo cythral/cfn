@@ -1,46 +1,56 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Amazon;
-using Amazon.Runtime;
+
 using Amazon.CloudFormation.Model;
 
-namespace Cythral.CloudFormation.BuildTasks.Converters {
-    public class ParameterConverter : JsonConverter<List<Parameter>> {
-        public override List<Parameter> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
+namespace Cythral.CloudFormation.BuildTasks.Converters
+{
+    public class ParameterConverter : JsonConverter<List<Parameter>>
+    {
+        public override List<Parameter> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
             var list = new List<Parameter>();
             reader.Read();
 
-            while(reader.TokenType != JsonTokenType.EndObject) {
-                try {
+            while (reader.TokenType != JsonTokenType.EndObject)
+            {
+                try
+                {
                     var key = reader.GetString();
                     reader.Read();
 
                     var value = reader.GetString();
                     reader.Read();
 
-                    list.Add(new Parameter {
+                    list.Add(new Parameter
+                    {
                         ParameterKey = key,
                         ParameterValue = value
                     });
-                } catch(Exception) {
+                }
+                catch (Exception)
+                {
                     break;
                 }
             }
-           
+
             return list;
         }
 
-        public override void Write(Utf8JsonWriter writer, List<Parameter> value, JsonSerializerOptions options) {
+        public override void Write(Utf8JsonWriter writer, List<Parameter> value, JsonSerializerOptions options)
+        {
             writer.WriteStringValue("{");
             int i = 0;
 
-            foreach(var parameter in value) {
+            foreach (var parameter in value)
+            {
                 writer.WriteStringValue($"\"{parameter.ParameterKey}\":\"{parameter.ParameterValue}\"");
 
-                if(i != value.Count() - 1) {
+                if (i != value.Count() - 1)
+                {
                     writer.WriteStringValue(",");
                 }
 

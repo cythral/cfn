@@ -1,9 +1,9 @@
-using System;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Cythral.CloudFormation.Entities {
-    public class Commit {
+namespace Cythral.CloudFormation.Entities
+{
+    public class Commit
+    {
         [JsonPropertyName("sha")]
         public string Sha { get; set; }
 
