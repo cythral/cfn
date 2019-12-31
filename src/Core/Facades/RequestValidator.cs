@@ -111,11 +111,13 @@ namespace Cythral.CloudFormation.Facades
             }
         }
 
-        private static void ValidateRef(PushEvent payload) {
+        private static void ValidateRef(PushEvent payload)
+        {
             var actual = payload.Ref;
             var expected = payload.Repository?.DefaultBranch;
 
-            if(actual != expected) {
+            if (actual != expected)
+            {
                 throw new UnexpectedRefException($"Unexpected ref {actual}.  Expected: {expected}");
             }
         }
