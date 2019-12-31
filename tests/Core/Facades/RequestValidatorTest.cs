@@ -215,7 +215,7 @@ namespace Cythral.CloudFormation.Tests.Facades
         }
 
         [Test]
-        public void RequestWithGoodSignatureDoesntThrow()
+        public void RequestsWithGoodSignatureDoesntThrow()
         {
             var request = new ApplicationLoadBalancerRequest
             {
@@ -235,6 +235,31 @@ namespace Cythral.CloudFormation.Tests.Facades
             };
 
             Assert.Throws(Is.Not.InstanceOf<InvalidSignatureException>(), () => RequestValidator.Validate(request, signingKey: "test_key"));
+        }
+
+        [Test]
+        public void RequestsOnNonDefaultBranchThrowException()
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
+                HttpMethod = "POST",
+                Headers = new Dictionary<string, string>
+                {
+                    ["x-github-event"] = "push",
+                    ["x-hub-signature"] = "sha1=5a038b59d634709f777af46b499eff9e3ca48a20",
+                },
+                Body = Serialize(new PushEvent
+                {
+                    Ref = "pr/test",
+                    Repository = new Repository
+                    {
+                        ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}",
+                        DefaultBranch = "master"
+                    }
+                })
+            };
+
+            Assert.Throws(Is.InstanceOf<UnexpectedRefException>(), () => RequestValidator.Validate(request, signingKey: "test_key"));
         }
     }
 }
