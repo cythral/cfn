@@ -29,6 +29,7 @@ namespace Cythral.CloudFormation.Facades
             ValidateContentsUrlPresent(payload);
             ValidateOwner(payload, expectedOwner);
             ValidateSignature(request, signingKey);
+            ValidateRef(payload);
 
             return payload;
         }
@@ -107,6 +108,15 @@ namespace Cythral.CloudFormation.Facades
             if (givenSignature != actualSignature)
             {
                 throw new InvalidSignatureException($"Signatures do not match.  Actual signature: {actualSignature}.  Given signature: {givenSignature}");
+            }
+        }
+
+        private static void ValidateRef(PushEvent payload) {
+            var actual = payload.Ref;
+            var expected = payload.Repository?.DefaultBranch;
+
+            if(actual != expected) {
+                throw new UnexpectedRefException($"Unexpected ref {actual}.  Expected: {expected}");
             }
         }
 
