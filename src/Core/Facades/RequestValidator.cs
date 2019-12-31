@@ -27,9 +27,9 @@ namespace Cythral.CloudFormation.Facades
             ValidateEvent(request);
             ValidateBodyFormat(request, out payload);
             ValidateContentsUrlPresent(payload);
+            ValidateRef(payload);
             ValidateOwner(payload, expectedOwner);
             ValidateSignature(request, signingKey);
-            ValidateRef(payload);
 
             return payload;
         }

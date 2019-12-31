@@ -261,5 +261,28 @@ namespace Cythral.CloudFormation.Tests.Facades
 
             Assert.Throws(Is.InstanceOf<UnexpectedRefException>(), () => RequestValidator.Validate(request, signingKey: "test_key"));
         }
+
+        [Test]
+        public void RequestsOnDefaultBranchDontThrowException()
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
+                HttpMethod = "POST",
+                Headers = new Dictionary<string, string>
+                {
+                    ["x-github-event"] = "push",
+                },
+                Body = Serialize(new PushEvent
+                {
+                    Ref = "master",
+                    Repository = new Repository
+                    {
+                        DefaultBranch = "master"
+                    }
+                })
+            };
+
+            Assert.Throws(Is.Not.InstanceOf<UnexpectedRefException>(), () => RequestValidator.Validate(request, signingKey: "test_key"));
+        }
     }
 }
