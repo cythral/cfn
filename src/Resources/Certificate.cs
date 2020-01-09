@@ -28,7 +28,11 @@ namespace Cythral.CloudFormation.Resources
     /// <summary>
     /// Certificate Custom Resource supporting automatic dns validation
     /// </summary>
-    [CustomResource(ResourcePropertiesType = typeof(Certificate.Properties))]
+    [CustomResource(
+        ResourcePropertiesType = typeof(Certificate.Properties),
+        Grantees = new string[] { "cfn-metadata:DevAgentRoleArn", "cfn-metadata:ProdAgentRoleArn" },
+        GranteeType = Import
+    )]
     public partial class Certificate
     {
 
@@ -52,6 +56,14 @@ namespace Cythral.CloudFormation.Resources
             [UpdateRequiresReplacement]
             public string HostedZoneId { get; set; }
 
+            /// <summary>
+            /// Role used when creating the certificate
+            /// </summary>
+            public string CreationRoleArn { get; set; }
+
+            /// <summary>
+            /// Role used when validating ownership the certificate via DNS
+            /// </summary>
             public string ValidationRoleArn { get; set; }
 
             public CertificateOptions Options { get; set; }
@@ -106,7 +118,7 @@ namespace Cythral.CloudFormation.Resources
         public async Task<Response> Create()
         {
             var props = Request.ResourceProperties;
-            var acmClient = await _acmFactory.Create();
+            var acmClient = await _acmFactory.Create(props.CreationRoleArn);
             var route53Client = await _route53Factory.Create(props.ValidationRoleArn);
             var request = new RequestCertificateRequest
             {
@@ -223,7 +235,8 @@ namespace Cythral.CloudFormation.Resources
 
         public async Task<Response> Wait()
         {
-            var acmClient = await _acmFactory.Create();
+            var props = Request.ResourceProperties;
+            var acmClient = await _acmFactory.Create(props.CreationRoleArn);
             var request = new DescribeCertificateRequest { CertificateArn = PhysicalResourceId };
             var response = await acmClient.DescribeCertificateAsync(request);
             var status = response?.Certificate?.Status?.Value;
@@ -250,16 +263,16 @@ namespace Cythral.CloudFormation.Resources
         }
 
 
-        public Task<Response> Update()
+        public async Task<Response> Update()
         {
             var oldProps = Request.OldResourceProperties;
             var newProps = Request.ResourceProperties;
+            var acmClient = await _acmFactory.Create(newProps.CreationRoleArn);
 
             Task.WaitAll(new Task[] {
 
                 // add new tags
                 Task.Run(async delegate {
-                    var acmClient = await _acmFactory.Create();
                     var upsertTagsResponse = await acmClient.AddTagsToCertificateAsync(new AddTagsToCertificateRequest {
                         Tags = UpsertedTags.ToList(),
                         CertificateArn = Request.PhysicalResourceId
@@ -270,7 +283,6 @@ namespace Cythral.CloudFormation.Resources
 
                 // delete old tags
                 Task.Run(async delegate {
-                    var acmClient = await _acmFactory.Create();
                     var deleteTagsResponse = await acmClient.RemoveTagsFromCertificateAsync(new RemoveTagsFromCertificateRequest {
                         Tags = DeletedTags.ToList(),
                         CertificateArn = Request.PhysicalResourceId
@@ -282,7 +294,6 @@ namespace Cythral.CloudFormation.Resources
                 // update options
                 Task.Run(async delegate {
                     if(newProps?.Options?.CertificateTransparencyLoggingPreference != oldProps?.Options?.CertificateTransparencyLoggingPreference) {
-                        var acmClient = await _acmFactory.Create();
                         var updateOptionsResponse = await acmClient.UpdateCertificateOptionsAsync(new UpdateCertificateOptionsRequest {
                             CertificateArn = Request.PhysicalResourceId,
                             Options = newProps.Options
@@ -293,15 +304,16 @@ namespace Cythral.CloudFormation.Resources
                 })
             });
 
-            return Task.FromResult(new Response
+            return new Response
             {
                 PhysicalResourceId = Request.PhysicalResourceId
-            });
+            };
         }
 
         public async Task<Response> Delete()
         {
-            var acmClient = await _acmFactory.Create();
+            var props = Request.ResourceProperties;
+            var acmClient = await _acmFactory.Create(props.CreationRoleArn);
             var describeResponse = await acmClient.DescribeCertificateAsync(new DescribeCertificateRequest
             {
                 CertificateArn = Request.PhysicalResourceId,

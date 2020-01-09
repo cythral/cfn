@@ -6,6 +6,6 @@ namespace Cythral.CloudFormation.Resources.Factories
 {
     public interface IAcmFactory
     {
-        Task<IAmazonCertificateManager> Create();
+        Task<IAmazonCertificateManager> Create(string roleArn = null);
     }
 }

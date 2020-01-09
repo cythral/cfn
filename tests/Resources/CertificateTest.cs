@@ -149,7 +149,7 @@ namespace Tests
         {
             var factory = Substitute.For<IAcmFactory>();
             client = client ?? CreateAcmClient();
-            factory.Create().Returns(client);
+            factory.Create(Arg.Any<string>()).Returns(client);
             return factory;
         }
 
@@ -304,6 +304,21 @@ namespace Tests
         }
 
         [Test]
+        public async Task Create_WithCreationRoleArn_CallsCreateAcmFactoryWithRoleArn()
+        {
+            IAcmFactory acmFactory;
+            IRoute53Factory route53Factory;
+            ILambdaFactory lambdaFactory;
+
+            var instance = CreateInstance(out acmFactory, out route53Factory, out lambdaFactory);
+            var roleArn = "arn";
+            instance.Request.ResourceProperties.CreationRoleArn = roleArn;
+
+            await instance.Create();
+            await acmFactory.Received().Create(Arg.Is<string>(val => val == roleArn));
+        }
+
+        [Test]
         public async Task Create_WithValidationRoleArn_CallsCreateRoute53FactoryWithRoleArn()
         {
             IAcmFactory acmFactory;
@@ -316,6 +331,21 @@ namespace Tests
 
             await instance.Create();
             await route53Factory.Received().Create(Arg.Is<string>(val => val == roleArn));
+        }
+
+        [Test]
+        public async Task Wait_WithCreationRoleArn_CallsCreateAcmFactoryWithRoleArn()
+        {
+            IAcmFactory acmFactory;
+            IRoute53Factory route53Factory;
+            ILambdaFactory lambdaFactory;
+
+            var instance = CreateInstance(out acmFactory, out route53Factory, out lambdaFactory);
+            var roleArn = "arn";
+            instance.Request.ResourceProperties.CreationRoleArn = roleArn;
+
+            await instance.Wait();
+            await acmFactory.Received().Create(Arg.Is<string>(val => val == roleArn));
         }
 
         [Test]
@@ -381,6 +411,20 @@ namespace Tests
             Assert.ThrowsAsync<Exception>(async () => await instance.Wait());
         }
 
+        [Test]
+        public async Task Update_WithCreationRoleArn_CallsCreateAcmFactoryWithRoleArn()
+        {
+            IAcmFactory acmFactory;
+            IRoute53Factory route53Factory;
+            ILambdaFactory lambdaFactory;
+
+            var instance = CreateInstance(out acmFactory, out route53Factory, out lambdaFactory);
+            var roleArn = "arn";
+            instance.Request.ResourceProperties.CreationRoleArn = roleArn;
+
+            await instance.Update();
+            await acmFactory.Received().Create(Arg.Is<string>(val => val == roleArn));
+        }
 
         [Test]
         public async Task Update_CallsAddAndDeleteTags()
@@ -436,6 +480,21 @@ namespace Tests
                 req.CertificateArn == ARN &&
                 req.Options.CertificateTransparencyLoggingPreference == CertificateTransparencyLoggingPreference.ENABLED
             ));
+        }
+
+        [Test]
+        public async Task Delete_WithCreationRoleArn_CallsCreateAcmFactoryWithRoleArn()
+        {
+            IAcmFactory acmFactory;
+            IRoute53Factory route53Factory;
+            ILambdaFactory lambdaFactory;
+
+            var instance = CreateInstance(out acmFactory, out route53Factory, out lambdaFactory);
+            var roleArn = "arn";
+            instance.Request.ResourceProperties.CreationRoleArn = roleArn;
+
+            await instance.Delete();
+            await acmFactory.Received().Create(Arg.Is<string>(val => val == roleArn));
         }
 
         [Test]
