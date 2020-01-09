@@ -16,6 +16,7 @@ using Amazon.Route53.Model;
 using Cythral.CloudFormation.CustomResource;
 using Cythral.CloudFormation.CustomResource.Attributes;
 using Cythral.CloudFormation.Resources.Factories;
+using static Cythral.CloudFormation.CustomResource.GranteeType;
 
 using static Amazon.Route53.ChangeStatus;
 
