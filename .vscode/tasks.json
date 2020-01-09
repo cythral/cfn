@@ -7,9 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/Core/Core.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "${workspaceFolder}/tests/Resources/ResourcesTests.csproj"
             ],
             "problemMatcher": "$msCompile"
         },
