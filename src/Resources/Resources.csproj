@@ -10,6 +10,7 @@
     <PackageReference Include="AWSSDK.KeyManagementService" Version="3.3.101.80" />
     <PackageReference Include="AWSSDK.Lambda" Version="3.3.103.19" />
     <PackageReference Include="AWSSDK.Route53" Version="3.3.102.33" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.3.104.15" />
     <ProjectReference Include="..\CustomResource\CustomResource.csproj" />
   </ItemGroup>
 

@@ -15,6 +15,7 @@ using Amazon.Route53.Model;
 
 using Cythral.CloudFormation.CustomResource;
 using Cythral.CloudFormation.CustomResource.Attributes;
+using Cythral.CloudFormation.Resources.Factories;
 
 using static Amazon.Route53.ChangeStatus;
 
@@ -51,6 +52,8 @@ namespace Cythral.CloudFormation.Resources
             [UpdateRequiresReplacement]
             public string HostedZoneId { get; set; }
 
+            public string ValidationRoleArn { get; set; }
+
             public CertificateOptions Options { get; set; }
 
             [UpdateRequiresReplacement]
@@ -59,11 +62,10 @@ namespace Cythral.CloudFormation.Resources
 
         public static int WaitInterval { get; set; } = 30;
 
-        public static Func<IAmazonCertificateManager> AcmClientFactory { get; set; } = delegate { return (IAmazonCertificateManager)new AmazonCertificateManagerClient(); };
+        private IAcmFactory _acmFactory { get; set; } = new AcmFactory();
+        private IRoute53Factory _route53Factory { get; set; } = new Route53Factory();
+        private ILambdaFactory _lambdaFactory { get; set; } = new LambdaFactory();
 
-        public static Func<IAmazonRoute53> Route53ClientFactory { get; set; } = delegate { return (IAmazonRoute53)new AmazonRoute53Client(); };
-
-        public static Func<IAmazonLambda> LambdaClientFactory { get; set; } = delegate { return (IAmazonLambda)new AmazonLambdaClient(); };
 
         /// <summary>
         /// Tags that have been updated or inserted since creation or last update
@@ -103,9 +105,9 @@ namespace Cythral.CloudFormation.Resources
 
         public async Task<Response> Create()
         {
-            var acmClient = AcmClientFactory();
-            var route53Client = Route53ClientFactory();
             var props = Request.ResourceProperties;
+            var acmClient = await _acmFactory.Create();
+            var route53Client = await _route53Factory.Create(props.ValidationRoleArn);
             var request = new RequestCertificateRequest
             {
                 DomainName = props.DomainName,
@@ -221,16 +223,17 @@ namespace Cythral.CloudFormation.Resources
 
         public async Task<Response> Wait()
         {
-            var request = new DescribeCertificateRequest { CertificateArn = Request.PhysicalResourceId };
-            var response = await AcmClientFactory().DescribeCertificateAsync(request);
+            var acmClient = await _acmFactory.Create();
+            var request = new DescribeCertificateRequest { CertificateArn = PhysicalResourceId };
+            var response = await acmClient.DescribeCertificateAsync(request);
             var status = response?.Certificate?.Status?.Value;
 
             switch (status)
             {
                 case "PENDING_VALIDATION":
                     Thread.Sleep(WaitInterval * 1000);
-
-                    var invokeResponse = await LambdaClientFactory().InvokeAsync(new InvokeRequest
+                    var lambdaClient = await _lambdaFactory.Create();
+                    var invokeResponse = lambdaClient.InvokeAsync(new InvokeRequest
                     {
                         FunctionName = Context.FunctionName,
                         Payload = JsonSerializer.Serialize(Request, SerializerOptions),
@@ -256,7 +259,8 @@ namespace Cythral.CloudFormation.Resources
 
                 // add new tags
                 Task.Run(async delegate {
-                    var upsertTagsResponse = await AcmClientFactory().AddTagsToCertificateAsync(new AddTagsToCertificateRequest {
+                    var acmClient = await _acmFactory.Create();
+                    var upsertTagsResponse = await acmClient.AddTagsToCertificateAsync(new AddTagsToCertificateRequest {
                         Tags = UpsertedTags.ToList(),
                         CertificateArn = Request.PhysicalResourceId
                     });
@@ -266,7 +270,8 @@ namespace Cythral.CloudFormation.Resources
 
                 // delete old tags
                 Task.Run(async delegate {
-                    var deleteTagsResponse = await AcmClientFactory().RemoveTagsFromCertificateAsync(new RemoveTagsFromCertificateRequest {
+                    var acmClient = await _acmFactory.Create();
+                    var deleteTagsResponse = await acmClient.RemoveTagsFromCertificateAsync(new RemoveTagsFromCertificateRequest {
                         Tags = DeletedTags.ToList(),
                         CertificateArn = Request.PhysicalResourceId
                     });
@@ -277,7 +282,8 @@ namespace Cythral.CloudFormation.Resources
                 // update options
                 Task.Run(async delegate {
                     if(newProps?.Options?.CertificateTransparencyLoggingPreference != oldProps?.Options?.CertificateTransparencyLoggingPreference) {
-                        var updateOptionsResponse = await AcmClientFactory().UpdateCertificateOptionsAsync(new UpdateCertificateOptionsRequest {
+                        var acmClient = await _acmFactory.Create();
+                        var updateOptionsResponse = await acmClient.UpdateCertificateOptionsAsync(new UpdateCertificateOptionsRequest {
                             CertificateArn = Request.PhysicalResourceId,
                             Options = newProps.Options
                         });
@@ -295,7 +301,8 @@ namespace Cythral.CloudFormation.Resources
 
         public async Task<Response> Delete()
         {
-            var describeResponse = await AcmClientFactory().DescribeCertificateAsync(new DescribeCertificateRequest
+            var acmClient = await _acmFactory.Create();
+            var describeResponse = await acmClient.DescribeCertificateAsync(new DescribeCertificateRequest
             {
                 CertificateArn = Request.PhysicalResourceId,
             });
@@ -335,7 +342,9 @@ namespace Cythral.CloudFormation.Resources
             {
                 try
                 {
-                    var changeRecordsResponse = await Route53ClientFactory().ChangeResourceRecordSetsAsync(new ChangeResourceRecordSetsRequest
+                    var roleArn = Request.ResourceProperties.ValidationRoleArn;
+                    var route53Client = await _route53Factory.Create(roleArn);
+                    var changeRecordsResponse = await route53Client.ChangeResourceRecordSetsAsync(new ChangeResourceRecordSetsRequest
                     {
                         HostedZoneId = Request.ResourceProperties.HostedZoneId,
                         ChangeBatch = new ChangeBatch
@@ -352,7 +361,7 @@ namespace Cythral.CloudFormation.Resources
                 }
             }
 
-            var deleteResponse = await AcmClientFactory().DeleteCertificateAsync(new DeleteCertificateRequest
+            var deleteResponse = await acmClient.DeleteCertificateAsync(new DeleteCertificateRequest
             {
                 CertificateArn = Request.PhysicalResourceId,
             });

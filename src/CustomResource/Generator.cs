@@ -351,6 +351,7 @@ namespace Cythral.CloudFormation.CustomResource
             yield return ParseStatement($"var request = await System.Text.Json.JsonSerializer.DeserializeAsync<Request<{ResourcePropertiesTypeName}>>(stream, SerializerOptions);");
             yield return ParseStatement("Console.WriteLine($\"Received request: {System.Text.Json.JsonSerializer.Serialize(request, SerializerOptions)}\");");
             yield return ParseStatement("resource.Request = request;");
+            yield return ParseStatement("resource.PhysicalResourceId = request?.PhysicalResourceId;");
 
             var cases = new List<SwitchSectionSyntax> {
                 GenerateHandleMethodCreateCase(),
