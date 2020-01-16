@@ -23,10 +23,10 @@ namespace Cythral.CloudFormation.Resources.Factories
                     RoleSessionName = "route-53-operations"
                 });
 
-                return new AmazonRoute53Client(response.Credentials);
+                return (IAmazonRoute53) new AmazonRoute53Client(response.Credentials);
             }
 
-            return new AmazonRoute53Client();
+            return (IAmazonRoute53) new AmazonRoute53Client();
         }
     }
 }

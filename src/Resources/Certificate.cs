@@ -119,8 +119,10 @@ namespace Cythral.CloudFormation.Resources
         public async Task<Response> Create()
         {
             var props = Request.ResourceProperties;
-            var acmClient = await _acmFactory.Create(props.CreationRoleArn);
-            var route53Client = await _route53Factory.Create(props.ValidationRoleArn);
+            
+            IAmazonCertificateManager acmClient = await _acmFactory.Create(props.CreationRoleArn);
+            IAmazonRoute53 route53Client = await _route53Factory.Create(props.ValidationRoleArn);
+            
             var request = new RequestCertificateRequest
             {
                 DomainName = props.DomainName,
@@ -237,7 +239,9 @@ namespace Cythral.CloudFormation.Resources
         public async Task<Response> Wait()
         {
             var props = Request.ResourceProperties;
-            var acmClient = await _acmFactory.Create(props.CreationRoleArn);
+            IAmazonCertificateManager acmClient = await _acmFactory.Create(props.CreationRoleArn);
+            IAmazonLambda lambdaClient = await _lambdaFactory.Create();
+           
             var request = new DescribeCertificateRequest { CertificateArn = PhysicalResourceId };
             var response = await acmClient.DescribeCertificateAsync(request);
             var status = response?.Certificate?.Status?.Value;
@@ -246,7 +250,7 @@ namespace Cythral.CloudFormation.Resources
             {
                 case "PENDING_VALIDATION":
                     Thread.Sleep(WaitInterval * 1000);
-                    var lambdaClient = await _lambdaFactory.Create();
+                    
                     var invokeResponse = lambdaClient.InvokeAsync(new InvokeRequest
                     {
                         FunctionName = Context.FunctionName,
@@ -268,7 +272,7 @@ namespace Cythral.CloudFormation.Resources
         {
             var oldProps = Request.OldResourceProperties;
             var newProps = Request.ResourceProperties;
-            var acmClient = await _acmFactory.Create(newProps.CreationRoleArn);
+            IAmazonCertificateManager acmClient = await _acmFactory.Create(newProps.CreationRoleArn);
 
             Task.WaitAll(new Task[] {
 
@@ -314,7 +318,9 @@ namespace Cythral.CloudFormation.Resources
         public async Task<Response> Delete()
         {
             var props = Request.ResourceProperties;
-            var acmClient = await _acmFactory.Create(props.CreationRoleArn);
+            IAmazonCertificateManager acmClient = await _acmFactory.Create(props.CreationRoleArn);
+            IAmazonRoute53 route53Client = await _route53Factory.Create(props.ValidationRoleArn);
+            
             var describeResponse = await acmClient.DescribeCertificateAsync(new DescribeCertificateRequest
             {
                 CertificateArn = Request.PhysicalResourceId,
@@ -356,7 +362,6 @@ namespace Cythral.CloudFormation.Resources
                 try
                 {
                     var roleArn = Request.ResourceProperties.ValidationRoleArn;
-                    var route53Client = await _route53Factory.Create(roleArn);
                     var changeRecordsResponse = await route53Client.ChangeResourceRecordSetsAsync(new ChangeResourceRecordSetsRequest
                     {
                         HostedZoneId = Request.ResourceProperties.HostedZoneId,
