@@ -299,13 +299,11 @@ namespace Cythral.CloudFormation.CustomResource
             }
             catch (Exception) { }
 
-            if (collector.Permissions.Count() > 0)
-            {
-                role.AddPolicy(
-                    new Policy($"{ClassName}PrimaryPolicy")
-                    .AddStatement(Action: collector.Permissions)
-                );
-            }
+            var policy = new Policy($"{ClassName}PrimaryPolicy");
+            var permissions = new HashSet<string> { "sts:AssumeRole" };
+            permissions.UnionWith(collector.Permissions);
+            policy.AddStatement(Action: permissions);
+            role.AddPolicy(policy);
 
             Resources.Add($"{ClassName}Role", role);
         }

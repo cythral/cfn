@@ -21,10 +21,10 @@ namespace Cythral.CloudFormation.Resources.Factories
                     RoleSessionName = "acm-operations"
                 });
 
-                return new AmazonCertificateManagerClient(response.Credentials);
+                return (IAmazonCertificateManager)new AmazonCertificateManagerClient(response.Credentials);
             }
 
-            return new AmazonCertificateManagerClient();
+            return (IAmazonCertificateManager)new AmazonCertificateManagerClient();
         }
     }
 }
