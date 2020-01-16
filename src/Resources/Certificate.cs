@@ -251,7 +251,7 @@ namespace Cythral.CloudFormation.Resources
                 case "PENDING_VALIDATION":
                     Thread.Sleep(WaitInterval * 1000);
                     
-                    var invokeResponse = lambdaClient.InvokeAsync(new InvokeRequest
+                    var invokeResponse = await lambdaClient.InvokeAsync(new InvokeRequest
                     {
                         FunctionName = Context.FunctionName,
                         Payload = JsonSerializer.Serialize(Request, SerializerOptions),
