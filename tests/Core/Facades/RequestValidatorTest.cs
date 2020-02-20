@@ -274,7 +274,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 },
                 Body = Serialize(new PushEvent
                 {
-                    Ref = "master",
+                    Ref = "refs/heads/master",
                     Repository = new Repository
                     {
                         DefaultBranch = "master"
