@@ -7,8 +7,6 @@ phases:
   install:
     runtime-versions:
       dotnet: 3.1
-    commands:
-      - yum install -y libunwind
 
   build:
     commands:
