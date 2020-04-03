@@ -54,7 +54,7 @@ Resources:
         Type: LINUX_CONTAINER
       Artifacts:
         Type: CODEPIPELINE
-      Source:
+      Source: 
         Type: CODEPIPELINE
   
   Webhook:
