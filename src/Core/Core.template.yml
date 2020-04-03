@@ -325,7 +325,7 @@ Resources:
   GithubWebhook:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: GithubWebhook
+      Handler: Core::Cythral.CloudFormation.GithubWebhookHandler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
@@ -401,8 +401,8 @@ Resources:
   UpdateTargetsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: UpdateTargets
-      Runtime: provided
+      Handler: Core::Cythral.CloudFormation.UpdateTargetsHandler::Handle
+      Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
       Policies:
