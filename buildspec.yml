@@ -7,13 +7,12 @@ phases:
   install:
     runtime-versions:
       dotnet: 3.1
-
-  pre_build:
     commands:
-      - dotnet --info
+      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version 2.2.0 --install-dir /usr/share/dotnet
 
   build:
     commands:
+      - dotnet --info
       - dotnet test -c Release
       - dotnet msbuild tools/package.proj -p:Configuration=Release
       - ./tools/create-networking-config.sh > Networking.config.json
