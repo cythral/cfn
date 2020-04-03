@@ -6,11 +6,9 @@ env:
 phases:
   install:
     runtime-versions:
-      dotnet: 2.2
+      dotnet: 3.1
     commands:
       - yum install -y libunwind
-      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version 3.0.100 --install-dir /usr/share/dotnet
-      - export PATH="$PATH:/usr/share/dotnet"
 
   build:
     commands:
