@@ -72,7 +72,6 @@
         <Output TaskParameter="ConsoleOutput" PropertyName="PackagedFile" />
     </Exec>
 
-    <Exec Command="chmod +x $(PublishDir)/bootstrap" />
     <Exec Command="aws cloudformation package --template-file $(TemplateFile) --s3-bucket $(DeploymentBucket) --output-template-file $(PackagedFile)" />
     
     <PropertyGroup>
