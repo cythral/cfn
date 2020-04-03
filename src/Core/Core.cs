@@ -9,6 +9,8 @@ using Amazon.Lambda.SNSEvents;
 
 using Cythral.CloudFormation.Handlers;
 
+[assembly:LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+
 namespace Cythral.CloudFormation
 {
     public class Core
