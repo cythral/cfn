@@ -8,9 +8,13 @@ phases:
     runtime-versions:
       dotnet: 3.1
 
-  build:
+  pre_build:
     commands:
       - dotnet --info
+      - git init
+
+  build:
+    commands:
       - dotnet test -c Release
       - dotnet msbuild tools/package.proj -p:Configuration=Release
       - ./tools/create-networking-config.sh > Networking.config.json
