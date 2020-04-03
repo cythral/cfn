@@ -5,7 +5,7 @@
     <OutputType>Exe</OutputType>
     <BuildTasksLocation>../BuildTasks/bin/$(Configuration)/netcoreapp3.1/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <PubishReadyToRun>true</PublishReadyToRun>
+    <PublishReadyToRun>true</PublishReadyToRun>
     <StackName>cfn-core</StackName>
     <TemplateFileName>Core.template.yml</TemplateFileName>
     <ConfigFileName>Core.config.json</ConfigFileName>
