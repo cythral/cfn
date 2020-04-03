@@ -326,7 +326,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: GithubWebhook
-      Runtime: provided
+      Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
       MemorySize: 256
