@@ -3,9 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <StackName>cfn-resources</StackName>
-    <RuntimeIdentifier>rhel.7.2-x64</RuntimeIdentifier>
-    <SelfContained>false</SelfContained>
-    <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 
   <ItemGroup>
