@@ -6,6 +6,7 @@
     <BuildTasksLocation>../BuildTasks/bin/$(Configuration)/netcoreapp3.1/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <RuntimeIdentifier>rhel.7.2-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
     <PublishReadyToRun>true</PublishReadyToRun>
     <StackName>cfn-core</StackName>
     <TemplateFileName>Core.template.yml</TemplateFileName>
