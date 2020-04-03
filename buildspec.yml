@@ -11,7 +11,6 @@ phases:
   pre_build:
     commands:
       - dotnet --info
-      - git init
 
   build:
     commands:
