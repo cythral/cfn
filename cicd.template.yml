@@ -21,6 +21,9 @@ Resources:
   ArtifactStore:
     Type: AWS::S3::Bucket
 
+  SecondArtifactStore:
+    Type: AWS::S3::Bucket
+
   ArtifactStorePolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
