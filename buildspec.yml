@@ -8,7 +8,7 @@ phases:
     runtime-versions:
       dotnet: 3.1
     commands:
-      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version 2.2.301 --install-dir /usr/share/dotnet
+      - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version 2.2.301 --install-dir /root/.dotnet
 
   build:
     commands:
