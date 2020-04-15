@@ -12,10 +12,10 @@ using Amazon.KeyManagementService.Model;
 using Amazon.Lambda;
 using Amazon.Lambda.Model;
 
-using Cythral.CloudFormation.CustomResource;
+using Cythral.CloudFormation.CustomResource.Core;
 using Cythral.CloudFormation.CustomResource.Attributes;
 
-using static Cythral.CloudFormation.CustomResource.GranteeType;
+using static Cythral.CloudFormation.CustomResource.Attributes.GranteeType;
 
 namespace Cythral.CloudFormation.Resources
 {

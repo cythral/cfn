@@ -20,7 +20,8 @@ using Amazon.Lambda.Model;
 using Amazon.Route53;
 using Amazon.Route53.Model;
 
-using Cythral.CloudFormation.CustomResource;
+using Cythral.CloudFormation.CustomResource.Core;
+using Cythral.CloudFormation.CustomResource.Attributes;
 using Cythral.CloudFormation.Resources;
 
 using FluentAssertions;

@@ -11,13 +11,6 @@
     <PackageReference Include="AWSSDK.Lambda" Version="3.3.103.19" />
     <PackageReference Include="AWSSDK.Route53" Version="3.3.102.33" />
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.3.104.15" />
-    <ProjectReference Include="..\CustomResource\CustomResource.csproj" />
+    <PackageReference Include="Cythral.CloudFormation.CustomResource" Version="0.2.10-alpha" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="4.6.0" />
-  </ItemGroup>
-
-  <Import Project="../CustomResource/build/Cythral.CloudFormation.CustomResource.props" />
-  <Import Project="../CustomResource/build/Cythral.CloudFormation.CustomResource.targets" />
 </Project>
