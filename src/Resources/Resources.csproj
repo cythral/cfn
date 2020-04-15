@@ -3,8 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <StackName>cfn-resources</StackName>
-    <RestorePackagesPath>$(MSBuildThisFileDirectory).nuget</RestorePackagesPath>
-    <RestoreAdditionalProjectSources>/Users/tfisher/Documents/cfn-custom-resource/bin/Packages/Debug;$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
   </PropertyGroup>
 
   <ItemGroup>
