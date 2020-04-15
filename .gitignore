@@ -1,6 +1,7 @@
-**/bin/
-**/obj/
-**/lib/
+bin/
+obj/
+lib/
 **/tasks/
 nuget.config
 **/Metadata.config.json
+.nuget/
