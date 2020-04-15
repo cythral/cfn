@@ -1,7 +1,7 @@
 using System;
 using System.Net.Http;
 
-using Cythral.CloudFormation.CustomResource;
+using Cythral.CloudFormation.CustomResource.Core;
 
 using RichardSzalay.MockHttp;
 

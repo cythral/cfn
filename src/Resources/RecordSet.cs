@@ -7,11 +7,10 @@ using System.Threading.Tasks;
 using Amazon.Route53;
 using Amazon.Route53.Model;
 
-using Cythral.CloudFormation.CustomResource;
+using Cythral.CloudFormation.CustomResource.Core;
 using Cythral.CloudFormation.CustomResource.Attributes;
-using Cythral.CloudFormation.CustomResource.Yaml;
 
-using static Cythral.CloudFormation.CustomResource.GranteeType;
+using static Cythral.CloudFormation.CustomResource.Attributes.GranteeType;
 
 namespace Cythral.CloudFormation.Resources
 {
@@ -62,7 +61,7 @@ namespace Cythral.CloudFormation.Resources
 
     [CustomResource(
         ResourcePropertiesType = typeof(Record),
-        Grantees = new string[] { "cfn-metadata:DevAccountId", "cfn-metadata:ProdAccountId" },
+        Grantees = new string[] {"cfn-metadata:DevAccountId", "cfn-metadata:ProdAccountId"},
         GranteeType = Import
     )]
     partial class RecordSet
