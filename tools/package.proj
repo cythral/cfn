@@ -27,15 +27,19 @@
             Properties="Configuration=$(Configuration);Dest=$(Destination)" />
 
         <!-- Get the Utility Bucket name -->
-        <Exec Command="aws cloudformation list-exports --query Exports[?Name==\`cfn-utilities:UtilityBucketName\`].Value --output text" ConsoleToMsBuild="true">
-            <Output TaskParameter="ConsoleOutput" PropertyName="UtilityBucket" />
+        <Exec 
+            Command="aws cloudformation list-exports --query Exports[?Name==\`cfn-utilities:UtilityBucketName\`].Value --output text" 
+            ConsoleToMsBuild="true"
+            Condition="$(DeploymentBucket) == ''"
+        >
+            <Output TaskParameter="ConsoleOutput" PropertyName="DeploymentBucket" />
         </Exec>
-
+        
         <MSBuild 
             Condition="$(SkipResources) != 'true'" 
             Projects="$(SourceDirectory)/Resources/Resources.csproj" 
             Targets="Publish" 
-            Properties="Deploy=false;DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration);PackagedFile=$(Destination)/Resources.template.yml" />
+            Properties="Deploy=false;DeploymentBucket=$(DeploymentBucket);Configuration=$(Configuration);PackagedFile=$(Destination)/Resources.template.yml" />
 
         <MSBuild 
             Condition="$(SkipDns) != 'true'" 
@@ -47,6 +51,6 @@
             Condition="$(SkipCore) != 'true'" 
             Projects="$(SourceDirectory)/Core/Core.csproj" 
             Targets="Publish" 
-            Properties="Deploy=false;DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration);PackagedFile=$(Destination)/Core.template.yml;Optimize=$(Optimize)" />
+            Properties="Deploy=false;DeploymentBucket=$(DeploymentBucket);Configuration=$(Configuration);PackagedFile=$(Destination)/Core.template.yml;Optimize=$(Optimize)" />
     </Target>
 </Project>
