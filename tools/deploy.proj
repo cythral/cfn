@@ -30,11 +30,6 @@
     </Target>
     
     <Target Name="Deploy">
-        <MSBuild
-            Projects="$(SourceDirectory)/Metadata/Metadata.proj"
-            Targets="Publish"
-            Properties="Configuration=$(Configuration);DevAccountId=$(DevAccountId);ProdAccountId=$(ProdAccountId)" />
-
         <!-- Deploy Utilities to all accounts -->
         <MSBuild    
             Projects="$(SourceDirectory)/Utilities/Utilities.proj" 
