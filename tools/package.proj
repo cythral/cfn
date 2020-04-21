@@ -21,11 +21,6 @@
             Targets="Copy" 
             Properties="Configuration=$(Configuration);Dest=$(Destination)" />
 
-        <MSBuild
-            Projects="$(SourceDirectory)/Metadata/Metadata.proj"
-            Targets="Copy"
-            Properties="Configuration=$(Configuration);Dest=$(Destination)" />
-
         <!-- Get the Utility Bucket name -->
         <Exec 
             Command="aws cloudformation list-exports --query Exports[?Name==\`cfn-utilities:UtilityBucketName\`].Value --output text" 
