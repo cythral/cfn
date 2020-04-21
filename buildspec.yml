@@ -25,4 +25,3 @@ artifacts:
     - "Dns.template.yml"
     - "Dns.config.json"
     - "Networking.config.json"
-    - "Metadata.template.yml"

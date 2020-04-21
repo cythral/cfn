@@ -114,30 +114,6 @@ Resources:
                 - Name: buildResults
               Configuration:
                 ProjectName: !Ref BuildProject
-        - Name: Metadata
-          Actions:
-            - Name: Deploy
-              ActionTypeId:
-                Category: Deploy
-                Provider: CloudFormation
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: buildResults
-              Configuration:
-                StackName: cfn-metadata
-                ActionMode: CREATE_UPDATE
-                TemplatePath: buildResults::Metadata.template.yml
-                RoleArn: !ImportValue cfn-utilities:MasterRoleArn
-                ParameterOverrides: !Sub
-                - |
-                  {
-                    "DevAccountId": "${DevAccountId}",
-                    "ProdAccountId": "${ProdAccountId}"
-                  }
-                - DevAccountId: !ImportValue cfn-metadata:DevAccountId
-                  ProdAccountId: !ImportValue cfn-metadata:ProdAccountId
-                Capabilities: CAPABILITY_IAM
         - Name: Utilities
           Actions:
             - Name: Shared
