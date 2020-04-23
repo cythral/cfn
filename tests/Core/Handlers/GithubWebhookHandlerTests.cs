@@ -7,6 +7,7 @@ using Amazon.Lambda.ApplicationLoadBalancerEvents;
 
 using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Events;
+using Cythral.CloudFormation.Handlers;
 
 using NUnit.Framework;
 
