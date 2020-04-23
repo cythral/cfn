@@ -1,8 +1,8 @@
 using System.Net;
 
-namespace Cythral.CloudFormation.Facades
+namespace Cythral.CloudFormation.UpdateTargets.DnsResolver
 {
-    public class DnsResolver : IDnsResolver
+    public class DefaultDnsResolver : IDnsResolver
     {
         public IPHostEntry Resolve(string hostname)
         {

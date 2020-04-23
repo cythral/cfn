@@ -10,70 +10,28 @@ using Amazon.Lambda.SNSEvents;
 
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Facades;
+using Cythral.CloudFormation.UpdateTargets.DnsResolver;
+using Cythral.CloudFormation.UpdateTargets.Request;
 
 using static System.Text.Json.JsonSerializer;
 using static Amazon.ElasticLoadBalancingV2.TargetHealthStateEnum;
 
-namespace Cythral.CloudFormation.Handlers
+namespace Cythral.CloudFormation.UpdateTargets
 {
-    public class UpdateTargetsHandler
+    public class Handler
     {
-        public class Request
-        {
-            public string TargetGroupArn { get; set; }
-            public string TargetDnsName { get; set; }
-
-            public static Request FromSnsEvent(SNSEvent evnt)
-            {
-                var message = Deserialize<AlarmEvent>(evnt.Records[0].Sns.Message);
-                var request = new Request();
-
-                foreach (var metric in message.Trigger.Metrics)
-                {
-                    if (metric.Id != "customdata") continue;
-
-                    foreach (var dimension in metric.MetricStat.Metric.Dimensions)
-                    {
-                        switch (dimension.Name)
-                        {
-                            case "TargetGroupArn": request.TargetGroupArn = dimension.Value; break;
-                            case "TargetDnsName": request.TargetDnsName = dimension.Value; break;
-                            default: break;
-                        }
-                    }
-                }
-
-                return request;
-            }
-        }
-
-        public class Response
-        {
-            public bool Success { get; set; }
-        }
+        private static DnsResolverFactory dnsResolverFactory = new DnsResolverFactory();
+        private static ElbClientFactory elbClientFactory = new ElbClientFactory();
+        private static UpdateTargetsRequestFactory requestFactory = new UpdateTargetsRequestFactory();
 
         public static async Task<Response> Handle(
             SNSEvent snsRequest,
-            ILambdaContext context
-        )
-        {
-            var resolver = new DnsResolver();
-            var elbClient = new AmazonElasticLoadBalancingV2Client();
-            var request = Request.FromSnsEvent(snsRequest);
-
-            Console.WriteLine($"Received SNS request: {Serialize(snsRequest)}");
-            return await Handle(request, resolver, elbClient, context);
-        }
-
-        public static async Task<Response> Handle(
-            Request request,
-            IDnsResolver resolver,
-            IAmazonElasticLoadBalancingV2 elbClient,
             ILambdaContext context = null
         )
         {
-            resolver = resolver ?? new DnsResolver();
-            elbClient = elbClient ?? new AmazonElasticLoadBalancingV2Client();
+            var resolver = dnsResolverFactory.Create();
+            var elbClient = elbClientFactory.Create();
+            var request = requestFactory.CreateFromSnsEvent(snsRequest);
 
             Console.WriteLine($"Received transformed request: {Serialize(request)}");
 
