@@ -57,10 +57,10 @@ Conditions:
           - ""
 
 Resources:
-  SSLCertificate:
+  Certificate:
     Type: Custom::Certificate
     Properties:
-      ServiceToken: !ImportValue cfn-resources:CertificateLambdaArn
+      ServiceToken: !ImportValue cfn-certificate-resource:CertificateLambdaArn
       DomainName: brigh.id
       HostedZoneId: !ImportValue cfn-dns:HostedZoneId
       ValidationMethod: DNS
@@ -107,7 +107,7 @@ Resources:
       Port: 443
       Protocol: HTTPS
       Certificates:
-        - CertificateArn: !Ref SSLCertificate
+        - CertificateArn: !Ref Certificate
 
   DevPeeringConnection:
     Type: AWS::EC2::VPCPeeringConnection
