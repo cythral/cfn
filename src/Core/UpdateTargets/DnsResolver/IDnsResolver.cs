@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Cythral.CloudFormation
+namespace Cythral.CloudFormation.UpdateTargets.DnsResolver
 {
     public interface IDnsResolver
     {

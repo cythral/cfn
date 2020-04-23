@@ -9,7 +9,9 @@ using Amazon.Lambda.SNSEvents;
 
 using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Events;
-using Cythral.CloudFormation.Handlers;
+using Cythral.CloudFormation.UpdateTargets;
+using Cythral.CloudFormation.UpdateTargets.DnsResolver;
+using Cythral.CloudFormation.UpdateTargets.Request;
 
 using NSubstitute;
 
@@ -21,10 +23,14 @@ using static System.Text.Json.JsonSerializer;
 using SNSRecord = Amazon.Lambda.SNSEvents.SNSEvent.SNSRecord;
 using SNSMessage = Amazon.Lambda.SNSEvents.SNSEvent.SNSMessage;
 
-namespace Cythral.CloudFormation.Tests.Handlers
+namespace Cythral.CloudFormation.Tests.UpdateTargets
 {
-    public class UpdateTargetsHandlerTest
+    public class HandlerTests
     {
+        private static DnsResolverFactory dnsResolverFactory = Substitute.For<DnsResolverFactory>();
+        private static ElbClientFactory elbClientFactory = Substitute.For<ElbClientFactory>();
+        private static UpdateTargetsRequestFactory requestFactory = Substitute.For<UpdateTargetsRequestFactory>();
+
         private IAmazonElasticLoadBalancingV2 CreateElbClient(string targetGroupArn, List<TargetHealthDescription> targets = null)
         {
             var elbClient = Substitute.For<IAmazonElasticLoadBalancingV2>();
@@ -50,31 +56,66 @@ namespace Cythral.CloudFormation.Tests.Handlers
                 TargetHealthDescriptions = targets
             });
 
+            elbClientFactory.Create().Returns(elbClient);
             return elbClient;
         }
 
-        [Test]
-        public async Task HandleCallsResolve()
+        private IDnsResolver CreateDnsResolver()
         {
             var dnsResolver = Substitute.For<IDnsResolver>();
-            var dnsName = "http://example.com";
-            var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
-            var elbClient = CreateElbClient(targetGroupArn);
-            var request = new UpdateTargetsHandler.Request
+            dnsResolver
+            .Resolve(Arg.Any<string>())
+            .Returns(new IPHostEntry());
+
+            dnsResolverFactory.Create().Returns(dnsResolver);
+            return dnsResolver;
+        }
+
+        private UpdateTargetsRequest CreateRequest(string targetGroupArn, string dnsName)
+        {
+            var request = new UpdateTargetsRequest
             {
                 TargetGroupArn = targetGroupArn,
                 TargetDnsName = dnsName,
             };
 
-            dnsResolver
-            .Resolve(Arg.Any<string>())
-            .Returns(new IPHostEntry());
+            requestFactory.CreateFromSnsEvent(Arg.Any<SNSEvent>()).Returns(request);
+            return request;
+        }
 
-            await UpdateTargetsHandler.Handle(
-                request: request,
-                resolver: dnsResolver,
-                elbClient: elbClient
-            );
+        [SetUp]
+        public void SetupDnsResolverFactory()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "dnsResolverFactory", dnsResolverFactory);
+            dnsResolverFactory.ClearReceivedCalls();
+        }
+
+        [SetUp]
+        public void SetupElbClientFactory()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "elbClientFactory", elbClientFactory);
+            elbClientFactory.ClearReceivedCalls();
+        }
+
+        [SetUp]
+        public void SetupRequestFactory()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "requestFactory", requestFactory);
+            requestFactory.ClearReceivedCalls();
+        }
+
+        [Test]
+        public async Task HandleCallsResolve()
+        {
+            var dnsName = "http://example.com";
+            var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
+            
+            var dnsResolver = CreateDnsResolver();
+            var elbClient = CreateElbClient(targetGroupArn);
+            var request = CreateRequest(targetGroupArn, dnsName);
+            var snsEvent = Substitute.For<SNSEvent>();
+
+            await Handler.Handle(snsEvent);
 
             dnsResolver
             .Received()
@@ -86,25 +127,14 @@ namespace Cythral.CloudFormation.Tests.Handlers
         [Test]
         public async Task HandleDeregistersUnhealthyTargets()
         {
-            var dnsResolver = Substitute.For<IDnsResolver>();
             var dnsName = "http://example.com";
             var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
             var elbClient = CreateElbClient(targetGroupArn);
-            var request = new UpdateTargetsHandler.Request
-            {
-                TargetGroupArn = targetGroupArn,
-                TargetDnsName = dnsName,
-            };
+            var request = CreateRequest(targetGroupArn, dnsName);
+            var dnsResolver = CreateDnsResolver();
+            var snsRequest = Substitute.For<SNSEvent>();
 
-            dnsResolver
-            .Resolve(Arg.Is<string>(hostname => hostname == dnsName))
-            .Returns(new IPHostEntry());
-
-            await UpdateTargetsHandler.Handle(
-                request: request,
-                resolver: dnsResolver,
-                elbClient: elbClient
-            );
+            await Handler.Handle(snsRequest);
 
             await elbClient
             .Received()
@@ -120,15 +150,12 @@ namespace Cythral.CloudFormation.Tests.Handlers
         [Test]
         public async Task HandleRegistersNewTargets()
         {
-            var dnsResolver = Substitute.For<IDnsResolver>();
+            var dnsResolver = CreateDnsResolver();
             var dnsName = "http://example.com";
             var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
             var elbClient = CreateElbClient(targetGroupArn);
-            var request = new UpdateTargetsHandler.Request
-            {
-                TargetGroupArn = targetGroupArn,
-                TargetDnsName = dnsName,
-            };
+            var request = CreateRequest(targetGroupArn, dnsName);
+            var snsRequest = Substitute.For<SNSEvent>();
 
             dnsResolver
             .Resolve(Arg.Is<string>(hostname => hostname == dnsName))
@@ -141,12 +168,7 @@ namespace Cythral.CloudFormation.Tests.Handlers
                 }
             });
 
-            await UpdateTargetsHandler.Handle(
-                request: request,
-                resolver: dnsResolver,
-                elbClient: elbClient
-            );
-
+            await Handler.Handle(snsRequest);
             await elbClient
             .Received()
             .RegisterTargetsAsync(
@@ -179,25 +201,18 @@ namespace Cythral.CloudFormation.Tests.Handlers
                 }
             };
 
-            var dnsResolver = Substitute.For<IDnsResolver>();
+            var dnsResolver = CreateDnsResolver();
             var dnsName = "http://example.com";
             var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
             var elbClient = CreateElbClient(targetGroupArn, targets);
-            var request = new UpdateTargetsHandler.Request
-            {
-                TargetGroupArn = targetGroupArn,
-                TargetDnsName = dnsName,
-            };
+            var request = CreateRequest(targetGroupArn, dnsName);
+            var snsRequest = Substitute.For<SNSEvent>();
 
             dnsResolver
             .Resolve(Arg.Is<string>(hostname => hostname == dnsName))
             .Returns(new IPHostEntry());
 
-            await UpdateTargetsHandler.Handle(
-                request: request,
-                resolver: dnsResolver,
-                elbClient: elbClient
-            );
+            await Handler.Handle(snsRequest);
 
             await elbClient
             .DidNotReceive()
@@ -214,15 +229,12 @@ namespace Cythral.CloudFormation.Tests.Handlers
                 }
             };
 
-            var dnsResolver = Substitute.For<IDnsResolver>();
+            var dnsResolver = CreateDnsResolver();
             var dnsName = "http://example.com";
             var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
             var elbClient = CreateElbClient(targetGroupArn, targets);
-            var request = new UpdateTargetsHandler.Request
-            {
-                TargetGroupArn = targetGroupArn,
-                TargetDnsName = dnsName,
-            };
+            var request = CreateRequest(targetGroupArn, dnsName);
+            var snsRequest = Substitute.For<SNSEvent>();
 
             dnsResolver
             .Resolve(Arg.Is<string>(hostname => hostname == dnsName))
@@ -233,65 +245,11 @@ namespace Cythral.CloudFormation.Tests.Handlers
                 }
             });
 
-            await UpdateTargetsHandler.Handle(
-                request: request,
-                resolver: dnsResolver,
-                elbClient: elbClient
-            );
+            await Handler.Handle(snsRequest);
 
             await elbClient
             .DidNotReceive()
             .RegisterTargetsAsync(Arg.Any<RegisterTargetsRequest>());
-        }
-
-        [Test]
-        public void FromSnsEventReturnsRequest()
-        {
-            var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
-            var dnsName = "http://example.com";
-            var alarm = new AlarmEvent
-            {
-                Trigger = new Trigger
-                {
-                    Metrics = new List<MetricDataQuery> {
-                        new MetricDataQuery {
-                            Id = "healthy",
-                        },
-                        new MetricDataQuery {
-                            Id = "customdata",
-                            MetricStat = new MetricStat {
-                                Metric = new Metric {
-                                    Dimensions = new List<Dimension> {
-                                        new Dimension {
-                                            Name = "TargetGroupArn",
-                                            Value = targetGroupArn
-                                        },
-                                        new Dimension {
-                                            Name ="TargetDnsName",
-                                            Value = dnsName
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            var evnt = new SNSEvent
-            {
-                Records = new List<SNSRecord> {
-                    new SNSRecord {
-                        Sns = new SNSMessage {
-                            Message = Serialize(alarm)
-                        }
-                    }
-                }
-            };
-
-            var request = UpdateTargetsHandler.Request.FromSnsEvent(evnt);
-            Assert.That(request.TargetGroupArn, Is.EqualTo(targetGroupArn));
-            Assert.That(request.TargetDnsName, Is.EqualTo(dnsName));
         }
     }
 }
