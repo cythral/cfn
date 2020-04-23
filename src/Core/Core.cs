@@ -33,7 +33,7 @@ namespace Cythral.CloudFormation
                     break;
 
                 case "UpdateTargets":
-                    Func<SNSEvent, ILambdaContext, Task<UpdateTargetsHandler.Response>> targetsHandler = UpdateTargetsHandler.Handle;
+                    Func<SNSEvent, ILambdaContext, Task<UpdateTargets.Response>> targetsHandler = UpdateTargets.Handler.Handle;
                     using (var wrapper = HandlerWrapper.GetHandlerWrapper(targetsHandler, serializer))
                     using (var bootstrap = new LambdaBootstrap(wrapper))
                     {
