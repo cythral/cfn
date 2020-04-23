@@ -18,7 +18,7 @@ using static System.Text.Json.JsonSerializer;
 
 using WebhookConfig = Cythral.CloudFormation.Config;
 
-namespace Cythral.CloudFormation
+namespace Cythral.CloudFormation.Handlers
 {
     public class GithubWebhookHandler
     {
