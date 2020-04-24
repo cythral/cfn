@@ -585,6 +585,13 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:LoadBalancerArn
 
+  LoadBalancerFullName:
+    Description: Name of the internal load balancer
+    Condition: IsAgentAccount
+    Value: !GetAtt LoadBalancer.LoadBalancerFullName
+    Export:
+      Name: !Sub ${AWS::StackName}:LoadBalancerFullName
+
   LoadBalancerDnsName:
     Description: DNS name of the internal load balancer
     Condition: IsAgentAccount
