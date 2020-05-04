@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <OutputType>Exe</OutputType>
     <BuildTasksLocation>../BuildTasks/bin/$(Configuration)/netcoreapp3.1/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <RuntimeIdentifier>rhel.7.2-x64</RuntimeIdentifier>
@@ -21,7 +20,6 @@
 
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.ApplicationLoadBalancerEvents" Version="1.0.0" />
-    <PackageReference Include="Amazon.Lambda.RuntimeSupport" Version="1.0.0" />
     <PackageReference Include="Amazon.Lambda.SNSEvents" Version="1.1.0" />
     <PackageReference Include="AWSSDK.CloudFormation" Version="3.3.100.90" />
     <PackageReference Include="AWSSDK.ElasticLoadBalancingV2" Version="3.3.102.56" />
