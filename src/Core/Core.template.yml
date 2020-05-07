@@ -430,7 +430,39 @@ Resources:
               - elasticloadbalancing:RegisterTargets
               - elasticloadbalancing:DeregisterTargets
             Resource: "*"
-            
+
+  StackDeploymentStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: Core::Cythral.CloudFormation.StackDeploymentStatus.Handler::Handle
+      Runtime: dotnetcore3.1
+      Timeout: 30
+      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      Policies:
+        - AWSLambdaExecute
+        - !Ref StackDeploymentStatusPolicy
+      Events:
+        SNS:
+          Type: SNS
+          Properties:
+            Topic: !Ref StackDeploymentStatusTopic
+            Region: !Ref AWS::Region
+
+  StackDeploymentStatusTopic:
+    Type: AWS::SNS::Topic
+
+  StackDeploymentStatusPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 
+              - states:SendTaskSuccess
+              - states:SendTaskFailure
+            Resource: "*"
+
 Outputs:
   LoadBalancerCanonicalHostedZoneId:
     Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
