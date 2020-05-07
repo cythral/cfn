@@ -44,7 +44,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus.Request
                 StackName={stackName}
                 ClientRequestToken={token}
                 EventId={eventId}
-                Timestamp={timestamp.ToString("MM/dd/yyyy hh:mm:ss.ffffff tt")}
+                Timestamp={timestamp.ToString("MM/dd/yyyy hh:mm:ss.fffffff tt")}
                 LogicalResourceId={logicalResourceId}
                 PhysicalResourceId={physicalResourceId}
                 Namespace={namespac}
