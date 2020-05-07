@@ -324,6 +324,7 @@ Resources:
               Service: 
                 - cloudformation.amazonaws.com
                 - codepipeline.amazonaws.com
+                - !Sub states.${AWS::Region}.amazonaws.com
     
   AgentRole:
     Type: AWS::IAM::Role
