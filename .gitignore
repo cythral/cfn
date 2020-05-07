@@ -5,3 +5,5 @@ lib/
 nuget.config
 **/Metadata.config.json
 .nuget/
+.fake
+.ionide
