@@ -80,16 +80,16 @@ namespace Cythral.CloudFormation.Handlers
                 var deployer = new DeployStackFacade();
                 await deployer.Deploy(new DeployStackContext
                 {
-                    StackName = stackName, 
-                    Template = templateContent, 
-                    PassRoleArn = roleArn, 
+                    StackName = stackName,
+                    Template = templateContent,
+                    PassRoleArn = roleArn,
                     Parameters = parameters
                 });
                 return CreateResponse(statusCode: OK);
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Failed to create/update stack: {e.Message}");
+                Console.WriteLine($"Failed to create/update stack: {e.Message} {e.StackTrace}");
             }
 
             return CreateResponse(statusCode: BadRequest);
