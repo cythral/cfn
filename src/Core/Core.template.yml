@@ -341,6 +341,7 @@ Resources:
           TEMPLATE_FILENAME: !Ref TemplateFilename
           STACK_SUFFIX: !Ref StackSuffix
           ROLE_ARN: !ImportValue cfn-utilities:MasterRoleArn
+          AWS_ACCOUNT_ID: !Ref AWS::AccountId
 
   GithubWebhookPolicy:
     Type: AWS::IAM::ManagedPolicy

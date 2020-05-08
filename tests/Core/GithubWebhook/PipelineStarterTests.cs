@@ -40,12 +40,24 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             stepFunctionsClientFactory.Create().Returns(stepFunctionsClient);
         }
 
+        [SetUp]
+        public void SetupEnvvars()
+        {
+            Environment.SetEnvironmentVariable("AWS_REGION", "us-east-1");
+            Environment.SetEnvironmentVariable("AWS_ACCOUNT_ID", "5");
+        }
+
         [Test]
         public async Task StepFunctionsClientIsCreated()
         {
+            var sha = "sha";
             var repoName = "name";
             var payload = new PushEvent
             {
+                HeadCommit = new Commit
+                {
+                    Sha = sha,
+                },
                 Repository = new Repository
                 {
                     Name = repoName
@@ -60,8 +72,13 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
         public async Task StartExecutionIsCalled()
         {
             var repoName = "name";
+            var sha = "sha";
             var payload = new PushEvent
             {
+                HeadCommit = new Commit
+                {
+                    Sha = sha,
+                },
                 Repository = new Repository
                 {
                     Name = repoName
@@ -72,7 +89,8 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             await pipelineStarter.StartPipelineIfExists(payload);
 
             await stepFunctionsClient.Received().StartExecutionAsync(Arg.Is<StartExecutionRequest>(req =>
-                req.Name == $"{repoName}-cicd-pipeline" &&
+                req.StateMachineArn == $"arn:aws:states:us-east-1:5:stateMachine:{repoName}-cicd-pipeline" &&
+                req.Name == sha &&
                 req.Input == serializedPayload
             ));
         }
