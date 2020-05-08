@@ -10,11 +10,11 @@ using Cythral.CloudFormation.Exceptions;
 
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation.Facades
+namespace Cythral.CloudFormation.GithubWebhook
 {
     public class RequestValidator
     {
-        public static PushEvent Validate(
+        public virtual PushEvent Validate(
             ApplicationLoadBalancerRequest request,
             string expectedOwner = null,
             bool validateSignature = true,
@@ -27,7 +27,6 @@ namespace Cythral.CloudFormation.Facades
             ValidateEvent(request);
             ValidateBodyFormat(request, out payload);
             ValidateContentsUrlPresent(payload);
-            ValidateRef(payload);
             ValidateOwner(payload, expectedOwner);
             ValidateSignature(request, signingKey);
 
@@ -108,17 +107,6 @@ namespace Cythral.CloudFormation.Facades
             if (givenSignature != actualSignature)
             {
                 throw new InvalidSignatureException($"Signatures do not match.  Actual signature: {actualSignature}.  Given signature: {givenSignature}");
-            }
-        }
-
-        private static void ValidateRef(PushEvent payload)
-        {
-            var actual = payload.Ref;
-            var expected = $"refs/heads/{payload.Repository?.DefaultBranch}";
-
-            if (actual != null && actual != expected)
-            {
-                throw new UnexpectedRefException($"Unexpected ref {actual}.  Expected: {expected}");
             }
         }
 

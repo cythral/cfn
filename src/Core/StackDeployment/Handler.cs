@@ -9,7 +9,6 @@ using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
 using Cythral.CloudFormation.Aws;
-using Cythral.CloudFormation.Facades;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
 using static System.Text.Json.JsonSerializer;

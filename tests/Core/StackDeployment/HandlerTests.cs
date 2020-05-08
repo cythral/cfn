@@ -13,7 +13,6 @@ using Amazon.Lambda.SNSEvents;
 
 using Cythral.CloudFormation.Aws;
 using Cythral.CloudFormation.Events;
-using Cythral.CloudFormation.Facades;
 using Cythral.CloudFormation.StackDeployment;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 

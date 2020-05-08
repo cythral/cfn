@@ -15,6 +15,9 @@ namespace Cythral.CloudFormation.Events
         [JsonPropertyName("before")]
         public string Before { get; set; }
 
+        [JsonPropertyName("head_commit")]
+        public Commit HeadCommit { get; set; }
+
         [JsonPropertyName("size")]
         public int Size { get; set; }
 
@@ -32,5 +35,8 @@ namespace Cythral.CloudFormation.Events
 
         [JsonPropertyName("repository")]
         public Repository Repository { get; set; }
+
+        [JsonPropertyName("on_default_branch")]
+        public virtual bool OnDefaultBranch => Ref == $"refs/heads/{Repository.DefaultBranch}";
     }
 }
