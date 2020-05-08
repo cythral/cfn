@@ -492,12 +492,19 @@ Resources:
               - s3:GetObject
             Resource: "*"
 
+  DecryptedGithubToken:
+    Type: Custom::Secret
+    Properties:
+      ServiceToken: !ImportValue cfn-resources:SecretLambdaArn
+      Ciphertext: !Ref GithubToken
+
   CodeBuildSourceCredential:
     Type: AWS::CodeBuild::SourceCredential
     Properties:
-      Token: !Ref GithubToken
+      Token: !GetAtt DecryptedGithubToken.Plaintext
       ServerType: GITHUB
       AuthType: PERSONAL_ACCESS_TOKEN
+
 Outputs:
   LoadBalancerCanonicalHostedZoneId:
     Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
