@@ -18,7 +18,7 @@ Parameters:
   TemplateFilename:
     Type: String
     Description: Filename of cicd templates to look for in repositories
-  
+
   StackSuffix:
     Type: String
     Description: Suffix to append to the repository name when creating cicd stacks
@@ -44,17 +44,15 @@ Parameters:
     Description: DNS name of the prod load balancer
 
 Conditions:
-  SetupDevAccount: 
-    !Not 
-      - !Equals 
-          - !Ref DevVpcId
-          - ""
+  SetupDevAccount: !Not
+    - !Equals
+      - !Ref DevVpcId
+      - ""
 
-  SetupProdAccount: 
-    !Not
-      - !Equals 
-          - !Ref ProdVpcId
-          - ""
+  SetupProdAccount: !Not
+    - !Equals
+      - !Ref ProdVpcId
+      - ""
 
 Resources:
   Certificate:
@@ -67,7 +65,7 @@ Resources:
       SubjectAlternativeNames:
         - "*.brigh.id"
         - "*.dev.brigh.id"
-    
+
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -97,12 +95,12 @@ Resources:
     Properties:
       DefaultActions:
         - !If
-            - SetupProdAccount
-            - Type: forward
-              TargetGroupArn: !Ref ProdTargetGroup
-            - Type: fixed-response
-              FixedResponseConfig:
-                StatusCode: "404"
+          - SetupProdAccount
+          - Type: forward
+            TargetGroupArn: !Ref ProdTargetGroup
+          - Type: fixed-response
+            FixedResponseConfig:
+              StatusCode: "404"
       LoadBalancerArn: !Ref LoadBalancer
       Port: 443
       Protocol: HTTPS
@@ -122,9 +120,9 @@ Resources:
     Type: AWS::EC2::Route
     Condition: SetupDevAccount
     Properties:
-     DestinationCidrBlock: 10.2.0.0/16
-     RouteTableId: !ImportValue cfn-utilities:RouteTableId
-     VpcPeeringConnectionId: !Ref DevPeeringConnection
+      DestinationCidrBlock: 10.2.0.0/16
+      RouteTableId: !ImportValue cfn-utilities:RouteTableId
+      VpcPeeringConnectionId: !Ref DevPeeringConnection
 
   DevListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
@@ -237,9 +235,9 @@ Resources:
     Type: AWS::EC2::Route
     Condition: SetupProdAccount
     Properties:
-     DestinationCidrBlock: 10.3.0.0/16
-     RouteTableId: !ImportValue cfn-utilities:RouteTableId
-     VpcPeeringConnectionId: !Ref ProdPeeringConnection
+      DestinationCidrBlock: 10.3.0.0/16
+      RouteTableId: !ImportValue cfn-utilities:RouteTableId
+      VpcPeeringConnectionId: !Ref ProdPeeringConnection
 
   ProdTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -431,6 +429,18 @@ Resources:
               - elasticloadbalancing:DeregisterTargets
             Resource: "*"
 
+  StackDeploymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: Core::Cythral.CloudFormation.StackDeployment.Handler::Handle
+      Runtime: dotnetcore3.1
+      Timeout: 300
+      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      Role: !ImportValue cfn-utilities:MasterRoleArn
+      Environment:
+        Variables:
+          NOTIFICATION_ARN: !Ref StackDeploymentStatusTopic
+
   StackDeploymentStatusFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -458,7 +468,7 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Action: 
+            Action:
               - states:SendTaskSuccess
               - states:SendTaskFailure
             Resource: "*"
