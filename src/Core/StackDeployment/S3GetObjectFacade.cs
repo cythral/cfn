@@ -45,14 +45,20 @@ namespace Cythral.CloudFormation.StackDeployment
 
         }
 
-        private (string, string) GetBucketAndKey(string s3Uri)
+        private (string, string) GetBucketAndKey(string location)
         {
-            var uriWithoutProtocol = s3Uri.Substring(5);
+            var uriWithoutProtocol = location.StartsWith("arn") ? ConvertToS3Uri(location) : location.Substring(5);
             var index = uriWithoutProtocol.IndexOf('/');
             var bucket = uriWithoutProtocol[0..index];
             var key = uriWithoutProtocol[(index + 1)..];
 
             return (bucket, key);
+        }
+
+        private string ConvertToS3Uri(string arn)
+        {
+            var parts = arn.Split(':');
+            return parts[5];
         }
     }
 }
