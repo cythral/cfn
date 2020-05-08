@@ -40,18 +40,18 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus.Request
             var resourceType = "type";
 
             var message = @$"
-                StackId={stackId}
-                StackName={stackName}
-                ClientRequestToken={token}
-                EventId={eventId}
-                Timestamp={timestamp.ToString("MM/dd/yyyy hh:mm:ss.fffffff tt")}
-                LogicalResourceId={logicalResourceId}
-                PhysicalResourceId={physicalResourceId}
-                Namespace={namespac}
-                PrincipalId={principalId}
-                ResourceProperties={Serialize(resourceProperties)}
-                ResourceStatus={resourceStatus}
-                ResourceType={resourceType}
+                StackId='{stackId}'
+                StackName={stackName}'
+                ClientRequestToken='{token}'
+                EventId='{eventId}'
+                Timestamp='{timestamp.ToString("MM/dd/yyyy hh:mm:ss.fffffff tt")}'
+                LogicalResourceId='{logicalResourceId}'
+                PhysicalResourceId='{physicalResourceId}'
+                Namespace='{namespac}'
+                PrincipalId='{principalId}'
+                ResourceProperties='{Serialize(resourceProperties)}'
+                ResourceStatus='{resourceStatus}'
+                ResourceType='{resourceType}'
             ";
 
 
@@ -68,7 +68,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus.Request
 
             var factory = new StackDeploymentStatusRequestFactory();
             var request = factory.CreateFromSnsEvent(evnt);
-            
+
             Assert.That(request.StackId, Is.EqualTo(stackId));
             Assert.That(request.StackName, Is.EqualTo(stackName));
             Assert.That(request.EventId, Is.EqualTo(eventId));

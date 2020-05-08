@@ -37,7 +37,8 @@ namespace Cythral.CloudFormation.StackDeployment
                 NotificationArn = notificationArn,
                 Parameters = config?.Parameters,
                 Tags = config?.Tags,
-                StackPolicyBody = config?.StackPolicy?.Value
+                StackPolicyBody = config?.StackPolicy?.Value,
+                ClientRequestToken = request.Token
             });
 
             return new Response

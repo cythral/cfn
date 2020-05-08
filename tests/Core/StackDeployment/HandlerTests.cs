@@ -44,6 +44,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private const string actionMode = "actionMode";
         private const string templateConfigurationFileName = "configurationFileName";
         private const string notificationArn = "notificationArn";
+        private const string clientRequestToken = "clientRequestToken";
         private string templateConfiguration = "templateConfiguration";
 
         private TemplateConfiguration configuration = new TemplateConfiguration
@@ -100,7 +101,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                 TemplateFileName = templateFileName,
                 TemplateConfigurationFileName = templateConfigurationFileName,
                 StackName = stackName,
-                RoleArn = roleArn
+                RoleArn = roleArn,
+                Token = clientRequestToken
             };
         }
 
@@ -158,7 +160,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                     c.NotificationArn == notificationArn &&
                     c.Parameters == configuration.Parameters &&
                     c.Tags == configuration.Tags &&
-                    c.StackPolicyBody == configuration.StackPolicy.ToString()
+                    c.StackPolicyBody == configuration.StackPolicy.ToString() &&
+                    c.ClientRequestToken == clientRequestToken
                 )
             );
         }

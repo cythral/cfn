@@ -20,21 +20,30 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
         public static async Task<Response> Handle(
             SNSEvent snsRequest,
             ILambdaContext context = null
-        ) {
+        )
+        {
             Console.WriteLine($"Received request: {Serialize(snsRequest)}");
 
             var client = stepFunctionsClientFactory.Create();
             var request = requestFactory.CreateFromSnsEvent(snsRequest);
             var status = request.ResourceStatus;
 
-            if (request.ClientRequestToken.Length > 0) {
-                var task = (status.Contains("ROLLBACK") || status.EndsWith("FAILED")) ? SendTaskFailure(request, client) : SendTaskSuccess(request, client);
-                await task;
+            if (request.ResourceType == "AWS::CloudFormation::Stack" && request.ClientRequestToken.Length > 0)
+            {
+                if (status.EndsWith("ROLLBACK_COMPLETE") || status.EndsWith("FAILED"))
+                {
+                    await SendTaskFailure(request, client);
+                }
+
+                if (status.EndsWith("COMPLETE"))
+                {
+                    await SendTaskSuccess(request, client);
+                }
+
             }
 
             return new Response { Success = true };
         }
-
         private static async Task SendTaskFailure(StackDeploymentStatusRequest request, IAmazonStepFunctions client)
         {
             var response = await client.SendTaskFailureAsync(new SendTaskFailureRequest
