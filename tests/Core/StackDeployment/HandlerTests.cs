@@ -11,6 +11,7 @@ using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
 using Amazon.Lambda.SNSEvents;
 
+using Cythral.CloudFormation.Aws;
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Facades;
 using Cythral.CloudFormation.StackDeployment;
@@ -35,6 +36,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private static ParseConfigFileFacade parseConfigFileFacade = Substitute.For<ParseConfigFileFacade>();
         private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
         private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
+        private static TokenGenerator tokenGenerator = Substitute.For<TokenGenerator>();
 
         private const string stackName = "stackName";
         private const string location = "location";
@@ -45,6 +47,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private const string templateConfigurationFileName = "configurationFileName";
         private const string notificationArn = "notificationArn";
         private const string clientRequestToken = "clientRequestToken";
+        private const string createdToken = "createdToken";
         private string templateConfiguration = "templateConfiguration";
 
         private TemplateConfiguration configuration = new TemplateConfiguration
@@ -68,8 +71,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             TestUtils.SetPrivateStaticField(typeof(Handler), "s3GetObjectFacade", s3GetObjectFacade);
             s3GetObjectFacade.ClearReceivedCalls();
-            s3GetObjectFacade.GetObject(Arg.Any<string>(), Arg.Is(templateFileName)).Returns(template);
-            s3GetObjectFacade.GetObject(Arg.Any<string>(), Arg.Is(templateConfigurationFileName)).Returns(templateConfiguration);
+            s3GetObjectFacade.GetZipEntryInObject(Arg.Any<string>(), Arg.Is(templateFileName)).Returns(template);
+            s3GetObjectFacade.GetZipEntryInObject(Arg.Any<string>(), Arg.Is(templateConfigurationFileName)).Returns(templateConfiguration);
         }
 
         [SetUp]
@@ -85,6 +88,14 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             TestUtils.SetPrivateStaticField(typeof(Handler), "parseConfigFileFacade", parseConfigFileFacade);
             parseConfigFileFacade.ClearReceivedCalls();
             parseConfigFileFacade.Parse(Arg.Any<string>()).Returns(configuration);
+        }
+
+        [SetUp]
+        public void SetupTokenGenerator()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "tokenGenerator", tokenGenerator);
+            tokenGenerator.ClearReceivedCalls();
+            tokenGenerator.Generate(Arg.Any<Request>()).Returns(createdToken);
         }
 
         [SetUp]
@@ -112,7 +123,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             var request = CreateRequest();
             await Handler.Handle(request);
 
-            await s3GetObjectFacade.Received().GetObject(Arg.Is(location), Arg.Is(templateFileName));
+            await s3GetObjectFacade.Received().GetZipEntryInObject(Arg.Is(location), Arg.Is(templateFileName));
         }
 
         [Test]
@@ -121,7 +132,16 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             var request = CreateRequest();
             await Handler.Handle(request);
 
-            await s3GetObjectFacade.Received().GetObject(Arg.Is(location), Arg.Is(templateConfigurationFileName));
+            await s3GetObjectFacade.Received().GetZipEntryInObject(Arg.Is(location), Arg.Is(templateConfigurationFileName));
+        }
+
+        [Test]
+        public async Task TokenIsGenerated()
+        {
+            var request = CreateRequest();
+            await Handler.Handle(request);
+
+            await tokenGenerator.Received().Generate(Arg.Is(request));
         }
 
         [Test]
@@ -132,7 +152,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
 
             await Handler.Handle(request);
 
-            await s3GetObjectFacade.DidNotReceive().GetObject(Arg.Is(location), Arg.Is((string)null));
+            await s3GetObjectFacade.DidNotReceive().GetZipEntryInObject(Arg.Is(location), Arg.Is((string)null));
         }
 
         [Test]
@@ -143,7 +163,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
 
             await Handler.Handle(request);
 
-            await s3GetObjectFacade.DidNotReceive().GetObject(Arg.Is(location), Arg.Is(""));
+            await s3GetObjectFacade.DidNotReceive().GetZipEntryInObject(Arg.Is(location), Arg.Is(""));
         }
 
         [Test]
@@ -161,7 +181,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                     c.Parameters == configuration.Parameters &&
                     c.Tags == configuration.Tags &&
                     c.StackPolicyBody == configuration.StackPolicy.ToString() &&
-                    c.ClientRequestToken == clientRequestToken
+                    c.ClientRequestToken == createdToken
                 )
             );
         }

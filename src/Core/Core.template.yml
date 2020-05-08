@@ -487,6 +487,7 @@ Resources:
             Action:
               - states:SendTaskSuccess
               - states:SendTaskFailure
+              - s3:GetObject
             Resource: "*"
 
 Outputs:

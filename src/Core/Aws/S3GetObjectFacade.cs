@@ -7,15 +7,17 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Util;
 
+using Cythral.CloudFormation.Aws;
+
 using ICSharpCode.SharpZipLib.Zip;
 
-namespace Cythral.CloudFormation.StackDeployment
+namespace Cythral.CloudFormation.Aws
 {
     public class S3GetObjectFacade
     {
         private S3Factory s3Factory = new S3Factory();
 
-        public virtual async Task<string> GetObject(string location, string entry)
+        public virtual async Task<string> GetZipEntryInObject(string location, string entry)
         {
             var s3Client = await s3Factory.Create();
             var (bucket, key) = GetBucketAndKey(location);
@@ -42,7 +44,22 @@ namespace Cythral.CloudFormation.StackDeployment
                     return result;
                 }
             }
+        }
 
+        public virtual async Task<string> GetObject(string location)
+        {
+            var s3Client = await s3Factory.Create();
+            var (bucket, key) = GetBucketAndKey(location);
+            var getObjResponse = await s3Client.GetObjectAsync(new GetObjectRequest
+            {
+                BucketName = bucket,
+                Key = key,
+            });
+
+            using (var reader = new StreamReader(getObjResponse.ResponseStream))
+            {
+                return reader.ReadToEnd();
+            }
         }
 
         private (string, string) GetBucketAndKey(string location)

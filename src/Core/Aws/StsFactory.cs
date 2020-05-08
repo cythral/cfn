@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 using Amazon.SecurityToken;
 
-namespace Cythral.CloudFormation.StackDeployment
+namespace Cythral.CloudFormation.Aws
 {
     public class StsFactory
     {

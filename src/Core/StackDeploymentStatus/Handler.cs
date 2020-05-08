@@ -6,6 +6,7 @@ using Amazon.StepFunctions.Model;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.SNSEvents;
 
+using Cythral.CloudFormation.Aws;
 using Cythral.CloudFormation.StackDeploymentStatus.Request;
 
 using static System.Text.Json.JsonSerializer;
@@ -16,6 +17,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
     {
         private static StackDeploymentStatusRequestFactory requestFactory = new StackDeploymentStatusRequestFactory();
         private static StepFunctionsClientFactory stepFunctionsClientFactory = new StepFunctionsClientFactory();
+        private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
 
         public static async Task<Response> Handle(
             SNSEvent snsRequest,
@@ -44,11 +46,28 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
 
             return new Response { Success = true };
         }
+
+        private static string TranslateTokenToS3Location(string clientRequestToken)
+        {
+            var index = clientRequestToken.LastIndexOf("-");
+            var bucket = clientRequestToken[0..index];
+            var key = clientRequestToken[(index + 1)..];
+
+            return $"s3://{bucket}/tokens/{key}";
+        }
+
+        private static async Task<string> GetTokenFromRequest(StackDeploymentStatusRequest request)
+        {
+            var location = TranslateTokenToS3Location(request.ClientRequestToken);
+            return await s3GetObjectFacade.GetObject(location);
+        }
+
         private static async Task SendTaskFailure(StackDeploymentStatusRequest request, IAmazonStepFunctions client)
         {
+            var token = await GetTokenFromRequest(request);
             var response = await client.SendTaskFailureAsync(new SendTaskFailureRequest
             {
-                TaskToken = request.ClientRequestToken,
+                TaskToken = token,
                 Cause = request.ResourceStatus
             });
 
@@ -57,9 +76,10 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
 
         private static async Task SendTaskSuccess(StackDeploymentStatusRequest request, IAmazonStepFunctions client)
         {
+            var token = await GetTokenFromRequest(request);
             var response = await client.SendTaskSuccessAsync(new SendTaskSuccessRequest
             {
-                TaskToken = request.ClientRequestToken,
+                TaskToken = token,
                 Output = Serialize(request)
             });
 
