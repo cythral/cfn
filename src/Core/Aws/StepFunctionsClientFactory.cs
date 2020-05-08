@@ -1,6 +1,6 @@
 using Amazon.StepFunctions;
 
-namespace Cythral.CloudFormation.StackDeploymentStatus
+namespace Cythral.CloudFormation.Aws
 {
     public class StepFunctionsClientFactory
     {

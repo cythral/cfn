@@ -9,7 +9,6 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.SNSEvents;
 
 using Cythral.CloudFormation.Events;
-using Cythral.CloudFormation.Facades;
 using Cythral.CloudFormation.UpdateTargets.DnsResolver;
 using Cythral.CloudFormation.UpdateTargets.Request;
 

@@ -12,18 +12,20 @@ using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Exceptions;
 using Cythral.CloudFormation.StackDeployment;
 
-using Cythral.CloudFormation.Facades;
-
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
 using WebhookConfig = Cythral.CloudFormation.Config;
 
-namespace Cythral.CloudFormation.Handlers
+namespace Cythral.CloudFormation.GithubWebhook
 {
-    public class GithubWebhookHandler
+    public class Handler
     {
         public static WebhookConfig Config { get; set; }
+        private static RequestValidator requestValidator = new RequestValidator();
+        private static DeployStackFacade stackDeployer = new DeployStackFacade();
+        private static PipelineStarter pipelineStarter = new PipelineStarter();
+
 
         /// <summary>
         /// This function is called on every request to /webhooks/github
@@ -49,7 +51,7 @@ namespace Cythral.CloudFormation.Handlers
 
             try
             {
-                payload = RequestValidator.Validate(request, expectedOwner: Config["GITHUB_OWNER"], signingKey: Config["GITHUB_SIGNING_SECRET"]);
+                payload = requestValidator.Validate(request, Config["GITHUB_OWNER"], true, Config["GITHUB_SIGNING_SECRET"]);
             }
             catch (RequestValidationException e)
             {
@@ -57,6 +59,24 @@ namespace Cythral.CloudFormation.Handlers
                 return CreateResponse(statusCode: e.StatusCode);
             }
 
+            var tasks = new List<Task>();
+
+            if (payload.OnDefaultBranch)
+            {
+                tasks.Add(DeployCicdStack(payload));
+            }
+
+            if (!payload.HeadCommit.Message.Contains("[skip ci]"))
+            {
+                tasks.Add(pipelineStarter.StartPipelineIfExists(payload));
+            }
+
+            Task.WaitAll(tasks.ToArray());
+            return CreateResponse(statusCode: OK);
+        }
+
+        private static async Task DeployCicdStack(PushEvent payload)
+        {
             var stackName = $"{payload.Repository.Name}-{Config["STACK_SUFFIX"]}";
             var contentsUrl = payload.Repository.ContentsUrl;
             var templateContent = await CommittedFile.FromContentsUrl(contentsUrl, Config["TEMPLATE_FILENAME"], Config, payload.Ref);
@@ -65,7 +85,7 @@ namespace Cythral.CloudFormation.Handlers
             if (templateContent == null)
             {
                 Console.WriteLine($"Couldn't find template for {payload.Repository.Name}");
-                return CreateResponse(statusCode: NotFound);
+                return;
             }
 
             var parameters = new List<Parameter> {
@@ -77,22 +97,18 @@ namespace Cythral.CloudFormation.Handlers
 
             try
             {
-                var deployer = new DeployStackFacade();
-                await deployer.Deploy(new DeployStackContext
+                await stackDeployer.Deploy(new DeployStackContext
                 {
                     StackName = stackName,
                     Template = templateContent,
                     PassRoleArn = roleArn,
                     Parameters = parameters
                 });
-                return CreateResponse(statusCode: OK);
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Failed to create/update stack: {e.Message} {e.StackTrace}");
             }
-
-            return CreateResponse(statusCode: BadRequest);
         }
 
         private static ApplicationLoadBalancerResponse CreateResponse(HttpStatusCode statusCode, string contentType = "text/plain", string body = "")

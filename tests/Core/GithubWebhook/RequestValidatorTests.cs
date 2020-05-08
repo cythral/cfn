@@ -5,28 +5,30 @@ using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Exceptions;
-using Cythral.CloudFormation.Facades;
+using Cythral.CloudFormation.GithubWebhook;
 
 using NUnit.Framework;
 
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation.Tests.Facades
+namespace Cythral.CloudFormation.Tests.GithubWebhook
 {
-    class RequestValidatorTest
+    public class RequestValidatorTests
     {
+        private static RequestValidator requestValidator = new RequestValidator();
+
         [Test]
         public void NonPostRequestsThrowMethodNotAllowed([Values("GET", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS")] string method)
         {
             var request = new ApplicationLoadBalancerRequest { HttpMethod = method };
-            Assert.Throws(Is.InstanceOf<MethodNotAllowedException>(), () => RequestValidator.Validate(request, validateSignature: false));
+            Assert.Throws(Is.InstanceOf<MethodNotAllowedException>(), () => requestValidator.Validate(request, validateSignature: false));
         }
 
         [Test]
         public void PostRequestsDontThrowMethodNotAllowed()
         {
             var request = new ApplicationLoadBalancerRequest { HttpMethod = "POST" };
-            Assert.Throws(Is.Not.InstanceOf<MethodNotAllowedException>(), () => RequestValidator.Validate(request, validateSignature: false));
+            Assert.Throws(Is.Not.InstanceOf<MethodNotAllowedException>(), () => requestValidator.Validate(request, validateSignature: false));
         }
 
         [Test]
@@ -39,7 +41,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 Body = "{}"
             };
 
-            Assert.Throws(Is.InstanceOf<EventNotAllowedException>(), () => RequestValidator.Validate(request, validateSignature: false));
+            Assert.Throws(Is.InstanceOf<EventNotAllowedException>(), () => requestValidator.Validate(request, validateSignature: false));
         }
 
         [Test]
@@ -52,7 +54,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 Body = "{}"
             };
 
-            Assert.Throws(Is.Not.InstanceOf<EventNotAllowedException>(), () => RequestValidator.Validate(request, validateSignature: false));
+            Assert.Throws(Is.Not.InstanceOf<EventNotAllowedException>(), () => requestValidator.Validate(request, validateSignature: false));
         }
 
         [Test]
@@ -65,7 +67,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 Body = body
             };
 
-            Assert.Throws(Is.InstanceOf<BodyNotJsonException>(), () => RequestValidator.Validate(request, validateSignature: false));
+            Assert.Throws(Is.InstanceOf<BodyNotJsonException>(), () => requestValidator.Validate(request, validateSignature: false));
         }
 
         [Test]
@@ -78,7 +80,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 Body = "{}"
             };
 
-            Assert.Throws(Is.Not.InstanceOf<BodyNotJsonException>(), () => RequestValidator.Validate(request, validateSignature: false));
+            Assert.Throws(Is.Not.InstanceOf<BodyNotJsonException>(), () => requestValidator.Validate(request, validateSignature: false));
         }
 
         [Test]
@@ -94,7 +96,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 })
             };
 
-            Assert.Throws(Is.InstanceOf<NoContentsUrlException>(), () => RequestValidator.Validate(request, validateSignature: false));
+            Assert.Throws(Is.InstanceOf<NoContentsUrlException>(), () => requestValidator.Validate(request, validateSignature: false));
         }
 
         [Test]
@@ -113,7 +115,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 })
             };
 
-            Assert.Throws(Is.Not.InstanceOf<NoContentsUrlException>(), () => RequestValidator.Validate(request, validateSignature: false));
+            Assert.Throws(Is.Not.InstanceOf<NoContentsUrlException>(), () => requestValidator.Validate(request, validateSignature: false));
         }
 
         public static IEnumerable<ApplicationLoadBalancerRequest> UnexpectedOwnerRequests()
@@ -149,7 +151,7 @@ namespace Cythral.CloudFormation.Tests.Facades
         [Test]
         public void RequestsWithUnexpectedOwnerThrowException([ValueSource("UnexpectedOwnerRequests")] ApplicationLoadBalancerRequest request)
         {
-            Assert.Throws(Is.InstanceOf<UnexpectedOwnerException>(), () => RequestValidator.Validate(request, "Codertocat", validateSignature: false));
+            Assert.Throws(Is.InstanceOf<UnexpectedOwnerException>(), () => requestValidator.Validate(request, "Codertocat", validateSignature: false));
         }
 
         [Test]
@@ -169,7 +171,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 })
             };
 
-            Assert.Throws(Is.Not.InstanceOf<UnexpectedOwnerException>(), () => RequestValidator.Validate(request, "Codertocat", validateSignature: false));
+            Assert.Throws(Is.Not.InstanceOf<UnexpectedOwnerException>(), () => requestValidator.Validate(request, "Codertocat", validateSignature: false));
         }
 
         [Test]
@@ -188,7 +190,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 })
             };
 
-            Assert.Throws(Is.InstanceOf<InvalidSignatureException>(), () => RequestValidator.Validate(request));
+            Assert.Throws(Is.InstanceOf<InvalidSignatureException>(), () => requestValidator.Validate(request));
         }
 
         [Test]
@@ -211,7 +213,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 })
             };
 
-            Assert.Throws(Is.InstanceOf<InvalidSignatureException>(), () => RequestValidator.Validate(request, signingKey: "test_key"));
+            Assert.Throws(Is.InstanceOf<InvalidSignatureException>(), () => requestValidator.Validate(request, signingKey: "test_key"));
         }
 
         [Test]
@@ -223,7 +225,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 Headers = new Dictionary<string, string>
                 {
                     ["x-github-event"] = "push",
-                    ["x-hub-signature"] = "sha1=ca7acf8d405303b2e4a08486a005ef29a730c69b"
+                    ["x-hub-signature"] = "sha1=18f5e4779090fcaf575a4a4c9948d950efc81fcd"
                 },
                 Body = Serialize(new PushEvent
                 {
@@ -234,55 +236,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 })
             };
 
-            Assert.Throws(Is.Not.InstanceOf<InvalidSignatureException>(), () => RequestValidator.Validate(request, signingKey: "test_key"));
-        }
-
-        [Test]
-        public void RequestsOnNonDefaultBranchThrowException()
-        {
-            var request = new ApplicationLoadBalancerRequest
-            {
-                HttpMethod = "POST",
-                Headers = new Dictionary<string, string>
-                {
-                    ["x-github-event"] = "push",
-                    ["x-hub-signature"] = "sha1=5a038b59d634709f777af46b499eff9e3ca48a20",
-                },
-                Body = Serialize(new PushEvent
-                {
-                    Ref = "pr/test",
-                    Repository = new Repository
-                    {
-                        ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}",
-                        DefaultBranch = "master"
-                    }
-                })
-            };
-
-            Assert.Throws(Is.InstanceOf<UnexpectedRefException>(), () => RequestValidator.Validate(request, signingKey: "test_key"));
-        }
-
-        [Test]
-        public void RequestsOnDefaultBranchDontThrowException()
-        {
-            var request = new ApplicationLoadBalancerRequest
-            {
-                HttpMethod = "POST",
-                Headers = new Dictionary<string, string>
-                {
-                    ["x-github-event"] = "push",
-                },
-                Body = Serialize(new PushEvent
-                {
-                    Ref = "refs/heads/master",
-                    Repository = new Repository
-                    {
-                        DefaultBranch = "master"
-                    }
-                })
-            };
-
-            Assert.Throws(Is.Not.InstanceOf<UnexpectedRefException>(), () => RequestValidator.Validate(request, signingKey: "test_key"));
+            Assert.Throws(Is.Not.InstanceOf<InvalidSignatureException>(), () => requestValidator.Validate(request, signingKey: "test_key"));
         }
     }
 }

@@ -13,9 +13,9 @@ using NUnit.Framework;
 
 using static Amazon.CloudFormation.OnFailure;
 
-namespace Cythral.CloudFormation.Tests.Facades
+namespace Cythral.CloudFormation.Tests.GithubWebhook
 {
-    public class StackDeployerTest
+    public class StackDeployerTests
     {
         [Test]
         public async Task DeployCallsCreateStackIfNotExists()
