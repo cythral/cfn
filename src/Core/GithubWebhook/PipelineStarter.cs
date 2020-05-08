@@ -25,7 +25,10 @@ namespace Cythral.CloudFormation.GithubWebhook
 
                 Console.WriteLine($"Received start execution response: {Serialize(response)}");
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Got error trying to start pipeline: {e.Message}");
+            }
         }
     }
 }
