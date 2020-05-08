@@ -9,6 +9,7 @@ using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
 using Amazon.Lambda.SNSEvents;
 
+using Cythral.CloudFormation.Aws;
 using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.StackDeploymentStatus;
@@ -32,8 +33,13 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         private static StackDeploymentStatusRequestFactory requestFactory = Substitute.For<StackDeploymentStatusRequestFactory>();
         private static StepFunctionsClientFactory stepFunctionsClientFactory = Substitute.For<StepFunctionsClientFactory>();
         private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
+        private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
 
         private const string stackId = "stackId";
+        private const string bucket = "bucket";
+        private const string key = "key";
+        private const string s3Location = "s3://bucket/tokens/key";
+        private const string tokenKey = "bucket-key";
         private const string token = "token";
 
 
@@ -58,6 +64,14 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             stepFunctionsClient.ClearReceivedCalls();
         }
 
+        [SetUp]
+        public void SetupS3GetObjectFacade()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "s3GetObjectFacade", s3GetObjectFacade);
+            s3GetObjectFacade.ClearReceivedCalls();
+            s3GetObjectFacade.GetObject(Arg.Any<string>()).Returns(token);
+        }
+
         private StackDeploymentStatusRequest CreateRequest(string stackId, string token, string status = "CREATE_COMPLETE", string resourceType = "AWS::CloudFormation::Stack")
         {
             var request = new StackDeploymentStatusRequest
@@ -75,7 +89,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         [Test]
         public async Task RequestIsParsed()
         {
-            var request = CreateRequest(stackId, token);
+            var request = CreateRequest(stackId, tokenKey);
             var snsEvent = Substitute.For<SNSEvent>();
 
             await Handler.Handle(snsEvent);
@@ -86,7 +100,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         [Test]
         public async Task StepFunctionsClientIsCreated()
         {
-            var request = CreateRequest(stackId, token);
+            var request = CreateRequest(stackId, tokenKey);
             var snsEvent = Substitute.For<SNSEvent>();
 
             await Handler.Handle(snsEvent);
@@ -97,11 +111,12 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         [Test]
         public async Task ShouldDoNothingIfResourceTypeIsNotStack()
         {
-            var request = CreateRequest(stackId, token, null, "AWS::S3::Bucket");
+            var request = CreateRequest(stackId, tokenKey, null, "AWS::S3::Bucket");
             var snsEvent = Substitute.For<SNSEvent>();
 
             await Handler.Handle(snsEvent);
 
+            await s3GetObjectFacade.DidNotReceiveWithAnyArgs().GetObject(Arg.Any<string>());
             await stepFunctionsClient.DidNotReceiveWithAnyArgs().SendTaskFailureAsync(Arg.Any<SendTaskFailureRequest>());
             await stepFunctionsClient.DidNotReceiveWithAnyArgs().SendTaskSuccessAsync(Arg.Any<SendTaskSuccessRequest>());
         }
@@ -110,11 +125,12 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         public async Task SendTaskFailureIsCalledIfStatusEndsWithRollbackComplete()
         {
             var status = "UPDATE_ROLLBACK_COMPLETE";
-            var request = CreateRequest(stackId, token, status);
+            var request = CreateRequest(stackId, tokenKey, status);
             var snsEvent = Substitute.For<SNSEvent>();
 
             await Handler.Handle(snsEvent);
 
+            await s3GetObjectFacade.Received().GetObject(Arg.Is(s3Location));
             await stepFunctionsClient
                 .Received()
                 .SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req => req.TaskToken == token && req.Cause == status));
@@ -124,11 +140,12 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         public async Task SendTaskFailureIsCalledIfStatusEndsWithFailed()
         {
             var status = "CREATE_FAILED";
-            var request = CreateRequest(stackId, token, status);
+            var request = CreateRequest(stackId, tokenKey, status);
             var snsEvent = Substitute.For<SNSEvent>();
 
             await Handler.Handle(snsEvent);
 
+            await s3GetObjectFacade.Received().GetObject(Arg.Is(s3Location));
             await stepFunctionsClient
                 .Received()
                 .SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req => req.TaskToken == token && req.Cause == status));
@@ -144,6 +161,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await Handler.Handle(snsEvent);
 
+            await s3GetObjectFacade.DidNotReceive().GetObject(Arg.Is(s3Location));
             await stepFunctionsClient
                 .DidNotReceive()
                 .SendTaskFailureAsync(Arg.Any<SendTaskFailureRequest>());
@@ -153,12 +171,13 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         public async Task SendTaskSuccessIfStatusEndsWithComplete()
         {
             var status = "CREATE_COMPLETE";
-            var request = CreateRequest(stackId, token, status);
+            var request = CreateRequest(stackId, tokenKey, status);
             var serializedRequest = Serialize(request);
             var snsEvent = Substitute.For<SNSEvent>();
 
             await Handler.Handle(snsEvent);
 
+            await s3GetObjectFacade.Received().GetObject(Arg.Is(s3Location));
             await stepFunctionsClient
                 .Received()
                 .SendTaskSuccessAsync(Arg.Is<SendTaskSuccessRequest>(req => req.TaskToken == token && req.Output == serializedRequest));
@@ -174,6 +193,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await Handler.Handle(snsEvent);
 
+            await s3GetObjectFacade.DidNotReceive().GetObject(Arg.Is(s3Location));
             await stepFunctionsClient
                 .DidNotReceive()
                 .SendTaskSuccessAsync(Arg.Any<SendTaskSuccessRequest>());

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.SecurityToken.Model;
 
-namespace Cythral.CloudFormation.StackDeployment
+namespace Cythral.CloudFormation.Aws
 {
     public class S3Factory
     {

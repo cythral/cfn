@@ -1,3 +1,5 @@
+using System.Text;
+using System.Security.Cryptography;
 using System;
 using System.Threading.Tasks;
 
@@ -6,6 +8,7 @@ using Amazon.Lambda.SNSEvents;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
+using Cythral.CloudFormation.Aws;
 using Cythral.CloudFormation.Facades;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
@@ -19,6 +22,7 @@ namespace Cythral.CloudFormation.StackDeployment
         private static DeployStackFacade stackDeployer = new DeployStackFacade();
         private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
         private static ParseConfigFileFacade parseConfigFileFacade = new ParseConfigFileFacade();
+        private static TokenGenerator tokenGenerator = new TokenGenerator();
 
         public static async Task<Response> Handle(
             Request request,
@@ -26,8 +30,9 @@ namespace Cythral.CloudFormation.StackDeployment
         )
         {
             var notificationArn = Environment.GetEnvironmentVariable(notificationArnKey);
-            var template = await s3GetObjectFacade.GetObject(request.ZipLocation, request.TemplateFileName);
+            var template = await s3GetObjectFacade.GetZipEntryInObject(request.ZipLocation, request.TemplateFileName);
             var config = await GetConfig(request);
+            var token = await tokenGenerator.Generate(request);
 
             await stackDeployer.Deploy(new DeployStackContext
             {
@@ -38,7 +43,7 @@ namespace Cythral.CloudFormation.StackDeployment
                 Parameters = config?.Parameters,
                 Tags = config?.Tags,
                 StackPolicyBody = config?.StackPolicy?.Value,
-                ClientRequestToken = request.Token
+                ClientRequestToken = token
             });
 
             return new Response
@@ -53,7 +58,7 @@ namespace Cythral.CloudFormation.StackDeployment
 
             if (fileName != null && fileName != "")
             {
-                var source = await s3GetObjectFacade.GetObject(request.ZipLocation, fileName);
+                var source = await s3GetObjectFacade.GetZipEntryInObject(request.ZipLocation, fileName);
                 return parseConfigFileFacade.Parse(source);
             }
 
