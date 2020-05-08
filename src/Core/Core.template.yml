@@ -461,6 +461,22 @@ Resources:
   StackDeploymentStatusTopic:
     Type: AWS::SNS::Topic
 
+  StackDeploymentStatusTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sns:Publish
+            Resource: "*"
+            Principal:
+              AWS:
+                - !ImportValue cfn-metadata:DevAgentRoleArn
+                - !ImportValue cfn-metadata:ProdAgentRoleArn
+      Topics:
+        - !Ref StackDeploymentStatusTopic
+
   StackDeploymentStatusPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
