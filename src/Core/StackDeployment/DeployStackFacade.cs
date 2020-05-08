@@ -20,6 +20,9 @@ namespace Cythral.CloudFormation.StackDeployment
             var cloudformationClient = await cloudFormationFactory.Create(context.RoleArn);
             var notificationArns = GetNotificationArns(context);
             var stackExists = await DoesStackExist(context, cloudformationClient);
+            var parameters = (List<Parameter>)context.Parameters ?? new List<Parameter> { };
+            var capabilities = (List<string>)context.Capabilities ?? new List<string> { };
+            var tags = (List<Tag>)context.Tags ?? new List<Tag> { };
 
             if (!stackExists)
             {
@@ -27,9 +30,9 @@ namespace Cythral.CloudFormation.StackDeployment
                 {
                     StackName = context.StackName,
                     TemplateBody = context.Template,
-                    Parameters = (List<Parameter>)context.Parameters,
-                    Capabilities = (List<string>)context.Capabilities,
-                    Tags = (List<Tag>)context.Tags,
+                    Parameters = parameters,
+                    Capabilities = capabilities,
+                    Tags = tags,
                     NotificationARNs = notificationArns,
                     RoleARN = context.PassRoleArn,
                     ClientRequestToken = context.ClientRequestToken,
@@ -45,9 +48,9 @@ namespace Cythral.CloudFormation.StackDeployment
                 {
                     StackName = context.StackName,
                     TemplateBody = context.Template,
-                    Parameters = (List<Parameter>)context.Parameters,
-                    Capabilities = (List<string>)context.Capabilities,
-                    Tags = (List<Tag>)context.Tags,
+                    Parameters = parameters,
+                    Capabilities = capabilities,
+                    Tags = tags,
                     NotificationARNs = notificationArns,
                     ClientRequestToken = context.ClientRequestToken,
                     RoleARN = context.PassRoleArn
@@ -78,7 +81,7 @@ namespace Cythral.CloudFormation.StackDeployment
 
         private List<string> GetNotificationArns(DeployStackContext context)
         {
-            return context.NotificationArn != null ? new List<string> { context.NotificationArn } : null;
+            return context.NotificationArn != null ? new List<string> { context.NotificationArn } : new List<string> { };
         }
     }
 }
