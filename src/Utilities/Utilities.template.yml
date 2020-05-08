@@ -21,27 +21,24 @@ Parameters:
     Type: String
     Description: Master account cidr block. A route to the peering connection is setup with this range
     Default: 10.1.0.0/16
-    
+
 Conditions:
   # Master/Shared account - one that has control of "agent" accounts like (dev/staging/prod)
-  IsMasterAccount: 
-    !Equals
+  IsMasterAccount: !Equals
+    - !Ref MasterAccountId
+    - ""
+
+  # Agent account (dev/staging/prod)
+  IsAgentAccount: !Not
+    - !Equals
       - !Ref MasterAccountId
       - ""
 
-  # Agent account (dev/staging/prod)
-  IsAgentAccount: 
-    !Not 
-      - !Equals 
-        - !Ref MasterAccountId
-        - ""
-
   # Whether or not to vpc setup peering with the master account.
-  SetupPeeringRoute:
-    !Not 
-      - !Equals
-        - !Ref PeeringConnectionId
-        - ""
+  SetupPeeringRoute: !Not
+    - !Equals
+      - !Ref PeeringConnectionId
+      - ""
 
 Resources:
   # Storage
@@ -55,7 +52,7 @@ Resources:
 
   # Networking
   # -------------------------------------------
-  # Use this VPC for quick development and/or tools that do not require extremely high availability 
+  # Use this VPC for quick development and/or tools that do not require extremely high availability
 
   VPC:
     Type: AWS::EC2::VPC
@@ -79,7 +76,7 @@ Resources:
             Action: sts:AssumeRole
             Principal:
               Service: vpc-flow-logs.amazonaws.com
-  
+
   VPCFlowLoggingPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -89,7 +86,7 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Action: 
+            Action:
               - logs:CreateLogStream
               - logs:PutLogEvents
               - logs:DescribeLogGroups
@@ -104,16 +101,16 @@ Resources:
       ResourceId: !Ref VPC
       ResourceType: VPC
       TrafficType: REJECT
-  
+
   Ipv6CidrBlock:
     Type: AWS::EC2::VPCCidrBlock
     Properties:
       AmazonProvidedIpv6CidrBlock: true
       VpcId: !Ref VPC
-  
+
   InternetGateway:
     Type: AWS::EC2::InternetGateway
-  
+
   InternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
@@ -148,17 +145,18 @@ Resources:
       DestinationCidrBlock: !Ref MasterAccountCidr
       RouteTableId: !Ref RouteTable
       VpcPeeringConnectionId: !Ref PeeringConnectionId
-  
+
   Subnet1:
     Type: AWS::EC2::Subnet
     DependsOn: Ipv6CidrBlock
     Properties:
       CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
-      Ipv6CidrBlock: !Select [0, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
+      Ipv6CidrBlock:
+        !Select [0, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
       AvailabilityZone: !Select [0, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
-  
+
   Subnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -170,7 +168,8 @@ Resources:
     DependsOn: Ipv6CidrBlock
     Properties:
       CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
-      Ipv6CidrBlock: !Select [1, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
+      Ipv6CidrBlock:
+        !Select [1, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
       AvailabilityZone: !Select [1, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
@@ -180,13 +179,14 @@ Resources:
     Properties:
       RouteTableId: !Ref RouteTable
       SubnetId: !Ref Subnet2
-  
+
   Subnet3:
     Type: AWS::EC2::Subnet
     DependsOn: Ipv6CidrBlock
     Properties:
       CidrBlock: !Select [2, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
-      Ipv6CidrBlock: !Select [2, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
+      Ipv6CidrBlock:
+        !Select [2, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
       AvailabilityZone: !Select [2, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
@@ -202,11 +202,12 @@ Resources:
     DependsOn: Ipv6CidrBlock
     Properties:
       CidrBlock: !Select [3, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
-      Ipv6CidrBlock: !Select [3, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
+      Ipv6CidrBlock:
+        !Select [3, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
       AvailabilityZone: !Select [3, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
-  
+
   Subnet4RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -304,7 +305,7 @@ Resources:
           ToPort: 3306
           CidrIp: !Ref NetworkCidr
       VpcId: !Ref VPC
-        
+
   # Security - Roles
   # -------------------------------------------
 
@@ -321,11 +322,12 @@ Resources:
           - Effect: Allow
             Action: sts:AssumeRole
             Principal:
-              Service: 
+              Service:
                 - cloudformation.amazonaws.com
                 - codepipeline.amazonaws.com
+                - lambda.amazonaws.com
                 - !Sub states.${AWS::Region}.amazonaws.com
-    
+
   AgentRole:
     Type: AWS::IAM::Role
     Condition: IsAgentAccount
@@ -338,12 +340,12 @@ Resources:
         Statement:
           - Effect: Allow
             Action: sts:AssumeRole
-            Principal: 
+            Principal:
               AWS: !Sub arn:aws:iam::${MasterAccountId}:role/Master
           - Effect: Allow
             Action: sts:AssumeRole
             Principal:
-              Service: 
+              Service:
                 - cloudformation.amazonaws.com
                 - codepipeline.amazonaws.com
 
@@ -358,8 +360,13 @@ Resources:
         Statement:
           - Effect: Allow
             Action: sts:AssumeRole
-            Principal: 
-              AWS: !If [IsMasterAccount, !GetAtt MasterRole.Arn, !GetAtt AgentRole.Arn]
+            Principal:
+              AWS:
+                !If [
+                  IsMasterAccount,
+                  !GetAtt MasterRole.Arn,
+                  !GetAtt AgentRole.Arn,
+                ]
 
   BuilderRole:
     Type: AWS::IAM::Role
@@ -378,7 +385,6 @@ Resources:
             Action: sts:AssumeRole
             Principal:
               Service: codebuild.amazonaws.com
-
 
   # Security - Encryption
   # -------------------------------------------
@@ -408,13 +414,13 @@ Resources:
                 - !GetAtt SpectatorRole.Arn
                 - - !GetAtt SpectatorRole.Arn
                   - !Sub arn:aws:iam::${MasterAccountId}:role/Spectator
-                  
+
   SecretsKeyAlias:
     Type: AWS::KMS::Alias
     Properties:
       TargetKeyId: !GetAtt SecretsKey.Arn
       AliasName: alias/SecretsKey
-  
+
   SecretsKeyEncryptPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -423,11 +429,11 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Action: 
+            Action:
               - kms:Encrypt
               - kms:ReEncrypt
             Resource: !GetAtt SecretsKey.Arn
-  
+
   SecretsKeyDecryptPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -454,13 +460,13 @@ Resources:
             Principal:
               AWS: !Ref AWS::AccountId
           - Effect: Allow
-            Action: 
+            Action:
               - kms:Encrypt
               - kms:Decrypt
               - kms:GenerateDataKey
             Resource: "*"
             Principal:
-              AWS: 
+              AWS:
                 - !GetAtt BuilderRole.Arn
                 - !ImportValue cfn-metadata:DevAccountId
                 - !ImportValue cfn-metadata:ProdAccountId
@@ -484,7 +490,7 @@ Outputs:
     Value: !Ref VPC
     Export:
       Name: !Sub ${AWS::StackName}:VpcId
-  
+
   SubnetIds:
     Description: Comma-delimited list of Subnet Ids
     Value: !Join
@@ -559,7 +565,7 @@ Outputs:
     Value: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:${SecretsKeyAlias}
     Export:
       Name: !Sub ${AWS::StackName}:SecretsKeyArn
-  
+
   SecretsKeyEncryptPolicyArn:
     Description: ARN of the key policy used for allowing secrets to be encrypted
     Value: !Ref SecretsKeyEncryptPolicy
@@ -606,4 +612,3 @@ Outputs:
     Value: !Ref HttpListener
     Export:
       Name: !Sub ${AWS::StackName}:HttpListenerArn
-  
