@@ -4,8 +4,8 @@ namespace Cythral.CloudFormation.Entities
 {
     public class Commit
     {
-        [JsonPropertyName("sha")]
-        public string Sha { get; set; }
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
 
         [JsonPropertyName("message")]
         public string Message { get; set; }
