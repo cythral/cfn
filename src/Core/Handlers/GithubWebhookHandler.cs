@@ -10,6 +10,7 @@ using Amazon.Lambda.Core;
 using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Exceptions;
+using Cythral.CloudFormation.StackDeployment;
 
 using Cythral.CloudFormation.Facades;
 
@@ -76,7 +77,14 @@ namespace Cythral.CloudFormation.Handlers
 
             try
             {
-                await StackDeployer.Deploy(stackName, templateContent, roleArn, parameters);
+                var deployer = new DeployStackFacade();
+                await deployer.Deploy(new DeployStackContext
+                {
+                    StackName = stackName, 
+                    Template = templateContent, 
+                    PassRoleArn = roleArn, 
+                    Parameters = parameters
+                });
                 return CreateResponse(statusCode: OK);
             }
             catch (Exception e)
