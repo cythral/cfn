@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 
-using Cythral.CloudFormation.Facades;
+using Cythral.CloudFormation.StackDeployment;
 
 using NSubstitute;
 
@@ -24,6 +24,13 @@ namespace Cythral.CloudFormation.Tests.Facades
             var exampleTemplate = "this is a bad example template.";
             var roleArn = "arn:aws:iam::1:role/Facade";
             var cloudformationClient = Substitute.For<IAmazonCloudFormation>();
+            var notificationArn = "arn:aws:sns::1:topic/Topic";
+
+            var tags = new List<Tag>
+            {
+                new Tag { Key = "A", Value = "B" }
+            };
+
             var parameters = new List<Parameter> {
                 new Parameter { ParameterKey = "GithubToken", ParameterValue = "this is definitely the token" }
             };
@@ -41,13 +48,29 @@ namespace Cythral.CloudFormation.Tests.Facades
             .CreateStackAsync(Arg.Any<CreateStackRequest>())
             .Returns(new CreateStackResponse { });
 
-            await StackDeployer.Deploy(stackName, exampleTemplate, roleArn, parameters, cloudformationClient: cloudformationClient);
+            var stackDeployer = new DeployStackFacade();
+            var cloudFormationFactory = Substitute.For<CloudFormationFactory>();
+            cloudFormationFactory.Create().Returns(cloudformationClient);
+            TestUtils.SetPrivateField(stackDeployer, "cloudFormationFactory", cloudFormationFactory);
+
+            await stackDeployer.Deploy(new DeployStackContext
+            {
+                StackName = stackName,
+                Template = exampleTemplate,
+                NotificationArn = notificationArn,
+                Tags = tags,
+                PassRoleArn = roleArn,
+                Parameters = parameters
+            });
+
             await cloudformationClient
             .Received()
             .CreateStackAsync(Arg.Is<CreateStackRequest>(req =>
                 req.StackName == stackName &&
                 req.TemplateBody == exampleTemplate &&
                 req.RoleARN == roleArn &&
+                req.NotificationARNs.Contains(notificationArn) &&
+                tags.All(req.Tags.Contains) &&
                 req.Parameters.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == "this is definitely the token") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_IAM") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_NAMED_IAM") &&
@@ -62,7 +85,15 @@ namespace Cythral.CloudFormation.Tests.Facades
             var exampleTemplate = "this is a bad example template.";
             var roleArn = "arn:aws:iam::1:role/Facade";
             var cloudformationClient = Substitute.For<IAmazonCloudFormation>();
-            var parameters = new List<Parameter> {
+            var notificationArn = "arn:aws:sns::1:topic/Topic";
+
+            var tags = new List<Tag>
+            {
+                new Tag { Key = "A", Value = "B" }
+            };
+
+            var parameters = new List<Parameter>
+            {
                 new Parameter { ParameterKey = "GithubToken", ParameterValue = "this is definitely the token" }
             };
 
@@ -83,13 +114,30 @@ namespace Cythral.CloudFormation.Tests.Facades
             .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
             .Returns(new UpdateStackResponse { });
 
-            await StackDeployer.Deploy(stackName, exampleTemplate, roleArn, parameters, cloudformationClient: cloudformationClient);
+            var stackDeployer = new DeployStackFacade();
+            var cloudFormationFactory = Substitute.For<CloudFormationFactory>();
+            cloudFormationFactory.Create().Returns(cloudformationClient);
+            TestUtils.SetPrivateField(stackDeployer, "cloudFormationFactory", cloudFormationFactory);
+
+
+            await stackDeployer.Deploy(new DeployStackContext
+            {
+                StackName = stackName,
+                Template = exampleTemplate,
+                NotificationArn = notificationArn,
+                PassRoleArn = roleArn,
+                Parameters = parameters,
+                Tags = tags,
+            });
+
             await cloudformationClient
             .Received()
             .UpdateStackAsync(Arg.Is<UpdateStackRequest>(req =>
                 req.StackName == stackName &&
                 req.TemplateBody == exampleTemplate &&
                 req.RoleARN == roleArn &&
+                req.NotificationARNs.Contains(notificationArn) &&
+                tags.All(req.Tags.Contains) &&
                 req.Parameters.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == "this is definitely the token") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_IAM") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_NAMED_IAM")
