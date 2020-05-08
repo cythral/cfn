@@ -7,5 +7,6 @@ namespace Cythral.CloudFormation.StackDeployment
         public string TemplateConfigurationFileName { get; set; }
         public string StackName { get; set; }
         public string RoleArn { get; set; }
+        public string Token { get; set; }
     }
 }

@@ -31,13 +31,12 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
     {
         private static StackDeploymentStatusRequestFactory requestFactory = Substitute.For<StackDeploymentStatusRequestFactory>();
         private static StepFunctionsClientFactory stepFunctionsClientFactory = Substitute.For<StepFunctionsClientFactory>();
-
         private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
-        
+
         private const string stackId = "stackId";
         private const string token = "token";
 
-        
+
         [SetUp]
         public void SetupRequestFactory()
         {
@@ -59,13 +58,14 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             stepFunctionsClient.ClearReceivedCalls();
         }
 
-        private StackDeploymentStatusRequest CreateRequest(string stackId, string token, string status = "CREATE_COMPLETE")
+        private StackDeploymentStatusRequest CreateRequest(string stackId, string token, string status = "CREATE_COMPLETE", string resourceType = "AWS::CloudFormation::Stack")
         {
             var request = new StackDeploymentStatusRequest
             {
                 StackId = stackId,
                 ClientRequestToken = token,
                 ResourceStatus = status,
+                ResourceType = resourceType
             };
 
             requestFactory.CreateFromSnsEvent(Arg.Any<SNSEvent>()).Returns(request);
@@ -80,7 +80,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await Handler.Handle(snsEvent);
 
-            requestFactory.Received().CreateFromSnsEvent(Arg.Is(snsEvent));   
+            requestFactory.Received().CreateFromSnsEvent(Arg.Is(snsEvent));
         }
 
         [Test]
@@ -95,7 +95,19 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         }
 
         [Test]
-        public async Task SendTaskFailureIsCalledIfStatusContainsRollback()
+        public async Task ShouldDoNothingIfResourceTypeIsNotStack()
+        {
+            var request = CreateRequest(stackId, token, null, "AWS::S3::Bucket");
+            var snsEvent = Substitute.For<SNSEvent>();
+
+            await Handler.Handle(snsEvent);
+
+            await stepFunctionsClient.DidNotReceiveWithAnyArgs().SendTaskFailureAsync(Arg.Any<SendTaskFailureRequest>());
+            await stepFunctionsClient.DidNotReceiveWithAnyArgs().SendTaskSuccessAsync(Arg.Any<SendTaskSuccessRequest>());
+        }
+
+        [Test]
+        public async Task SendTaskFailureIsCalledIfStatusEndsWithRollbackComplete()
         {
             var status = "UPDATE_ROLLBACK_COMPLETE";
             var request = CreateRequest(stackId, token, status);
@@ -138,7 +150,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         }
 
         [Test]
-        public async Task SendTaskSuccessIsCalledOtherwise()
+        public async Task SendTaskSuccessIfStatusEndsWithComplete()
         {
             var status = "CREATE_COMPLETE";
             var request = CreateRequest(stackId, token, status);

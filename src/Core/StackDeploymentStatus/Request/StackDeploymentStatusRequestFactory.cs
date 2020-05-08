@@ -15,15 +15,15 @@ namespace Cythral.CloudFormation.StackDeploymentStatus.Request
             foreach (var line in message.Split('\n'))
             {
                 var i = line.IndexOf('=');
-                
+
                 if (i <= 0)
                 {
                     continue;
                 }
 
                 var key = line.Substring(0, i).Trim();
-                var value = line.Substring(i + 1);
-                
+                var value = line.Substring(i + 1).Trim('\'');
+
                 switch (key)
                 {
                     case "StackId": request.StackId = value; break;

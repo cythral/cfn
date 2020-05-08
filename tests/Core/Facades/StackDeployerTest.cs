@@ -25,6 +25,7 @@ namespace Cythral.CloudFormation.Tests.Facades
             var roleArn = "arn:aws:iam::1:role/Facade";
             var cloudformationClient = Substitute.For<IAmazonCloudFormation>();
             var notificationArn = "arn:aws:sns::1:topic/Topic";
+            var clientRequestToken = "token";
 
             var tags = new List<Tag>
             {
@@ -60,7 +61,8 @@ namespace Cythral.CloudFormation.Tests.Facades
                 NotificationArn = notificationArn,
                 Tags = tags,
                 PassRoleArn = roleArn,
-                Parameters = parameters
+                Parameters = parameters,
+                ClientRequestToken = clientRequestToken
             });
 
             await cloudformationClient
@@ -71,6 +73,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 req.RoleARN == roleArn &&
                 req.NotificationARNs.Contains(notificationArn) &&
                 tags.All(req.Tags.Contains) &&
+                req.ClientRequestToken == clientRequestToken &&
                 req.Parameters.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == "this is definitely the token") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_IAM") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_NAMED_IAM") &&
@@ -86,6 +89,7 @@ namespace Cythral.CloudFormation.Tests.Facades
             var roleArn = "arn:aws:iam::1:role/Facade";
             var cloudformationClient = Substitute.For<IAmazonCloudFormation>();
             var notificationArn = "arn:aws:sns::1:topic/Topic";
+            var clientRequestToken = "token";
 
             var tags = new List<Tag>
             {
@@ -128,6 +132,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 PassRoleArn = roleArn,
                 Parameters = parameters,
                 Tags = tags,
+                ClientRequestToken = clientRequestToken
             });
 
             await cloudformationClient
@@ -138,6 +143,7 @@ namespace Cythral.CloudFormation.Tests.Facades
                 req.RoleARN == roleArn &&
                 req.NotificationARNs.Contains(notificationArn) &&
                 tags.All(req.Tags.Contains) &&
+                req.ClientRequestToken == clientRequestToken &&
                 req.Parameters.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == "this is definitely the token") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_IAM") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_NAMED_IAM")

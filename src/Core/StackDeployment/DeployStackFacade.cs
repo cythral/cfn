@@ -32,6 +32,7 @@ namespace Cythral.CloudFormation.StackDeployment
                     Tags = (List<Tag>)context.Tags,
                     NotificationARNs = notificationArns,
                     RoleARN = context.PassRoleArn,
+                    ClientRequestToken = context.ClientRequestToken,
                     OnFailure = DELETE
                 };
 
@@ -48,6 +49,7 @@ namespace Cythral.CloudFormation.StackDeployment
                     Capabilities = (List<string>)context.Capabilities,
                     Tags = (List<Tag>)context.Tags,
                     NotificationARNs = notificationArns,
+                    ClientRequestToken = context.ClientRequestToken,
                     RoleARN = context.PassRoleArn
                 };
 

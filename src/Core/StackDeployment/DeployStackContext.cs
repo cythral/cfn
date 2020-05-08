@@ -18,6 +18,8 @@ namespace Cythral.CloudFormation.StackDeployment
 
         public string StackPolicyBody { get; set; }
 
+        public string ClientRequestToken { get; set; }
+
         public IEnumerable<Parameter> Parameters { get; set; }
 
         public IEnumerable<Tag> Tags { get; set; }
