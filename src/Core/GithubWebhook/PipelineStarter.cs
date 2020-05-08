@@ -17,9 +17,13 @@ namespace Cythral.CloudFormation.GithubWebhook
 
             try
             {
+                var accountId = Environment.GetEnvironmentVariable("AWS_ACCOUNT_ID");
+                var region = Environment.GetEnvironmentVariable("AWS_REGION");
+
                 var response = await client.StartExecutionAsync(new StartExecutionRequest
                 {
-                    Name = $"{payload.Repository.Name}-cicd-pipeline",
+                    StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:{payload.Repository.Name}-cicd-pipeline",
+                    Name = payload.HeadCommit.Sha,
                     Input = Serialize(payload)
                 });
 
