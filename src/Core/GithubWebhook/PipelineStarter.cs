@@ -23,7 +23,7 @@ namespace Cythral.CloudFormation.GithubWebhook
                 var response = await client.StartExecutionAsync(new StartExecutionRequest
                 {
                     StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:{payload.Repository.Name}-cicd-pipeline",
-                    Name = payload.HeadCommit.Sha,
+                    Name = payload.HeadCommit.Id,
                     Input = Serialize(payload)
                 });
 

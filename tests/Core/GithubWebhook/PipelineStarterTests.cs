@@ -56,7 +56,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             {
                 HeadCommit = new Commit
                 {
-                    Sha = sha,
+                    Id = sha,
                 },
                 Repository = new Repository
                 {
@@ -77,7 +77,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             {
                 HeadCommit = new Commit
                 {
-                    Sha = sha,
+                    Id = sha,
                 },
                 Repository = new Repository
                 {
