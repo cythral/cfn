@@ -492,6 +492,12 @@ Resources:
               - s3:GetObject
             Resource: "*"
 
+  CodeBuildSourceCredential:
+    Type: AWS::CodeBuild::SourceCredential
+    Properties:
+      Token: !Ref GithubToken
+      ServerType: GITHUB
+      AuthType: PERSONAL_ACCESS_TOKEN
 Outputs:
   LoadBalancerCanonicalHostedZoneId:
     Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
