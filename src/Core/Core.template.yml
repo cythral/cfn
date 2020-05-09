@@ -492,6 +492,68 @@ Resources:
               - s3:GetObject
             Resource: "*"
 
+  ApprovalWebhook:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: Core::Cythral.CloudFormation.ApprovalWebhook.Handler::Handle
+      Runtime: dotnetcore3.1
+      Timeout: 30
+      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      MemorySize: 256
+      Policies:
+        - AWSLambdaExecute
+        - !Ref ApprovalWebhookPolicy
+      AutoPublishAlias: ApprovalWebhook
+
+  ApprovalWebhookPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - states:SendTaskSuccess
+            Resource: "*"
+
+  ApprovalWebhookPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ApprovalWebhook.Alias
+      Principal: elasticloadbalancing.amazonaws.com
+      SourceArn: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/cfn-core-ApprovalWebhook/*
+
+  ApprovalWebhookTarget:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: ApprovalWebhookPermission
+    Properties:
+      Name: cfn-core-ApprovalWebhook
+      TargetType: lambda
+      TargetGroupAttributes:
+        - Key: lambda.multi_value_headers.enabled
+          Value: false
+      Targets:
+        - Id: !Ref ApprovalWebhook.Alias
+
+  ApprovalWebhookListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HttpsListener
+      Priority: 3
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref ApprovalWebhookTarget
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - brigh.id
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - /webhooks/approval
+
   DecryptedGithubToken:
     Type: Custom::Secret
     Properties:
