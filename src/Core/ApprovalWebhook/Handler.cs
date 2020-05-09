@@ -21,9 +21,10 @@ namespace Cythral.CloudFormation.ApprovalWebhook
         {
             var client = stepFunctionsClientFactory.Create();
             var action = request.QueryStringParameters["action"];
+            var token = request.QueryStringParameters["token"];
             var response = await client.SendTaskSuccessAsync(new SendTaskSuccessRequest
             {
-                TaskToken = request.QueryStringParameters["token"],
+                TaskToken = WebUtility.UrlDecode(token),
                 Output = Serialize(new
                 {
                     Action = action,
