@@ -24,7 +24,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
             var encodedToken = WebUtility.UrlEncode(request.Token);
             var approveUrl = $"{baseUrl}?action=approve&token={encodedToken}";
             var rejectUrl = $"{baseUrl}?action=reject&token={encodedToken}";
-            var defaultMessage = $"{request.CustomMessage}.\nApprove: {approveUrl}\nReject: {rejectUrl}";
+            var defaultMessage = $"{request.CustomMessage}.\n\nApprove:\n{approveUrl}\n\nReject:\n{rejectUrl}";
 
             var response = await client.PublishAsync(new PublishRequest
             {
