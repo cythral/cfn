@@ -554,6 +554,36 @@ Resources:
             Values:
               - /webhooks/approval
 
+  ApprovalTopic:
+    Type: AWS::SNS::Topic
+
+  ApprovalNotificationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: Core::Cythral.CloudFormation.ApprovalNotification.Handler::Handle
+      Runtime: dotnetcore3.1
+      Timeout: 30
+      MemorySize: 256
+      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      Policies:
+        - AWSLambdaExecute
+        - !Ref ApprovalNotificationPolicy
+      Environment:
+        Variables:
+          TOPIC_ARN: !Ref ApprovalTopic
+          BASE_URL: https://brigh.id/webhooks/approval
+
+  ApprovalNotificationPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sns:Publish
+            Resource: !Ref ApprovalTopic
+
   DecryptedGithubToken:
     Type: Custom::Secret
     Properties:

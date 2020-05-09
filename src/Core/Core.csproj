@@ -28,6 +28,7 @@
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.7.0" />
     <PackageReference Include="AWSSDK.S3" Version="3.3.110.65" />
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.3.104.73" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.165" />
     <PackageReference Include="AWSSDK.StepFunctions" Version="3.3.104.38" />
     <PackageReference Include="SharpZipLib.NETStandard" Version="1.0.7" />
   </ItemGroup>
