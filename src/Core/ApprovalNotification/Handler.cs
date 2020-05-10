@@ -36,6 +36,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
             var rejectUrl = $"{baseUrl}?action=reject&store={request.ArtifactStore}&token={approvalHash}";
             var defaultMessage = $"{request.CustomMessage}.\n\nApprove:\n{approveUrl}\n\nReject:\n{rejectUrl}";
 
+
             var response = await client.PublishAsync(new PublishRequest
             {
                 TopicArn = Environment.GetEnvironmentVariable("TOPIC_ARN"),
@@ -53,6 +54,8 @@ namespace Cythral.CloudFormation.ApprovalNotification
                     })
                 })
             });
+
+            await CancelPreviousApprovals(request);
 
             return new Response
             {
