@@ -108,16 +108,22 @@ namespace Cythral.CloudFormation.ApprovalNotification
             using (var s3Client = await s3Factory.Create())
             {
                 var approvalInfo = await s3GetObjectFacade.GetObject<ApprovalInfo>(location.BucketName, location.Key);
-                var sendTaskCancelResponse = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
-                {
-                    TaskToken = approvalInfo.Token,
-                    Output = Serialize(new
-                    {
-                        Action = "reject"
-                    })
-                });
 
-                Console.WriteLine($"Cancellation response: {Serialize(sendTaskCancelResponse)}");
+                try
+                {
+                    var sendTaskCancelResponse = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
+                    {
+                        TaskToken = approvalInfo.Token,
+                        Output = Serialize(new
+                        {
+                            Action = "reject"
+                        })
+                    });
+
+                    Console.WriteLine($"Cancellation response: {Serialize(sendTaskCancelResponse)}");
+                }
+                catch (TaskTimedOutException) { }
+                catch (TaskDoesNotExistException) { }
 
 
                 var deleteResponse = await s3Client.DeleteObjectAsync(location.BucketName, location.Key);
