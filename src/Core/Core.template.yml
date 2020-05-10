@@ -595,6 +595,7 @@ Resources:
           - Effect: Allow
             Action:
               - s3:*Object
+              - s3:ListObjects
             Resource: "*"
 
   DecryptedGithubToken:
