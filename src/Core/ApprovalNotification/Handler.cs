@@ -29,6 +29,8 @@ namespace Cythral.CloudFormation.ApprovalNotification
         {
             Console.WriteLine($"Recieved request: {Serialize(request)}");
 
+            await CancelPreviousApprovals(request);
+
             var approvalHash = await CreateApprovalObject(request);
             var client = await snsFactory.Create();
             var baseUrl = Environment.GetEnvironmentVariable("BASE_URL");
@@ -54,8 +56,6 @@ namespace Cythral.CloudFormation.ApprovalNotification
                     })
                 })
             });
-
-            await CancelPreviousApprovals(request);
 
             return new Response
             {
