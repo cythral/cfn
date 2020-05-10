@@ -46,10 +46,9 @@ namespace Cythral.CloudFormation.Aws
             }
         }
 
-        public virtual async Task<string> GetObject(string location)
+        public virtual async Task<string> GetObject(string bucket, string key)
         {
             var s3Client = await s3Factory.Create();
-            var (bucket, key) = GetBucketAndKey(location);
             var getObjResponse = await s3Client.GetObjectAsync(new GetObjectRequest
             {
                 BucketName = bucket,
@@ -60,6 +59,24 @@ namespace Cythral.CloudFormation.Aws
             {
                 return reader.ReadToEnd();
             }
+        }
+
+        public virtual async Task<string> GetObject(string location)
+        {
+            var (bucket, key) = GetBucketAndKey(location);
+            return await GetObject(bucket, key);
+        }
+
+        public virtual async Task<T> GetObject<T>(string bucket, string key)
+        {
+            var stringContent = await GetObject(bucket, key);
+            return Deserialize<T>(stringContent);
+        }
+
+        public virtual async Task<T> GetObject<T>(string location)
+        {
+            var stringContent = await GetObject(location);
+            return Deserialize<T>(stringContent);
         }
 
         private (string, string) GetBucketAndKey(string location)

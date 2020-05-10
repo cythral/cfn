@@ -16,25 +16,37 @@ namespace Cythral.CloudFormation.ApprovalWebhook
     public class Handler
     {
         private static StepFunctionsClientFactory stepFunctionsClientFactory = new StepFunctionsClientFactory();
+        private static S3Factory s3Factory = new S3Factory();
+        private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
 
         public static async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, ILambdaContext context = null)
         {
-            var client = stepFunctionsClientFactory.Create();
-            var action = request.QueryStringParameters["action"];
-            var token = request.QueryStringParameters["token"];
-            var response = await client.SendTaskSuccessAsync(new SendTaskSuccessRequest
+            using (var stepFunctionsClient = stepFunctionsClientFactory.Create())
+            using (var s3Client = await s3Factory.Create())
             {
-                TaskToken = WebUtility.UrlDecode(token),
-                Output = Serialize(new
+                var action = request.QueryStringParameters["action"];
+                var store = request.QueryStringParameters["store"];
+                var tokenHash = request.QueryStringParameters["token"];
+                var key = $"approvals/{tokenHash}";
+                var approvalInfo = await s3GetObjectFacade.GetObject<ApprovalInfo>(store, key);
+
+                var sendTaskResponse = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
                 {
-                    Action = action,
-                })
-            });
+                    TaskToken = approvalInfo.Token,
+                    Output = Serialize(new
+                    {
+                        Action = action,
+                    })
+                });
 
-            Console.WriteLine($"Send task success response: {Serialize(response)}");
+                Console.WriteLine($"Send task success response: {Serialize(sendTaskResponse)}");
 
-            var body = action == "approve" ? "approved" : "rejected";
-            return CreateResponse(OK, body: body);
+                var deleteResponse = await s3Client.DeleteObjectAsync(store, key);
+                Console.WriteLine($"Received delete response: {Serialize(deleteResponse)}");
+
+                var body = action == "approve" ? "approved" : "rejected";
+                return CreateResponse(OK, body: body);
+            }
         }
 
         private static ApplicationLoadBalancerResponse CreateResponse(HttpStatusCode statusCode, string contentType = "text/plain", string body = "")
@@ -45,14 +57,7 @@ namespace Cythral.CloudFormation.ApprovalWebhook
 
                 foreach (var character in statusCode.ToString())
                 {
-                    if (Char.ToLower(character) == character)
-                    {
-                        result += character;
-                    }
-                    else
-                    {
-                        result += $" {character}";
-                    }
+                    result += (Char.ToLower(character) == character) ? $"{character}" : $" {character}";
                 }
 
                 return result;
