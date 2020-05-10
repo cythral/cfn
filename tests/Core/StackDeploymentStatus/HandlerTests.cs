@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
+using Amazon.SQS;
+using Amazon.SQS.Model;
 using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
 using Amazon.Lambda.SNSEvents;
@@ -17,6 +19,7 @@ using Cythral.CloudFormation.UpdateTargets.DnsResolver;
 using Cythral.CloudFormation.StackDeploymentStatus.Request;
 
 using NSubstitute;
+using NSubstitute.ClearExtensions;
 
 using NUnit.Framework;
 
@@ -34,13 +37,22 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         private static StepFunctionsClientFactory stepFunctionsClientFactory = Substitute.For<StepFunctionsClientFactory>();
         private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
         private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
-
+        private static SqsFactory sqsFactory = Substitute.For<SqsFactory>();
+        private static IAmazonSQS sqsClient = Substitute.For<IAmazonSQS>();
         private const string stackId = "stackId";
         private const string bucket = "bucket";
         private const string key = "key";
         private const string s3Location = "s3://bucket/tokens/key";
         private const string tokenKey = "bucket-key";
         private const string token = "token";
+        private const string receiptHandle = "receiptHandle";
+        private const string queueUrl = "queueUrl";
+        private static string tokenInfo = Serialize(new TokenInfo
+        {
+            ClientRequestToken = token,
+            ReceiptHandle = receiptHandle,
+            QueueUrl = queueUrl,
+        });
 
 
         [SetUp]
@@ -69,7 +81,17 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         {
             TestUtils.SetPrivateStaticField(typeof(Handler), "s3GetObjectFacade", s3GetObjectFacade);
             s3GetObjectFacade.ClearReceivedCalls();
-            s3GetObjectFacade.GetObject(Arg.Any<string>()).Returns(token);
+            s3GetObjectFacade.GetObject(Arg.Any<string>()).Returns(tokenInfo);
+        }
+
+        [SetUp]
+        public void SetupSQS()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "sqsFactory", sqsFactory);
+            sqsFactory.ClearSubstitute();
+            sqsFactory.Create().Returns(sqsClient);
+
+            sqsClient.ClearSubstitute();
         }
 
         private StackDeploymentStatusRequest CreateRequest(string stackId, string token, string status = "CREATE_COMPLETE", string resourceType = "AWS::CloudFormation::Stack")
@@ -149,6 +171,11 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             await stepFunctionsClient
                 .Received()
                 .SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req => req.TaskToken == token && req.Cause == status));
+
+            await sqsFactory.Received().Create();
+            await sqsClient
+                .Received()
+                .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
         }
 
         [Test]
@@ -165,6 +192,9 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             await stepFunctionsClient
                 .DidNotReceive()
                 .SendTaskFailureAsync(Arg.Any<SendTaskFailureRequest>());
+
+            await sqsFactory.DidNotReceive().Create();
+            await sqsClient.DidNotReceive().DeleteMessageAsync(Arg.Any<DeleteMessageRequest>());
         }
 
         [Test]
@@ -181,6 +211,11 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             await stepFunctionsClient
                 .Received()
                 .SendTaskSuccessAsync(Arg.Is<SendTaskSuccessRequest>(req => req.TaskToken == token && req.Output == serializedRequest));
+
+            await sqsFactory.Received().Create();
+            await sqsClient
+                .Received()
+                .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
         }
 
         [Test]
@@ -197,6 +232,9 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             await stepFunctionsClient
                 .DidNotReceive()
                 .SendTaskSuccessAsync(Arg.Any<SendTaskSuccessRequest>());
+
+            await sqsFactory.DidNotReceive().Create();
+            await sqsClient.DidNotReceive().DeleteMessageAsync(Arg.Any<DeleteMessageRequest>());
         }
     }
 }

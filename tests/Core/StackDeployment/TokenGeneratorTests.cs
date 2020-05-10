@@ -11,7 +11,7 @@ using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
-using Amazon.Lambda.SNSEvents;
+using Amazon.Lambda.SQSEvents;
 
 using Cythral.CloudFormation.Aws;
 using Cythral.CloudFormation.Events;
@@ -36,7 +36,6 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         public static S3Factory s3Factory = Substitute.For<S3Factory>();
         public static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
         public static TokenGenerator tokenGenerator = new TokenGenerator();
-
         private const string stackName = "stackName";
         private const string bucket = "bucket";
         private const string key = "key";
@@ -50,6 +49,9 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private const string clientRequestToken = "clientRequestToken";
         private const string clientRequestTokenSum = "272A689245B6118F1AAB392CED48E3D07C3894CC2EF6A3500F298628CE87F88A";
         private string templateConfiguration = "templateConfiguration";
+        private string sqsArn = "arn:sqs:aws:us-east-1:5:testQueue";
+        private string receiptHandle = "5";
+        private string sqsUrl = "https://sqs.us-east-1.amazonaws.com/5/testQueue";
         private static List<string> Locations = new List<string> { $"s3://{bucket}/{key}", $"arn:s3:aws:::{bucket}/{key}" };
 
         [SetUp]
@@ -75,11 +77,25 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             };
         }
 
+        private SQSEvent CreateSQSEvent()
+        {
+            return new SQSEvent
+            {
+                Records = new List<SQSEvent.SQSMessage> {
+                    new SQSEvent.SQSMessage {
+                        ReceiptHandle = receiptHandle,
+                        EventSourceArn = sqsArn
+                    }
+                }
+            };
+        }
+
         [Test]
         public async Task S3ClientIsCreated()
         {
             var request = CreateRequest();
-            await tokenGenerator.Generate(request);
+            var sqsEvent = CreateSQSEvent();
+            await tokenGenerator.Generate(sqsEvent, request);
 
             await s3Factory.Received().Create();
         }
@@ -88,14 +104,22 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         public async Task PutObjectIsCalled([ValueSource("Locations")] string location)
         {
             var request = CreateRequest();
+            var sqsEvent = CreateSQSEvent();
             request.ZipLocation = location;
 
-            await tokenGenerator.Generate(request);
+            var contentBody = Serialize(new TokenInfo
+            {
+                ClientRequestToken = clientRequestToken,
+                ReceiptHandle = receiptHandle,
+                QueueUrl = sqsUrl
+            });
+
+            await tokenGenerator.Generate(sqsEvent, request);
 
             await s3Client.Received().PutObjectAsync(Arg.Is<PutObjectRequest>(req =>
                 req.BucketName == bucket &&
                 req.Key == $"tokens/{clientRequestTokenSum}" &&
-                req.ContentBody == clientRequestToken
+                req.ContentBody == contentBody
             ));
         }
 
@@ -103,9 +127,10 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         public async Task ReturnsBucketPlusToken()
         {
             var request = CreateRequest();
+            var sqsEvent = CreateSQSEvent();
             request.ZipLocation = location;
 
-            var result = await tokenGenerator.Generate(request);
+            var result = await tokenGenerator.Generate(sqsEvent, request);
             Assert.That(result, Is.EqualTo($"{bucket}-{clientRequestTokenSum}"));
         }
     }

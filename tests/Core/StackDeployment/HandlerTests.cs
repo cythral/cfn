@@ -9,7 +9,7 @@ using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
-using Amazon.Lambda.SNSEvents;
+using Amazon.Lambda.SQSEvents;
 
 using Cythral.CloudFormation.Aws;
 using Cythral.CloudFormation.Events;
@@ -19,6 +19,7 @@ using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 using NSubstitute;
 
 using NUnit.Framework;
+using NSubstitute.ClearExtensions;
 
 using static Amazon.ElasticLoadBalancingV2.TargetHealthStateEnum;
 using static System.Text.Json.JsonSerializer;
@@ -36,6 +37,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
         private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
         private static TokenGenerator tokenGenerator = Substitute.For<TokenGenerator>();
+        private static RequestFactory requestFactory = Substitute.For<RequestFactory>();
+        private static StepFunctionsClientFactory stepFunctionsClientFactory = Substitute.For<StepFunctionsClientFactory>();
 
         private const string stackName = "stackName";
         private const string location = "location";
@@ -78,14 +81,14 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         public void SetupStackDeployer()
         {
             TestUtils.SetPrivateStaticField(typeof(Handler), "stackDeployer", stackDeployer);
-            stackDeployer.ClearReceivedCalls();
+            stackDeployer.ClearSubstitute();
         }
 
         [SetUp]
         public void SetupParseConfigFileFacade()
         {
             TestUtils.SetPrivateStaticField(typeof(Handler), "parseConfigFileFacade", parseConfigFileFacade);
-            parseConfigFileFacade.ClearReceivedCalls();
+            parseConfigFileFacade.ClearSubstitute();
             parseConfigFileFacade.Parse(Arg.Any<string>()).Returns(configuration);
         }
 
@@ -93,8 +96,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         public void SetupTokenGenerator()
         {
             TestUtils.SetPrivateStaticField(typeof(Handler), "tokenGenerator", tokenGenerator);
-            tokenGenerator.ClearReceivedCalls();
-            tokenGenerator.Generate(Arg.Any<Request>()).Returns(createdToken);
+            tokenGenerator.ClearSubstitute();
+            tokenGenerator.Generate(Arg.Any<SQSEvent>(), Arg.Any<Request>()).Returns(createdToken);
         }
 
         [SetUp]
@@ -103,9 +106,24 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             Environment.SetEnvironmentVariable("NOTIFICATION_ARN", notificationArn);
         }
 
+        [SetUp]
+        public void SetupRequestFactory()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "requestFactory", requestFactory);
+            requestFactory.ClearSubstitute();
+        }
+
+        [SetUp]
+        public void SetupStepFunctions()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "stepFunctionsClientFactory", stepFunctionsClientFactory);
+            stepFunctionsClientFactory.ClearSubstitute();
+            stepFunctionsClientFactory.Create().Returns(stepFunctionsClient);
+        }
+
         private Request CreateRequest()
         {
-            return new Request
+            var req = new Request
             {
                 ZipLocation = location,
                 TemplateFileName = templateFileName,
@@ -114,13 +132,29 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                 RoleArn = roleArn,
                 Token = clientRequestToken
             };
+
+            requestFactory.CreateFromSqsEvent(Arg.Any<SQSEvent>()).Returns(req);
+            return req;
+        }
+
+        [Test]
+        public void SQSEventIsParsed()
+        {
+            var request = CreateRequest();
+            var sqs = Substitute.For<SQSEvent>();
+
+            Assert.ThrowsAsync<Exception>(() => Handler.Handle(sqs));
+
+            requestFactory.Received().CreateFromSqsEvent(Arg.Is(sqs));
         }
 
         [Test]
         public async Task TemplateIsRetrieved()
         {
             var request = CreateRequest();
-            await Handler.Handle(request);
+            var sqs = Substitute.For<SQSEvent>();
+
+            Assert.ThrowsAsync<Exception>(() => Handler.Handle(sqs));
 
             await s3GetObjectFacade.Received().GetZipEntryInObject(Arg.Is(location), Arg.Is(templateFileName));
         }
@@ -129,7 +163,9 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         public async Task TemplateConfigurationIsRetrieved()
         {
             var request = CreateRequest();
-            await Handler.Handle(request);
+            var sqs = Substitute.For<SQSEvent>();
+
+            Assert.ThrowsAsync<Exception>(() => Handler.Handle(sqs));
 
             await s3GetObjectFacade.Received().GetZipEntryInObject(Arg.Is(location), Arg.Is(templateConfigurationFileName));
         }
@@ -138,18 +174,21 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         public async Task TokenIsGenerated()
         {
             var request = CreateRequest();
-            await Handler.Handle(request);
+            var sqs = Substitute.For<SQSEvent>();
 
-            await tokenGenerator.Received().Generate(Arg.Is(request));
+            Assert.ThrowsAsync<Exception>(() => Handler.Handle(sqs));
+
+            await tokenGenerator.Received().Generate(Arg.Is(sqs), Arg.Is(request));
         }
 
         [Test]
         public async Task TemplateConfigurationIsNotRetrievedIfNotGiven()
         {
             var request = CreateRequest();
+            var sqs = Substitute.For<SQSEvent>();
             request.TemplateConfigurationFileName = null;
 
-            await Handler.Handle(request);
+            Assert.ThrowsAsync<Exception>(() => Handler.Handle(sqs));
 
             await s3GetObjectFacade.DidNotReceive().GetZipEntryInObject(Arg.Is(location), Arg.Is((string)null));
         }
@@ -158,9 +197,10 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         public async Task TemplateConfigurationIsNotRetrievedIfNotBlank()
         {
             var request = CreateRequest();
+            var sqs = Substitute.For<SQSEvent>();
             request.TemplateConfigurationFileName = "";
 
-            await Handler.Handle(request);
+            Assert.ThrowsAsync<Exception>(() => Handler.Handle(sqs));
 
             await s3GetObjectFacade.DidNotReceive().GetZipEntryInObject(Arg.Is(location), Arg.Is(""));
         }
@@ -169,7 +209,9 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         public async Task DeployWasCalled()
         {
             var request = CreateRequest();
-            await Handler.Handle(request);
+            var sqs = Substitute.For<SQSEvent>();
+
+            Assert.ThrowsAsync<Exception>(() => Handler.Handle(sqs));
 
             await stackDeployer.Received().Deploy(
                 Arg.Is<DeployStackContext>(c =>
@@ -183,6 +225,24 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                     c.ClientRequestToken == createdToken
                 )
             );
+        }
+
+        [Test]
+        public async Task StepFunctionsNotifiedIfDeployFailed()
+        {
+            var request = CreateRequest();
+            var sqs = Substitute.For<SQSEvent>();
+            var message = "message";
+
+            stackDeployer.Deploy(Arg.Any<DeployStackContext>()).Returns(x => throw new Exception(message));
+
+            await Handler.Handle(sqs);
+
+            stepFunctionsClientFactory.Received().Create();
+            await stepFunctionsClient.Received().SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req =>
+                req.TaskToken == clientRequestToken &&
+                req.Cause == message
+            ));
         }
     }
 }
