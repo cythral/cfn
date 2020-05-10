@@ -594,7 +594,9 @@ Resources:
             Resource: !Ref ApprovalTopic
           - Effect: Allow
             Action:
-              - s3:*Object
+              - s3:GetObject
+              - s3:PutObject
+              - s3:DeleteObject
               - s3:ListObjects
               - states:SendTaskSuccess
             Resource: "*"
