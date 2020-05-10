@@ -4,7 +4,7 @@ using System;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.Core;
-using Amazon.Lambda.SNSEvents;
+using Amazon.Lambda.SQSEvents;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
@@ -22,33 +22,51 @@ namespace Cythral.CloudFormation.StackDeployment
         private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
         private static ParseConfigFileFacade parseConfigFileFacade = new ParseConfigFileFacade();
         private static TokenGenerator tokenGenerator = new TokenGenerator();
+        private static RequestFactory requestFactory = new RequestFactory();
+        private static StepFunctionsClientFactory stepFunctionsClientFactory = new StepFunctionsClientFactory();
 
         public static async Task<Response> Handle(
-            Request request,
+            SQSEvent sqsEvent,
             ILambdaContext context = null
         )
         {
-            var notificationArn = Environment.GetEnvironmentVariable(notificationArnKey);
-            var template = await s3GetObjectFacade.GetZipEntryInObject(request.ZipLocation, request.TemplateFileName);
-            var config = await GetConfig(request);
-            var token = await tokenGenerator.Generate(request);
+            var request = requestFactory.CreateFromSqsEvent(sqsEvent);
 
-            await stackDeployer.Deploy(new DeployStackContext
+            try
             {
-                StackName = request.StackName,
-                Template = template,
-                RoleArn = request.RoleArn,
-                NotificationArn = notificationArn,
-                Parameters = config?.Parameters,
-                Tags = config?.Tags,
-                StackPolicyBody = config?.StackPolicy?.Value,
-                ClientRequestToken = token
-            });
+                var notificationArn = Environment.GetEnvironmentVariable(notificationArnKey);
+                var template = await s3GetObjectFacade.GetZipEntryInObject(request.ZipLocation, request.TemplateFileName);
+                var config = await GetConfig(request);
+                var token = await tokenGenerator.Generate(sqsEvent, request);
 
-            return new Response
+                await stackDeployer.Deploy(new DeployStackContext
+                {
+                    StackName = request.StackName,
+                    Template = template,
+                    RoleArn = request.RoleArn,
+                    NotificationArn = notificationArn,
+                    Parameters = config?.Parameters,
+                    Tags = config?.Tags,
+                    StackPolicyBody = config?.StackPolicy?.Value,
+                    ClientRequestToken = token
+                });
+            }
+            catch (Exception e)
             {
-                Success = true
-            };
+                var client = stepFunctionsClientFactory.Create();
+                var response = await client.SendTaskFailureAsync(new SendTaskFailureRequest
+                {
+                    TaskToken = request.Token,
+                    Cause = e.Message
+                });
+
+                return new Response
+                {
+                    Success = true
+                };
+            }
+
+            throw new Exception();
         }
 
         private static async Task<TemplateConfiguration> GetConfig(Request request)

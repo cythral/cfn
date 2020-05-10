@@ -3,7 +3,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Text.Json.JsonSerializer;
 
+using Amazon.Lambda.SQSEvents;
 using Amazon.S3.Model;
 
 using Cythral.CloudFormation.Aws;
@@ -14,11 +16,12 @@ namespace Cythral.CloudFormation.StackDeployment
     {
         private S3Factory s3Factory = new S3Factory();
 
-        public virtual async Task<string> Generate(Request request)
+        public virtual async Task<string> Generate(SQSEvent sqsEvent, Request request)
         {
             using (var client = await s3Factory.Create())
             using (SHA256 mySHA256 = SHA256.Create())
             {
+                var sqsRecord = sqsEvent.Records[0];
                 var token = request.Token;
                 var bytes = Encoding.UTF8.GetBytes(token);
                 var sumBytes = mySHA256.ComputeHash(bytes);
@@ -29,7 +32,12 @@ namespace Cythral.CloudFormation.StackDeployment
                 {
                     BucketName = bucket,
                     Key = $"tokens/{sum}",
-                    ContentBody = token
+                    ContentBody = Serialize(new TokenInfo
+                    {
+                        ClientRequestToken = token,
+                        QueueUrl = ConvertQueueArnToUrl(sqsRecord.EventSourceArn),
+                        ReceiptHandle = sqsRecord.ReceiptHandle
+                    })
                 });
 
                 return $"{bucket}-{sum}";
@@ -50,6 +58,12 @@ namespace Cythral.CloudFormation.StackDeployment
         {
             var parts = arn.Split(':');
             return parts[5];
+        }
+
+        private string ConvertQueueArnToUrl(string arn)
+        {
+            var parts = arn.Split(":");
+            return $"https://sqs.{parts[3]}.amazonaws.com/{parts[4]}/{parts[5]}";
         }
     }
 }

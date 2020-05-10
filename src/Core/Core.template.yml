@@ -443,6 +443,13 @@ Resources:
         Variables:
           NOTIFICATION_ARN: !Ref StackDeploymentStatusTopic
 
+  StackDeploymentFunctionRetryPolicy:
+    Type: AWS::Lambda::EventInvokeConfig
+    Properties:
+      FunctionName: !Ref StackDeploymentFunction
+      MaximumRetryAttempts: 0
+      Qualifier: $LATEST
+
   StackDeploymentStatusFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -490,6 +497,7 @@ Resources:
               - states:SendTaskSuccess
               - states:SendTaskFailure
               - s3:GetObject
+              - sqs:DeleteMessage
             Resource: "*"
 
   ApprovalWebhook:
