@@ -596,6 +596,7 @@ Resources:
             Action:
               - s3:*Object
               - s3:ListObjects
+              - states:SendTaskSuccess
             Resource: "*"
 
   DecryptedGithubToken:
