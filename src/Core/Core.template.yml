@@ -522,6 +522,7 @@ Resources:
           - Effect: Allow
             Action:
               - states:SendTaskSuccess
+              - s3:*Object
             Resource: "*"
 
   ApprovalWebhookPermission:
@@ -591,6 +592,10 @@ Resources:
             Action:
               - sns:Publish
             Resource: !Ref ApprovalTopic
+          - Effect: Allow
+            Action:
+              - s3:*Object
+            Resource: "*"
 
   DecryptedGithubToken:
     Type: Custom::Secret
