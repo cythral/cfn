@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using Amazon.S3;
+using Amazon.S3.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
@@ -9,6 +11,7 @@ using Cythral.CloudFormation.Aws;
 
 using NUnit.Framework;
 using NSubstitute;
+using NSubstitute.ClearExtensions;
 
 using static System.Text.Json.JsonSerializer;
 
@@ -20,29 +23,54 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
     {
         private static StepFunctionsClientFactory stepFunctionsClientFactory = Substitute.For<StepFunctionsClientFactory>();
         private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
+        private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
+        private static S3Factory s3Factory = Substitute.For<S3Factory>();
+        private static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
+
+        private const string token = "token";
+        private const string store = "store";
+
+        private static ApprovalInfo approvalInfo = new ApprovalInfo
+        {
+            Token = token
+        };
 
         [SetUp]
-        public void SetUpStepFunctions()
+        public void SetupStepFunctions()
         {
             TestUtils.SetPrivateStaticField(typeof(Handler), "stepFunctionsClientFactory", stepFunctionsClientFactory);
-            stepFunctionsClientFactory.ClearReceivedCalls();
-            stepFunctionsClient.ClearReceivedCalls();
+            stepFunctionsClientFactory.ClearSubstitute();
+            stepFunctionsClient.ClearSubstitute();
 
             stepFunctionsClientFactory.Create().Returns(stepFunctionsClient);
             stepFunctionsClient.SendTaskSuccessAsync(Arg.Any<SendTaskSuccessRequest>()).Returns(new SendTaskSuccessResponse { });
         }
 
+        [SetUp]
+        public void SetupS3()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "s3Factory", s3Factory);
+            TestUtils.SetPrivateStaticField(typeof(Handler), "s3GetObjectFacade", s3GetObjectFacade);
+            s3GetObjectFacade.ClearSubstitute();
+            s3Client.ClearSubstitute();
+            s3Factory.ClearSubstitute();
+
+            s3Factory.Create().Returns(s3Client);
+            s3GetObjectFacade.GetObject<ApprovalInfo>(Arg.Any<string>(), Arg.Any<string>()).Returns(approvalInfo);
+        }
+
         [Test]
         public async Task ShouldCreateStepFunctionsClient()
         {
-            var token = "token";
+            var tokenHash = "tokenHash";
             var action = "approve";
             var request = new ApplicationLoadBalancerRequest
             {
                 QueryStringParameters = new Dictionary<string, string>
                 {
-                    ["token"] = token,
-                    ["action"] = action
+                    ["token"] = tokenHash,
+                    ["action"] = action,
+                    ["store"] = store,
                 }
             };
 
@@ -52,17 +80,59 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
         }
 
         [Test]
-        public async Task ShouldCallSendTaskSuccess()
+        public async Task ShouldCreateS3Client()
         {
-            var token = "token";
+            var tokenHash = "tokenHash";
+            var action = "approve";
+            var request = new ApplicationLoadBalancerRequest
+            {
+                QueryStringParameters = new Dictionary<string, string>
+                {
+                    ["token"] = tokenHash,
+                    ["action"] = action,
+                    ["store"] = store,
+                }
+            };
+
+            await Handler.Handle(request);
+
+            await s3Factory.Received().Create();
+        }
+
+        [Test]
+        public async Task ShouldGetApprovalInfo()
+        {
+            var tokenHash = "tokenHash";
             var action = "approve";
             var serializedOutput = Serialize(new { Action = action });
             var request = new ApplicationLoadBalancerRequest
             {
                 QueryStringParameters = new Dictionary<string, string>
                 {
-                    ["token"] = token,
-                    ["action"] = action
+                    ["token"] = tokenHash,
+                    ["action"] = action,
+                    ["store"] = store,
+                }
+            };
+
+            await Handler.Handle(request);
+
+            await s3GetObjectFacade.Received().GetObject<ApprovalInfo>(Arg.Is(store), Arg.Is($"approvals/{tokenHash}"));
+        }
+
+        [Test]
+        public async Task ShouldCallSendTaskSuccess()
+        {
+            var tokenHash = "tokenHash";
+            var action = "approve";
+            var serializedOutput = Serialize(new { Action = action });
+            var request = new ApplicationLoadBalancerRequest
+            {
+                QueryStringParameters = new Dictionary<string, string>
+                {
+                    ["token"] = tokenHash,
+                    ["action"] = action,
+                    ["store"] = store,
                 }
             };
 
@@ -72,6 +142,27 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
                 req.TaskToken == token &&
                 req.Output == serializedOutput
             ));
+        }
+
+        [Test]
+        public async Task ShouldDeleteApprovalInfo()
+        {
+            var tokenHash = "tokenHash";
+            var action = "approve";
+            var serializedOutput = Serialize(new { Action = action });
+            var request = new ApplicationLoadBalancerRequest
+            {
+                QueryStringParameters = new Dictionary<string, string>
+                {
+                    ["token"] = tokenHash,
+                    ["action"] = action,
+                    ["store"] = store,
+                }
+            };
+
+            await Handler.Handle(request);
+
+            await s3Client.Received().DeleteObjectAsync(Arg.Is(store), Arg.Is($"approvals/{tokenHash}"));
         }
     }
 }
