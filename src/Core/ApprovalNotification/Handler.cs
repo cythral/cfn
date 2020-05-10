@@ -19,6 +19,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
 
         public async Task<Response> Handle(Request request, ILambdaContext context = null)
         {
+            Console.WriteLine($"Recieved request: {Serialize(request)}");
             var client = await snsFactory.Create();
             var baseUrl = Environment.GetEnvironmentVariable("BASE_URL");
             var encodedToken = WebUtility.UrlEncode(request.Token);
