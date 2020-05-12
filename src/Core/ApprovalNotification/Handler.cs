@@ -34,8 +34,9 @@ namespace Cythral.CloudFormation.ApprovalNotification
             var approvalHash = await CreateApprovalObject(request);
             var client = await snsFactory.Create();
             var baseUrl = Environment.GetEnvironmentVariable("BASE_URL");
-            var approveUrl = $"{baseUrl}?action=approve&store={request.ArtifactStore}&token={approvalHash}";
-            var rejectUrl = $"{baseUrl}?action=reject&store={request.ArtifactStore}&token={approvalHash}";
+            var pipeline = request.Pipeline;
+            var approveUrl = $"{baseUrl}?action=approve&pipeline={pipeline}&token={approvalHash}";
+            var rejectUrl = $"{baseUrl}?action=reject&store={pipeline}&token={approvalHash}";
             var defaultMessage = $"{request.CustomMessage}.\n\nApprove:\n{approveUrl}\n\nReject:\n{rejectUrl}";
 
 
@@ -71,11 +72,13 @@ namespace Cythral.CloudFormation.ApprovalNotification
                 var tokenBytes = Encoding.UTF8.GetBytes(request.Token);
                 var hashBytes = sha256.ComputeHash(tokenBytes);
                 var hash = string.Join("", hashBytes.Select(byt => $"{byt:X2}"));
+                var bucket = Environment.GetEnvironmentVariable("STATE_STORE");
+                var pipeline = request.Pipeline;
 
                 var response = await client.PutObjectAsync(new PutObjectRequest
                 {
-                    BucketName = request.ArtifactStore,
-                    Key = $"approvals/{hash}",
+                    BucketName = bucket,
+                    Key = $"{pipeline}/approvals/{hash}",
                     ContentBody = Serialize(new ApprovalInfo
                     {
                         Token = request.Token
@@ -91,10 +94,12 @@ namespace Cythral.CloudFormation.ApprovalNotification
         {
             using (var client = await s3Factory.Create())
             {
+                var bucket = Environment.GetEnvironmentVariable("STATE_STORE");
+                var pipeline = request.Pipeline;
                 var approvals = await client.ListObjectsV2Async(new ListObjectsV2Request
                 {
-                    BucketName = request.ArtifactStore,
-                    Prefix = "approvals"
+                    BucketName = bucket,
+                    Prefix = $"{pipeline}/approvals"
                 });
 
                 var tasks = approvals.S3Objects.Select(location => CancelPreviousApproval(request, location));

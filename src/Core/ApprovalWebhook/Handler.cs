@@ -25,10 +25,11 @@ namespace Cythral.CloudFormation.ApprovalWebhook
             using (var s3Client = await s3Factory.Create())
             {
                 var action = request.QueryStringParameters["action"];
-                var store = request.QueryStringParameters["store"];
+                var pipeline = request.QueryStringParameters["pipeline"];
                 var tokenHash = request.QueryStringParameters["token"];
-                var key = $"approvals/{tokenHash}";
-                var approvalInfo = await s3GetObjectFacade.GetObject<ApprovalInfo>(store, key);
+                var key = $"{pipeline}/approvals/{tokenHash}";
+                var bucket = Environment.GetEnvironmentVariable("STATE_STORE");
+                var approvalInfo = await s3GetObjectFacade.GetObject<ApprovalInfo>(bucket, key);
 
                 var sendTaskResponse = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
                 {
@@ -41,7 +42,7 @@ namespace Cythral.CloudFormation.ApprovalWebhook
 
                 Console.WriteLine($"Send task success response: {Serialize(sendTaskResponse)}");
 
-                var deleteResponse = await s3Client.DeleteObjectAsync(store, key);
+                var deleteResponse = await s3Client.DeleteObjectAsync(bucket, key);
                 Console.WriteLine($"Received delete response: {Serialize(deleteResponse)}");
 
                 var body = action == "approve" ? "approved" : "rejected";

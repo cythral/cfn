@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -27,8 +28,9 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
         private static S3Factory s3Factory = Substitute.For<S3Factory>();
         private static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
 
+        private const string bucket = "bucket";
         private const string token = "token";
-        private const string store = "store";
+        private const string pipeline = "pipeline";
 
         private static ApprovalInfo approvalInfo = new ApprovalInfo
         {
@@ -49,6 +51,7 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
         [SetUp]
         public void SetupS3()
         {
+            Environment.SetEnvironmentVariable("STATE_STORE", bucket);
             TestUtils.SetPrivateStaticField(typeof(Handler), "s3Factory", s3Factory);
             TestUtils.SetPrivateStaticField(typeof(Handler), "s3GetObjectFacade", s3GetObjectFacade);
             s3GetObjectFacade.ClearSubstitute();
@@ -70,7 +73,7 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
                 {
                     ["token"] = tokenHash,
                     ["action"] = action,
-                    ["store"] = store,
+                    ["pipeline"] = pipeline,
                 }
             };
 
@@ -90,7 +93,7 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
                 {
                     ["token"] = tokenHash,
                     ["action"] = action,
-                    ["store"] = store,
+                    ["pipeline"] = pipeline,
                 }
             };
 
@@ -111,13 +114,13 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
                 {
                     ["token"] = tokenHash,
                     ["action"] = action,
-                    ["store"] = store,
+                    ["pipeline"] = pipeline,
                 }
             };
 
             await Handler.Handle(request);
 
-            await s3GetObjectFacade.Received().GetObject<ApprovalInfo>(Arg.Is(store), Arg.Is($"approvals/{tokenHash}"));
+            await s3GetObjectFacade.Received().GetObject<ApprovalInfo>(Arg.Is(bucket), Arg.Is($"{pipeline}/approvals/{tokenHash}"));
         }
 
         [Test]
@@ -132,7 +135,7 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
                 {
                     ["token"] = tokenHash,
                     ["action"] = action,
-                    ["store"] = store,
+                    ["pipeline"] = pipeline,
                 }
             };
 
@@ -156,13 +159,13 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
                 {
                     ["token"] = tokenHash,
                     ["action"] = action,
-                    ["store"] = store,
+                    ["pipeline"] = pipeline,
                 }
             };
 
             await Handler.Handle(request);
 
-            await s3Client.Received().DeleteObjectAsync(Arg.Is(store), Arg.Is($"approvals/{tokenHash}"));
+            await s3Client.Received().DeleteObjectAsync(Arg.Is(bucket), Arg.Is($"{pipeline}/approvals/{tokenHash}"));
         }
     }
 }
