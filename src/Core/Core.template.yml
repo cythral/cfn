@@ -641,6 +641,8 @@ Resources:
           - Effect: Allow
             Action:
               - states:SendTaskSuccess
+              - sqs:ReceiveMessage
+              - sqs:DeleteMessage
             Resource: "*"
           - Effect: Allow
             Action:
