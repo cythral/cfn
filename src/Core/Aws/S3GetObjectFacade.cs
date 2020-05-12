@@ -73,6 +73,19 @@ namespace Cythral.CloudFormation.Aws
             return Deserialize<T>(stringContent);
         }
 
+        public virtual async Task<T> TryGetObject<T>(string bucket, string key) where T : class
+        {
+            try
+            {
+                var stringContent = await GetObject(bucket, key);
+                return Deserialize<T>(stringContent);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public virtual async Task<T> GetObject<T>(string location)
         {
             var stringContent = await GetObject(location);
