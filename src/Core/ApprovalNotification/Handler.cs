@@ -36,7 +36,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
             var baseUrl = Environment.GetEnvironmentVariable("BASE_URL");
             var pipeline = request.Pipeline;
             var approveUrl = $"{baseUrl}?action=approve&pipeline={pipeline}&token={approvalHash}";
-            var rejectUrl = $"{baseUrl}?action=reject&store={pipeline}&token={approvalHash}";
+            var rejectUrl = $"{baseUrl}?action=reject&pipeline={pipeline}&token={approvalHash}";
             var defaultMessage = $"{request.CustomMessage}.\n\nApprove:\n{approveUrl}\n\nReject:\n{rejectUrl}";
 
 
