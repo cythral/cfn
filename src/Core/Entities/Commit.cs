@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 namespace Cythral.CloudFormation.Entities
@@ -9,6 +10,9 @@ namespace Cythral.CloudFormation.Entities
 
         [JsonPropertyName("message")]
         public string Message { get; set; }
+
+        [JsonPropertyName("timestamp")]
+        public DateTime Timestamp { get; set; }
 
         [JsonPropertyName("author")]
         public Author Author { get; set; }
