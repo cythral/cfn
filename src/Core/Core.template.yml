@@ -500,6 +500,9 @@ Resources:
               - sqs:DeleteMessage
             Resource: "*"
 
+  StateStore:
+    Type: AWS::S3::Bucket
+
   ApprovalWebhook:
     Type: AWS::Serverless::Function
     Properties:
@@ -512,6 +515,9 @@ Resources:
         - AWSLambdaExecute
         - !Ref ApprovalWebhookPolicy
       AutoPublishAlias: ApprovalWebhook
+      Environment:
+        Variables:
+          STATE_STORE: !Ref StateStore
 
   ApprovalWebhookPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -522,8 +528,12 @@ Resources:
           - Effect: Allow
             Action:
               - states:SendTaskSuccess
-              - s3:*Object
             Resource: "*"
+          - Effect: Allow
+            Action:
+              - s3:DeleteObject
+              - s3:GetObject
+            Resource: !Sub arn:aws:s3:::${StateStore}/*
 
   ApprovalWebhookPermission:
     Type: AWS::Lambda::Permission
@@ -581,6 +591,7 @@ Resources:
         Variables:
           TOPIC_ARN: !Ref ApprovalTopic
           BASE_URL: https://brigh.id/webhooks/approval
+          STATE_STORE: !Ref StateStore
 
   ApprovalNotificationPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -594,13 +605,17 @@ Resources:
             Resource: !Ref ApprovalTopic
           - Effect: Allow
             Action:
+              - states:SendTaskSuccess
+            Resource: "*"
+          - Effect: Allow
+            Action:
               - s3:GetObject
               - s3:PutObject
               - s3:DeleteObject
-              - s3:ListObjects
               - s3:ListBucket
-              - states:SendTaskSuccess
-            Resource: "*"
+            Resource:
+              - !Sub arn:aws:s3:::${StateStore}
+              - !Sub arn:aws:s3:::${StateStore}/*
 
   DecryptedGithubToken:
     Type: Custom::Secret
