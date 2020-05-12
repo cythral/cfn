@@ -617,6 +617,38 @@ Resources:
               - !Sub arn:aws:s3:::${StateStore}
               - !Sub arn:aws:s3:::${StateStore}/*
 
+  DeploymentSupersessionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: Core::Cythral.CloudFormation.DeploymentSupersession.Handler::Handle
+      Runtime: dotnetcore3.1
+      Timeout: 30
+      MemorySize: 256
+      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      Policies:
+        - AWSLambdaExecute
+        - !Ref DeploymentSupersessionPolicy
+      Environment:
+        Variables:
+          STATE_STORE: !Ref StateStore
+
+  DeploymentSupersessionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - states:SendTaskSuccess
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+            Resource:
+              - !Sub arn:aws:s3:::${StateStore}/*
+
   DecryptedGithubToken:
     Type: Custom::Secret
     Properties:
@@ -668,3 +700,9 @@ Outputs:
     Description: ARN of the stack deployment function for use in step function pipelines
     Export:
       Name: !Sub ${AWS::StackName}:StackDeploymentFunctionArn
+
+  DeploymentSupersessionFunctionArn:
+    Value: !GetAtt DeploymentSupersessionFunction.Arn
+    Description: ARN of the deployment supersession function for use in step function pipelines
+    Export:
+      Name: !Sub ${AWS::StackName}:DeploymentSupersessionFunctionArn
