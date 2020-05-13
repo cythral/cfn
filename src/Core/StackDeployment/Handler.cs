@@ -48,7 +48,8 @@ namespace Cythral.CloudFormation.StackDeployment
                     Parameters = config?.Parameters,
                     Tags = config?.Tags,
                     StackPolicyBody = config?.StackPolicy?.Value,
-                    ClientRequestToken = token
+                    ClientRequestToken = token,
+                    Capabilities = request.Capabilities,
                 });
             }
             catch (Exception e)
