@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
+using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
@@ -39,6 +40,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private static TokenGenerator tokenGenerator = Substitute.For<TokenGenerator>();
         private static RequestFactory requestFactory = Substitute.For<RequestFactory>();
         private static StepFunctionsClientFactory stepFunctionsClientFactory = Substitute.For<StepFunctionsClientFactory>();
+        private static CloudFormationFactory cloudFormationFactory = Substitute.For<CloudFormationFactory>();
+        private static IAmazonCloudFormation cloudFormationClient = Substitute.For<IAmazonCloudFormation>();
 
         private const string stackName = "stackName";
         private const string location = "location";
@@ -52,6 +55,11 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private const string createdToken = "createdToken";
         private const string templateConfiguration = "templateConfiguration";
         private List<string> capabilities = new List<string> { "a", "b" };
+
+        private Dictionary<string, string> outputs = new Dictionary<string, string>
+        {
+            ["A"] = "B"
+        };
 
         private TemplateConfiguration configuration = new TemplateConfiguration
         {
@@ -121,6 +129,28 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             stepFunctionsClientFactory.ClearSubstitute();
             stepFunctionsClientFactory.Create().Returns(stepFunctionsClient);
         }
+
+        [SetUp]
+        public void SetupCloudFormation()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "cloudFormationFactory", cloudFormationFactory);
+            cloudFormationFactory.ClearSubstitute();
+            cloudFormationFactory.Create(Arg.Any<string>()).Returns(cloudFormationClient);
+
+            cloudFormationClient.DescribeStacksAsync(Arg.Any<DescribeStacksRequest>()).Returns(new DescribeStacksResponse
+            {
+                Stacks = new List<Stack>
+                {
+                    new Stack
+                    {
+                        Outputs = outputs
+                                    .Select(entry => new Output { OutputKey = entry.Key, OutputValue = entry.Value })
+                                    .ToList()
+                    }
+                }
+            });
+        }
+
 
         private Request CreateRequest()
         {
@@ -228,6 +258,30 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                     capabilities.All(c.Capabilities.Contains)
                 )
             );
+        }
+
+        [Test]
+        public async Task HandleDoesntThrowIfNoUpdatesExceptionWasCaught()
+        {
+            var request = CreateRequest();
+            var sqs = Substitute.For<SQSEvent>();
+            var serializedOutput = Serialize(outputs);
+
+            stackDeployer.Deploy(null).ReturnsForAnyArgs(x => { throw new NoUpdatesException("no updates"); });
+
+            await Handler.Handle(sqs);
+
+            await stepFunctionsClient.Received().SendTaskSuccessAsync(
+                Arg.Is<SendTaskSuccessRequest>(c =>
+                    c.TaskToken == clientRequestToken &&
+                    c.Output == serializedOutput
+                )
+            );
+
+            await cloudFormationFactory.Received().Create(Arg.Is(roleArn));
+            await cloudFormationClient.Received().DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
+                req.StackName == stackName
+            ));
         }
 
         [Test]

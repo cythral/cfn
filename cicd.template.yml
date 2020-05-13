@@ -156,9 +156,19 @@ Resources:
                   {
                     "Variable": "$.SupersededOutput.Superseded",
                     "BooleanEquals": false,
-                    "Next": "Deploy Utilities to Shared"
+                    "Next": "Extract Networking Config"
                   }
                 ]
+              },
+              "Extract Networking Config": {
+                "Type": "Task",
+                "Resource": "${FileFromZipArn}",
+                "ResultPath": "$.NetworkingConfig",
+                "Parameters": {
+                  "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                  "Filename": "Networking.config.json"
+                },
+                "Next": "Deploy Utilities to Shared"
               },
               "Deploy Utilities to Shared": {
                 "Type": "Task",
@@ -309,3 +319,4 @@ Resources:
         - DevRoleArn: !ImportValue cfn-metadata:DevAgentRoleArn
           ProdRoleArn: !ImportValue cfn-metadata:ProdAgentRoleArn
           SharedRoleArn: !ImportValue cfn-utilities:MasterRoleArn
+          FileFromZipArn: !ImportValue cfn-core:ExtractFileFromZipFunctionArn

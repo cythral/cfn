@@ -66,7 +66,11 @@ namespace Cythral.CloudFormation.StackDeployment
                 }
                 catch (Exception e)
                 {
-                    if (e.Message != "No updates are to be performed.")
+                    if (e.Message == "No updates are to be performed.")
+                    {
+                        throw new NoUpdatesException(e.Message);
+                    }
+                    else
                     {
                         throw e;
                     }

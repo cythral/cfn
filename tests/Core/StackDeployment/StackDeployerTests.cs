@@ -140,7 +140,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
         }
 
         [Test]
-        public void UpdateDoesntThrowIfMessageIsNoUpdates()
+        public void UpdateRethrowsWithNoUpdatesException()
         {
 
             cloudformationClient
@@ -166,7 +166,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             TestUtils.SetPrivateField(stackDeployer, "cloudFormationFactory", cloudFormationFactory);
 
 
-            Assert.DoesNotThrowAsync(() => stackDeployer.Deploy(new DeployStackContext
+            Assert.ThrowsAsync<NoUpdatesException>(() => stackDeployer.Deploy(new DeployStackContext
             {
                 StackName = stackName,
                 Template = exampleTemplate,
