@@ -660,6 +660,7 @@ Resources:
           - Effect: Allow
             Action:
               - s3:GetObject
+              - kms:Decrypt
             Resource: "*"
 
   DecryptedGithubToken:
