@@ -7,5 +7,11 @@ get_export() {
     echo -n $(aws cloudformation list-exports --query Exports[?Name==\`${stack}:${name}\`].Value --output text);
 }
 
-export DEV_PEERING_ID=$(get_export cfn-core DevPeeringConnectionId)
-export PROD_PEERING_ID=$(get_export cfn-core ProdPeeringConnectionId)
+devPeeringConnectionId=$(get_export cfn-core DevPeeringConnectionId)
+prodPeeringConnectionId=$(get_export cfn-core ProdPeeringConnectionId)
+
+config={}
+config=$(echo $config | jq ".DevPeeringConnectionId=\"$devPeeringConnectionId\"") 
+config=$(echo $config | jq ".ProdPeeringConnectionId=\"$prodPeeringConnectionId\"")
+
+echo $config
