@@ -636,6 +636,32 @@ Resources:
             Resource:
               - !Sub arn:aws:s3:::${StateStore}/*
 
+  ExtractFileFromZipFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: Core::Cythral.CloudFormation.ExtractFileFromZip.Handler::Handle
+      Runtime: dotnetcore3.1
+      Timeout: 30
+      MemorySize: 256
+      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      Policies:
+        - AWSLambdaExecute
+        - !Ref ExtractFileFromZipPolicy
+      Environment:
+        Variables:
+          STATE_STORE: !Ref StateStore
+
+  ExtractFileFromZipPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+            Resource: "*"
+
   DecryptedGithubToken:
     Type: Custom::Secret
     Properties:
@@ -693,3 +719,9 @@ Outputs:
     Description: ARN of the deployment supersession function for use in step function pipelines
     Export:
       Name: !Sub ${AWS::StackName}:DeploymentSupersessionFunctionArn
+
+  ExtractFileFromZipFunctionArn:
+    Value: !GetAtt ExtractFileFromZipFunction.Arn
+    Description: ARN of the file extraction function for use in step function pipelines
+    Export:
+      Name: !Sub ${AWS::StackName}:ExtractFileFromZipFunctionArn
