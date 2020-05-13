@@ -15,6 +15,7 @@ phases:
   build:
     commands:
       - dotnet --info
+      - dotnet restore
       - dotnet test -c Release
       - dotnet msbuild tools/package.proj -p:Configuration=Release -p:DeploymentBucket=$ARTIFACT_STORE
       - . ./tools/create-networking-config.sh
