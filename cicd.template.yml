@@ -190,7 +190,7 @@ Resources:
                         "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
                         "Parameters": {
                           "QueueUrl": "${DeploymentQueue}",
-                          "MessageGroupId": "${GithubRepo}",
+                          "MessageGroupId": "${GithubRepo}-utilities-dev",
                           "MessageBody": {
                             "StackName": "cfn-utilities",
                             "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
@@ -217,7 +217,7 @@ Resources:
                         "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
                         "Parameters": {
                           "QueueUrl": "${DeploymentQueue}",
-                          "MessageGroupId": "${GithubRepo}",
+                          "MessageGroupId": "${GithubRepo}-utilities-prod",
                           "MessageBody": {
                             "StackName": "cfn-utilities",
                             "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
