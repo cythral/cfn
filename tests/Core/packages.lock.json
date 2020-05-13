@@ -73,13 +73,12 @@
         "resolved": "1.1.0",
         "contentHash": "ueGId8b4DEHoVWkHDs3iAJH8IUSAUGu5AqkoI/Syl4RuByzik7lz9IjoImiGAlGhtsQV02MHNeTo04IFjS37gQ=="
       },
-      "Amazon.Lambda.Serialization.Json": {
+      "Amazon.Lambda.Serialization.SystemTextJson": {
         "type": "Transitive",
-        "resolved": "1.7.0",
-        "contentHash": "R2PD+JZnLuCnP3f8sTZEGyVexeVWxIJqQbVUbZJIEjrElE8Dbx0zTMXxKr1w1AdhRsZvL3HXpIvYywRHChPQig==",
+        "resolved": "2.0.1",
+        "contentHash": "WPtMxw5jwEcVbe0Ro/bF0VDnict/zoCW0r6dfRIIOthjO+fVMgDyGYa4Pkz6ptgCCFcnhQuOq6iebYw1LRZeIQ==",
         "dependencies": {
-          "Amazon.Lambda.Core": "1.1.0",
-          "Newtonsoft.Json": "9.0.1"
+          "Amazon.Lambda.Core": "1.1.0"
         }
       },
       "Amazon.Lambda.SNSEvents": {
@@ -1125,7 +1124,7 @@
           "Amazon.Lambda.Core": "1.1.0",
           "Amazon.Lambda.SNSEvents": "1.1.0",
           "Amazon.Lambda.SQSEvents": "1.1.0",
-          "Amazon.Lambda.Serialization.Json": "1.7.0",
+          "Amazon.Lambda.Serialization.SystemTextJson": "2.0.1",
           "SharpZipLib.NETStandard": "1.0.7"
         }
       }
