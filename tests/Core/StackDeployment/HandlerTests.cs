@@ -50,7 +50,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private const string notificationArn = "notificationArn";
         private const string clientRequestToken = "clientRequestToken";
         private const string createdToken = "createdToken";
-        private string templateConfiguration = "templateConfiguration";
+        private const string templateConfiguration = "templateConfiguration";
+        private List<string> capabilities = new List<string> { "a", "b" };
 
         private TemplateConfiguration configuration = new TemplateConfiguration
         {
@@ -130,7 +131,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                 TemplateConfigurationFileName = templateConfigurationFileName,
                 StackName = stackName,
                 RoleArn = roleArn,
-                Token = clientRequestToken
+                Token = clientRequestToken,
+                Capabilities = capabilities
             };
 
             requestFactory.CreateFromSqsEvent(Arg.Any<SQSEvent>()).Returns(req);
@@ -222,7 +224,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                     c.Parameters == configuration.Parameters &&
                     c.Tags == configuration.Tags &&
                     c.StackPolicyBody == configuration.StackPolicy.ToString() &&
-                    c.ClientRequestToken == createdToken
+                    c.ClientRequestToken == createdToken &&
+                    capabilities.All(c.Capabilities.Contains)
                 )
             );
         }
