@@ -86,7 +86,7 @@ namespace Cythral.CloudFormation.StackDeployment
             return null;
         }
 
-        private static IEnumerable<Parameter> MergeParameters(List<Parameter> parameters, Dictionary<string, string> overrides)
+        private static List<Parameter> MergeParameters(List<Parameter> parameters, Dictionary<string, string> overrides)
         {
             var result = parameters?.ToDictionary(param => param.ParameterKey, param => param.ParameterValue) ?? new Dictionary<string, string>();
             overrides = overrides ?? new Dictionary<string, string>();
@@ -96,7 +96,7 @@ namespace Cythral.CloudFormation.StackDeployment
                 result[entry.Key] = entry.Value;
             }
 
-            return result.Select(entry => new Parameter { ParameterKey = entry.Key, ParameterValue = entry.Value });
+            return result.Select(entry => new Parameter { ParameterKey = entry.Key, ParameterValue = entry.Value }).ToList();
         }
     }
 }
