@@ -3,6 +3,10 @@ env:
   variables:
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: "true"
 
+  exported-variables:
+    - DEV_PEERING_ID
+    - PROD_PEERING_ID
+
 phases:
   install:
     runtime-versions:
@@ -13,7 +17,7 @@ phases:
       - dotnet --info
       - dotnet test -c Release
       - dotnet msbuild tools/package.proj -p:Configuration=Release -p:DeploymentBucket=$ARTIFACT_STORE
-      - ./tools/create-networking-config.sh > Networking.config.json
+      - . ./tools/create-networking-config.sh
 
 artifacts:
   discard-paths: yes
@@ -24,4 +28,3 @@ artifacts:
     - "Resources.template.yml"
     - "Dns.template.yml"
     - "Dns.config.json"
-    - "Networking.config.json"
