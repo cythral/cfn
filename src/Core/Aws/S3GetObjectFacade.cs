@@ -35,6 +35,11 @@ namespace Cythral.CloudFormation.Aws
             {
                 var file = zip.GetEntry(entry);
 
+                if (file == null)
+                {
+                    throw new Exception($"{entry} could not be found in {key}");
+                }
+
                 using (var inputStream = zip.GetInputStream(file))
                 using (var reader = new StreamReader(inputStream))
                 {
