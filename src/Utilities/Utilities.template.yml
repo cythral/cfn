@@ -50,6 +50,9 @@ Resources:
     Properties:
       AccessControl: BucketOwnerFullControl
 
+  TestBucket:
+    Type: AWS::S3::Bucket
+
   # Networking
   # -------------------------------------------
   # Use this VPC for quick development and/or tools that do not require extremely high availability
