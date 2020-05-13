@@ -232,7 +232,7 @@ Resources:
                             "Capabilities": ["CAPABILITY_NAMED_IAM"]
                           }
                         },
-                        "End": true
+                        "End": true 
                       }
                     }
                   }
