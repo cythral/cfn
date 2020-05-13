@@ -1,6 +1,9 @@
+using System.Linq;
+using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
 
+using Amazon.CloudFormation.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 using Amazon.Lambda.Core;
@@ -20,6 +23,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
         private static StepFunctionsClientFactory stepFunctionsClientFactory = new StepFunctionsClientFactory();
         private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
         private static SqsFactory sqsFactory = new SqsFactory();
+        private static CloudFormationFactory cloudFormationFactory = new CloudFormationFactory();
 
         public static async Task<Response> Handle(
             SNSEvent snsRequest,
@@ -82,15 +86,28 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
         private static async Task SendSuccess(StackDeploymentStatusRequest request, IAmazonStepFunctions client)
         {
             var tokenInfo = await GetTokenInfoFromRequest(request);
+            var outputs = await GetStackOutputs(request);
             var response = await client.SendTaskSuccessAsync(new SendTaskSuccessRequest
             {
                 TaskToken = tokenInfo.ClientRequestToken,
-                Output = Serialize(request)
+                Output = Serialize(outputs)
             });
 
             Console.WriteLine($"Received send task failure response: {Serialize(response)}");
 
             await Dequeue(tokenInfo);
+        }
+
+        private static async Task<Dictionary<string, string>> GetStackOutputs(StackDeploymentStatusRequest request)
+        {
+            var agentArn = $"arn:aws:iam::{request.Namespace}:role/Agent";
+            var client = await cloudFormationFactory.Create(agentArn);
+            var response = await client.DescribeStacksAsync(new DescribeStacksRequest
+            {
+                StackName = request.StackId
+            });
+
+            return response.Stacks[0].Outputs.ToDictionary(entry => entry.OutputKey, entry => entry.OutputValue);
         }
 
         private static async Task Dequeue(TokenInfo tokenInfo)

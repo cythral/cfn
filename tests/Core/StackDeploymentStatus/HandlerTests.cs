@@ -3,6 +3,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
+using Amazon.CloudFormation;
+using Amazon.CloudFormation.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 using Amazon.SQS;
@@ -39,6 +41,8 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
         private static SqsFactory sqsFactory = Substitute.For<SqsFactory>();
         private static IAmazonSQS sqsClient = Substitute.For<IAmazonSQS>();
+        private static CloudFormationFactory cloudFormationFactory = Substitute.For<CloudFormationFactory>();
+        private static IAmazonCloudFormation cloudFormationClient = Substitute.For<IAmazonCloudFormation>();
         private const string stackId = "stackId";
         private const string bucket = "bucket";
         private const string key = "key";
@@ -47,6 +51,11 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         private const string token = "token";
         private const string receiptHandle = "receiptHandle";
         private const string queueUrl = "queueUrl";
+        private const string accountId = "1";
+        private Dictionary<string, string> outputs = new Dictionary<string, string>
+        {
+            ["A"] = "B"
+        };
         private static string tokenInfo = Serialize(new TokenInfo
         {
             ClientRequestToken = token,
@@ -94,6 +103,27 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             sqsClient.ClearSubstitute();
         }
 
+        [SetUp]
+        public void SetupCloudFormation()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "cloudFormationFactory", cloudFormationFactory);
+            cloudFormationFactory.ClearSubstitute();
+            cloudFormationFactory.Create(Arg.Any<string>()).Returns(cloudFormationClient);
+
+            cloudFormationClient.DescribeStacksAsync(Arg.Any<DescribeStacksRequest>()).Returns(new DescribeStacksResponse
+            {
+                Stacks = new List<Stack>
+                {
+                    new Stack
+                    {
+                        Outputs = outputs
+                                    .Select(entry => new Output { OutputKey = entry.Key, OutputValue = entry.Value })
+                                    .ToList()
+                    }
+                }
+            });
+        }
+
         private StackDeploymentStatusRequest CreateRequest(string stackId, string token, string status = "CREATE_COMPLETE", string resourceType = "AWS::CloudFormation::Stack")
         {
             var request = new StackDeploymentStatusRequest
@@ -101,7 +131,8 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
                 StackId = stackId,
                 ClientRequestToken = token,
                 ResourceStatus = status,
-                ResourceType = resourceType
+                ResourceType = resourceType,
+                Namespace = accountId
             };
 
             requestFactory.CreateFromSnsEvent(Arg.Any<SNSEvent>()).Returns(request);
@@ -204,18 +235,25 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             var request = CreateRequest(stackId, tokenKey, status);
             var serializedRequest = Serialize(request);
             var snsEvent = Substitute.For<SNSEvent>();
+            var serializedOutput = Serialize(outputs);
 
             await Handler.Handle(snsEvent);
+
+            await cloudFormationFactory.Received().Create(Arg.Is($"arn:aws:iam::{accountId}:role/Agent"));
+            await cloudFormationClient.Received().DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
+                req.StackName == stackId
+            ));
 
             await s3GetObjectFacade.Received().GetObject(Arg.Is(s3Location));
             await stepFunctionsClient
                 .Received()
-                .SendTaskSuccessAsync(Arg.Is<SendTaskSuccessRequest>(req => req.TaskToken == token && req.Output == serializedRequest));
+                .SendTaskSuccessAsync(Arg.Is<SendTaskSuccessRequest>(req => req.TaskToken == token && req.Output == serializedOutput));
 
             await sqsFactory.Received().Create();
             await sqsClient
                 .Received()
                 .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
+
         }
 
         [Test]

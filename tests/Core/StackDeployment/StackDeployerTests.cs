@@ -6,6 +6,7 @@ using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 
 using Cythral.CloudFormation.StackDeployment;
+using Cythral.CloudFormation.Aws;
 
 using NSubstitute;
 
