@@ -28,7 +28,7 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - Effect: Allow 
+          - Effect: Allow
             Action: s3:*Object
             Resource:
               - !Sub arn:aws:s3:::${ArtifactStore}
@@ -43,200 +43,275 @@ Resources:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Sub ${AWS::StackName}-build
+      BadgeEnabled: true
       ServiceRole: !ImportValue cfn-utilities:BuilderRoleArn
       EncryptionKey: !ImportValue cfn-utilities:ArtifactKeyArn
       Environment:
         Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
-        ComputeType: BUILD_GENERAL1_SMALL 
+        ComputeType: BUILD_GENERAL1_SMALL
         EnvironmentVariables:
           - Name: ARTIFACT_STORE
             Value: !Ref ArtifactStore
         Type: LINUX_CONTAINER
+      Cache:
+        Type: LOCAL
+        Modes:
+          - LOCAL_DOCKER_LAYER_CACHE
       Artifacts:
-        Type: CODEPIPELINE
-      Source: 
-        Type: CODEPIPELINE
-  
-  Webhook:
-    Type: AWS::CodePipeline::Webhook
-    Properties:
-      Authentication: GITHUB_HMAC
-      AuthenticationConfiguration:
-        SecretToken: !Ref GithubToken
-      Filters:
-        - JsonPath: $.ref
-          MatchEquals: "refs/heads/{Branch}"
-      TargetPipeline: !Ref Pipeline
-      TargetAction: Source
-      TargetPipelineVersion: !GetAtt Pipeline.Version
-      RegisterWithThirdParty: true
-
-  Pipeline:
-    Type: AWS::CodePipeline::Pipeline
-    Properties:
-      Name: !Sub ${AWS::StackName}-pipeline 
-      ArtifactStore:
         Type: S3
         Location: !Ref ArtifactStore
-        EncryptionKey: 
-          Id: !ImportValue cfn-utilities:ArtifactKeyArn
-          Type: KMS
+        Name: buildResults.zip
+        NamespaceType: BUILD_ID
+        Packaging: ZIP
+      Source:
+        Type: GITHUB
+        Location: !Sub https://github.com/${GithubOwner}/${GithubRepo}.git
+        ReportBuildStatus: true
+
+  SupersessionQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      ContentBasedDeduplication: true
+      FifoQueue: true
+      MessageRetentionPeriod: 1209600
+
+  SupersessionEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !ImportValue cfn-core:DeploymentSupersessionFunctionArn
+      EventSourceArn: !GetAtt SupersessionQueue.Arn
+
+  DeploymentQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      ContentBasedDeduplication: true
+      VisibilityTimeout: 3600
+      FifoQueue: true
+      MessageRetentionPeriod: 1209600
+
+  DeploymentEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !ImportValue cfn-core:StackDeploymentFunctionArn
+      EventSourceArn: !GetAtt DeploymentQueue.Arn
+
+  StateMachine:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
       RoleArn: !ImportValue cfn-utilities:MasterRoleArn
-      RestartExecutionOnUpdate: true
-      Stages:
-        - Name: Source
-          Actions:
-            - Name: Source
-              ActionTypeId:
-                Category: Source
-                Provider: GitHub
-                Owner: ThirdParty
-                Version: 1
-              OutputArtifacts:
-                - Name: sourceCode
-              Configuration:
-                Owner: !Ref GithubOwner
-                Repo: !Ref GithubRepo
-                Branch: !Ref GithubBranch
-                OAuthToken: !Ref GithubToken
-                PollForSourceChanges: false
-        - Name: Build
-          Actions:
-            - Name: Build
-              ActionTypeId:
-                Category: Build
-                Provider: CodeBuild
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: sourceCode
-              OutputArtifacts:
-                - Name: buildResults
-              Configuration:
-                ProjectName: !Ref BuildProject
-        - Name: Utilities
-          Actions:
-            - Name: Shared
-              RunOrder: 1
-              ActionTypeId:
-                Category: Deploy
-                Provider: CloudFormation
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: buildResults
-              Configuration:
-                StackName: cfn-utilities
-                ActionMode: CREATE_UPDATE
-                TemplatePath: buildResults::Utilities.template.yml
-                RoleArn: !ImportValue cfn-utilities:MasterRoleArn
-                Capabilities: CAPABILITY_NAMED_IAM
-            - Name: Dev
-              RunOrder: 2
-              RoleArn: !ImportValue cfn-metadata:DevAgentRoleArn
-              ActionTypeId:
-                Category: Deploy
-                Provider: CloudFormation
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: buildResults
-              OutputArtifacts:
-                - Name: devUtilityExports
-              Configuration:
-                StackName: cfn-utilities
-                ActionMode: CREATE_UPDATE
-                TemplatePath: buildResults::Utilities.template.yml
-                RoleArn: !ImportValue cfn-metadata:DevAgentRoleArn
-                ParameterOverrides: !Sub |
-                  { 
-                    "MasterAccountId": "${AWS::AccountId}", 
-                    "NetworkCidr": "10.2.0.0/16",
-                    "PeeringConnectionId": { "Fn::GetParam": [ "buildResults", "Networking.config.json", "DevPeeringConnectionId" ] }
-                  }
-                Capabilities: CAPABILITY_NAMED_IAM
-                OutputFileName: utility-output.json
-            - Name: Prod
-              RunOrder: 3
-              RoleArn: !ImportValue cfn-metadata:ProdAgentRoleArn
-              ActionTypeId:
-                Category: Deploy
-                Provider: CloudFormation
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: buildResults
-              OutputArtifacts:
-                - Name: prodUtilityExports
-              Configuration:
-                StackName: cfn-utilities
-                ActionMode: CREATE_UPDATE
-                TemplatePath: buildResults::Utilities.template.yml
-                RoleArn: !ImportValue cfn-metadata:ProdAgentRoleArn
-                ParameterOverrides: !Sub |
-                  { 
-                    "MasterAccountId": "${AWS::AccountId}", 
-                    "NetworkCidr": "10.3.0.0/16",
-                    "PeeringConnectionId": { "Fn::GetParam": [ "buildResults", "Networking.config.json", "ProdPeeringConnectionId" ] }
-                  }
-                Capabilities: CAPABILITY_NAMED_IAM
-                OutputFileName: utility-output.json
-        - Name: Features
-          Actions:
-            - Name: Resources
-              RunOrder: 1
-              ActionTypeId:
-                Category: Deploy
-                Provider: CloudFormation
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: buildResults
-              Configuration:
-                StackName: cfn-resources
-                ActionMode: CREATE_UPDATE
-                TemplatePath: buildResults::Resources.template.yml
-                RoleArn: !ImportValue cfn-utilities:MasterRoleArn
-                Capabilities: CAPABILITY_IAM
-            - Name: DNS
-              RunOrder: 2
-              ActionTypeId:
-                Category: Deploy
-                Provider: CloudFormation
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: buildResults
-              Configuration:
-                StackName: cfn-dns
-                ActionMode: CREATE_UPDATE
-                TemplatePath: buildResults::Dns.template.yml
-                TemplateConfiguration: buildResults::Dns.config.json
-                RoleArn: !ImportValue cfn-utilities:MasterRoleArn
-                Capabilities: CAPABILITY_IAM
-            - Name: Core
-              RunOrder: 3
-              ActionTypeId:
-                Category: Deploy
-                Provider: CloudFormation
-                Owner: AWS
-                Version: 1
-              InputArtifacts:
-                - Name: buildResults
-                - Name: devUtilityExports
-                - Name: prodUtilityExports
-              Configuration:
-                StackName: cfn-core
-                ActionMode: CREATE_UPDATE
-                TemplatePath: buildResults::Core.template.yml
-                TemplateConfiguration: buildResults::Core.config.json
-                RoleArn: !ImportValue cfn-utilities:MasterRoleArn
-                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                ParameterOverrides: |
+      StateMachineName: !Sub ${AWS::StackName}-pipeline
+      DefinitionString: !Sub
+        - |
+          {
+            "StartAt": "Build",
+            "States": {
+              "Build": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::codebuild:startBuild.sync",
+                "Parameters": {
+                  "ProjectName": "${BuildProject}",
+                  "SourceVersion.$": "$.head_commit.id"
+                },
+                "ResultPath": "$.BuildOutput",
+                "Next": "On Default Branch?"
+              },
+              "On Default Branch?": {
+                "Type": "Choice",
+                "Choices": [
                   {
-                    "DevVpcId": { "Fn::GetParam": [ "devUtilityExports", "utility-output.json", "VpcId" ] },
-                    "ProdVpcId": { "Fn::GetParam": [ "prodUtilityExports", "utility-output.json", "VpcId" ] },
-                    "DevLoadBalancerDnsName": { "Fn::GetParam": [ "devUtilityExports", "utility-output.json", "LoadBalancerDnsName" ] },
-                    "ProdLoadBalancerDnsName": { "Fn::GetParam": [ "prodUtilityExports", "utility-output.json", "LoadBalancerDnsName" ] }
+                    "Variable": "$.on_default_branch",
+                    "BooleanEquals": true,
+                    "Next": "Check if Superseded"
+                  },
+                  {
+                    "Variable": "$.on_default_branch",
+                    "BooleanEquals": false,
+                    "Next": "Success"
+                  } 
+                ]
+              },
+              "Check if Superseded": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+                "ResultPath": "$.SupersededOutput",
+                "Next": "Was Superseded?",
+                "Parameters": {
+                  "QueueUrl": "${SupersessionQueue}",
+                  "MessageGroupId": "${GithubRepo}",
+                  "MessageBody": {
+                    "Pipeline": "${GithubRepo}",
+                    "CommitTimestamp.$": "$.head_commit.timestamp",
+                    "Token.$": "$$.Task.Token"
                   }
-            
+                }
+              },
+              "Was Superseded?": {
+                "Type": "Choice",
+                "Choices": [
+                  {
+                    "Variable": "$.SupersededOutput.Superseded",
+                    "BooleanEquals": true,
+                    "Next": "Success"
+                  },
+                  {
+                    "Variable": "$.SupersededOutput.Superseded",
+                    "BooleanEquals": false,
+                    "Next": "Deploy to Shared"
+                  }
+                ]
+              },
+              "Deploy Utilities to Shared": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+                "ResultPath": "$.UtilityOutputs.Shared",
+                "Parameters": {
+                  "QueueUrl": "${DeploymentQueue}",
+                  "MessageGroupId": "${GithubRepo}",
+                  "MessageBody": {
+                    "StackName": "cfn-utilities",
+                    "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                    "TemplateFileName": "Utilities.template.yml",
+                    "RoleArn": "${SharedRoleArn}",
+                    "Token.$": "$$.Task.Token",
+                    "Capabilities": [
+                      "CAPABILITY_NAMED_IAM"
+                    ]
+                  }
+                },
+                "Next": "Deploy Utilities to Agents"
+              },
+              "Deploy Utilities to Agents": {
+                "Type": "Parallel",
+                "ResultPath": "$.UtilityOutputs.Agents",
+                "Branches": [
+                  {
+                    "StartAt": "Dev",
+                    "States": {
+                      "Dev": {
+                        "Type": "Task",
+                        "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+                        "Parameters": {
+                          "QueueUrl": "${DeploymentQueue}",
+                          "MessageGroupId": "${GithubRepo}",
+                          "MessageBody": {
+                            "StackName": "cfn-utilities",
+                            "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                            "TemplateFileName": "Utilities.template.yml",
+                            "RoleArn": "${DevRoleArn}",
+                            "Token.$": "$$.Task.Token",
+                            "ParameterOverrides": {
+                              "MasterAccountId": "${AWS::AccountId}",
+                              "NetworkCidr": "10.2.0.0/16",
+                              "PeeringConnectionId.$": "$.BuildOutputs.Build.ExportedEnvironmentVariables[?Name=='DEV_PEERING_ID'].Value" 
+                            },
+                            "Capabilities": [
+                              "CAPABILITY_NAMED_IAM"
+                            ]
+                          }
+                        },
+                        "End": true
+                      }
+                    }
+                  },
+                  {
+                    "StartAt": "Prod",
+                    "States": {
+                      "Prod": {
+                        "Type": "Task",
+                        "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+                        "Parameters": {
+                          "QueueUrl": "${DeploymentQueue}",
+                          "MessageGroupId": "${GithubRepo}",
+                          "MessageBody": {
+                            "StackName": "cfn-utilities",
+                            "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                            "TemplateFileName": "Utilities.template.yml",
+                            "RoleArn": "${ProdRoleArn}",
+                            "Token.$": "$$.Task.Token",
+                            "ParameterOverrides": {
+                              "MasterAccountId": "${AWS::AccountId}",
+                              "NetworkCidr": "10.3.0.0/16",
+                              "PeeringConnectionId.$": "$.BuildOutputs.Build.ExportedEnvironmentVariables[?Name=='PROD_PEERING_ID'].Value" 
+                            },
+                            "Capabilities": [
+                              "CAPABILITY_NAMED_IAM"
+                            ]
+                          }
+                        },
+                        "End": true
+                      }
+                    }
+                  }
+                ]
+              },
+              "Deploy Resources": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+                "Parameters": {
+                  "QueueUrl": "${DeploymentQueue}",
+                  "MessageGroupId": "${GithubRepo}",
+                  "MessageBody": {
+                    "StackName": "cfn-resources",
+                    "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                    "TemplateFileName": "Resources.template.yml",
+                    "RoleArn": "${SharedRoleArn}",
+                    "Token.$": "$$.Task.Token",
+                    "Capabilities": [
+                      "CAPABILITY_IAM"
+                    ]
+                  }
+                },
+                "Next": "Deploy DNS"
+              },
+              "Deploy DNS": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+                "Parameters": {
+                  "QueueUrl": "${DeploymentQueue}",
+                  "MessageGroupId": "${GithubRepo}",
+                  "MessageBody": {
+                    "StackName": "cfn-dns",
+                    "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                    "TemplateFileName": "Dns.template.yml",
+                    "TemplateConfigurationFileName": "Dns.config.json",
+                    "RoleArn": "${SharedRoleArn}",
+                    "Token.$": "$$.Task.Token",
+                    "Capabilities": [
+                      "CAPABILITY_IAM"
+                    ]
+                  }
+                },
+                "Next": "Deploy Core"
+              },
+              "Deploy Core": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+                "Parameters": {
+                  "QueueUrl": "${DeploymentQueue}",
+                  "MessageGroupId": "${GithubRepo}",
+                  "MessageBody": {
+                    "StackName": "cfn-core",
+                    "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                    "TemplateFileName": "Core.template.yml",
+                    "TemplateConfigurationFileName": "Core.config.json",
+                    "RoleArn": "${SharedRoleArn}",
+                    "Token.$": "$$.Task.Token",
+                    "ParameterOverrides": {
+                      "DevVpcId.$": "$.UtilityOutputs.Agents[0].VpcId",
+                      "ProdVpcId.$": "$.UtilityOutputs.Agents[1].VpcId",
+                      "DevLoadBalancerDnsName": "$.UtilityOutputs.Agents[0].LoadBalancerDnsName",
+                      "ProdLoadBalancerDnsName": "$.UtilityOutputs.Agents[1].LoadBalancerDnsName",
+                    },
+                    "Capabilities": [
+                      "CAPABILITY_IAM",
+                      "CAPABILITY_AUTO_EXPAND"
+                    ]
+                  }
+                },
+                "End": true
+              }
+            }
+          }
+        - DevRoleArn: !ImportValue cfn-metadata:DevAgentRoleArn
+          ProdRoleArn: !ImportValue cfn-metadata:ProdAgentRoleArn
+          SharedRoleArn: !ImportValue cfn-utilities:MasterRoleArn
