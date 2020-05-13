@@ -127,7 +127,7 @@ Resources:
                     "Variable": "$.on_default_branch",
                     "BooleanEquals": false,
                     "Next": "Success"
-                  } 
+                  }
                 ]
               },
               "Check if Superseded": {
@@ -173,9 +173,7 @@ Resources:
                     "TemplateFileName": "Utilities.template.yml",
                     "RoleArn": "${SharedRoleArn}",
                     "Token.$": "$$.Task.Token",
-                    "Capabilities": [
-                      "CAPABILITY_NAMED_IAM"
-                    ]
+                    "Capabilities": ["CAPABILITY_NAMED_IAM"]
                   }
                 },
                 "Next": "Deploy Utilities to Agents"
@@ -202,11 +200,9 @@ Resources:
                             "ParameterOverrides": {
                               "MasterAccountId": "${AWS::AccountId}",
                               "NetworkCidr": "10.2.0.0/16",
-                              "PeeringConnectionId.$": "$.BuildOutputs.Build.ExportedEnvironmentVariables[?Name==\"DEV_PEERING_ID\"].Value" 
+                              "PeeringConnectionId.$": "$.BuildOutputs.Build.ExportedEnvironmentVariables[?Name==\"DEV_PEERING_ID\"].Value"
                             },
-                            "Capabilities": [
-                              "CAPABILITY_NAMED_IAM"
-                            ]
+                            "Capabilities": ["CAPABILITY_NAMED_IAM"]
                           }
                         },
                         "End": true
@@ -231,18 +227,17 @@ Resources:
                             "ParameterOverrides": {
                               "MasterAccountId": "${AWS::AccountId}",
                               "NetworkCidr": "10.3.0.0/16",
-                              "PeeringConnectionId.$": "$.BuildOutputs.Build.ExportedEnvironmentVariables[?Name==\"PROD_PEERING_ID\"].Value" 
+                              "PeeringConnectionId.$": "$.BuildOutputs.Build.ExportedEnvironmentVariables[?Name==\"PROD_PEERING_ID\"].Value"
                             },
-                            "Capabilities": [
-                              "CAPABILITY_NAMED_IAM"
-                            ]
+                            "Capabilities": ["CAPABILITY_NAMED_IAM"]
                           }
                         },
                         "End": true
                       }
                     }
                   }
-                ]
+                ],
+                "Next": "Deploy Resources"
               },
               "Deploy Resources": {
                 "Type": "Task",
@@ -256,9 +251,7 @@ Resources:
                     "TemplateFileName": "Resources.template.yml",
                     "RoleArn": "${SharedRoleArn}",
                     "Token.$": "$$.Task.Token",
-                    "Capabilities": [
-                      "CAPABILITY_IAM"
-                    ]
+                    "Capabilities": ["CAPABILITY_IAM"]
                   }
                 },
                 "Next": "Deploy DNS"
@@ -276,9 +269,7 @@ Resources:
                     "TemplateConfigurationFileName": "Dns.config.json",
                     "RoleArn": "${SharedRoleArn}",
                     "Token.$": "$$.Task.Token",
-                    "Capabilities": [
-                      "CAPABILITY_IAM"
-                    ]
+                    "Capabilities": ["CAPABILITY_IAM"]
                   }
                 },
                 "Next": "Deploy Core"
@@ -302,13 +293,13 @@ Resources:
                       "DevLoadBalancerDnsName": "$.UtilityOutputs.Agents[0].LoadBalancerDnsName",
                       "ProdLoadBalancerDnsName": "$.UtilityOutputs.Agents[1].LoadBalancerDnsName"
                     },
-                    "Capabilities": [
-                      "CAPABILITY_IAM",
-                      "CAPABILITY_AUTO_EXPAND"
-                    ]
+                    "Capabilities": ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"]
                   }
                 },
-                "End": true
+                "Next": "Success"
+              },
+              "Success": {
+                "Type": "Succeed"
               }
             }
           }

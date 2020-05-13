@@ -132,7 +132,8 @@
             }
           }
         }
-      ]
+      ],
+      "Next": "Deploy Resources"
     },
     "Deploy Resources": {
       "Type": "Task",
@@ -191,7 +192,10 @@
           "Capabilities": ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"]
         }
       },
-      "End": true
+      "Next": "Success"
+    },
+    "Success": {
+      "Type": "Succeed"
     }
   }
 }
