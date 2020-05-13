@@ -300,7 +300,7 @@ Resources:
                       "DevVpcId.$": "$.UtilityOutputs.Agents[0].VpcId",
                       "ProdVpcId.$": "$.UtilityOutputs.Agents[1].VpcId",
                       "DevLoadBalancerDnsName": "$.UtilityOutputs.Agents[0].LoadBalancerDnsName",
-                      "ProdLoadBalancerDnsName": "$.UtilityOutputs.Agents[1].LoadBalancerDnsName",
+                      "ProdLoadBalancerDnsName": "$.UtilityOutputs.Agents[1].LoadBalancerDnsName"
                     },
                     "Capabilities": [
                       "CAPABILITY_IAM",
