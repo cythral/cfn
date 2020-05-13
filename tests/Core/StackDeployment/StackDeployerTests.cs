@@ -18,24 +18,26 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
 {
     public class StackDeployerTests
     {
+        private const string stackName = "test-stack";
+        private const string exampleTemplate = "this is a bad example template.";
+        private const string roleArn = "arn:aws:iam::1:role/Facade";
+        private IAmazonCloudFormation cloudformationClient = Substitute.For<IAmazonCloudFormation>();
+        private const string notificationArn = "arn:aws:sns::1:topic/Topic";
+        private const string clientRequestToken = "token";
+
+        private List<Tag> tags = new List<Tag>
+        {
+            new Tag { Key = "A", Value = "B" }
+        };
+
+        private List<Parameter> parameters = new List<Parameter>
+        {
+            new Parameter { ParameterKey = "GithubToken", ParameterValue = "this is definitely the token" }
+        };
+
         [Test]
         public async Task DeployCallsCreateStackIfNotExists()
         {
-            var stackName = "test-stack";
-            var exampleTemplate = "this is a bad example template.";
-            var roleArn = "arn:aws:iam::1:role/Facade";
-            var cloudformationClient = Substitute.For<IAmazonCloudFormation>();
-            var notificationArn = "arn:aws:sns::1:topic/Topic";
-            var clientRequestToken = "token";
-
-            var tags = new List<Tag>
-            {
-                new Tag { Key = "A", Value = "B" }
-            };
-
-            var parameters = new List<Parameter> {
-                new Parameter { ParameterKey = "GithubToken", ParameterValue = "this is definitely the token" }
-            };
 
             cloudformationClient
             .DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
@@ -85,22 +87,6 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
         [Test]
         public async Task DeployCallsUpdateStackIfExists()
         {
-            var stackName = "test-stack";
-            var exampleTemplate = "this is a bad example template.";
-            var roleArn = "arn:aws:iam::1:role/Facade";
-            var cloudformationClient = Substitute.For<IAmazonCloudFormation>();
-            var notificationArn = "arn:aws:sns::1:topic/Topic";
-            var clientRequestToken = "token";
-
-            var tags = new List<Tag>
-            {
-                new Tag { Key = "A", Value = "B" }
-            };
-
-            var parameters = new List<Parameter>
-            {
-                new Parameter { ParameterKey = "GithubToken", ParameterValue = "this is definitely the token" }
-            };
 
             cloudformationClient
             .DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
@@ -149,6 +135,46 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 req.Capabilities.Any(capability => capability == "CAPABILITY_IAM") &&
                 req.Capabilities.Any(capability => capability == "CAPABILITY_NAMED_IAM")
             ));
+        }
+
+        [Test]
+        public async Task UpdateDoesntThrow()
+        {
+
+            cloudformationClient
+            .DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
+                req.StackName == stackName
+            ))
+            .Returns(new DescribeStacksResponse
+            {
+                Stacks = new List<Stack> {
+                    new Stack {
+                        StackName = stackName
+                    }
+                }
+            });
+
+            cloudformationClient
+            .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
+            .Returns(x => { throw new Exception() });
+            var stackDeployer = new DeployStackFacade();
+            var cloudFormationFactory = Substitute.For<CloudFormationFactory>();
+            cloudFormationFactory.Create().Returns(cloudformationClient);
+            TestUtils.SetPrivateField(stackDeployer, "cloudFormationFactory", cloudFormationFactory);
+
+
+            await stackDeployer.Deploy(new DeployStackContext
+            {
+                StackName = stackName,
+                Template = exampleTemplate,
+                NotificationArn = notificationArn,
+                PassRoleArn = roleArn,
+                Parameters = parameters,
+                Tags = tags,
+                ClientRequestToken = clientRequestToken
+            });
+
+
         }
     }
 }
