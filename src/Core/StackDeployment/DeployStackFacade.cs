@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Text.Json.JsonSerializer;
 
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
-
 using static Amazon.CloudFormation.OnFailure;
-using static System.Text.Json.JsonSerializer;
+
+using Cythral.CloudFormation.Aws;
 
 namespace Cythral.CloudFormation.StackDeployment
 {
