@@ -331,14 +331,6 @@
           "Microsoft.NETCore.Targets": "1.1.0"
         }
       },
-      "SharpZipLib.NETStandard": {
-        "type": "Transitive",
-        "resolved": "1.0.7",
-        "contentHash": "mYKPizF2CY32RQB8FITYy0e30gVgItFA63SFquruaxq+votwL1T+yOfssK10v4enBcxklr8ks48hS1emw5TTXg==",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1"
-        }
-      },
       "System.AppContext": {
         "type": "Transitive",
         "resolved": "4.1.0",
@@ -1124,8 +1116,7 @@
           "Amazon.Lambda.Core": "1.1.0",
           "Amazon.Lambda.SNSEvents": "1.1.0",
           "Amazon.Lambda.SQSEvents": "1.1.0",
-          "Amazon.Lambda.Serialization.SystemTextJson": "2.0.1",
-          "SharpZipLib.NETStandard": "1.0.7"
+          "Amazon.Lambda.Serialization.SystemTextJson": "2.0.1"
         }
       }
     }

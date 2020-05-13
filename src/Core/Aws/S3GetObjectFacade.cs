@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -8,8 +9,6 @@ using Amazon.S3.Model;
 using Amazon.S3.Util;
 
 using Cythral.CloudFormation.Aws;
-
-using ICSharpCode.SharpZipLib.Zip;
 
 namespace Cythral.CloudFormation.Aws
 {
@@ -27,11 +26,7 @@ namespace Cythral.CloudFormation.Aws
                 Key = key,
             });
 
-            var destStream = new MemoryStream();
-            getObjResponse.ResponseStream.CopyTo(destStream);
-            getObjResponse.ResponseStream.Dispose();
-
-            using (var zip = new ZipFile(destStream))
+            using (var zip = new ZipArchive(getObjResponse.ResponseStream))
             {
                 var file = zip.GetEntry(entry);
 
@@ -40,11 +35,10 @@ namespace Cythral.CloudFormation.Aws
                     throw new Exception($"{entry} could not be found in {key}");
                 }
 
-                using (var inputStream = zip.GetInputStream(file))
+                using (var inputStream = file.Open())
                 using (var reader = new StreamReader(inputStream))
                 {
                     var result = await reader.ReadToEndAsync();
-                    destStream.Dispose();
 
                     return result;
                 }
