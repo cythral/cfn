@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <BuildTasksLocation>../BuildTasks/bin/$(Configuration)/netcoreapp3.1/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
+    <BuildTasksLocation>../../bin/BuildTasks/$(Configuration)/netcoreapp3.1/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <RuntimeIdentifier>rhel.7.2-x64</RuntimeIdentifier>
     <SelfContained>false</SelfContained>
