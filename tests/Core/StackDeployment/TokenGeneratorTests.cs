@@ -111,7 +111,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             {
                 ClientRequestToken = clientRequestToken,
                 ReceiptHandle = receiptHandle,
-                QueueUrl = sqsUrl
+                QueueUrl = sqsUrl,
+                RoleArn = request.RoleArn
             });
 
             await tokenGenerator.Generate(sqsEvent, request);

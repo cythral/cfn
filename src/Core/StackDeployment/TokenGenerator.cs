@@ -36,7 +36,8 @@ namespace Cythral.CloudFormation.StackDeployment
                     {
                         ClientRequestToken = token,
                         QueueUrl = ConvertQueueArnToUrl(sqsRecord.EventSourceArn),
-                        ReceiptHandle = sqsRecord.ReceiptHandle
+                        ReceiptHandle = sqsRecord.ReceiptHandle,
+                        RoleArn = request.RoleArn
                     })
                 });
 

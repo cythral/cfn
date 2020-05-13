@@ -86,7 +86,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
         private static async Task SendSuccess(StackDeploymentStatusRequest request, IAmazonStepFunctions client)
         {
             var tokenInfo = await GetTokenInfoFromRequest(request);
-            var outputs = await GetStackOutputs(request);
+            var outputs = await GetStackOutputs(request.StackId, tokenInfo.RoleArn);
             var response = await client.SendTaskSuccessAsync(new SendTaskSuccessRequest
             {
                 TaskToken = tokenInfo.ClientRequestToken,
@@ -98,13 +98,12 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             await Dequeue(tokenInfo);
         }
 
-        private static async Task<Dictionary<string, string>> GetStackOutputs(StackDeploymentStatusRequest request)
+        private static async Task<Dictionary<string, string>> GetStackOutputs(string stackId, string roleArn)
         {
-            var agentArn = $"arn:aws:iam::{request.Namespace}:role/Agent";
-            var client = await cloudFormationFactory.Create(agentArn);
+            var client = await cloudFormationFactory.Create(roleArn);
             var response = await client.DescribeStacksAsync(new DescribeStacksRequest
             {
-                StackName = request.StackId
+                StackName = stackId
             });
 
             return response.Stacks[0].Outputs.ToDictionary(entry => entry.OutputKey, entry => entry.OutputValue);
