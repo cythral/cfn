@@ -200,7 +200,7 @@ Resources:
                             "ParameterOverrides": {
                               "MasterAccountId": "${AWS::AccountId}",
                               "NetworkCidr": "10.2.0.0/16",
-                              "PeeringConnectionId.$": "$.BuildOutput.Build.ExportedEnvironmentVariables[0].Value"
+                              "PeeringConnectionId": "pcx-0a4720fb017eacd94"
                             },
                             "Capabilities": ["CAPABILITY_NAMED_IAM"]
                           }
@@ -227,7 +227,7 @@ Resources:
                             "ParameterOverrides": {
                               "MasterAccountId": "${AWS::AccountId}",
                               "NetworkCidr": "10.3.0.0/16",
-                              "PeeringConnectionId.$": "$.BuildOutput.Build.ExportedEnvironmentVariables[1].Value"
+                              "PeeringConnectionId": "pcx-072b1be3d62f14093"
                             },
                             "Capabilities": ["CAPABILITY_NAMED_IAM"]
                           }
