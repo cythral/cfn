@@ -6,5 +6,6 @@
         <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj/$(MSBuildProjectName)</BaseIntermediateOutputPath>
         <PackageOutputPath>$(MSBuildThisFileDirectory)bin/Packages/$(Configuration)</PackageOutputPath>
         <RestorePackagesPath>$(MSBuildThisFileDirectory).nuget</RestorePackagesPath>
+        <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     </PropertyGroup>
 </Project>
