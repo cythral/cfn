@@ -156,19 +156,9 @@ Resources:
                   {
                     "Variable": "$.SupersededOutput.Superseded",
                     "BooleanEquals": false,
-                    "Next": "Extract Networking Config"
+                    "Next": "Deploy Utilities to Shared"
                   }
                 ]
-              },
-              "Extract Networking Config": {
-                "Type": "Task",
-                "Resource": "${FileFromZipArn}",
-                "ResultPath": "$.NetworkingConfig",
-                "Parameters": {
-                  "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
-                  "Filename": "Networking.config.json"
-                },
-                "Next": "Deploy Utilities to Shared"
               },
               "Deploy Utilities to Shared": {
                 "Type": "Task",
@@ -210,7 +200,7 @@ Resources:
                             "ParameterOverrides": {
                               "MasterAccountId": "${AWS::AccountId}",
                               "NetworkCidr": "10.2.0.0/16",
-                              "PeeringConnectionId": "pcx-0a4720fb017eacd94"
+                              "PeeringConnectionId": "pcx-0babb17415631ea21"
                             },
                             "Capabilities": ["CAPABILITY_NAMED_IAM"]
                           }
@@ -237,7 +227,7 @@ Resources:
                             "ParameterOverrides": {
                               "MasterAccountId": "${AWS::AccountId}",
                               "NetworkCidr": "10.3.0.0/16",
-                              "PeeringConnectionId": "pcx-072b1be3d62f14093"
+                              "PeeringConnectionId": "pcx-03e27910342da4550"
                             },
                             "Capabilities": ["CAPABILITY_NAMED_IAM"]
                           }
