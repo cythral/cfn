@@ -1,3 +1,5 @@
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -138,7 +140,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
         }
 
         [Test]
-        public async Task UpdateDoesntThrow()
+        public void UpdateDoesntThrowIfMessageIsNoUpdates()
         {
 
             cloudformationClient
@@ -156,14 +158,15 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
 
             cloudformationClient
             .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
-            .Returns(x => { throw new Exception() });
+            .Returns<UpdateStackResponse>(x => { throw new Exception("No updates are to be performed."); });
+
             var stackDeployer = new DeployStackFacade();
             var cloudFormationFactory = Substitute.For<CloudFormationFactory>();
             cloudFormationFactory.Create().Returns(cloudformationClient);
             TestUtils.SetPrivateField(stackDeployer, "cloudFormationFactory", cloudFormationFactory);
 
 
-            await stackDeployer.Deploy(new DeployStackContext
+            Assert.DoesNotThrowAsync(() => stackDeployer.Deploy(new DeployStackContext
             {
                 StackName = stackName,
                 Template = exampleTemplate,
@@ -172,9 +175,46 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 Parameters = parameters,
                 Tags = tags,
                 ClientRequestToken = clientRequestToken
+            }));
+        }
+
+        [Test]
+        public void UpdateThrowsIfMessageIsNotNoUpdates()
+        {
+
+            cloudformationClient
+            .DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
+                req.StackName == stackName
+            ))
+            .Returns(new DescribeStacksResponse
+            {
+                Stacks = new List<Stack> {
+                    new Stack {
+                        StackName = stackName
+                    }
+                }
             });
 
+            cloudformationClient
+            .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
+            .Returns<UpdateStackResponse>(x => { throw new Exception("Some other exception"); });
 
+            var stackDeployer = new DeployStackFacade();
+            var cloudFormationFactory = Substitute.For<CloudFormationFactory>();
+            cloudFormationFactory.Create().Returns(cloudformationClient);
+            TestUtils.SetPrivateField(stackDeployer, "cloudFormationFactory", cloudFormationFactory);
+
+
+            Assert.ThrowsAsync<Exception>(() => stackDeployer.Deploy(new DeployStackContext
+            {
+                StackName = stackName,
+                Template = exampleTemplate,
+                NotificationArn = notificationArn,
+                PassRoleArn = roleArn,
+                Parameters = parameters,
+                Tags = tags,
+                ClientRequestToken = clientRequestToken
+            }));
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace Cythral.CloudFormation.StackDeployment
             var parameters = (List<Parameter>)context.Parameters ?? new List<Parameter> { };
             var capabilities = (List<string>)context.Capabilities ?? new List<string> { };
             var tags = (List<Tag>)context.Tags ?? new List<Tag> { };
+
 
             if (!stackExists)
             {
@@ -57,8 +59,18 @@ namespace Cythral.CloudFormation.StackDeployment
                     RoleARN = context.PassRoleArn
                 };
 
-                var updateStackResponse = await cloudformationClient.UpdateStackAsync(updateStackRequest);
-                Console.WriteLine($"Got update stack response: {Serialize(updateStackResponse)}");
+                try
+                {
+                    var updateStackResponse = await cloudformationClient.UpdateStackAsync(updateStackRequest);
+                    Console.WriteLine($"Got update stack response: {Serialize(updateStackResponse)}");
+                }
+                catch (Exception e)
+                {
+                    if (e.Message != "No updates are to be performed.")
+                    {
+                        throw e;
+                    }
+                }
             }
         }
 
