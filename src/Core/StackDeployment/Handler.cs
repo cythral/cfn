@@ -27,6 +27,7 @@ namespace Cythral.CloudFormation.StackDeployment
         private static TokenGenerator tokenGenerator = new TokenGenerator();
         private static RequestFactory requestFactory = new RequestFactory();
         private static StepFunctionsClientFactory stepFunctionsClientFactory = new StepFunctionsClientFactory();
+        private static CloudFormationFactory cloudFormationFactory = new CloudFormationFactory();
 
         public static async Task<Response> Handle(
             SQSEvent sqsEvent,
@@ -54,6 +55,21 @@ namespace Cythral.CloudFormation.StackDeployment
                     ClientRequestToken = token,
                     Capabilities = request.Capabilities,
                 });
+            }
+            catch (NoUpdatesException)
+            {
+                var outputs = await GetStackOutputs(request.StackName, request.RoleArn);
+                var client = stepFunctionsClientFactory.Create();
+                var response = await client.SendTaskSuccessAsync(new SendTaskSuccessRequest
+                {
+                    TaskToken = request.Token,
+                    Output = Serialize(outputs)
+                });
+
+                return new Response
+                {
+                    Success = true
+                };
             }
             catch (Exception e)
             {
@@ -97,6 +113,17 @@ namespace Cythral.CloudFormation.StackDeployment
             }
 
             return result.Select(entry => new Parameter { ParameterKey = entry.Key, ParameterValue = entry.Value }).ToList();
+        }
+
+        private static async Task<Dictionary<string, string>> GetStackOutputs(string stackId, string roleArn)
+        {
+            var client = await cloudFormationFactory.Create(roleArn);
+            var response = await client.DescribeStacksAsync(new DescribeStacksRequest
+            {
+                StackName = stackId
+            });
+
+            return response.Stacks[0].Outputs.ToDictionary(entry => entry.OutputKey, entry => entry.OutputValue);
         }
     }
 }
