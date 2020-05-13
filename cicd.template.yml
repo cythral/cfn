@@ -163,7 +163,7 @@ Resources:
               "Retrieve Network Config": {
                 "Type": "Task",
                 "Resource": "${FileFromZipArn}",
-                "ResultPath": "$.NetworkConfig",
+                "ResultPath": "$.NetworkingConfig",
                 "Parameters": {
                   "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
                   "Filename": "Networking.config.json"
