@@ -457,9 +457,7 @@ Resources:
       Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
-      Policies:
-        - AWSLambdaExecute
-        - !Ref StackDeploymentStatusPolicy
+      Role: !ImportValue cfn-utilities:MasterRoleArn
       Events:
         SNS:
           Type: SNS
@@ -485,20 +483,6 @@ Resources:
                 - !ImportValue cfn-metadata:ProdAgentRoleArn
       Topics:
         - !Ref StackDeploymentStatusTopic
-
-  StackDeploymentStatusPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action:
-              - states:SendTaskSuccess
-              - states:SendTaskFailure
-              - s3:GetObject
-              - sqs:DeleteMessage
-            Resource: "*"
 
   StateStore:
     Type: AWS::S3::Bucket
