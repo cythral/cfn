@@ -5,5 +5,6 @@ namespace Cythral.CloudFormation
         public string ClientRequestToken { get; set; }
         public string QueueUrl { get; set; }
         public string ReceiptHandle { get; set; }
+        public string RoleArn { get; set; }
     }
 }

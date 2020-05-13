@@ -52,6 +52,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         private const string receiptHandle = "receiptHandle";
         private const string queueUrl = "queueUrl";
         private const string accountId = "1";
+        private const string roleArn = "roleArn";
         private Dictionary<string, string> outputs = new Dictionary<string, string>
         {
             ["A"] = "B"
@@ -61,6 +62,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             ClientRequestToken = token,
             ReceiptHandle = receiptHandle,
             QueueUrl = queueUrl,
+            RoleArn = roleArn
         });
 
 
@@ -239,7 +241,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await Handler.Handle(snsEvent);
 
-            await cloudFormationFactory.Received().Create(Arg.Is($"arn:aws:iam::{accountId}:role/Agent"));
+            await cloudFormationFactory.Received().Create(Arg.Is(roleArn));
             await cloudFormationClient.Received().DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
                 req.StackName == stackId
             ));
