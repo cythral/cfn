@@ -166,7 +166,7 @@ Resources:
                 "ResultPath": "$.NetworkConfig",
                 "Parameters": {
                   "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
-                  "Filename": "Network.config.json"
+                  "Filename": "Networking.config.json"
                 },
                 "Next": "Deploy Utilities to Shared"
               },
@@ -210,7 +210,7 @@ Resources:
                             "ParameterOverrides": {
                               "MasterAccountId": "${AWS::AccountId}",
                               "NetworkCidr": "10.2.0.0/16",
-                              "PeeringConnectionId": "pcx-0babb17415631ea21"
+                              "PeeringConnectionId.$": "$.NetworkingConfig.DevPeeringConnectionId"
                             },
                             "Capabilities": ["CAPABILITY_NAMED_IAM"]
                           }
@@ -237,7 +237,7 @@ Resources:
                             "ParameterOverrides": {
                               "MasterAccountId": "${AWS::AccountId}",
                               "NetworkCidr": "10.3.0.0/16",
-                              "PeeringConnectionId": "pcx-03e27910342da4550"
+                              "PeeringConnectionId.$": "$.NetworkingConfig.ProdPeeringConnectionId"
                             },
                             "Capabilities": ["CAPABILITY_NAMED_IAM"]
                           }
