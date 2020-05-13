@@ -156,9 +156,19 @@ Resources:
                   {
                     "Variable": "$.SupersededOutput.Superseded",
                     "BooleanEquals": false,
-                    "Next": "Deploy Utilities to Shared"
+                    "Next": "Retrieve Network Config"
                   }
                 ]
+              },
+              "Retrieve Network Config": {
+                "Type": "Task",
+                "Resource": "${FileFromZipArn}",
+                "ResultPath": "$.NetworkConfig",
+                "Parameters": {
+                  "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                  "Filename": "Network.config.json"
+                },
+                "Next": "Deploy Utilities to Shared"
               },
               "Deploy Utilities to Shared": {
                 "Type": "Task",
