@@ -221,11 +221,31 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                     c.Template == template &&
                     c.RoleArn == roleArn &&
                     c.NotificationArn == notificationArn &&
-                    c.Parameters == configuration.Parameters &&
+                    configuration.Parameters.All(entry => c.Parameters.Any(param => param.ParameterKey == entry.ParameterKey && param.ParameterValue == entry.ParameterValue)) &&
                     c.Tags == configuration.Tags &&
                     c.StackPolicyBody == configuration.StackPolicy.ToString() &&
                     c.ClientRequestToken == createdToken &&
                     capabilities.All(c.Capabilities.Contains)
+                )
+            );
+        }
+
+        [Test]
+        public async Task ParameterOverridesAreRespected()
+        {
+            var request = CreateRequest();
+            request.ParameterOverrides = new Dictionary<string, string>
+            {
+                ["A"] = "C"
+            };
+
+            var sqs = Substitute.For<SQSEvent>();
+
+            Assert.ThrowsAsync<Exception>(() => Handler.Handle(sqs));
+
+            await stackDeployer.Received().Deploy(
+                Arg.Is<DeployStackContext>(c =>
+                    (from param in c.Parameters where param.ParameterKey == "A" select param.ParameterValue).First() == "C"
                 )
             );
         }

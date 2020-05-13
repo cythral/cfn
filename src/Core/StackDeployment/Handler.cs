@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
 using System;
@@ -7,6 +9,7 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.SQSEvents;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
+using Amazon.CloudFormation.Model;
 
 using Cythral.CloudFormation.Aws;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
@@ -45,7 +48,7 @@ namespace Cythral.CloudFormation.StackDeployment
                     Template = template,
                     RoleArn = request.RoleArn,
                     NotificationArn = notificationArn,
-                    Parameters = config?.Parameters,
+                    Parameters = MergeParameters(config?.Parameters, request.ParameterOverrides),
                     Tags = config?.Tags,
                     StackPolicyBody = config?.StackPolicy?.Value,
                     ClientRequestToken = token,
@@ -81,6 +84,19 @@ namespace Cythral.CloudFormation.StackDeployment
             }
 
             return null;
+        }
+
+        private static IEnumerable<Parameter> MergeParameters(List<Parameter> parameters, Dictionary<string, string> overrides)
+        {
+            var result = parameters?.ToDictionary(param => param.ParameterKey, param => param.ParameterValue) ?? new Dictionary<string, string>();
+            overrides = overrides ?? new Dictionary<string, string>();
+
+            foreach (var entry in overrides)
+            {
+                result[entry.Key] = entry.Value;
+            }
+
+            return result.Select(entry => new Parameter { ParameterKey = entry.Key, ParameterValue = entry.Value });
         }
     }
 }
