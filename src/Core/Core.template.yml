@@ -668,25 +668,7 @@ Resources:
       Timeout: 300
       MemorySize: 256
       CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
-      Policies:
-        - AWSLambdaExecute
-        - !Ref S3DeploymentPolicy
-
-  S3DeploymentPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action:
-              - s3:GetObject
-              - kms:Decrypt
-              - kms:Encrypt
-              - kms:GenerateDataKey
-              - s3:PutObject
-              - s3:PutObjectAcl
-            Resource: "*"
+      Role: !ImportValue cfn-utilities:MasterRoleArn
 
   DecryptedGithubToken:
     Type: Custom::Secret

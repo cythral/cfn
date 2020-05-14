@@ -9,9 +9,21 @@ namespace Cythral.CloudFormation.Aws
     {
         private StsFactory stsFactory = new StsFactory();
 
-        public virtual Task<IAmazonS3> Create()
+        public virtual async Task<IAmazonS3> Create(string roleArn = null)
         {
-            return Task.FromResult((IAmazonS3)new AmazonS3Client());
+            if (roleArn != null)
+            {
+                var client = await stsFactory.Create();
+                var response = await client.AssumeRoleAsync(new AssumeRoleRequest
+                {
+                    RoleArn = roleArn,
+                    RoleSessionName = "s3-deployment-ops"
+                });
+
+                return (IAmazonS3)new AmazonS3Client(response.Credentials);
+            }
+
+            return (IAmazonS3)new AmazonS3Client();
         }
     }
 }

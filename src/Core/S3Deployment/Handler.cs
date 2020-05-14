@@ -24,8 +24,9 @@ namespace Cythral.CloudFormation.S3Deployment
             using (var zipStream = new ZipArchive(stream))
             {
                 var bucket = request.DestinationBucket;
+                var role = request.RoleArn;
                 var entries = zipStream.Entries.ToList();
-                var tasks = entries.Select(entry => UploadEntry(entry, bucket));
+                var tasks = entries.Select(entry => UploadEntry(entry, bucket, role));
                 Task.WaitAll(tasks.ToArray());
             }
 
@@ -35,9 +36,9 @@ namespace Cythral.CloudFormation.S3Deployment
             };
         }
 
-        public static async Task UploadEntry(ZipArchiveEntry entry, string bucket)
+        public static async Task UploadEntry(ZipArchiveEntry entry, string bucket, string role)
         {
-            using (var client = await s3Factory.Create())
+            using (var client = await s3Factory.Create(role))
             using (var stream = entry.Open())
             {
                 var request = new PutObjectRequest
