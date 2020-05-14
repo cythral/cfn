@@ -383,6 +383,7 @@ Resources:
           STACK_SUFFIX: !Ref StackSuffix
           ROLE_ARN: !ImportValue cfn-utilities:MasterRoleArn
           AWS_ACCOUNT_ID: !Ref AWS::AccountId
+          LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   GithubWebhookPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -449,6 +450,9 @@ Resources:
       Policies:
         - AWSLambdaExecute
         - !Ref UpdateTargetsPolicy
+      Environment:
+        Variables:
+          LAMBDA_NET_SERIALIZER_DEBUG: "true"
       Events:
         SNS:
           Type: SNS
@@ -483,6 +487,7 @@ Resources:
       Environment:
         Variables:
           NOTIFICATION_ARN: !Ref StackDeploymentStatusTopic
+          LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   StackDeploymentFunctionRetryPolicy:
     Type: AWS::Lambda::EventInvokeConfig
@@ -505,6 +510,9 @@ Resources:
           Properties:
             Topic: !Ref StackDeploymentStatusTopic
             Region: !Ref AWS::Region
+      Environment:
+        Variables:
+          LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   StackDeploymentStatusTopic:
     Type: AWS::SNS::Topic
@@ -543,6 +551,7 @@ Resources:
       Environment:
         Variables:
           STATE_STORE: !Ref StateStore
+          LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   ApprovalWebhookPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -618,6 +627,7 @@ Resources:
           TOPIC_ARN: !Ref ApprovalTopic
           BASE_URL: https://brigh.id/webhooks/approval
           STATE_STORE: !Ref StateStore
+          LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   ApprovalNotificationPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -657,6 +667,7 @@ Resources:
       Environment:
         Variables:
           STATE_STORE: !Ref StateStore
+          LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   DeploymentSupersessionPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -689,6 +700,9 @@ Resources:
       Policies:
         - AWSLambdaExecute
         - !Ref ExtractFileFromZipPolicy
+      Environment:
+        Variables:
+          LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   ExtractFileFromZipPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -711,6 +725,9 @@ Resources:
       MemorySize: 256
       CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
+      Environment:
+        Variables:
+          LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   DecryptedGithubToken:
     Type: Custom::Secret
