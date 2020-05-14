@@ -682,6 +682,8 @@ Resources:
             Action:
               - s3:GetObject
               - kms:Decrypt
+              - kms:Encrypt
+              - kms:GenerateDataKey
               - s3:PutObject
             Resource: "*"
 
