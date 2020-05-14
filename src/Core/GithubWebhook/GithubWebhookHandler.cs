@@ -122,10 +122,10 @@ namespace Cythral.CloudFormation.GithubWebhook
 
                 foreach (var character in statusCode.ToString())
                 {
-                    var previousWasUppercase = Char.ToLower(previous) == previous;
-                    var currentIsUppercase = Char.ToLower(character) == character;
+                    var previousWasUppercase = Char.ToLower(previous) != previous;
+                    var currentIsUppercase = Char.ToLower(character) != character;
 
-                    result += (currentIsUppercase || previousWasUppercase) ? $"{character}" : $" {character}";
+                    result += (currentIsUppercase && !previousWasUppercase) ? $" {character}" : $"{character}";
                     previous = character;
                 }
 
