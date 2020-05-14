@@ -58,14 +58,5 @@ namespace Cythral.CloudFormation.S3Deployment
                 Console.WriteLine($"Uploaded {entry.FullName}");
             }
         }
-
-        public static async Task Main(string[] args)
-        {
-            await Handler.Handle(new Request
-            {
-                ZipLocation = "s3://cfn-cicd-artifactstore-16nabth253y78/04eea462-9f82-48ee-9fda-d80e74f507cc/buildResults.zip",
-                DestinationBucket = "cythral-test-bucket"
-            });
-        }
     }
 }
