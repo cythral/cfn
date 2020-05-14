@@ -8,6 +8,7 @@ using static System.Net.HttpStatusCode;
 using Cythral.CloudFormation.Aws;
 
 using Amazon.Lambda.Core;
+using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.StepFunctions.Model;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 
@@ -19,6 +20,7 @@ namespace Cythral.CloudFormation.ApprovalWebhook
         private static S3Factory s3Factory = new S3Factory();
         private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
 
+        [LambdaSerializer(typeof(CamelCaseLambdaJsonSerializer))]
         public static async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, ILambdaContext context = null)
         {
             string body = null;
@@ -58,10 +60,15 @@ namespace Cythral.CloudFormation.ApprovalWebhook
             string CreateStatusString()
             {
                 var result = "";
+                var previous = ' ';
 
                 foreach (var character in statusCode.ToString())
                 {
-                    result += (Char.ToLower(character) == character) ? $"{character}" : $" {character}";
+                    var previousWasUppercase = Char.ToLower(previous) == previous;
+                    var currentIsUppercase = Char.ToLower(character) == character;
+
+                    result += (currentIsUppercase || previousWasUppercase) ? $"{character}" : $" {character}";
+                    previous = character;
                 }
 
                 return result;
