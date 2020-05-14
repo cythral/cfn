@@ -1,3 +1,5 @@
+using System.IO;
+using System.Reflection;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -38,8 +40,10 @@ namespace Cythral.CloudFormation.S3Deployment
 
         public static async Task UploadEntry(ZipArchiveEntry entry, string bucket, string role)
         {
+            var method = entry.GetType().GetMethod("OpenInReadMode", BindingFlags.NonPublic | BindingFlags.Instance);
+
             using (var client = await s3Factory.Create(role))
-            using (var stream = entry.Open())
+            using (var stream = method.Invoke(entry, new object[] { false }) as Stream)
             {
                 var request = new PutObjectRequest
                 {
@@ -53,6 +57,15 @@ namespace Cythral.CloudFormation.S3Deployment
                 await client.PutObjectAsync(request);
                 Console.WriteLine($"Uploaded {entry.FullName}");
             }
+        }
+
+        public static async Task Main(string[] args)
+        {
+            await Handler.Handle(new Request
+            {
+                ZipLocation = "s3://cfn-cicd-artifactstore-16nabth253y78/04eea462-9f82-48ee-9fda-d80e74f507cc/buildResults.zip",
+                DestinationBucket = "cythral-test-bucket"
+            });
         }
     }
 }
