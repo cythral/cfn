@@ -520,17 +520,17 @@ Resources:
               - kms:Decrypt
             Resource: !Sub arn:aws:s3:::${StateStore}/*
 
-  # ApprovalWebhookPermission:
-  #   Type: AWS::Lambda::Permission
-  #   Properties:
-  #     Action: lambda:InvokeFunction
-  #     FunctionName: !Ref ApprovalWebhook.Alias
-  #     Principal: elasticloadbalancing.amazonaws.com
-  #     SourceArn: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/cfn-core-ApprovalWebhook/*
+  ApprovalWebhookPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ApprovalWebhook.Alias
+      Principal: elasticloadbalancing.amazonaws.com
+      SourceArn: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/cfn-core-ApprovalWebhook/*
 
   ApprovalWebhookTarget:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    # DependsOn: ApprovalWebhookPermission
+    DependsOn: ApprovalWebhookPermission
     Properties:
       Name: cfn-core-ApprovalWebhook
       TargetType: lambda
