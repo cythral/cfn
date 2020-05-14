@@ -21,6 +21,8 @@ namespace Cythral.CloudFormation.ApprovalWebhook
 
         public static async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, ILambdaContext context = null)
         {
+            string body = null;
+
             using (var stepFunctionsClient = stepFunctionsClientFactory.Create())
             using (var s3Client = await s3Factory.Create())
             {
@@ -45,9 +47,10 @@ namespace Cythral.CloudFormation.ApprovalWebhook
                 var deleteResponse = await s3Client.DeleteObjectAsync(bucket, key);
                 Console.WriteLine($"Received delete response: {Serialize(deleteResponse)}");
 
-                var body = action == "approve" ? "approved" : "rejected";
-                return CreateResponse(OK, body: body);
+                body = action == "approve" ? "approved" : "rejected";
             }
+
+            return CreateResponse(OK, body: body);
         }
 
         private static ApplicationLoadBalancerResponse CreateResponse(HttpStatusCode statusCode, string contentType = "text/plain", string body = "")
