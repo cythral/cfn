@@ -781,6 +781,12 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:StackDeploymentFunctionArn
 
+  ApprovalNotificationFunctionArn:
+    Value: !GetAtt ApprovalNotificationFunction.Arn
+    Description: ARN of the approval notification function for use in step function pipelines
+    Export:
+      Name: !Sub ${AWS::StackName}:ApprovalNotificationFunctionArn
+
   DeploymentSupersessionFunctionArn:
     Value: !GetAtt DeploymentSupersessionFunction.Arn
     Description: ARN of the deployment supersession function for use in step function pipelines
