@@ -43,7 +43,6 @@ namespace Cythral.CloudFormation.ApprovalWebhook
                         Action = action,
                     })
                 });
-
                 Console.WriteLine($"Send task success response: {Serialize(sendTaskResponse)}");
 
                 var deleteResponse = await s3Client.DeleteObjectAsync(bucket, key);
@@ -52,33 +51,11 @@ namespace Cythral.CloudFormation.ApprovalWebhook
                 body = action == "approve" ? "approved" : "rejected";
             }
 
-            return CreateResponse(OK, body: body);
-        }
-
-        private static ApplicationLoadBalancerResponse CreateResponse(HttpStatusCode statusCode, string contentType = "text/plain", string body = "")
-        {
-            string CreateStatusString()
-            {
-                var result = "";
-                var previous = ' ';
-
-                foreach (var character in statusCode.ToString())
-                {
-                    var previousWasUppercase = Char.ToLower(previous) == previous;
-                    var currentIsUppercase = Char.ToLower(character) == character;
-
-                    result += (currentIsUppercase || previousWasUppercase) ? $"{character}" : $" {character}";
-                    previous = character;
-                }
-
-                return result;
-            }
-
             return new ApplicationLoadBalancerResponse
             {
-                StatusCode = (int)statusCode,
-                StatusDescription = $"{(int)statusCode}{CreateStatusString()}",
-                Headers = new Dictionary<string, string> { ["content-type"] = contentType },
+                StatusCode = 200,
+                StatusDescription = "200 OK",
+                Headers = new Dictionary<string, string> { ["content-type"] = "text/plain" },
                 Body = body,
                 IsBase64Encoded = false,
             };

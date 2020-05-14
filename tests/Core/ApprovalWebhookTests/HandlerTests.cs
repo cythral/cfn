@@ -62,6 +62,46 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
         }
 
         [Test]
+        public async Task ShouldReturnCorrectStatusCode()
+        {
+            var tokenHash = "tokenHash";
+            var action = "approve";
+            var request = new ApplicationLoadBalancerRequest
+            {
+                QueryStringParameters = new Dictionary<string, string>
+                {
+                    ["token"] = tokenHash,
+                    ["action"] = action,
+                    ["pipeline"] = pipeline,
+                }
+            };
+
+            var response = await Handler.Handle(request);
+
+            Assert.That(response.StatusCode, Is.EqualTo(200));
+        }
+
+        [Test]
+        public async Task ShouldReturnCorrectStatusDescription()
+        {
+            var tokenHash = "tokenHash";
+            var action = "approve";
+            var request = new ApplicationLoadBalancerRequest
+            {
+                QueryStringParameters = new Dictionary<string, string>
+                {
+                    ["token"] = tokenHash,
+                    ["action"] = action,
+                    ["pipeline"] = pipeline,
+                }
+            };
+
+            var response = await Handler.Handle(request);
+
+            Assert.That(response.StatusDescription, Is.EqualTo("200 OK"));
+        }
+
+        [Test]
         public async Task ShouldCreateStepFunctionsClient()
         {
             var tokenHash = "tokenHash";
