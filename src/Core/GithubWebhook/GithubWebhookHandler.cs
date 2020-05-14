@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Amazon.CloudFormation.Model;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.Lambda.Core;
+using Amazon.Lambda.Serialization.SystemTextJson;
 
 using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Events;
@@ -33,6 +34,7 @@ namespace Cythral.CloudFormation.GithubWebhook
         /// <param name="request">Request sent by the application load balancer</param>
         /// <param name="context">The lambda context</param>
         /// <returns>A load balancer response object</returns>
+        [LambdaSerializer(typeof(CamelCaseLambdaJsonSerializer))]
         public static async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, ILambdaContext context = null)
         {
             Console.WriteLine($"Got request: {Serialize(request)}");
@@ -116,17 +118,15 @@ namespace Cythral.CloudFormation.GithubWebhook
             string CreateStatusString()
             {
                 var result = "";
+                var previous = ' ';
 
                 foreach (var character in statusCode.ToString())
                 {
-                    if (Char.ToLower(character) == character)
-                    {
-                        result += character;
-                    }
-                    else
-                    {
-                        result += $" {character}";
-                    }
+                    var previousWasUppercase = Char.ToLower(previous) == previous;
+                    var currentIsUppercase = Char.ToLower(character) == character;
+
+                    result += (currentIsUppercase || previousWasUppercase) ? $"{character}" : $" {character}";
+                    previous = character;
                 }
 
                 return result;
