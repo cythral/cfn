@@ -1,36 +1,17 @@
 using System.IO;
-using System;
-using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-
-using Amazon.CloudFormation;
-using Amazon.CloudFormation.Model;
-using Amazon.ElasticLoadBalancingV2;
-using Amazon.ElasticLoadBalancingV2.Model;
-using Amazon.Lambda.SQSEvents;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Amazon.StepFunctions;
-using Amazon.StepFunctions.Model;
 
 using Cythral.CloudFormation.Aws;
-using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.S3Deployment;
 
 using NSubstitute;
 using NSubstitute.ClearExtensions;
 
 using NUnit.Framework;
-
-using static Amazon.ElasticLoadBalancingV2.TargetHealthStateEnum;
-using static System.Text.Json.JsonSerializer;
-
-using SNSRecord = Amazon.Lambda.SNSEvents.SNSEvent.SNSRecord;
-using SNSMessage = Amazon.Lambda.SNSEvents.SNSEvent.SNSMessage;
-using Tag = Amazon.CloudFormation.Model.Tag;
 
 namespace Cythral.CloudFormation.Tests.S3Deployment
 {
