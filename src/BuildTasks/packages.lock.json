@@ -11,12 +11,6 @@
           "AWSSDK.Core": "[3.3.103.54, 3.4.0)"
         }
       },
-      "AWSSDK.Core": {
-        "type": "Direct",
-        "requested": "[3.3.103.54, )",
-        "resolved": "3.3.103.54",
-        "contentHash": "wOXu2Arxkyu4uXHWJJVQcDErOiGim3doomkpiAKRqTOq4ruuI7nitNcKjcKNrllgqW0kGw0HX0AkF1bvqC0xSw=="
-      },
       "Microsoft.Build.Framework": {
         "type": "Direct",
         "requested": "[16.3.0, )",
@@ -44,6 +38,11 @@
         "requested": "[4.6.0, )",
         "resolved": "4.6.0",
         "contentHash": "4F8Xe+JIkVoDJ8hDAZ7HqLkjctN/6WItJIzQaifBwClC7wmoLSda/Sv2i6i1kycqDb3hWF4JCVbpAweyOKHEUA=="
+      },
+      "AWSSDK.Core": {
+        "type": "Transitive",
+        "resolved": "3.3.103.54",
+        "contentHash": "wOXu2Arxkyu4uXHWJJVQcDErOiGim3doomkpiAKRqTOq4ruuI7nitNcKjcKNrllgqW0kGw0HX0AkF1bvqC0xSw=="
       },
       "Microsoft.NETCore.Platforms": {
         "type": "Transitive",
