@@ -1,23 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Text.Json;
+using System.Threading.Tasks;
 
-using Amazon.Lambda.ApplicationLoadBalancerEvents;
-
-using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Aws;
 using Cythral.CloudFormation.ExtractFileFromZip;
 
-using NUnit.Framework;
 using NSubstitute;
 
-using RichardSzalay.MockHttp;
-
-using static System.Net.HttpStatusCode;
-using static System.Text.Json.JsonSerializer;
+using NUnit.Framework;
 
 using Handler = Cythral.CloudFormation.ExtractFileFromZip.Handler;
 

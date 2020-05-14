@@ -1,28 +1,18 @@
 using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
-using Amazon.Lambda.ApplicationLoadBalancerEvents;
 
-using Cythral.CloudFormation.StackDeployment;
 using Cythral.CloudFormation.Aws;
 using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.GithubWebhook;
 
-using NUnit.Framework;
 using NSubstitute;
 
-using RichardSzalay.MockHttp;
-
-using static System.Net.HttpStatusCode;
+using NUnit.Framework;
 using static System.Text.Json.JsonSerializer;
-
-using Handler = Cythral.CloudFormation.GithubWebhook.Handler;
 
 namespace Cythral.CloudFormation.Tests.GithubWebhook
 {

@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
 using Amazon.Lambda.SNSEvents;
-
-using Cythral.CloudFormation.Entities;
-using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.UpdateTargets;
 using Cythral.CloudFormation.UpdateTargets.DnsResolver;
 using Cythral.CloudFormation.UpdateTargets.Request;
@@ -18,10 +15,6 @@ using NSubstitute;
 using NUnit.Framework;
 
 using static Amazon.ElasticLoadBalancingV2.TargetHealthStateEnum;
-using static System.Text.Json.JsonSerializer;
-
-using SNSRecord = Amazon.Lambda.SNSEvents.SNSEvent.SNSRecord;
-using SNSMessage = Amazon.Lambda.SNSEvents.SNSEvent.SNSMessage;
 
 namespace Cythral.CloudFormation.Tests.UpdateTargets
 {
@@ -109,7 +102,7 @@ namespace Cythral.CloudFormation.Tests.UpdateTargets
         {
             var dnsName = "http://example.com";
             var targetGroupArn = "arn:aws:elb:us-east-1:1:targetgroup/test/test";
-            
+
             var dnsResolver = CreateDnsResolver();
             var elbClient = CreateElbClient(targetGroupArn);
             var request = CreateRequest(targetGroupArn, dnsName);

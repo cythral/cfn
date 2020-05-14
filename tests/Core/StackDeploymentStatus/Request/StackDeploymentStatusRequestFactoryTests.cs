@@ -1,18 +1,8 @@
 using System;
 using System.Collections.Generic;
 using static System.Text.Json.JsonSerializer;
-
-using Amazon.ElasticLoadBalancingV2;
-using Amazon.ElasticLoadBalancingV2.Model;
 using Amazon.Lambda.SNSEvents;
-
-using Cythral.CloudFormation.Entities;
-using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.StackDeploymentStatus.Request;
-using Cythral.CloudFormation.UpdateTargets.DnsResolver;
-using Cythral.CloudFormation.UpdateTargets.Request;
-
-using NSubstitute;
 
 using NUnit.Framework;
 
