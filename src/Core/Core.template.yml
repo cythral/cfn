@@ -685,6 +685,7 @@ Resources:
               - kms:Encrypt
               - kms:GenerateDataKey
               - s3:PutObject
+              - s3:PutObjectAcl
             Resource: "*"
 
   DecryptedGithubToken:
