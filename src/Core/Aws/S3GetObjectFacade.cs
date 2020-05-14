@@ -91,7 +91,25 @@ namespace Cythral.CloudFormation.Aws
             return Deserialize<T>(stringContent);
         }
 
-        private (string, string) GetBucketAndKey(string location)
+        public virtual async Task<Stream> GetObjectStream(string bucket, string key)
+        {
+            var client = await s3Factory.Create();
+            var obj = await client.GetObjectAsync(new GetObjectRequest
+            {
+                BucketName = bucket,
+                Key = key,
+            });
+
+            return obj.ResponseStream;
+        }
+
+        public virtual async Task<Stream> GetObjectStream(string location)
+        {
+            var (bucket, key) = GetBucketAndKey(location);
+            return await GetObjectStream(bucket, key);
+        }
+
+        public (string, string) GetBucketAndKey(string location)
         {
             var uriWithoutProtocol = location.StartsWith("arn") ? ConvertToS3Uri(location) : location.Substring(5);
             var index = uriWithoutProtocol.IndexOf('/');

@@ -647,9 +647,6 @@ Resources:
       Policies:
         - AWSLambdaExecute
         - !Ref ExtractFileFromZipPolicy
-      Environment:
-        Variables:
-          STATE_STORE: !Ref StateStore
 
   ExtractFileFromZipPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -661,6 +658,31 @@ Resources:
             Action:
               - s3:GetObject
               - kms:Decrypt
+            Resource: "*"
+
+  S3DeploymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: Core::Cythral.CloudFormation.S3Deployment.Handler::Handle
+      Runtime: dotnetcore3.1
+      Timeout: 300
+      MemorySize: 256
+      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      Policies:
+        - AWSLambdaExecute
+        - !Ref S3DeploymentPolicy
+
+  S3DeploymentPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - kms:Decrypt
+              - s3:PutObject
             Resource: "*"
 
   DecryptedGithubToken:
@@ -726,3 +748,9 @@ Outputs:
     Description: ARN of the file extraction function for use in step function pipelines
     Export:
       Name: !Sub ${AWS::StackName}:ExtractFileFromZipFunctionArn
+
+  S3DeploymentFunctionArn:
+    Value: !GetAtt S3DeploymentFunction.Arn
+    Description: ARN of the S3 Deployment function for use in step function pipelines
+    Export:
+      Name: !Sub ${AWS::StackName}:S3DeploymentFunctionArn
