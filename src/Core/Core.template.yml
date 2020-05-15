@@ -755,6 +755,12 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:LoadBalancerDnsName
 
+  CertificateArn:
+    Value: !Ref Certificate
+    Description: ARN of the certificate used for core services
+    Export:
+      Name: !Sub ${AWS::StackName}:CertificateArn
+
   HttpsListenerArn:
     Value: !Ref HttpsListener
     Description: ARN of the primary load balancer's HTTPS listener
