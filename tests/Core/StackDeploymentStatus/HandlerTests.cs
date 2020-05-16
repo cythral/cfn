@@ -11,6 +11,7 @@ using Amazon.SQS.Model;
 using Amazon.Lambda.SNSEvents;
 
 using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.StackDeploymentStatus;
 using Cythral.CloudFormation.StackDeploymentStatus.Request;
 
@@ -32,6 +33,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         private static IAmazonSQS sqsClient = Substitute.For<IAmazonSQS>();
         private static CloudFormationFactory cloudFormationFactory = Substitute.For<CloudFormationFactory>();
         private static IAmazonCloudFormation cloudFormationClient = Substitute.For<IAmazonCloudFormation>();
+        private static PutCommitStatusFacade putCommitStatusFacade = Substitute.For<PutCommitStatusFacade>();
         private const string stackId = "stackId";
         private const string bucket = "bucket";
         private const string key = "key";
@@ -113,6 +115,13 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
                     }
                 }
             });
+        }
+
+        [SetUp]
+        public void SetupPutCommitStatusFacade()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "putCommitStatusFacade", putCommitStatusFacade);
+            putCommitStatusFacade.ClearSubstitute();
         }
 
         private StackDeploymentStatusRequest CreateRequest(string stackId, string token, string status = "CREATE_COMPLETE", string resourceType = "AWS::CloudFormation::Stack")

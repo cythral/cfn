@@ -6,5 +6,9 @@ namespace Cythral.CloudFormation
         public string QueueUrl { get; set; }
         public string ReceiptHandle { get; set; }
         public string RoleArn { get; set; }
+        public string GithubOwner { get; set; }
+        public string GithubRepo { get; set; }
+        public string GithubRef { get; set; }
+        public string EnvironmentName { get; set; }
     }
 }

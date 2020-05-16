@@ -10,6 +10,7 @@ using Amazon.StepFunctions.Model;
 using Amazon.Lambda.SQSEvents;
 
 using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.StackDeployment;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
@@ -33,6 +34,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private static StepFunctionsClientFactory stepFunctionsClientFactory = Substitute.For<StepFunctionsClientFactory>();
         private static CloudFormationFactory cloudFormationFactory = Substitute.For<CloudFormationFactory>();
         private static IAmazonCloudFormation cloudFormationClient = Substitute.For<IAmazonCloudFormation>();
+        private static PutCommitStatusFacade putCommitStatusFacade = Substitute.For<PutCommitStatusFacade>();
 
         private const string stackName = "stackName";
         private const string location = "location";
@@ -142,6 +144,12 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             });
         }
 
+        [SetUp]
+        public void SetupPutCommitStatusFacade()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "putCommitStatusFacade", putCommitStatusFacade);
+            putCommitStatusFacade.ClearSubstitute();
+        }
 
         private Request CreateRequest()
         {

@@ -11,7 +11,10 @@ using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 using Amazon.CloudFormation.Model;
 
+using Octokit;
+
 using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
 using static System.Text.Json.JsonSerializer;
@@ -28,6 +31,7 @@ namespace Cythral.CloudFormation.StackDeployment
         private static RequestFactory requestFactory = new RequestFactory();
         private static StepFunctionsClientFactory stepFunctionsClientFactory = new StepFunctionsClientFactory();
         private static CloudFormationFactory cloudFormationFactory = new CloudFormationFactory();
+        private static PutCommitStatusFacade putCommitStatusFacade = new PutCommitStatusFacade();
 
         public static async Task<Response> Handle(
             SQSEvent sqsEvent,
@@ -42,6 +46,17 @@ namespace Cythral.CloudFormation.StackDeployment
                 var template = await s3GetObjectFacade.GetZipEntryInObject(request.ZipLocation, request.TemplateFileName);
                 var config = await GetConfig(request);
                 var token = await tokenGenerator.Generate(sqsEvent, request);
+
+
+                await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
+                {
+                    CommitState = CommitState.Pending,
+                    EnvironmentName = request.EnvironmentName,
+                    StackName = request.StackName,
+                    GithubOwner = request.GithubOwner,
+                    GithubRepo = request.GithubRepository,
+                    GithubRef = request.GithubRef,
+                });
 
                 await stackDeployer.Deploy(new DeployStackContext
                 {
@@ -66,6 +81,16 @@ namespace Cythral.CloudFormation.StackDeployment
                     Output = Serialize(outputs)
                 });
 
+                await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
+                {
+                    CommitState = CommitState.Success,
+                    EnvironmentName = request.EnvironmentName,
+                    StackName = request.StackName,
+                    GithubOwner = request.GithubOwner,
+                    GithubRepo = request.GithubRepository,
+                    GithubRef = request.GithubRef,
+                });
+
                 return new Response
                 {
                     Success = true
@@ -78,6 +103,16 @@ namespace Cythral.CloudFormation.StackDeployment
                 {
                     TaskToken = request.Token,
                     Cause = e.Message
+                });
+
+                await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
+                {
+                    CommitState = CommitState.Failure,
+                    EnvironmentName = request.EnvironmentName,
+                    StackName = request.StackName,
+                    GithubOwner = request.GithubOwner,
+                    GithubRepo = request.GithubRepository,
+                    GithubRef = request.GithubRef,
                 });
 
                 return new Response

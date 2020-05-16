@@ -37,7 +37,11 @@ namespace Cythral.CloudFormation.StackDeployment
                         ClientRequestToken = token,
                         QueueUrl = ConvertQueueArnToUrl(sqsRecord.EventSourceArn),
                         ReceiptHandle = sqsRecord.ReceiptHandle,
-                        RoleArn = request.RoleArn
+                        RoleArn = request.RoleArn,
+                        GithubOwner = request.GithubOwner,
+                        GithubRepo = request.GithubRepository,
+                        GithubRef = request.GithubRef,
+                        EnvironmentName = request.EnvironmentName
                     })
                 });
 
