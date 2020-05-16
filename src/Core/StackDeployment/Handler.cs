@@ -56,6 +56,8 @@ namespace Cythral.CloudFormation.StackDeployment
                     GithubOwner = request.GithubOwner,
                     GithubRepo = request.GithubRepository,
                     GithubRef = request.GithubRef,
+                    GoogleClientId = request.GoogleClientId,
+                    IdentityPoolId = request.IdentityPoolId
                 });
 
                 await stackDeployer.Deploy(new DeployStackContext
@@ -89,6 +91,8 @@ namespace Cythral.CloudFormation.StackDeployment
                     GithubOwner = request.GithubOwner,
                     GithubRepo = request.GithubRepository,
                     GithubRef = request.GithubRef,
+                    GoogleClientId = request.GoogleClientId,
+                    IdentityPoolId = request.IdentityPoolId
                 });
 
                 return new Response
@@ -113,6 +117,8 @@ namespace Cythral.CloudFormation.StackDeployment
                     GithubOwner = request.GithubOwner,
                     GithubRepo = request.GithubRepository,
                     GithubRef = request.GithubRef,
+                    GoogleClientId = request.GoogleClientId,
+                    IdentityPoolId = request.IdentityPoolId
                 });
 
                 return new Response
