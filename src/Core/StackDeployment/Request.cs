@@ -15,5 +15,7 @@ namespace Cythral.CloudFormation.StackDeployment
         public string GithubOwner { get; set; }
         public string GithubRepository { get; set; }
         public string GithubRef { get; set; }
+        public string GoogleClientId { get; set; }
+        public string IdentityPoolId { get; set; }
     }
 }

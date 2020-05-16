@@ -93,6 +93,8 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
                 GithubOwner = tokenInfo.GithubOwner,
                 GithubRepo = tokenInfo.GithubRepo,
                 GithubRef = tokenInfo.GithubRef,
+                GoogleClientId = tokenInfo.GoogleClientId,
+                IdentityPoolId = tokenInfo.IdentityPoolId
             });
         }
 
@@ -117,6 +119,8 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
                 GithubOwner = tokenInfo.GithubOwner,
                 GithubRepo = tokenInfo.GithubRepo,
                 GithubRef = tokenInfo.GithubRef,
+                GoogleClientId = tokenInfo.GoogleClientId,
+                IdentityPoolId = tokenInfo.IdentityPoolId
             });
         }
 
