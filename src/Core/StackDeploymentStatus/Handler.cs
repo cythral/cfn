@@ -11,7 +11,10 @@ using Amazon.Lambda.SNSEvents;
 using Amazon.SQS.Model;
 
 using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.StackDeploymentStatus.Request;
+
+using Octokit;
 
 using static System.Text.Json.JsonSerializer;
 
@@ -24,6 +27,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
         private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
         private static SqsFactory sqsFactory = new SqsFactory();
         private static CloudFormationFactory cloudFormationFactory = new CloudFormationFactory();
+        private static PutCommitStatusFacade putCommitStatusFacade = new PutCommitStatusFacade();
 
         public static async Task<Response> Handle(
             SNSEvent snsRequest,
@@ -81,6 +85,15 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             Console.WriteLine($"Received send task failure response: {Serialize(response)}");
 
             await Dequeue(tokenInfo);
+            await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
+            {
+                CommitState = CommitState.Failure,
+                EnvironmentName = tokenInfo.EnvironmentName,
+                StackName = request.StackName,
+                GithubOwner = tokenInfo.GithubOwner,
+                GithubRepo = tokenInfo.GithubRepo,
+                GithubRef = tokenInfo.GithubRef,
+            });
         }
 
         private static async Task SendSuccess(StackDeploymentStatusRequest request, IAmazonStepFunctions client)
@@ -96,6 +109,15 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             Console.WriteLine($"Received send task failure response: {Serialize(response)}");
 
             await Dequeue(tokenInfo);
+            await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
+            {
+                CommitState = CommitState.Success,
+                EnvironmentName = tokenInfo.EnvironmentName,
+                StackName = request.StackName,
+                GithubOwner = tokenInfo.GithubOwner,
+                GithubRepo = tokenInfo.GithubRepo,
+                GithubRef = tokenInfo.GithubRef,
+            });
         }
 
         private static async Task<Dictionary<string, string>> GetStackOutputs(string stackId, string roleArn)

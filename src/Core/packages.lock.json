@@ -107,6 +107,12 @@
           "AWSSDK.Core": "[3.3.106.18, 3.4.0)"
         }
       },
+      "Octokit": {
+        "type": "Direct",
+        "requested": "[0.47.0, )",
+        "resolved": "0.47.0",
+        "contentHash": "q1TWsMEjxG7Eb7YFrXm3MWgSPsMvPKxrIF//tuUPd9i/SS/fG7PerKr088E8AOoAFcHqMqouSrW0iAg2WgskDA=="
+      },
       "AWSSDK.Core": {
         "type": "Transitive",
         "resolved": "3.3.106.21",

@@ -11,5 +11,9 @@ namespace Cythral.CloudFormation.StackDeployment
         public string StackName { get; set; }
         public string RoleArn { get; set; }
         public string Token { get; set; }
+        public string EnvironmentName { get; set; }
+        public string GithubOwner { get; set; }
+        public string GithubRepository { get; set; }
+        public string GithubRef { get; set; }
     }
 }
