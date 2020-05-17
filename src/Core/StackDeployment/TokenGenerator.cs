@@ -41,7 +41,9 @@ namespace Cythral.CloudFormation.StackDeployment
                         GithubOwner = request.GithubOwner,
                         GithubRepo = request.GithubRepository,
                         GithubRef = request.GithubRef,
-                        EnvironmentName = request.EnvironmentName
+                        EnvironmentName = request.EnvironmentName,
+                        GoogleClientId = request.GoogleClientId,
+                        IdentityPoolId = request.IdentityPoolId
                     })
                 });
 
