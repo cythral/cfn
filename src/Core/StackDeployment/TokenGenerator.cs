@@ -38,12 +38,12 @@ namespace Cythral.CloudFormation.StackDeployment
                         QueueUrl = ConvertQueueArnToUrl(sqsRecord.EventSourceArn),
                         ReceiptHandle = sqsRecord.ReceiptHandle,
                         RoleArn = request.RoleArn,
-                        GithubOwner = request.CommitInfo.GithubOwner,
-                        GithubRepo = request.CommitInfo.GithubRepository,
-                        GithubRef = request.CommitInfo.GithubRef,
+                        GithubOwner = request.CommitInfo?.GithubOwner,
+                        GithubRepo = request.CommitInfo?.GithubRepository,
+                        GithubRef = request.CommitInfo?.GithubRef,
                         EnvironmentName = request.EnvironmentName,
-                        GoogleClientId = request.SsoConfig.GoogleClientId,
-                        IdentityPoolId = request.SsoConfig.IdentityPoolId
+                        GoogleClientId = request.SsoConfig?.GoogleClientId,
+                        IdentityPoolId = request.SsoConfig?.IdentityPoolId
                     })
                 });
 
