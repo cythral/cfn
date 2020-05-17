@@ -27,7 +27,7 @@ namespace Cythral.CloudFormation.GithubUtils
                 State = request.CommitState,
                 TargetUrl = GetSsoUrl(request),
                 Description = $"CloudFormation Deployment {GetStatusDescription(request.CommitState)}",
-                Context = $"AWS CloudFormation ({request.EnvironmentName})"
+                Context = $"AWS CloudFormation - {request.EnvironmentName} ({request.StackName})"
             });
         }
 
