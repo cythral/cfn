@@ -53,11 +53,11 @@ namespace Cythral.CloudFormation.StackDeployment
                     CommitState = CommitState.Pending,
                     EnvironmentName = request.EnvironmentName,
                     StackName = request.StackName,
-                    GithubOwner = request.GithubOwner,
-                    GithubRepo = request.GithubRepository,
-                    GithubRef = request.GithubRef,
-                    GoogleClientId = request.GoogleClientId,
-                    IdentityPoolId = request.IdentityPoolId
+                    GithubOwner = request.CommitInfo.GithubOwner,
+                    GithubRepo = request.CommitInfo.GithubRepository,
+                    GithubRef = request.CommitInfo.GithubRef,
+                    GoogleClientId = request.SsoConfig.GoogleClientId,
+                    IdentityPoolId = request.SsoConfig.IdentityPoolId
                 });
 
                 await stackDeployer.Deploy(new DeployStackContext
@@ -88,11 +88,11 @@ namespace Cythral.CloudFormation.StackDeployment
                     CommitState = CommitState.Success,
                     EnvironmentName = request.EnvironmentName,
                     StackName = request.StackName,
-                    GithubOwner = request.GithubOwner,
-                    GithubRepo = request.GithubRepository,
-                    GithubRef = request.GithubRef,
-                    GoogleClientId = request.GoogleClientId,
-                    IdentityPoolId = request.IdentityPoolId
+                    GithubOwner = request.CommitInfo.GithubOwner,
+                    GithubRepo = request.CommitInfo.GithubRepository,
+                    GithubRef = request.CommitInfo.GithubRef,
+                    GoogleClientId = request.SsoConfig.GoogleClientId,
+                    IdentityPoolId = request.SsoConfig.IdentityPoolId
                 });
 
                 return new Response
@@ -114,11 +114,11 @@ namespace Cythral.CloudFormation.StackDeployment
                     CommitState = CommitState.Failure,
                     EnvironmentName = request.EnvironmentName,
                     StackName = request.StackName,
-                    GithubOwner = request.GithubOwner,
-                    GithubRepo = request.GithubRepository,
-                    GithubRef = request.GithubRef,
-                    GoogleClientId = request.GoogleClientId,
-                    IdentityPoolId = request.IdentityPoolId
+                    GithubOwner = request.CommitInfo.GithubOwner,
+                    GithubRepo = request.CommitInfo.GithubRepository,
+                    GithubRef = request.CommitInfo.GithubRef,
+                    GoogleClientId = request.SsoConfig.GoogleClientId,
+                    IdentityPoolId = request.SsoConfig.IdentityPoolId
                 });
 
                 return new Response
