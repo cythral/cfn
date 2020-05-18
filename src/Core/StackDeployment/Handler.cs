@@ -47,19 +47,7 @@ namespace Cythral.CloudFormation.StackDeployment
                 var config = await GetConfig(request);
                 var token = await tokenGenerator.Generate(sqsEvent, request);
 
-
-                await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
-                {
-                    CommitState = CommitState.Pending,
-                    EnvironmentName = request.EnvironmentName,
-                    StackName = request.StackName,
-                    GithubOwner = request.CommitInfo?.GithubOwner,
-                    GithubRepo = request.CommitInfo?.GithubRepository,
-                    GithubRef = request.CommitInfo?.GithubRef,
-                    GoogleClientId = request.SsoConfig?.GoogleClientId,
-                    IdentityPoolId = request.SsoConfig?.IdentityPoolId
-                });
-
+                await PutCommitStatus(request, CommitState.Pending);
                 await stackDeployer.Deploy(new DeployStackContext
                 {
                     StackName = request.StackName,
@@ -83,17 +71,7 @@ namespace Cythral.CloudFormation.StackDeployment
                     Output = Serialize(outputs)
                 });
 
-                await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
-                {
-                    CommitState = CommitState.Success,
-                    EnvironmentName = request.EnvironmentName,
-                    StackName = request.StackName,
-                    GithubOwner = request.CommitInfo?.GithubOwner,
-                    GithubRepo = request.CommitInfo?.GithubRepository,
-                    GithubRef = request.CommitInfo?.GithubRef,
-                    GoogleClientId = request.SsoConfig?.GoogleClientId,
-                    IdentityPoolId = request.SsoConfig?.IdentityPoolId
-                });
+                await PutCommitStatus(request, CommitState.Success);
 
                 return new Response
                 {
@@ -109,17 +87,7 @@ namespace Cythral.CloudFormation.StackDeployment
                     Cause = e.Message
                 });
 
-                await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
-                {
-                    CommitState = CommitState.Failure,
-                    EnvironmentName = request.EnvironmentName,
-                    StackName = request.StackName,
-                    GithubOwner = request.CommitInfo?.GithubOwner,
-                    GithubRepo = request.CommitInfo?.GithubRepository,
-                    GithubRef = request.CommitInfo?.GithubRef,
-                    GoogleClientId = request.SsoConfig?.GoogleClientId,
-                    IdentityPoolId = request.SsoConfig?.IdentityPoolId
-                });
+                await PutCommitStatus(request, CommitState.Failure);
 
                 return new Response
                 {
@@ -165,6 +133,21 @@ namespace Cythral.CloudFormation.StackDeployment
             });
 
             return response.Stacks[0].Outputs.ToDictionary(entry => entry.OutputKey, entry => entry.OutputValue);
+        }
+
+        private static async Task PutCommitStatus(Request request, CommitState state)
+        {
+            await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
+            {
+                CommitState = state,
+                ServiceName = "AWS CloudFormation",
+                EnvironmentName = request.EnvironmentName,
+                GithubOwner = request.CommitInfo?.GithubOwner,
+                GithubRepo = request.CommitInfo?.GithubRepository,
+                GithubRef = request.CommitInfo?.GithubRef,
+                GoogleClientId = request.SsoConfig?.GoogleClientId,
+                IdentityPoolId = request.SsoConfig?.IdentityPoolId
+            });
         }
     }
 }

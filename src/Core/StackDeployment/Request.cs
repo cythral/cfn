@@ -16,16 +16,7 @@ namespace Cythral.CloudFormation.StackDeployment
         public SsoConfig SsoConfig { get; set; }
     }
 
-    public class CommitInfo
-    {
-        public string GithubOwner { get; set; }
-        public string GithubRepository { get; set; }
-        public string GithubRef { get; set; }
-    }
 
-    public class SsoConfig
-    {
-        public string GoogleClientId { get; set; }
-        public string IdentityPoolId { get; set; }
-    }
+
+
 }

@@ -16,6 +16,8 @@ using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
 using NSubstitute;
 
+using Octokit;
+
 using NUnit.Framework;
 using NSubstitute.ClearExtensions;
 using static System.Text.Json.JsonSerializer;
@@ -48,6 +50,12 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private const string createdToken = "createdToken";
         private const string templateConfiguration = "templateConfiguration";
         private List<string> capabilities = new List<string> { "a", "b" };
+        private const string githubOwner = "githubOwner";
+        private const string githubRepo = "githubRepo";
+        private const string githubRef = "githubRef";
+        private const string googleClientId = "googleClientId";
+        private const string identityPoolId = "identityPoolId";
+        private const string environmentName = "environmentName";
 
         private Dictionary<string, string> outputs = new Dictionary<string, string>
         {
@@ -161,7 +169,19 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                 StackName = stackName,
                 RoleArn = roleArn,
                 Token = clientRequestToken,
-                Capabilities = capabilities
+                Capabilities = capabilities,
+                EnvironmentName = environmentName,
+                CommitInfo = new CommitInfo
+                {
+                    GithubOwner = githubOwner,
+                    GithubRepository = githubRepo,
+                    GithubRef = githubRef,
+                },
+                SsoConfig = new SsoConfig
+                {
+                    GoogleClientId = googleClientId,
+                    IdentityPoolId = identityPoolId
+                }
             };
 
             requestFactory.CreateFromSqsEvent(Arg.Any<SQSEvent>()).Returns(req);
@@ -177,6 +197,26 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             Assert.ThrowsAsync<Exception>(() => Handler.Handle(sqs));
 
             requestFactory.Received().CreateFromSqsEvent(Arg.Is(sqs));
+        }
+
+        [Test]
+        public async Task ShouldPutPendingCommitStatus()
+        {
+            var request = CreateRequest();
+            var sqs = Substitute.For<SQSEvent>();
+
+            Assert.ThrowsAsync<Exception>(() => Handler.Handle(sqs));
+
+            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
+                req.CommitState == CommitState.Pending &&
+                req.ServiceName == "AWS CloudFormation" &&
+                req.EnvironmentName == environmentName &&
+                req.GithubOwner == githubOwner &&
+                req.GithubRepo == githubRepo &&
+                req.GithubRef == githubRef &&
+                req.GoogleClientId == googleClientId &&
+                req.IdentityPoolId == identityPoolId
+            ));
         }
 
         [Test]
@@ -284,6 +324,27 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         }
 
         [Test]
+        public async Task ShouldPutSuccessCommitStatusIfNoUpdatesExceptionWasCaught()
+        {
+            var request = CreateRequest();
+            var sqs = Substitute.For<SQSEvent>();
+
+            stackDeployer.Deploy(null).ReturnsForAnyArgs(x => { throw new NoUpdatesException("no updates"); });
+            await Handler.Handle(sqs);
+
+            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
+                req.CommitState == CommitState.Success &&
+                req.ServiceName == "AWS CloudFormation" &&
+                req.EnvironmentName == environmentName &&
+                req.GithubOwner == githubOwner &&
+                req.GithubRepo == githubRepo &&
+                req.GithubRef == githubRef &&
+                req.GoogleClientId == googleClientId &&
+                req.IdentityPoolId == identityPoolId
+            ));
+        }
+
+        [Test]
         public async Task ParameterOverridesAreRespected()
         {
             var request = CreateRequest();
@@ -311,13 +372,34 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             var message = "message";
 
             stackDeployer.Deploy(Arg.Any<DeployStackContext>()).Returns(x => throw new Exception(message));
-
             await Handler.Handle(sqs);
 
             stepFunctionsClientFactory.Received().Create();
             await stepFunctionsClient.Received().SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req =>
                 req.TaskToken == clientRequestToken &&
                 req.Cause == message
+            ));
+        }
+
+        [Test]
+        public async Task ShouldPutFailedCommitStatusIfDeployFailed()
+        {
+            var request = CreateRequest();
+            var sqs = Substitute.For<SQSEvent>();
+            var message = "message";
+
+            stackDeployer.Deploy(Arg.Any<DeployStackContext>()).Returns(x => throw new Exception(message));
+            await Handler.Handle(sqs);
+
+            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
+                req.CommitState == CommitState.Failure &&
+                req.ServiceName == "AWS CloudFormation" &&
+                req.EnvironmentName == environmentName &&
+                req.GithubOwner == githubOwner &&
+                req.GithubRepo == githubRepo &&
+                req.GithubRef == githubRef &&
+                req.GoogleClientId == googleClientId &&
+                req.IdentityPoolId == identityPoolId
             ));
         }
     }

@@ -12,6 +12,9 @@ using Amazon.S3;
 using Amazon.S3.Model;
 
 using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.GithubUtils;
+
+using Octokit;
 
 namespace Cythral.CloudFormation.S3Deployment
 {
@@ -19,18 +22,32 @@ namespace Cythral.CloudFormation.S3Deployment
     {
         private static S3Factory s3Factory = new S3Factory();
         private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
+        private static PutCommitStatusFacade putCommitStatusFacade = new PutCommitStatusFacade();
 
         public static async Task<object> Handle(Request request, ILambdaContext context = null)
         {
-            using (var stream = await s3GetObjectFacade.GetObjectStream(request.ZipLocation))
-            using (var zipStream = new ZipArchive(stream))
+            await PutCommitStatus(request, CommitState.Pending);
+
+            try
             {
-                var bucket = request.DestinationBucket;
-                var role = request.RoleArn;
-                var entries = zipStream.Entries.ToList();
-                var tasks = entries.Select(entry => UploadEntry(entry, bucket, role));
-                Task.WaitAll(tasks.ToArray());
+                using (var stream = await s3GetObjectFacade.GetObjectStream(request.ZipLocation))
+                using (var zipStream = new ZipArchive(stream))
+                {
+                    var bucket = request.DestinationBucket;
+                    var role = request.RoleArn;
+                    var entries = zipStream.Entries.ToList();
+                    var tasks = entries.Select(entry => UploadEntry(entry, bucket, role));
+                    Task.WaitAll(tasks.ToArray());
+                }
+
+                await PutCommitStatus(request, CommitState.Success);
             }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Got an error uploading files: {e.Message} {e.StackTrace}");
+            }
+
+            await PutCommitStatus(request, CommitState.Failure);
 
             return new Response
             {
@@ -38,7 +55,7 @@ namespace Cythral.CloudFormation.S3Deployment
             };
         }
 
-        public static async Task UploadEntry(ZipArchiveEntry entry, string bucket, string role)
+        private static async Task UploadEntry(ZipArchiveEntry entry, string bucket, string role)
         {
             var method = entry.GetType().GetMethod("OpenInReadMode", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -57,6 +74,21 @@ namespace Cythral.CloudFormation.S3Deployment
                 await client.PutObjectAsync(request);
                 Console.WriteLine($"Uploaded {entry.FullName}");
             }
+        }
+
+        private static async Task PutCommitStatus(Request request, CommitState state)
+        {
+            await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
+            {
+                CommitState = state,
+                ServiceName = "AWS S3",
+                EnvironmentName = request.EnvironmentName,
+                GithubOwner = request.CommitInfo?.GithubOwner,
+                GithubRepo = request.CommitInfo?.GithubRepository,
+                GithubRef = request.CommitInfo?.GithubRef,
+                GoogleClientId = request.SsoConfig?.GoogleClientId,
+                IdentityPoolId = request.SsoConfig?.IdentityPoolId
+            });
         }
     }
 }

@@ -730,6 +730,7 @@ Resources:
       Environment:
         Variables:
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
+          GITHUB_TOKEN: !Ref GithubToken
 
   DecryptedGithubToken:
     Type: Custom::Secret

@@ -15,7 +15,11 @@ namespace Cythral.CloudFormation.GithubUtils
 
         public virtual async Task PutCommitStatus(PutCommitStatusRequest request)
         {
-            if (request.GithubOwner == null || request.GithubRepo == null || request.GithubRef == null)
+            if (request.ServiceName == null ||
+                request.EnvironmentName == null ||
+                request.GithubOwner == null ||
+                request.GithubRepo == null ||
+                request.GithubRef == null)
             {
                 return;
             }
@@ -26,8 +30,8 @@ namespace Cythral.CloudFormation.GithubUtils
             {
                 State = request.CommitState,
                 TargetUrl = GetSsoUrl(request),
-                Description = $"CloudFormation Deployment {GetStatusDescription(request.CommitState)}",
-                Context = $"AWS CloudFormation - {request.EnvironmentName} ({request.StackName})"
+                Description = $"{request.ServiceName} Deployment {GetStatusDescription(request.CommitState)}",
+                Context = $"{request.ServiceName} - {request.EnvironmentName} ({request.StackName})"
             });
         }
 
