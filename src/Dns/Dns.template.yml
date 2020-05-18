@@ -33,7 +33,7 @@ Mappings:
       Ipv6Address: "2600:9000:5306:fa00::1"
 
 Resources:
-  HostedZone:
+  PrimaryHostedZone:
     Type: Custom::HostedZone
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
@@ -48,7 +48,7 @@ Resources:
     Type: AWS::Route53::RecordSetGroup
     Properties:
       Comment: Morag resource records
-      HostedZoneId: !Ref HostedZone
+      HostedZoneId: !Ref PrimaryHostedZone
       RecordSets:
         - Name: !Sub morag.${DomainName}
           Type: A
@@ -65,7 +65,7 @@ Resources:
     Type: AWS::Route53::RecordSetGroup
     Properties:
       Comment: Niall resource records
-      HostedZoneId: !Ref HostedZone
+      HostedZoneId: !Ref PrimaryHostedZone
       RecordSets:
         - Name: !Sub niall.${DomainName}
           Type: A
@@ -82,7 +82,7 @@ Resources:
     Type: AWS::Route53::RecordSetGroup
     Properties:
       Comment: Hugo resource records
-      HostedZoneId: !Ref HostedZone
+      HostedZoneId: !Ref PrimaryHostedZone
       RecordSets:
         - Name: !Sub hugo.${DomainName}
           Type: A
@@ -99,7 +99,7 @@ Resources:
     Type: AWS::Route53::RecordSetGroup
     Properties:
       Comment: Ardain resource records
-      HostedZoneId: !Ref HostedZone
+      HostedZoneId: !Ref PrimaryHostedZone
       RecordSets:
         - Name: !Sub ardain.${DomainName}
           Type: A
@@ -116,7 +116,7 @@ Resources:
     Type: Custom::RecordSet
     Properties:
       ServiceToken: !ImportValue cfn-resources:RecordSetLambdaArn
-      HostedZoneId: !Ref HostedZone
+      HostedZoneId: !Ref PrimaryHostedZone
       Comment: Name Server Record Set (NS)
       Name: !Ref DomainName
       Type: NS
@@ -131,7 +131,7 @@ Resources:
     Type: Custom::RecordSet
     Properties:
       ServiceToken: !ImportValue cfn-resources:RecordSetLambdaArn
-      HostedZoneId: !Ref HostedZone
+      HostedZoneId: !Ref PrimaryHostedZone
       Comment: Start Of Authority Record Set (SOA)
       Name: !Ref DomainName
       Type: SOA
@@ -148,6 +148,6 @@ Outputs:
 
   HostedZoneId:
     Description: ID of the primary hosted zone
-    Value: !Ref HostedZone
+    Value: !Ref PrimaryHostedZone
     Export:
       Name: !Sub ${AWS::StackName}:HostedZoneId
