@@ -9,7 +9,7 @@ Parameters:
   DomainName:
     Type: String
     Description: Domain name to use
-  
+
   SoaContactEmail:
     Type: String
     Description: Contact email to put in the SOA record
@@ -19,7 +19,7 @@ Mappings:
     Morag:
       Ipv4Address: "205.251.194.29"
       Ipv6Address: "2600:9000:5302:1d00::1"
-      
+
     Niall:
       Ipv4Address: "205.251.196.129"
       Ipv6Address: "2600:9000:5304:8100::1"
@@ -42,73 +42,82 @@ Resources:
       HostedZoneConfig:
         Comment: The hosted zone for brigh.id
 
+  PrimaryHostedZone:
+    Type: Custom::HostedZone
+    Properties:
+      ServiceToken: !ImportValue cfn-hosted-zone-resource:HostedZoneLambdaArn
+      Name: !Ref DomainName
+      DelegationSetId: !Ref DelegationSetId
+      HostedZoneConfig:
+        Comment: The hosted zone for brigh.id
+
   MoragRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
     Properties:
       Comment: Morag resource records
       HostedZoneId: !Ref HostedZone
-      RecordSets: 
-      - Name: !Sub morag.${DomainName}
-        Type: A
-        TTL: 60
-        ResourceRecords:
-          - !FindInMap [Nameservers, Morag, Ipv4Address]
-      - Name: !Sub morag.${DomainName}
-        Type: AAAA
-        TTL: 60
-        ResourceRecords:
-          - !FindInMap [Nameservers, Morag, Ipv6Address]
-  
+      RecordSets:
+        - Name: !Sub morag.${DomainName}
+          Type: A
+          TTL: 60
+          ResourceRecords:
+            - !FindInMap [Nameservers, Morag, Ipv4Address]
+        - Name: !Sub morag.${DomainName}
+          Type: AAAA
+          TTL: 60
+          ResourceRecords:
+            - !FindInMap [Nameservers, Morag, Ipv6Address]
+
   NiallRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
     Properties:
       Comment: Niall resource records
       HostedZoneId: !Ref HostedZone
-      RecordSets: 
-      - Name: !Sub niall.${DomainName}
-        Type: A
-        TTL: 60
-        ResourceRecords:
-          - !FindInMap [Nameservers, Niall, Ipv4Address]
-      - Name: !Sub niall.${DomainName}
-        Type: AAAA
-        TTL: 60
-        ResourceRecords:
-          - !FindInMap [Nameservers, Niall, Ipv6Address]
-  
+      RecordSets:
+        - Name: !Sub niall.${DomainName}
+          Type: A
+          TTL: 60
+          ResourceRecords:
+            - !FindInMap [Nameservers, Niall, Ipv4Address]
+        - Name: !Sub niall.${DomainName}
+          Type: AAAA
+          TTL: 60
+          ResourceRecords:
+            - !FindInMap [Nameservers, Niall, Ipv6Address]
+
   HugoRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
     Properties:
       Comment: Hugo resource records
       HostedZoneId: !Ref HostedZone
-      RecordSets: 
-      - Name: !Sub hugo.${DomainName}
-        Type: A
-        TTL: 60
-        ResourceRecords:
-          - !FindInMap [Nameservers, Hugo, Ipv4Address]
-      - Name: !Sub hugo.${DomainName}
-        Type: AAAA
-        TTL: 60
-        ResourceRecords:
-          - !FindInMap [Nameservers, Hugo, Ipv6Address]
+      RecordSets:
+        - Name: !Sub hugo.${DomainName}
+          Type: A
+          TTL: 60
+          ResourceRecords:
+            - !FindInMap [Nameservers, Hugo, Ipv4Address]
+        - Name: !Sub hugo.${DomainName}
+          Type: AAAA
+          TTL: 60
+          ResourceRecords:
+            - !FindInMap [Nameservers, Hugo, Ipv6Address]
 
   ArdainRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
     Properties:
       Comment: Ardain resource records
       HostedZoneId: !Ref HostedZone
-      RecordSets: 
-      - Name: !Sub ardain.${DomainName}
-        Type: A
-        TTL: 60
-        ResourceRecords:
-          - !FindInMap [Nameservers, Ardain, Ipv4Address]
-      - Name: !Sub ardain.${DomainName}
-        Type: AAAA
-        TTL: 60
-        ResourceRecords:
-          - !FindInMap [Nameservers, Ardain, Ipv6Address]
+      RecordSets:
+        - Name: !Sub ardain.${DomainName}
+          Type: A
+          TTL: 60
+          ResourceRecords:
+            - !FindInMap [Nameservers, Ardain, Ipv4Address]
+        - Name: !Sub ardain.${DomainName}
+          Type: AAAA
+          TTL: 60
+          ResourceRecords:
+            - !FindInMap [Nameservers, Ardain, Ipv6Address]
 
   NameServerRecordSet:
     Type: Custom::RecordSet
@@ -149,4 +158,9 @@ Outputs:
     Value: !Ref HostedZone
     Export:
       Name: !Sub ${AWS::StackName}:HostedZoneId
-  
+
+  PrimaryHostedZoneId:
+    Description: ID of the primary hosted zone
+    Value: !Ref PrimaryHostedZone
+    Export:
+      Name: !Sub ${AWS::StackName}:PrimaryHostedZoneId
