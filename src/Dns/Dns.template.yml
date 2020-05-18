@@ -38,7 +38,7 @@ Resources:
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
     Properties:
-      ServiceToken: !ImportValue cfn-resources:HostedZoneLambdaArn
+      ServiceToken: !ImportValue cfn-hosted-zone-resource:HostedZoneLambdaArn
       Name: !Ref DomainName
       DelegationSetId: !Ref DelegationSetId
       HostedZoneConfig:
