@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-        <!-- <RestoreLockedMode>true</RestoreLockedMode> -->
+        <RestoreLockedMode>true</RestoreLockedMode>
         <OutputPath>$(MSBuildThisFileDirectory)bin/$(MSBuildProjectName)/$(Configuration)</OutputPath>
         <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj/$(MSBuildProjectName)</BaseIntermediateOutputPath>
         <PackageOutputPath>$(MSBuildThisFileDirectory)bin/Packages/$(Configuration)</PackageOutputPath>
