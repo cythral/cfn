@@ -85,17 +85,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             Console.WriteLine($"Received send task failure response: {Serialize(response)}");
 
             await Dequeue(tokenInfo);
-            await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
-            {
-                CommitState = CommitState.Failure,
-                EnvironmentName = tokenInfo.EnvironmentName,
-                StackName = request.StackName,
-                GithubOwner = tokenInfo.GithubOwner,
-                GithubRepo = tokenInfo.GithubRepo,
-                GithubRef = tokenInfo.GithubRef,
-                GoogleClientId = tokenInfo.GoogleClientId,
-                IdentityPoolId = tokenInfo.IdentityPoolId
-            });
+            await PutCommitStatus(tokenInfo, CommitState.Failure);
         }
 
         private static async Task SendSuccess(StackDeploymentStatusRequest request, IAmazonStepFunctions client)
@@ -111,17 +101,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             Console.WriteLine($"Received send task failure response: {Serialize(response)}");
 
             await Dequeue(tokenInfo);
-            await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
-            {
-                CommitState = CommitState.Success,
-                EnvironmentName = tokenInfo.EnvironmentName,
-                StackName = request.StackName,
-                GithubOwner = tokenInfo.GithubOwner,
-                GithubRepo = tokenInfo.GithubRepo,
-                GithubRef = tokenInfo.GithubRef,
-                GoogleClientId = tokenInfo.GoogleClientId,
-                IdentityPoolId = tokenInfo.IdentityPoolId
-            });
+            await PutCommitStatus(tokenInfo, CommitState.Success);
         }
 
         private static async Task<Dictionary<string, string>> GetStackOutputs(string stackId, string roleArn)
@@ -145,6 +125,21 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             });
 
             Console.WriteLine($"Got delete message response: {Serialize(response)}");
+        }
+
+        private static async Task PutCommitStatus(TokenInfo tokenInfo, CommitState state)
+        {
+            await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
+            {
+                CommitState = state,
+                ServiceName = "AWS CloudFormation",
+                EnvironmentName = tokenInfo.EnvironmentName,
+                GithubOwner = tokenInfo.GithubOwner,
+                GithubRepo = tokenInfo.GithubRepo,
+                GithubRef = tokenInfo.GithubRef,
+                GoogleClientId = tokenInfo.GoogleClientId,
+                IdentityPoolId = tokenInfo.IdentityPoolId
+            });
         }
     }
 }
