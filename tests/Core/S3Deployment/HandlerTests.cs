@@ -35,6 +35,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
         private const string googleClientId = "googleClientId";
         private const string identityPoolId = "identityPoolId";
         private const string environmentName = "environmentName";
+        private const string projectName = "projectName";
 
         [SetUp]
         public void SetupS3()
@@ -64,6 +65,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 DestinationBucket = destinationBucket,
                 RoleArn = roleArn,
                 EnvironmentName = environmentName,
+                ProjectName = projectName,
                 CommitInfo = new CommitInfo
                 {
                     GithubOwner = githubOwner,
@@ -99,13 +101,27 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Pending &&
                 req.ServiceName == "AWS S3" &&
-                req.ProjectName == destinationBucket &&
+                req.ProjectName == projectName &&
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
                 req.GithubRef == githubRef &&
                 req.GoogleClientId == googleClientId &&
                 req.IdentityPoolId == identityPoolId
+            ));
+        }
+
+        [Test]
+        public async Task ShouldPutPendingCommitStatusWithDestinationBucketIfProjectNameNotSpecified()
+        {
+            var request = CreateRequest();
+            request.ProjectName = null;
+
+            await Handler.Handle(request);
+
+            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
+                req.CommitState == CommitState.Pending &&
+                req.ProjectName == destinationBucket
             ));
         }
 
@@ -187,7 +203,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Success &&
                 req.ServiceName == "AWS S3" &&
-                req.ProjectName == destinationBucket &&
+                req.ProjectName == projectName &&
                 req.DetailsUrl == $"https://s3.console.aws.amazon.com/s3/buckets/{destinationBucket}/?region=us-east-1" &&
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
@@ -195,6 +211,20 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 req.GithubRef == githubRef &&
                 req.GoogleClientId == googleClientId &&
                 req.IdentityPoolId == identityPoolId
+            ));
+        }
+
+        [Test]
+        public async Task ShouldPutSuccessCommitStatusWithDestinationBucketIfNoProjectName()
+        {
+            var request = CreateRequest();
+            request.ProjectName = null;
+
+            await Handler.Handle(request);
+
+            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
+                req.CommitState == CommitState.Success &&
+                req.ProjectName == destinationBucket
             ));
         }
 
@@ -209,7 +239,6 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             await putCommitStatusFacade.DidNotReceive().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Success &&
                 req.ServiceName == "AWS S3" &&
-                req.ProjectName == destinationBucket &&
                 req.DetailsUrl == $"https://s3.console.aws.amazon.com/s3/buckets/{destinationBucket}/?region=us-east-1" &&
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
@@ -219,6 +248,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 req.IdentityPoolId == identityPoolId
             ));
         }
+
 
         [Test]
         public async Task ShouldPutFailedCommitStatusIfFailed()
@@ -231,7 +261,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Failure &&
                 req.ServiceName == "AWS S3" &&
-                req.ProjectName == destinationBucket &&
+                req.ProjectName == projectName &&
                 req.DetailsUrl == $"https://s3.console.aws.amazon.com/s3/buckets/{destinationBucket}/?region=us-east-1" &&
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
@@ -239,6 +269,22 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 req.GithubRef == githubRef &&
                 req.GoogleClientId == googleClientId &&
                 req.IdentityPoolId == identityPoolId
+            ));
+        }
+
+        [Test]
+        public async Task ShouldPutFailedCommitStatusIfFailedWithDestinationBucket()
+        {
+            s3Client.PutObjectAsync(null).ReturnsForAnyArgs<PutObjectResponse>(x => { throw new Exception(); });
+
+            var request = CreateRequest();
+            request.ProjectName = null;
+
+            await Handler.Handle(request);
+
+            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
+                req.CommitState == CommitState.Failure &&
+                req.ProjectName == destinationBucket
             ));
         }
     }
