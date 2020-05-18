@@ -85,7 +85,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             Console.WriteLine($"Received send task failure response: {Serialize(response)}");
 
             await Dequeue(tokenInfo);
-            await PutCommitStatus(tokenInfo, CommitState.Failure);
+            await PutCommitStatus(tokenInfo, request.StackName, CommitState.Failure);
         }
 
         private static async Task SendSuccess(StackDeploymentStatusRequest request, IAmazonStepFunctions client)
@@ -101,7 +101,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             Console.WriteLine($"Received send task failure response: {Serialize(response)}");
 
             await Dequeue(tokenInfo);
-            await PutCommitStatus(tokenInfo, CommitState.Success);
+            await PutCommitStatus(tokenInfo, request.StackName, CommitState.Success);
         }
 
         private static async Task<Dictionary<string, string>> GetStackOutputs(string stackId, string roleArn)
@@ -127,12 +127,14 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             Console.WriteLine($"Got delete message response: {Serialize(response)}");
         }
 
-        private static async Task PutCommitStatus(TokenInfo tokenInfo, CommitState state)
+        private static async Task PutCommitStatus(TokenInfo tokenInfo, string stackName, CommitState state)
         {
             await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
             {
                 CommitState = state,
                 ServiceName = "AWS CloudFormation",
+                DetailsUrl = $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={stackName}",
+                ProjectName = stackName,
                 EnvironmentName = tokenInfo.EnvironmentName,
                 GithubOwner = tokenInfo.GithubOwner,
                 GithubRepo = tokenInfo.GithubRepo,

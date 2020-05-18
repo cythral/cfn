@@ -82,6 +82,8 @@ namespace Cythral.CloudFormation.S3Deployment
             {
                 CommitState = state,
                 ServiceName = "AWS S3",
+                DetailsUrl = $"https://s3.console.aws.amazon.com/s3/buckets/{request.DestinationBucket}/?region=us-east-1",
+                ProjectName = request.DestinationBucket,
                 EnvironmentName = request.EnvironmentName,
                 GithubOwner = request.CommitInfo?.GithubOwner,
                 GithubRepo = request.CommitInfo?.GithubRepository,

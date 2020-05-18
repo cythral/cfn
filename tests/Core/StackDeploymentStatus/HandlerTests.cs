@@ -54,6 +54,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         private const string googleClientId = "googleClientId";
         private const string identityPoolId = "identityPoolId";
         private const string environmentName = "environmentName";
+        private const string stackName = "stackName";
         private static Dictionary<string, string> outputs = new Dictionary<string, string>
         {
             ["A"] = "B"
@@ -152,6 +153,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             var request = new StackDeploymentStatusRequest
             {
                 StackId = stackId,
+                StackName = stackName,
                 ClientRequestToken = token,
                 ResourceStatus = status,
                 ResourceType = resourceType,
@@ -302,6 +304,8 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
                 await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                     req.CommitState == CommitState.Failure &&
                     req.ServiceName == "AWS CloudFormation" &&
+                    req.ProjectName == stackName &&
+                    req.DetailsUrl == $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={stackName}" &&
                     req.EnvironmentName == environmentName &&
                     req.GithubOwner == githubOwner &&
                     req.GithubRepo == githubRepo &&

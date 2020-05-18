@@ -141,6 +141,8 @@ namespace Cythral.CloudFormation.StackDeployment
             {
                 CommitState = state,
                 ServiceName = "AWS CloudFormation",
+                DetailsUrl = $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={request.StackName}",
+                ProjectName = request.StackName,
                 EnvironmentName = request.EnvironmentName,
                 GithubOwner = request.CommitInfo?.GithubOwner,
                 GithubRepo = request.CommitInfo?.GithubRepository,
