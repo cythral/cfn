@@ -35,17 +35,10 @@ Mappings:
 Resources:
   HostedZone:
     Type: Custom::HostedZone
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
     Properties:
       ServiceToken: !ImportValue cfn-resources:HostedZoneLambdaArn
-      Name: !Ref DomainName
-      DelegationSetId: !Ref DelegationSetId
-      HostedZoneConfig:
-        Comment: The hosted zone for brigh.id
-
-  PrimaryHostedZone:
-    Type: Custom::HostedZone
-    Properties:
-      ServiceToken: !ImportValue cfn-hosted-zone-resource:HostedZoneLambdaArn
       Name: !Ref DomainName
       DelegationSetId: !Ref DelegationSetId
       HostedZoneConfig:
@@ -158,9 +151,3 @@ Outputs:
     Value: !Ref HostedZone
     Export:
       Name: !Sub ${AWS::StackName}:HostedZoneId
-
-  PrimaryHostedZoneId:
-    Description: ID of the primary hosted zone
-    Value: !Ref PrimaryHostedZone
-    Export:
-      Name: !Sub ${AWS::StackName}:PrimaryHostedZoneId
