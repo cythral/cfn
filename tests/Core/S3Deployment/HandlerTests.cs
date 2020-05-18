@@ -99,6 +99,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Pending &&
                 req.ServiceName == "AWS S3" &&
+                req.ProjectName == destinationBucket &&
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
@@ -186,6 +187,8 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Success &&
                 req.ServiceName == "AWS S3" &&
+                req.ProjectName == destinationBucket &&
+                req.DetailsUrl == $"https://s3.console.aws.amazon.com/s3/buckets/{destinationBucket}/?region=us-east-1" &&
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
@@ -206,6 +209,8 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             await putCommitStatusFacade.DidNotReceive().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Success &&
                 req.ServiceName == "AWS S3" &&
+                req.ProjectName == destinationBucket &&
+                req.DetailsUrl == $"https://s3.console.aws.amazon.com/s3/buckets/{destinationBucket}/?region=us-east-1" &&
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
@@ -226,6 +231,8 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Failure &&
                 req.ServiceName == "AWS S3" &&
+                req.ProjectName == destinationBucket &&
+                req.DetailsUrl == $"https://s3.console.aws.amazon.com/s3/buckets/{destinationBucket}/?region=us-east-1" &&
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&

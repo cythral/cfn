@@ -31,17 +31,15 @@ namespace Cythral.CloudFormation.GithubUtils
                 State = request.CommitState,
                 TargetUrl = GetSsoUrl(request),
                 Description = $"{request.ServiceName} Deployment {GetStatusDescription(request.CommitState)}",
-                Context = $"{request.ServiceName} - {request.EnvironmentName} ({request.StackName})"
+                Context = $"{request.ServiceName} - {request.EnvironmentName} ({request.ProjectName})"
             });
         }
 
         private static string GetSsoUrl(PutCommitStatusRequest request)
         {
-            var stackUrl = $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={request.StackName}";
-
             if (request.IdentityPoolId == null || request.GoogleClientId == null)
             {
-                return stackUrl;
+                return request.DetailsUrl;
             }
 
             var nonceBytes = new byte[16];
@@ -51,7 +49,7 @@ namespace Cythral.CloudFormation.GithubUtils
             }
 
             var nonce = string.Join("", nonceBytes.Select(x => $"{x:X2}"));
-            var destination = Uri.EscapeDataString(stackUrl);
+            var destination = Uri.EscapeDataString(request.DetailsUrl);
             var state = Serialize(new { identity_pool_id = request.IdentityPoolId, destination = destination });
             var encodedState = Uri.EscapeDataString(state);
             var redirectUri = Uri.EscapeDataString("https://sso.brigh.id/redirect.html");

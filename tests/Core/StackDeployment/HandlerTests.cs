@@ -210,6 +210,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Pending &&
                 req.ServiceName == "AWS CloudFormation" &&
+                req.ProjectName == stackName &&
+                req.DetailsUrl == $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={stackName}" &&
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
@@ -335,6 +337,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Success &&
                 req.ServiceName == "AWS CloudFormation" &&
+                req.ProjectName == stackName &&
+                req.DetailsUrl == $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={stackName}" &&
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
@@ -394,6 +398,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Failure &&
                 req.ServiceName == "AWS CloudFormation" &&
+                req.ProjectName == stackName &&
+                req.DetailsUrl == $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={stackName}" &&
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
