@@ -112,10 +112,10 @@ Resources:
           ResourceRecords:
             - !FindInMap [Nameservers, Ardain, Ipv6Address]
 
-  NameServerRecordSet:
+  NameServerRecord:
     Type: Custom::RecordSet
     Properties:
-      ServiceToken: !ImportValue cfn-resources:RecordSetLambdaArn
+      ServiceToken: !ImportValue cfn-record-set-resource:RecordSetLambdaArn
       HostedZoneId: !Ref PrimaryHostedZone
       Comment: Name Server Record Set (NS)
       Name: !Ref DomainName
@@ -127,10 +127,10 @@ Resources:
         - !Sub hugo.${DomainName}.
         - !Sub ardain.${DomainName}.
 
-  SoaRecordSet:
+  SoaRecord:
     Type: Custom::RecordSet
     Properties:
-      ServiceToken: !ImportValue cfn-resources:RecordSetLambdaArn
+      ServiceToken: !ImportValue cfn-record-set-resource:RecordSetLambdaArn
       HostedZoneId: !Ref PrimaryHostedZone
       Comment: Start Of Authority Record Set (SOA)
       Name: !Ref DomainName
