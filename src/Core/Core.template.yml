@@ -732,16 +732,16 @@ Resources:
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
           GITHUB_TOKEN: !Ref GithubToken
 
-  DecryptedGithubToken:
+  GithubTokenSecret:
     Type: Custom::Secret
     Properties:
-      ServiceToken: !ImportValue cfn-resources:SecretLambdaArn
+      ServiceToken: !ImportValue cfn-secret-resource:SecretLambdaArn
       Ciphertext: !Ref GithubToken
 
   CodeBuildSourceCredential:
     Type: AWS::CodeBuild::SourceCredential
     Properties:
-      Token: !GetAtt DecryptedGithubToken.Plaintext
+      Token: !GetAtt GithubTokenSecret.Plaintext
       ServerType: GITHUB
       AuthType: PERSONAL_ACCESS_TOKEN
 
