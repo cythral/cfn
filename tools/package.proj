@@ -29,12 +29,6 @@
         >
             <Output TaskParameter="ConsoleOutput" PropertyName="DeploymentBucket" />
         </Exec>
-        
-        <MSBuild 
-            Condition="$(SkipResources) != 'true'" 
-            Projects="$(SourceDirectory)/Resources/Resources.csproj" 
-            Targets="Publish" 
-            Properties="Deploy=false;DeploymentBucket=$(DeploymentBucket);Configuration=$(Configuration);PackagedFile=$(Destination)/Resources.template.yml" />
 
         <MSBuild 
             Condition="$(SkipDns) != 'true'" 

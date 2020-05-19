@@ -53,12 +53,6 @@
 
         <!-- Deploy "Feature" Projects -->
         <MSBuild 
-            Condition="$(SkipResources) != 'true'" 
-            Projects="$(SourceDirectory)/Resources/Resources.csproj" 
-            Targets="Publish" 
-            Properties="DeploymentBucket=$(UtilityBucket);Configuration=$(Configuration)" />
-
-        <MSBuild 
             Condition="$(SkipDns) != 'true'" 
             Projects="$(SourceDirectory)/Dns/Dns.proj" 
             Targets="Publish" 
