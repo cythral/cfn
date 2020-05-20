@@ -52,7 +52,9 @@ Resources:
       IpAddressType: dualstack
       SecurityGroups:
         - !ImportValue cfn-utilities:WebSecurityGroupId
-      Subnets: !Split [",", !ImportValue cfn-utilities:SubnetIds]
+      Subnets: !Split
+        - ","
+        - !ImportValue cfn-utilities:SubnetIds
       LoadBalancerAttributes:
         - Key: access_logs.s3.enabled
           Value: "true"
