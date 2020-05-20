@@ -272,13 +272,13 @@ Resources:
         - Name: dev.brigh.id
           Type: A
           AliasTarget:
-            HostedZoneId: !ImportValue cfn-gateway:LoadBalancerCanonicalHostedZoneId
-            DNSName: !ImportValue cfn-gateway:LoadBalancerDnsName
+            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+            DNSName: !GetAtt LoadBalancer.DNSName
         - Name: dev.brigh.id
           Type: AAAA
           AliasTarget:
-            HostedZoneId: !ImportValue cfn-gateway:LoadBalancerCanonicalHostedZoneId
-            DNSName: !ImportValue cfn-gateway:LoadBalancerDnsName
+            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+            DNSName: !GetAtt LoadBalancer.DNSName
 
   ProdPeeringConnection:
     Type: AWS::EC2::VPCPeeringConnection
@@ -371,13 +371,13 @@ Resources:
         - Name: brigh.id
           Type: A
           AliasTarget:
-            HostedZoneId: !ImportValue cfn-gateway:LoadBalancerCanonicalHostedZoneId
-            DNSName: !ImportValue cfn-gateway:LoadBalancerDnsName
+            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+            DNSName: !GetAtt LoadBalancer.DNSName
         - Name: brigh.id
           Type: AAAA
           AliasTarget:
-            HostedZoneId: !ImportValue cfn-gateway:LoadBalancerCanonicalHostedZoneId
-            DNSName: !ImportValue cfn-gateway:LoadBalancerDnsName
+            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+            DNSName: !GetAtt LoadBalancer.DNSName
 
   GithubWebhook:
     Type: AWS::Serverless::Function
