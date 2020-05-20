@@ -120,6 +120,12 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:LoadBalancerDnsName
 
+  LoadBalancerFullName:
+    Value: !GetAtt LoadBalancer.LoadBalancerFullName
+    Description: Full name of the primary load balancer
+    Export:
+      Name: !Sub ${AWS::StackName}:LoadBalancerFullName
+
   CertificateArn:
     Value: !Ref Certificate
     Description: ARN of the certificate used for core services
