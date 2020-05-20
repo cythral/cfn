@@ -582,7 +582,18 @@ Resources:
       ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
       Priority: 3
       Actions:
+        - Type: authenticate-oidc
+          Order: 1
+          AuthenticateOidcConfig:
+            Issuer: https://accounts.google.com
+            AuthorizationEndpoint: https://accounts.google.com/o/oauth2/v2/auth
+            TokenEndpoint: https://oauth2.googleapis.com/token
+            UserInfoEndpoint: https://openidconnect.googleapis.com/v1/userinfo
+            ClientId: !ImportValue sso-aws-registry:SharedGoogleClientId
+            ClientSecret: !GetAtt DecryptedSharedClientSecret.Plaintext
+            SessionTimeout: 86400
         - Type: forward
+          Order: 2
           TargetGroupArn: !Ref ApprovalWebhookTargetGroup
       Conditions:
         - Field: host-header
@@ -593,6 +604,12 @@ Resources:
           PathPatternConfig:
             Values:
               - /webhooks/approval
+
+  DecryptedSharedClientSecret:
+    Type: Custom::Secret
+    Properties:
+      ServiceToken: !ImportValue cfn-secret-resource:SecretLambdaArn
+      Ciphertext: !ImportValue sso-aws-registry:SharedGoogleClientSecret
 
   ApprovalTopic:
     Type: AWS::SNS::Topic
