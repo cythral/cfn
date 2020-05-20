@@ -169,7 +169,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Condition: SetupDevAccount
     Properties:
-      ListenerArn: !Ref HttpsListener
+      ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
       Priority: 2
       Actions:
         - Type: authenticate-oidc
@@ -184,7 +184,7 @@ Resources:
             SessionTimeout: 86400
         - Type: forward
           Order: 2
-          TargetGroupArn: !Ref DevTargetGroup
+          TargetGroupArn: !ImportValue cfn-gateway:DevTargetGroupArn
       Conditions:
         - Field: host-header
           HostHeaderConfig:
@@ -230,9 +230,9 @@ Resources:
               MetricName: UnHealthyHostCount
               Dimensions:
                 - Name: LoadBalancer
-                  Value: !GetAtt LoadBalancer.LoadBalancerName
+                  Value: !ImportValue cfn-gateway:LoadBalancerFullName
                 - Name: TargetGroup
-                  Value: !GetAtt DevTargetGroup.TargetGroupName
+                  Value: !ImportValue cfn-gateway:DevTargetGroupFullName
             Stat: Maximum
             Period: 60
           ReturnData: false
@@ -243,9 +243,9 @@ Resources:
               MetricName: HealthyHostCount
               Dimensions:
                 - Name: LoadBalancer
-                  Value: !GetAtt LoadBalancer.LoadBalancerFullName
+                  Value: !ImportValue cfn-gateway:LoadBalancerFullName
                 - Name: TargetGroup
-                  Value: !GetAtt DevTargetGroup.TargetGroupFullName
+                  Value: !ImportValue cfn-gateway:DevTargetGroupFullName
             Stat: Maximum
             Period: 60
           ReturnData: false
@@ -256,7 +256,7 @@ Resources:
               MetricName: CustomData
               Dimensions:
                 - Name: TargetGroupArn
-                  Value: !Ref DevTargetGroup
+                  Value: !ImportValue cfn-gateway:DevTargetGroupArn
                 - Name: TargetDnsName
                   Value: !Ref DevLoadBalancerDnsName
             Stat: Maximum
@@ -265,20 +265,19 @@ Resources:
 
   DevDnsRecords:
     Type: AWS::Route53::RecordSetGroup
-    Condition: SetupDevAccount
     Properties:
       HostedZoneId: !ImportValue cfn-dns:HostedZoneId
       RecordSets:
         - Name: dev.brigh.id
           Type: A
           AliasTarget:
-            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-            DNSName: !GetAtt LoadBalancer.DNSName
+            HostedZoneId: !ImportValue cfn-gateway:LoadBalancerCanonicalHostedZoneId
+            DNSName: !ImportValue cfn-gateway:LoadBalancerDnsName
         - Name: dev.brigh.id
           Type: AAAA
           AliasTarget:
-            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-            DNSName: !GetAtt LoadBalancer.DNSName
+            HostedZoneId: !ImportValue cfn-gateway:LoadBalancerCanonicalHostedZoneId
+            DNSName: !ImportValue cfn-gateway:LoadBalancerDnsName
 
   ProdPeeringConnection:
     Type: AWS::EC2::VPCPeeringConnection
@@ -329,9 +328,9 @@ Resources:
               MetricName: UnHealthyHostCount
               Dimensions:
                 - Name: LoadBalancer
-                  Value: !GetAtt LoadBalancer.LoadBalancerName
+                  Value: !ImportValue cfn-gateway:LoadBalancerFullName
                 - Name: TargetGroup
-                  Value: !GetAtt ProdTargetGroup.TargetGroupName
+                  Value: !ImportValue cfn-gateway:ProdTargetGroupFullName
             Stat: Maximum
             Period: 60
           ReturnData: false
@@ -342,9 +341,9 @@ Resources:
               MetricName: HealthyHostCount
               Dimensions:
                 - Name: LoadBalancer
-                  Value: !GetAtt LoadBalancer.LoadBalancerFullName
+                  Value: !ImportValue cfn-gateway:LoadBalancerFullName
                 - Name: TargetGroup
-                  Value: !GetAtt ProdTargetGroup.TargetGroupFullName
+                  Value: !ImportValue cfn-gateway:ProdTargetGroupFullName
             Stat: Maximum
             Period: 60
           ReturnData: false
@@ -355,7 +354,7 @@ Resources:
               MetricName: CustomData
               Dimensions:
                 - Name: TargetGroupArn
-                  Value: !Ref ProdTargetGroup
+                  Value: !ImportValue cfn-gateway:ProdTargetGroupArn
                 - Name: TargetDnsName
                   Value: !Ref ProdLoadBalancerDnsName
             Stat: Maximum
@@ -370,13 +369,13 @@ Resources:
         - Name: brigh.id
           Type: A
           AliasTarget:
-            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-            DNSName: !GetAtt LoadBalancer.DNSName
+            HostedZoneId: !ImportValue cfn-gateway:LoadBalancerCanonicalHostedZoneId
+            DNSName: !ImportValue cfn-gateway:LoadBalancerDnsName
         - Name: brigh.id
           Type: AAAA
           AliasTarget:
-            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-            DNSName: !GetAtt LoadBalancer.DNSName
+            HostedZoneId: !ImportValue cfn-gateway:LoadBalancerCanonicalHostedZoneId
+            DNSName: !ImportValue cfn-gateway:LoadBalancerDnsName
 
   GithubWebhook:
     Type: AWS::Serverless::Function
@@ -442,7 +441,7 @@ Resources:
   GithubWebhookListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Properties:
-      ListenerArn: !Ref HttpsListener
+      ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
       Priority: 1
       Actions:
         - Type: forward
@@ -612,7 +611,7 @@ Resources:
   ApprovalWebhookListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Properties:
-      ListenerArn: !Ref HttpsListener
+      ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
       Priority: 3
       Actions:
         - Type: forward
