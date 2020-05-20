@@ -172,6 +172,15 @@ Resources:
       ListenerArn: !Ref HttpsListener
       Priority: 2
       Actions:
+        - Type: authenticate-oidc
+          AuthenticateOidcConfig:
+            Issuer: https://accounts.google.com
+            AuthorizationEndpoint: https://accounts.google.com/o/oauth2/v2/auth
+            TokenEndpoint: https://oauth2.googleapis.com/token
+            UserInfoEndpoint: https://openidconnect.googleapis.com/v1/userinfo
+            ClientId: !ImportValue sso-aws-registry:DevGoogleClientId
+            ClientSecret: !GetAtt DecryptedDevClientSecret.Plaintext
+            SessionTimeout: 86400
         - Type: forward
           TargetGroupArn: !Ref DevTargetGroup
       Conditions:
@@ -180,6 +189,12 @@ Resources:
             Values:
               - "dev.*"
               - "*.dev.*"
+
+  DecryptedDevClientSecret:
+    Type: Custom::Secret
+    Properties:
+      ServiceToken: !ImportValue cfn-secret-resource:SecretLambdaArn
+      Ciphertext: !ImportValue sso-aws-registry:DevGoogleClientSecret
 
   DevTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
