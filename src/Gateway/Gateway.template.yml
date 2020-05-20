@@ -139,7 +139,7 @@ Outputs:
       Name: !Sub ${AWS::StackName}:DevTargetGroupArn
 
   ProdTargetGroupArn:
-    Value: !Ref DevTargetGroup
-    Description: ARN of the dev target group
+    Value: !Ref ProdTargetGroup
+    Description: ARN of the prod target group
     Export:
-      Name: !Sub ${AWS::StackName}:DevTargetGroupArn
+      Name: !Sub ${AWS::StackName}:ProdTargetGroupArn
