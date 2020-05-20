@@ -265,6 +265,7 @@ Resources:
 
   DevDnsRecords:
     Type: AWS::Route53::RecordSetGroup
+    DeletionPolicy: Retain
     Properties:
       HostedZoneId: !ImportValue cfn-dns:HostedZoneId
       RecordSets:
@@ -362,7 +363,8 @@ Resources:
           ReturnData: false
 
   ProdDnsRecords:
-    Type: AWS::Route53::RecordSetGroup # Prod DNS records setup regardless of if peering or not
+    Type: AWS::Route53::RecordSetGroup
+    DeletionPolicy: Retain
     Properties:
       HostedZoneId: !ImportValue cfn-dns:HostedZoneId
       RecordSets:
