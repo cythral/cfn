@@ -173,6 +173,7 @@ Resources:
       Priority: 2
       Actions:
         - Type: authenticate-oidc
+          Order: 1
           AuthenticateOidcConfig:
             Issuer: https://accounts.google.com
             AuthorizationEndpoint: https://accounts.google.com/o/oauth2/v2/auth
@@ -182,6 +183,7 @@ Resources:
             ClientSecret: !GetAtt DecryptedDevClientSecret.Plaintext
             SessionTimeout: 86400
         - Type: forward
+          Order: 2
           TargetGroupArn: !Ref DevTargetGroup
       Conditions:
         - Field: host-header
