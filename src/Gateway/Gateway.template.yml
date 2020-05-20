@@ -116,12 +116,12 @@ Resources:
   #         Type: A
   #         AliasTarget:
   #           HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-  #           DNSName: !GetAtt LoadBalancer.DNSName
+  #           DNSName: !Sub dualstack.${LoadBalancer.DNSName}
   #       - Name: dev.brigh.id
   #         Type: AAAA
   #         AliasTarget:
   #           HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-  #           DNSName: !GetAtt LoadBalancer.DNSName
+  #           DNSName: !Sub dualstack.${LoadBalancer.DNSName}
   # ProdDnsRecords:
   #   Type: AWS::Route53::RecordSetGroup
   #   Properties:
@@ -131,12 +131,12 @@ Resources:
   #         Type: A
   #         AliasTarget:
   #           HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-  #           DNSName: !GetAtt LoadBalancer.DNSName
+  #           DNSName: !Sub dualstack.${LoadBalancer.DNSName}
   #       - Name: brigh.id
   #         Type: AAAA
   #         AliasTarget:
   #           HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-  #           DNSName: !GetAtt LoadBalancer.DNSName
+  #           DNSName: !Sub dualstack.${LoadBalancer.DNSName}
 
 Outputs:
   LoadBalancerCanonicalHostedZoneId:
