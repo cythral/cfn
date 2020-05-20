@@ -138,8 +138,20 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:DevTargetGroupArn
 
+  DevTargetGroupFullName:
+    Value: !GetAtt DevTargetGroup.TargetGroupFullName
+    Description: Full name of the dev target group
+    Export:
+      Name: !Sub ${AWS::StackName}:DevTargetGroupFullName
+
   ProdTargetGroupArn:
     Value: !Ref ProdTargetGroup
     Description: ARN of the prod target group
     Export:
       Name: !Sub ${AWS::StackName}:ProdTargetGroupArn
+
+  ProdTargetGroupFullName:
+    Value: !GetAtt ProdTargetGroup.TargetGroupFullName
+    Description: Full name of the prod target group
+    Export:
+      Name: !Sub ${AWS::StackName}:ProdTargetGroupFullName
