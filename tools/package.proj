@@ -7,6 +7,7 @@
         <Optimize>false</Optimize>
         <SkipResources>false</SkipResources>
         <SkipDns>false</SkipDns>
+        <SkipGateway>false</SkipGateway>
         <SkipCore>false</SkipCore>
     </PropertyGroup>
     
@@ -33,6 +34,12 @@
         <MSBuild 
             Condition="$(SkipDns) != 'true'" 
             Projects="$(SourceDirectory)/Dns/Dns.proj" 
+            Targets="Copy" 
+            Properties="Configuration=$(Configuration);Dest=$(Destination)" />
+
+        <MSBuild 
+            Condition="$(SkipGateway) != 'true'" 
+            Projects="$(SourceDirectory)/Gateway/Gateway.proj" 
             Targets="Copy" 
             Properties="Configuration=$(Configuration);Dest=$(Destination)" />
         

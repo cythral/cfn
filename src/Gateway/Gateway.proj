@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project ToolsVersion="14.0" DefaultTargets="Publish" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <StackName>cfn-gateway</StackName>
+        <TemplateName>Gateway.template.yml</TemplateName>
+        <TemplateFile>$(MSBuildThisFileDirectory)$(TemplateName)</TemplateFile>
+    </PropertyGroup>
+
+    <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.Deploy" AssemblyFile="../BuildTasks/bin/$(Configuration)/netcoreapp3.0/publish/Cythral.CloudFormation.BuildTasks.dll" />
+    
+    <Target Name="Publish">
+        <Deploy
+            StackName="$(StackName)"
+            TemplateFile="$(TemplateFile)"
+            Capabilities="CAPABILITY_IAM" />
+    </Target>
+
+    <Target Name="Copy" Condition="$(Dest) != ''">
+        <Copy SourceFiles="$(TemplateFile)" DestinationFiles="$(Dest)/$(TemplateName)" />
+    </Target>
+</Project>

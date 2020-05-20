@@ -5,6 +5,7 @@
         <UtilitiesStackName>cfn-utilities</UtilitiesStackName>
         <SkipResources>false</SkipResources>
         <SkipDns>false</SkipDns>
+        <SkipGateway>false</SkipGateway>
         <SkipCore>false</SkipCore>
     </PropertyGroup>
 
@@ -57,6 +58,12 @@
             Projects="$(SourceDirectory)/Dns/Dns.proj" 
             Targets="Publish" 
             Properties="Configuration=$(Configuration)" />
+
+        <MSBuild 
+            Condition="$(SkipGateway) != 'true'" 
+            Projects="$(SourceDirectory)/Gateway/Gateway.proj" 
+            Targets="Copy" 
+            Properties="Configuration=$(Configuration);Dest=$(Destination)" />
 
         <MSBuild 
             Condition="$(SkipCore) != 'true'" 

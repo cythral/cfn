@@ -1,0 +1,143 @@
+Resources:
+  Certificate:
+    Type: Custom::Certificate
+    Properties:
+      ServiceToken: !ImportValue cfn-certificate-resource:CertificateLambdaArn
+      DomainName: brigh.id
+      HostedZoneId: !ImportValue cfn-dns:HostedZoneId
+      ValidationMethod: DNS
+      SubjectAlternativeNames:
+        - "*.brigh.id"
+        - "*.dev.brigh.id"
+
+  LoadBalancerLogsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      LifecycleConfiguration:
+        Rules:
+          - Status: Enabled
+            ExpirationInDays: 14
+
+  LoadBalancerLogsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref LoadBalancerLogsBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: s3:PutObject
+            Principal:
+              AWS: arn:aws:iam::127311923021:root
+            Resource: !Sub arn:aws:s3:::${LoadBalancerLogsBucket}/AWSLogs/${AWS::AccountId}/*
+          - Effect: Allow
+            Action: s3:PutObject
+            Principal:
+              Service: delivery.logs.amazonaws.com
+            Resource: !Sub arn:aws:s3:::${LoadBalancerLogsBucket}/AWSLogs/${AWS::AccountId}/*
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: bucket-owner-full-control
+          - Effect: Allow
+            Action: s3:GetBucketAcl
+            Principal:
+              Service: delivery.logs.amazonaws.com
+            Resource: !Sub arn:aws:s3:::${LoadBalancerLogsBucket}
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    DependsOn:
+      - LoadBalancerLogsBucketPolicy
+    Properties:
+      IpAddressType: dualstack
+      SecurityGroups:
+        - !ImportValue cfn-utilities:WebSecurityGroupId
+      Subnets: !Split [",", !ImportValue cfn-utilities:SubnetIds]
+      LoadBalancerAttributes:
+        - Key: access_logs.s3.enabled
+          Value: "true"
+        - Key: access_logs.s3.bucket
+          Value: !Ref LoadBalancerLogsBucket
+
+  HttpListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            StatusCode: HTTP_301
+            Protocol: HTTPS
+            Port: 443
+            Host: "#{host}"
+            Path: "/#{path}"
+            Query: "#{query}"
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  HttpsListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ProdTargetGroup
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref Certificate
+
+  DevTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      TargetType: ip
+      VpcId: !ImportValue cfn-utilities:VpcId
+      Port: 80
+      HealthCheckPath: /healthcheck
+      Protocol: HTTP
+
+  ProdTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      TargetType: ip
+      VpcId: !ImportValue cfn-utilities:VpcId
+      HealthCheckPath: /healthcheck
+      Port: 80
+      Protocol: HTTP
+
+Outputs:
+  LoadBalancerCanonicalHostedZoneId:
+    Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
+    Description: ID of the canonical hosted zone for the primary load balancer
+    Export:
+      Name: !Sub ${AWS::StackName}:LoadBalancerCanonicalHostedZoneId
+
+  LoadBalancerDnsName:
+    Value: !GetAtt LoadBalancer.DNSName
+    Description: DNS name of the primary load balancer
+    Export:
+      Name: !Sub ${AWS::StackName}:LoadBalancerDnsName
+
+  CertificateArn:
+    Value: !Ref Certificate
+    Description: ARN of the certificate used for core services
+    Export:
+      Name: !Sub ${AWS::StackName}:CertificateArn
+
+  HttpsListenerArn:
+    Value: !Ref HttpsListener
+    Description: ARN of the primary load balancer's HTTPS listener
+    Export:
+      Name: !Sub ${AWS::StackName}:HttpsListenerArn
+
+  DevTargetGroupArn:
+    Value: !Ref DevTargetGroup
+    Description: ARN of the dev target group
+    Export:
+      Name: !Sub ${AWS::StackName}:DevTargetGroupArn
+
+  ProdTargetGroupArn:
+    Value: !Ref DevTargetGroup
+    Description: ARN of the dev target group
+    Export:
+      Name: !Sub ${AWS::StackName}:DevTargetGroupArn
