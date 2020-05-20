@@ -18,4 +18,4 @@
     <Target Name="Copy" Condition="$(Dest) != ''">
         <Copy SourceFiles="$(TemplateFile)" DestinationFiles="$(Dest)/$(TemplateName)" />
     </Target>
-</Project> 
+</Project>  
