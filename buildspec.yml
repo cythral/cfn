@@ -24,4 +24,5 @@ artifacts:
     - "Resources.template.yml"
     - "Dns.template.yml"
     - "Dns.config.json"
+    - "Gateway.template.yml"
     - "Networking.config.json"
