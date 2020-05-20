@@ -424,13 +424,13 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref GithubWebhook.Alias
       Principal: elasticloadbalancing.amazonaws.com
-      SourceArn: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/cfn-core-GithubWebhook/*
+      SourceArn: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/cfn-core-GithubWebhookTarget/*
 
-  GithubWebhookTarget:
+  GithubWebhookTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     DependsOn: GithubWebhookPermission
     Properties:
-      Name: cfn-core-GithubWebhook
+      Name: cfn-core-GithubWebhookTarget
       TargetType: lambda
       TargetGroupAttributes:
         - Key: lambda.multi_value_headers.enabled
@@ -445,7 +445,7 @@ Resources:
       Priority: 1
       Actions:
         - Type: forward
-          TargetGroupArn: !Ref GithubWebhookTarget
+          TargetGroupArn: !Ref GithubWebhookTargetGroup
       Conditions:
         - Field: host-header
           HostHeaderConfig:
@@ -594,13 +594,13 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref ApprovalWebhook.Alias
       Principal: elasticloadbalancing.amazonaws.com
-      SourceArn: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/cfn-core-ApprovalWebhook/*
+      SourceArn: !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/cfn-core-ApprovalWebhookTarget/*
 
-  ApprovalWebhookTarget:
+  ApprovalWebhookTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     DependsOn: ApprovalWebhookPermission
     Properties:
-      Name: cfn-core-ApprovalWebhook
+      Name: cfn-core-ApprovalWebhookTarget
       TargetType: lambda
       TargetGroupAttributes:
         - Key: lambda.multi_value_headers.enabled
@@ -615,7 +615,7 @@ Resources:
       Priority: 3
       Actions:
         - Type: forward
-          TargetGroupArn: !Ref ApprovalWebhookTarget
+          TargetGroupArn: !Ref ApprovalWebhookTargetGroup
       Conditions:
         - Field: host-header
           HostHeaderConfig:
