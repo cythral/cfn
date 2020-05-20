@@ -263,6 +263,23 @@ Resources:
             Period: 60
           ReturnData: false
 
+  DevDnsRecords:
+    Type: AWS::Route53::RecordSetGroup
+    DeletionPolicy: Retain
+    Properties:
+      HostedZoneId: !ImportValue cfn-dns:HostedZoneId
+      RecordSets:
+        - Name: dev.brigh.id
+          Type: A
+          AliasTarget:
+            HostedZoneId: !ImportValue cfn-gateway:LoadBalancerCanonicalHostedZoneId
+            DNSName: !ImportValue cfn-gateway:LoadBalancerDnsName
+        - Name: dev.brigh.id
+          Type: AAAA
+          AliasTarget:
+            HostedZoneId: !ImportValue cfn-gateway:LoadBalancerCanonicalHostedZoneId
+            DNSName: !ImportValue cfn-gateway:LoadBalancerDnsName
+
   ProdPeeringConnection:
     Type: AWS::EC2::VPCPeeringConnection
     Condition: SetupProdAccount
@@ -344,6 +361,23 @@ Resources:
             Stat: Maximum
             Period: 60
           ReturnData: false
+
+  ProdDnsRecords:
+    Type: AWS::Route53::RecordSetGroup
+    DeletionPolicy: Retain
+    Properties:
+      HostedZoneId: !ImportValue cfn-dns:HostedZoneId
+      RecordSets:
+        - Name: brigh.id
+          Type: A
+          AliasTarget:
+            HostedZoneId: !ImportValue cfn-gateway:LoadBalancerCanonicalHostedZoneId
+            DNSName: !ImportValue cfn-gateway:LoadBalancerDnsName
+        - Name: brigh.id
+          Type: AAAA
+          AliasTarget:
+            HostedZoneId: !ImportValue cfn-gateway:LoadBalancerCanonicalHostedZoneId
+            DNSName: !ImportValue cfn-gateway:LoadBalancerDnsName
 
   GithubWebhook:
     Type: AWS::Serverless::Function

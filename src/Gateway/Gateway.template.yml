@@ -107,37 +107,36 @@ Resources:
       Port: 80
       Protocol: HTTP
 
-  DevDnsRecords:
-    Type: AWS::Route53::RecordSetGroup
-    Properties:
-      HostedZoneId: !ImportValue cfn-dns:HostedZoneId
-      RecordSets:
-        - Name: dev.brigh.id
-          Type: A
-          AliasTarget:
-            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-            DNSName: !GetAtt LoadBalancer.DNSName
-        - Name: dev.brigh.id
-          Type: AAAA
-          AliasTarget:
-            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-            DNSName: !GetAtt LoadBalancer.DNSName
-
-  ProdDnsRecords:
-    Type: AWS::Route53::RecordSetGroup
-    Properties:
-      HostedZoneId: !ImportValue cfn-dns:HostedZoneId
-      RecordSets:
-        - Name: brigh.id
-          Type: A
-          AliasTarget:
-            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-            DNSName: !GetAtt LoadBalancer.DNSName
-        - Name: brigh.id
-          Type: AAAA
-          AliasTarget:
-            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-            DNSName: !GetAtt LoadBalancer.DNSName
+  # DevDnsRecords:
+  #   Type: AWS::Route53::RecordSetGroup
+  #   Properties:
+  #     HostedZoneId: !ImportValue cfn-dns:HostedZoneId
+  #     RecordSets:
+  #       - Name: dev.brigh.id
+  #         Type: A
+  #         AliasTarget:
+  #           HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+  #           DNSName: !GetAtt LoadBalancer.DNSName
+  #       - Name: dev.brigh.id
+  #         Type: AAAA
+  #         AliasTarget:
+  #           HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+  #           DNSName: !GetAtt LoadBalancer.DNSName
+  # ProdDnsRecords:
+  #   Type: AWS::Route53::RecordSetGroup
+  #   Properties:
+  #     HostedZoneId: !ImportValue cfn-dns:HostedZoneId
+  #     RecordSets:
+  #       - Name: brigh.id
+  #         Type: A
+  #         AliasTarget:
+  #           HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+  #           DNSName: !GetAtt LoadBalancer.DNSName
+  #       - Name: brigh.id
+  #         Type: AAAA
+  #         AliasTarget:
+  #           HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+  #           DNSName: !GetAtt LoadBalancer.DNSName
 
 Outputs:
   LoadBalancerCanonicalHostedZoneId:
