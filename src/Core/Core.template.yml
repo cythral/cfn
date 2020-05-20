@@ -215,13 +215,13 @@ Resources:
       AlarmDescription: Dev load balancer target health
       AlarmActions:
         - !Ref UpdateTargetsTopic
-      Threshold: 2.0
+      Threshold: 0.0
       TreatMissingData: breaching
       EvaluationPeriods: 1
-      ComparisonOperator: LessThanOrEqualToThreshold
+      ComparisonOperator: GreaterThanThreshold
       Metrics:
         - Id: healthyfactor
-          Expression: MIN([healthy - unhealthy, unhealthy])
+          Expression: healthy == 0 OR unhealthy > 0
           ReturnData: true
         - Id: unhealthy
           MetricStat:
@@ -297,13 +297,13 @@ Resources:
       AlarmDescription: Prod load balancer target health
       AlarmActions:
         - !Ref UpdateTargetsTopic
-      Threshold: 2.0
+      Threshold: 0.0
       EvaluationPeriods: 1
       TreatMissingData: breaching
-      ComparisonOperator: LessThanOrEqualToThreshold
+      ComparisonOperator: GreaterThanThreshold
       Metrics:
         - Id: healthyfactor
-          Expression: MIN([healthy - unhealthy, unhealthy])
+          Expression: healthy == 0 OR unhealthy > 0
           ReturnData: true
         - Id: unhealthy
           MetricStat:
