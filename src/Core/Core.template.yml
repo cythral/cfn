@@ -263,23 +263,6 @@ Resources:
             Period: 60
           ReturnData: false
 
-  DevDnsRecords:
-    Type: AWS::Route53::RecordSetGroup
-    DeletionPolicy: Retain
-    Properties:
-      HostedZoneId: !ImportValue cfn-dns:HostedZoneId
-      RecordSets:
-        - Name: dev.brigh.id
-          Type: A
-          AliasTarget:
-            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-            DNSName: !GetAtt LoadBalancer.DNSName
-        - Name: dev.brigh.id
-          Type: AAAA
-          AliasTarget:
-            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-            DNSName: !GetAtt LoadBalancer.DNSName
-
   ProdPeeringConnection:
     Type: AWS::EC2::VPCPeeringConnection
     Condition: SetupProdAccount
@@ -361,23 +344,6 @@ Resources:
             Stat: Maximum
             Period: 60
           ReturnData: false
-
-  ProdDnsRecords:
-    Type: AWS::Route53::RecordSetGroup
-    DeletionPolicy: Retain
-    Properties:
-      HostedZoneId: !ImportValue cfn-dns:HostedZoneId
-      RecordSets:
-        - Name: brigh.id
-          Type: A
-          AliasTarget:
-            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-            DNSName: !GetAtt LoadBalancer.DNSName
-        - Name: brigh.id
-          Type: AAAA
-          AliasTarget:
-            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-            DNSName: !GetAtt LoadBalancer.DNSName
 
   GithubWebhook:
     Type: AWS::Serverless::Function
