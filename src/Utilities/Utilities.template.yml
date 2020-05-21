@@ -335,7 +335,6 @@ Resources:
       RoleName: Agent
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
-        - !Ref AssumeRoleAccess
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -363,11 +362,12 @@ Resources:
             Action: sts:AssumeRole
             Principal:
               AWS:
-                !If [
-                  IsMasterAccount,
-                  !GetAtt MasterRole.Arn,
-                  !GetAtt AgentRole.Arn,
-                ]
+                - !If [
+                    IsMasterAccount,
+                    !GetAtt MasterRole.Arn,
+                    !GetAtt AgentRole.Arn,
+                  ]
+                - !GetAtt BrokerRole.Arn
 
   BuilderRole:
     Type: AWS::IAM::Role
@@ -386,6 +386,24 @@ Resources:
             Action: sts:AssumeRole
             Principal:
               Service: codebuild.amazonaws.com
+
+  BrokerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Broker
+      ManagedPolicyArns:
+        - !Ref AssumeRoleAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principl:
+              Service: lambda.amazonaws.com
+              AWS: !If
+                - IsMasterAccount
+                - !Ref AWS::NoValue
+                - !Sub arn:aws:iam::${MasterAccountId}:role/Broker
 
   AssumeRoleAccess:
     Type: AWS::IAM::ManagedPolicy
@@ -571,6 +589,12 @@ Outputs:
     Value: !GetAtt BuilderRole.Arn
     Export:
       Name: !Sub ${AWS::StackName}:BuilderRoleArn
+
+  BrokerRoleArn:
+    Description: ARN of the broker role
+    Value: !GetAtt BrokerRole.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}:BrokerRoleArn
 
   SecretsKeyArn:
     Description: ARN of the secrets key alias
