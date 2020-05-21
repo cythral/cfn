@@ -184,7 +184,12 @@ Resources:
                     "RoleArn": "${SharedRoleArn}",
                     "Token.$": "$$.Task.Token",
                     "Capabilities": ["CAPABILITY_NAMED_IAM"],
-                    "EnvironmentName": "shared"
+                    "EnvironmentName": "shared",
+                    "CommitInfo": {
+                      "GithubOwner": "${GithubOwner}",
+                      "GithubRepo": "${GithubRepo}",
+                      "GithubRef.$": "$.head_commit.id"
+                    }
                   }
                 },
                 "Next": "Deploy Utilities to Agents"
@@ -214,7 +219,12 @@ Resources:
                               "PeeringConnectionId.$": "$.NetworkingConfig.DevPeeringConnectionId"
                             },
                             "Capabilities": ["CAPABILITY_NAMED_IAM"],
-                            "EnvironmentName": "dev"
+                            "EnvironmentName": "dev",
+                            "CommitInfo": {
+                              "GithubOwner": "${GithubOwner}",
+                              "GithubRepo": "${GithubRepo}",
+                              "GithubRef.$": "$.head_commit.id"
+                            }
                           }
                         },
                         "End": true
@@ -242,7 +252,12 @@ Resources:
                               "PeeringConnectionId.$": "$.NetworkingConfig.ProdPeeringConnectionId"
                             },
                             "Capabilities": ["CAPABILITY_NAMED_IAM"],
-                            "EnvironmentName": "prod"
+                            "EnvironmentName": "prod",
+                            "CommitInfo": {
+                              "GithubOwner": "${GithubOwner}",
+                              "GithubRepo": "${GithubRepo}",
+                              "GithubRef.$": "$.head_commit.id"
+                            }
                           }
                         },
                         "End": true 
@@ -267,7 +282,12 @@ Resources:
                     "RoleArn": "${SharedRoleArn}",
                     "Token.$": "$$.Task.Token",
                     "Capabilities": ["CAPABILITY_IAM"],
-                    "EnvironmentName": "shared"
+                    "EnvironmentName": "shared",
+                    "CommitInfo": {
+                      "GithubOwner": "${GithubOwner}",
+                      "GithubRepo": "${GithubRepo}",
+                      "GithubRef.$": "$.head_commit.id"
+                    }
                   }
                 },
                 "Next": "Deploy Gateway"
@@ -286,7 +306,12 @@ Resources:
                     "RoleArn": "${SharedRoleArn}",
                     "Token.$": "$$.Task.Token",
                     "Capabilities": ["CAPABILITY_IAM"],
-                    "EnvironmentName": "shared"
+                    "EnvironmentName": "shared",
+                    "CommitInfo": {
+                      "GithubOwner": "${GithubOwner}",
+                      "GithubRepo": "${GithubRepo}",
+                      "GithubRef.$": "$.head_commit.id"
+                    }
                   }
                 },
                 "Next": "Deploy Core"
@@ -312,7 +337,12 @@ Resources:
                       "ProdLoadBalancerDnsName.$": "$.UtilityOutputs.Agents[1].LoadBalancerDnsName"
                     },
                     "Capabilities": ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"],
-                    "EnvironmentName": "shared"
+                    "EnvironmentName": "shared",
+                    "CommitInfo": {
+                      "GithubOwner": "${GithubOwner}",
+                      "GithubRepo": "${GithubRepo}",
+                      "GithubRef.$": "$.head_commit.id"
+                    }
                   }
                 },
                 "Next": "Success"
