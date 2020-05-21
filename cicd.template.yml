@@ -183,7 +183,7 @@ Resources:
                     "TemplateFileName": "Utilities.template.yml",
                     "RoleArn": "${SharedRoleArn}",
                     "Token.$": "$$.Task.Token",
-                    "Capabilities": ["CAPABILITY_NAMED_IAM"]
+                    "Capabilities": ["CAPABILITY_NAMED_IAM"],
                     "EnvironmentName": "shared"
                   }
                 },
