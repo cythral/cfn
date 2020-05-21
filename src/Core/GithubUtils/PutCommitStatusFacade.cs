@@ -37,24 +37,8 @@ namespace Cythral.CloudFormation.GithubUtils
 
         private static string GetSsoUrl(PutCommitStatusRequest request)
         {
-            if (request.IdentityPoolId == null || request.GoogleClientId == null)
-            {
-                return request.DetailsUrl;
-            }
-
-            var nonceBytes = new byte[16];
-            using (var generator = new RNGCryptoServiceProvider())
-            {
-                generator.GetBytes(nonceBytes);
-            }
-
-            var nonce = string.Join("", nonceBytes.Select(x => $"{x:X2}"));
             var destination = Uri.EscapeDataString(request.DetailsUrl);
-            var state = Serialize(new { identity_pool_id = request.IdentityPoolId, destination = destination });
-            var encodedState = Uri.EscapeDataString(state);
-            var redirectUri = Uri.EscapeDataString("https://sso.brigh.id/redirect.html");
-
-            return $"https://accounts.google.com/o/oauth2/v2/auth?redirect_uri={redirectUri}&state={encodedState}&client_id={request.GoogleClientId}&response_type=id_token&scope=profile+openid+email&nonce={nonce}";
+            return $"https://sso.brigh.id/start/{request.EnvironmentName.ToLower()}?destination={destination}";
         }
 
         private static string GetStatusDescription(CommitState state)
