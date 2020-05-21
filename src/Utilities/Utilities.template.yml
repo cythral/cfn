@@ -414,6 +414,7 @@ Resources:
                 - !GetAtt SpectatorRole.Arn
                 - - !GetAtt SpectatorRole.Arn
                   - !Sub arn:aws:iam::${MasterAccountId}:role/Spectator
+                  - !Sub arn:aws:iam::${MasterAccountId}:role/Master
 
   SecretsKeyAlias:
     Type: AWS::KMS::Alias
