@@ -187,7 +187,7 @@ Resources:
                     "EnvironmentName": "shared",
                     "CommitInfo": {
                       "GithubOwner": "${GithubOwner}",
-                      "GithubRepo": "${GithubRepo}",
+                      "GithubRepository": "${GithubRepo}",
                       "GithubRef.$": "$.head_commit.id"
                     }
                   }
@@ -222,7 +222,7 @@ Resources:
                             "EnvironmentName": "dev",
                             "CommitInfo": {
                               "GithubOwner": "${GithubOwner}",
-                              "GithubRepo": "${GithubRepo}",
+                              "GithubRepository": "${GithubRepo}",
                               "GithubRef.$": "$.head_commit.id"
                             }
                           }
@@ -255,7 +255,7 @@ Resources:
                             "EnvironmentName": "prod",
                             "CommitInfo": {
                               "GithubOwner": "${GithubOwner}",
-                              "GithubRepo": "${GithubRepo}",
+                              "GithubRepository": "${GithubRepo}",
                               "GithubRef.$": "$.head_commit.id"
                             }
                           }
@@ -285,7 +285,7 @@ Resources:
                     "EnvironmentName": "shared",
                     "CommitInfo": {
                       "GithubOwner": "${GithubOwner}",
-                      "GithubRepo": "${GithubRepo}",
+                      "GithubRepository": "${GithubRepo}",
                       "GithubRef.$": "$.head_commit.id"
                     }
                   }
@@ -309,7 +309,7 @@ Resources:
                     "EnvironmentName": "shared",
                     "CommitInfo": {
                       "GithubOwner": "${GithubOwner}",
-                      "GithubRepo": "${GithubRepo}",
+                      "GithubRepository": "${GithubRepo}",
                       "GithubRef.$": "$.head_commit.id"
                     }
                   }
@@ -340,7 +340,7 @@ Resources:
                     "EnvironmentName": "shared",
                     "CommitInfo": {
                       "GithubOwner": "${GithubOwner}",
-                      "GithubRepo": "${GithubRepo}",
+                      "GithubRepository": "${GithubRepo}",
                       "GithubRef.$": "$.head_commit.id"
                     }
                   }
