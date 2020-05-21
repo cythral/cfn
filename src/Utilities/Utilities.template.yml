@@ -349,6 +349,20 @@ Resources:
                 - cloudformation.amazonaws.com
                 - codepipeline.amazonaws.com
 
+  AdminRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Admin
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              AWS: !GetAtt BrokerRole.Arn
+
   SpectatorRole:
     Type: AWS::IAM::Role
     Properties:
@@ -398,7 +412,7 @@ Resources:
         Statement:
           - Effect: Allow
             Action: sts:AssumeRole
-            Principl:
+            Principal:
               Service: lambda.amazonaws.com
               AWS: !If
                 - IsMasterAccount
@@ -589,6 +603,12 @@ Outputs:
     Value: !GetAtt BuilderRole.Arn
     Export:
       Name: !Sub ${AWS::StackName}:BuilderRoleArn
+
+  AdminRoleArn:
+    Description: ARN of the admin role
+    Value: !GetAtt AdminRole.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}:AdminRoleArn
 
   BrokerRoleArn:
     Description: ARN of the broker role
