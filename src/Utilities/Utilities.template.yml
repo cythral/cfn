@@ -406,6 +406,7 @@ Resources:
     Properties:
       RoleName: Broker
       ManagedPolicyArns:
+        - AWSLambdaExecute
         - !Ref AssumeRoleAccess
       AssumeRolePolicyDocument:
         Version: 2012-10-17
