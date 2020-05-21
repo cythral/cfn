@@ -306,7 +306,7 @@ Resources:
           CidrIp: !Ref NetworkCidr
       VpcId: !Ref VPC
 
-  # Security - Roles
+  # Security - Roles & Policies
   # -------------------------------------------
 
   MasterRole:
@@ -335,6 +335,7 @@ Resources:
       RoleName: Agent
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
+        - !Ref AssumeRoleAccess
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -385,6 +386,16 @@ Resources:
             Action: sts:AssumeRole
             Principal:
               Service: codebuild.amazonaws.com
+
+  AssumeRoleAccess:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Resource: "*"
 
   # Security - Encryption
   # -------------------------------------------
