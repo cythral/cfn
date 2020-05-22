@@ -11,7 +11,7 @@ phases:
   build:
     commands:
       - dotnet --info
-      - dotnet test -c Release --logger "junit;LogFilePath=test-results.xml"
+      - dotnet test -c Release --logger trx
       - dotnet msbuild tools/package.proj -p:Configuration=Release -p:DeploymentBucket=$ARTIFACT_STORE
       - ./tools/create-networking-config.sh > Networking.config.json
 
@@ -26,3 +26,10 @@ artifacts:
     - "Dns.config.json"
     - "Gateway.template.yml"
     - "Networking.config.json"
+
+reports:
+  cfn-cicd-test-reports:
+    files:
+      - "**/TestResults/*.xml"
+    discard-paths: yes
+    file-format: VisualStudioTrx

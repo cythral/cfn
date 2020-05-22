@@ -11,15 +11,6 @@
           "System.Configuration.ConfigurationManager": "4.4.0"
         }
       },
-      "JUnitTestLogger": {
-        "type": "Direct",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "5nIxpRXczNH2To76s/AxmgiXrfMeebLx10R8edNO4w5UNo2diCUf0kQn0qC5+WPnONCjmtzyFrHolK+b7aBemQ==",
-        "dependencies": {
-          "Microsoft.TestPlatform.ObjectModel": "15.5.0"
-        }
-      },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[16.2.0, )",
