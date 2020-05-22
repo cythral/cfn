@@ -28,7 +28,7 @@ artifacts:
     - "Networking.config.json"
 
 reports:
-  cfn-cicd-test-reports:
+  cfn-cicd-test-results:
     files:
       - "**/TestResults/*.xml"
     discard-paths: yes
