@@ -37,8 +37,7 @@ namespace Cythral.CloudFormation.GithubUtils
 
         private static string GetSsoUrl(PutCommitStatusRequest request)
         {
-            var destination = Uri.EscapeDataString(request.DetailsUrl);
-            return $"https://sso.brigh.id/start/{request.EnvironmentName.ToLower()}?destination={destination}";
+            return $"https://sso.brigh.id/start/{request.EnvironmentName.ToLower()}?destination={request.DetailsUrl}";
         }
 
         private static string GetStatusDescription(CommitState state)
