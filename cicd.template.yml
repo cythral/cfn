@@ -72,7 +72,7 @@ Resources:
     Type: AWS::CodeBuild::ReportGroup
     Properties:
       Type: TEST
-      Name: !Sub ${AWS::StackName}-test-results
+      Name: !Sub ${AWS::StackName}-build-test-results
       ExportConfig:
         ExportConfigType: S3
         S3Destination:
