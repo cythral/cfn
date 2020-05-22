@@ -68,6 +68,19 @@ Resources:
         Location: !Sub https://github.com/${GithubOwner}/${GithubRepo}.git
         ReportBuildStatus: true
 
+  TestReportGroup:
+    Type: AWS::CodeBuild::ReportGroup
+    Properties:
+      Type: TEST
+      Name: !Sub ${AWS::StackName}-test-results
+      ExportConfig:
+        ExportConfigType: S3
+        S3Destination:
+          Bucket: !Ref ArtifactStore
+          Path: test-reports/
+          Packaging: ZIP
+          EncryptionKey: !ImportValue cfn-utilities:ArtifactKeyArn
+
   SupersessionQueue:
     Type: AWS::SQS::Queue
     Properties:
