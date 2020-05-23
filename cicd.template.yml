@@ -62,7 +62,7 @@ Resources:
         CloudWatchLogs:
           GroupName: !Ref LogGroup
           Status: ENABLED
-          StreamName: build-logs/
+          StreamName: build-logs
       Cache:
         Type: LOCAL
         Modes:
