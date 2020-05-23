@@ -10,6 +10,7 @@ using Amazon.CloudFormation.Model;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
+using Amazon.S3;
 using Amazon.S3.Model;
 
 using Cythral.CloudFormation.Entities;
@@ -22,6 +23,11 @@ using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
 using WebhookConfig = Cythral.CloudFormation.Config;
+
+using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.S3.IAmazonS3,
+    Amazon.S3.AmazonS3Client
+>;
 
 namespace Cythral.CloudFormation.GithubWebhook
 {

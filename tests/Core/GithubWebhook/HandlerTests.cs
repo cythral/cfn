@@ -15,10 +15,16 @@ using NSubstitute;
 
 using NUnit.Framework;
 
+using Amazon.S3;
+
 using RichardSzalay.MockHttp;
 using static System.Text.Json.JsonSerializer;
 
 using Handler = Cythral.CloudFormation.GithubWebhook.Handler;
+using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.S3.IAmazonS3,
+    Amazon.S3.AmazonS3Client
+>;
 
 namespace Cythral.CloudFormation.Tests.GithubWebhook
 {
@@ -28,6 +34,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
         private static DeployStackFacade stackDeployer = Substitute.For<DeployStackFacade>();
         private static PipelineStarter pipelineStarter = Substitute.For<PipelineStarter>();
         private static S3Factory s3Factory = Substitute.For<S3Factory>();
+        private static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
 
         private const string repoName = "repoName";
 
@@ -58,6 +65,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
         {
             TestUtils.SetPrivateStaticField(typeof(Handler), "s3Factory", s3Factory);
             s3Factory.ClearReceivedCalls();
+            s3Factory.Create().Returns(s3Client);
         }
 
         [SetUp]
