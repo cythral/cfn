@@ -1,4 +1,7 @@
-﻿using System;
+﻿using System.Text;
+using System.Security.Cryptography;
+using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
@@ -7,11 +10,13 @@ using Amazon.CloudFormation.Model;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
+using Amazon.S3.Model;
 
 using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.Exceptions;
 using Cythral.CloudFormation.StackDeployment;
+using Cythral.CloudFormation.Aws;
 
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
@@ -26,7 +31,7 @@ namespace Cythral.CloudFormation.GithubWebhook
         private static RequestValidator requestValidator = new RequestValidator();
         private static DeployStackFacade stackDeployer = new DeployStackFacade();
         private static PipelineStarter pipelineStarter = new PipelineStarter();
-
+        private static S3Factory s3Factory = new S3Factory();
 
         /// <summary>
         /// This function is called on every request to /webhooks/github
@@ -37,18 +42,19 @@ namespace Cythral.CloudFormation.GithubWebhook
         [LambdaSerializer(typeof(CamelCaseLambdaJsonSerializer))]
         public static async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, ILambdaContext context = null)
         {
-            Console.WriteLine($"Got request: {Serialize(request)}");
             PushEvent payload = null;
 
             // create the config variable if it hasn't been created already (may have been cached from previous request)
             Config = Config ?? await WebhookConfig.Create(new List<(string, bool)> {
-                // envvar name              encrypted? 
-                ("GITHUB_OWNER",            false),
-                ("GITHUB_TOKEN",            true),
-                ("GITHUB_SIGNING_SECRET",   true),
-                ("TEMPLATE_FILENAME",       false),
-                ("STACK_SUFFIX",            false),
-                ("ROLE_ARN",                false),
+                // envvar name                      encrypted? 
+                ("GITHUB_OWNER",                    false),
+                ("GITHUB_TOKEN",                    true),
+                ("GITHUB_SIGNING_SECRET",           true),
+                ("TEMPLATE_FILENAME",               false),
+                ("PIPELINE_DEFINITION_FILENAME",    false),
+                ("ARTIFACT_STORE",                  false),
+                ("STACK_SUFFIX",                    false),
+                ("ROLE_ARN",                        false),
             });
 
             try
@@ -82,6 +88,7 @@ namespace Cythral.CloudFormation.GithubWebhook
             var stackName = $"{payload.Repository.Name}-{Config["STACK_SUFFIX"]}";
             var contentsUrl = payload.Repository.ContentsUrl;
             var templateContent = await CommittedFile.FromContentsUrl(contentsUrl, Config["TEMPLATE_FILENAME"], Config, payload.Ref);
+            var pipelineDefinition = await CommittedFile.FromContentsUrl(contentsUrl, Config["PIPELINE_DEFINITION_FILENAME"], Config, payload.Ref);
             var roleArn = Config["ROLE_ARN"];
 
             if (templateContent == null)
@@ -97,6 +104,37 @@ namespace Cythral.CloudFormation.GithubWebhook
                 new Parameter { ParameterKey = "GithubBranch", ParameterValue = payload.Repository.DefaultBranch }
             };
 
+            if (pipelineDefinition != null)
+            {
+                var hash = GetSum(pipelineDefinition);
+                var key = $"{payload.Repository.Name}/${hash}";
+
+                parameters.Add(new Parameter
+                {
+                    ParameterKey = "PipelineDefinitionBucket",
+                    ParameterValue = Config["ARTIFACT_STORE"]
+                });
+
+                parameters.Add(new Parameter
+                {
+                    ParameterKey = "PipelineDefinitionKey",
+                    ParameterValue = key
+                });
+
+                if (!await IsFileAlreadyUploaded(Config["ARTIFACT_STORE"], key))
+                {
+                    var s3Client = await s3Factory.Create();
+                    var response = await s3Client.PutObjectAsync(new PutObjectRequest
+                    {
+                        BucketName = Config["ARTIFACT_STORE"],
+                        Key = key,
+                        ContentBody = pipelineDefinition
+                    });
+
+                    Console.WriteLine($"Got response from s3 put object on the pipeline definition: {Serialize(response)}");
+                }
+            }
+
             try
             {
                 await stackDeployer.Deploy(new DeployStackContext
@@ -110,6 +148,31 @@ namespace Cythral.CloudFormation.GithubWebhook
             catch (Exception e)
             {
                 Console.WriteLine($"Failed to create/update stack: {e.Message} {e.StackTrace}");
+            }
+        }
+
+        private static string GetSum(string contents)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var fileBytes = Encoding.UTF8.GetBytes(contents);
+                var sumBytes = sha256.ComputeHash(fileBytes);
+                return string.Join("", sumBytes.Select(byt => $"{byt:X2}"));
+            }
+        }
+
+        private static async Task<bool> IsFileAlreadyUploaded(string bucket, string key)
+        {
+            var s3Client = await s3Factory.Create();
+
+            try
+            {
+                await s3Client.GetObjectMetadataAsync(bucket, key);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 

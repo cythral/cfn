@@ -19,6 +19,10 @@ Parameters:
     Type: String
     Description: Filename of cicd templates to look for in repositories
 
+  PipelineDefinitionFilename:
+    Type: String
+    Description: Filename of the pipeline definition file to look for in repositories
+
   StackSuffix:
     Type: String
     Description: Suffix to append to the repository name when creating cicd stacks
@@ -252,6 +256,30 @@ Resources:
             Period: 60
           ReturnData: false
 
+  GithubWebhookArtifactStore:
+    Type: AWS::S3::Bucket
+
+  GithubWebhookArtifactStorePolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref GithubWebhookArtifactStore
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+            Resource: "*"
+            Principal:
+              AWS: !Ref GithubWebhookRole
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+            Resource: "*"
+            Principal:
+              Service: cloudformation.amazonaws.com
+
   GithubWebhook:
     Type: AWS::Serverless::Function
     Properties:
@@ -271,9 +299,11 @@ Resources:
           GITHUB_TOKEN: !Ref GithubToken
           GITHUB_SIGNING_SECRET: !Ref GithubSigningSecret
           TEMPLATE_FILENAME: !Ref TemplateFilename
+          PIPELINE_DEFINITION_FILENAME: !Ref PipelineDefinitionFilename
           STACK_SUFFIX: !Ref StackSuffix
           ROLE_ARN: !ImportValue cfn-utilities:MasterRoleArn
           AWS_ACCOUNT_ID: !Ref AWS::AccountId
+          ARTIFACT_STORE: !Ref GithubWebhookArtifactStore
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   GithubWebhookPolicy:
