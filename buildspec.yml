@@ -30,6 +30,6 @@ artifacts:
 reports:
   test-results:
     files:
-      - "**/TestResults/*.xml"
+      - "**/TestResults/*.trx"
     discard-paths: yes
     file-format: VisualStudioTrx
