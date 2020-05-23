@@ -9,6 +9,7 @@ using Cythral.CloudFormation.Entities;
 using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.GithubWebhook;
 using Cythral.CloudFormation.StackDeployment;
+using Cythral.CloudFormation.Aws;
 
 using NSubstitute;
 
@@ -26,6 +27,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
         private static RequestValidator requestValidator = Substitute.For<RequestValidator>();
         private static DeployStackFacade stackDeployer = Substitute.For<DeployStackFacade>();
         private static PipelineStarter pipelineStarter = Substitute.For<PipelineStarter>();
+        private static S3Factory s3Factory = Substitute.For<S3Factory>();
 
         private const string repoName = "repoName";
 
@@ -52,6 +54,13 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
         }
 
         [SetUp]
+        public void SetupS3()
+        {
+            TestUtils.SetPrivateStaticField(typeof(Handler), "s3Factory", s3Factory);
+            s3Factory.ClearReceivedCalls();
+        }
+
+        [SetUp]
         public void SetupConfig()
         {
             Handler.Config = new Config()
@@ -63,6 +72,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 ["STACK_SUFFIX"] = "cicd",
                 ["GITHUB_SIGNING_SECRET"] = "",
                 ["ROLE_ARN"] = "arn:aws:iam::1:role/Facade",
+                ["PIPELINE_DEFINITION_FILENAME"] = "pipeline.json"
             };
         }
 

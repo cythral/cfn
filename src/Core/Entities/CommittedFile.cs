@@ -34,7 +34,8 @@ namespace Cythral.CloudFormation.Entities
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github.VERSION.raw"));
 
             var result = await httpClient.SendAsync(request);
-            var body = await result.Content?.ReadAsStringAsync();
+            var task = result.Content?.ReadAsStringAsync() ?? Task.Run(() => "");
+            var body = await task;
 
             if (result.StatusCode != HttpStatusCode.OK)
             {
