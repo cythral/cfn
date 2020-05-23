@@ -10,20 +10,25 @@ using Amazon.SecurityToken.Model;
 
 namespace Cythral.CloudFormation.Aws
 {
-    public class AmazonClientFactory<TInterface, TImplementation> where TImplementation : TInterface, new() where TInterface : Amazon.Runtime.IAmazonService
+    public class AmazonClientFactory<TInterface, TImplementation> where TImplementation : TInterface where TInterface : Amazon.Runtime.IAmazonService
     {
         private static readonly Func<TInterface> New = Expression.Lambda<Func<TInterface>>(Expression.New(typeof(TImplementation))).Compile();
 
         // (credentials) => new AmazonServiceClient(credentials)
-        private static readonly Func<AWSCredentials, TImplementation> NewWithCredentials =
-            Expression.Lambda<Func<AWSCredentials, TImplementation>>(
+        private static readonly Func<AWSCredentials, TInterface> NewWithCredentials;
+
+        static AmazonClientFactory()
+        {
+            var param = Expression.Parameter(typeof(AWSCredentials), "credentials");
+            NewWithCredentials = Expression.Lambda<Func<AWSCredentials, TInterface>>(
                 Expression.New(
-                    typeof(TImplementation).GetConstructor(new Type[] { }),
-                    new Expression[] { Expression.Parameter(typeof(AWSCredentials), "credentials") }
+                    typeof(TImplementation).GetConstructor(new Type[] { typeof(AWSCredentials) }),
+                    new Expression[] { param }
                 ),
                 true,
-                new ParameterExpression[] { Expression.Parameter(typeof(AWSCredentials), "credentials") }
+                new ParameterExpression[] { param }
             ).Compile();
+        }
 
         public virtual async Task<TInterface> Create(string roleArn = null)
         {
