@@ -15,6 +15,7 @@ Parameters:
 
   GithubBranch:
     Type: String
+    Default: ""
     Description: Name of the github branch to track
 
 Resources:
