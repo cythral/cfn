@@ -273,12 +273,6 @@ Resources:
             Resource: "*"
             Principal:
               AWS: !Ref GithubWebhookRole
-          - Effect: Allow
-            Action:
-              - s3:GetObject
-            Resource: "*"
-            Principal:
-              Service: cloudformation.amazonaws.com
 
   GithubWebhook:
     Type: AWS::Serverless::Function
