@@ -12,7 +12,7 @@ namespace Cythral.CloudFormation.Aws
 {
     public class AmazonClientFactory<TInterface, TImplementation> where TImplementation : TInterface, new() where TInterface : Amazon.Runtime.IAmazonService
     {
-        private static readonly Func<TInterface> New = Expression.Lambda<Func<TInterface>>(Expression.New(typeof(TInterface))).Compile();
+        private static readonly Func<TInterface> New = Expression.Lambda<Func<TInterface>>(Expression.New(typeof(TImplementation))).Compile();
 
         // (credentials) => new AmazonServiceClient(credentials)
         private static readonly Func<AWSCredentials, TImplementation> NewWithCredentials =
