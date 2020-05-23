@@ -272,7 +272,7 @@ Resources:
               - s3:PutObject
             Resource: "*"
             Principal:
-              AWS: !Ref GithubWebhookRole
+              AWS: !GetAtt GithubWebhookRole.Arn
 
   GithubWebhook:
     Type: AWS::Serverless::Function
