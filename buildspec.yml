@@ -26,9 +26,10 @@ artifacts:
     - "Dns.config.json"
     - "Gateway.template.yml"
     - "Networking.config.json"
-# reports:
-#   test-results:
-#     files:
-#       - "**/TestResults/*.xml"
-#     discard-paths: yes
-#     file-format: VisualStudioTrx
+
+reports:
+  test-results:
+    files:
+      - "**/TestResults/*.xml"
+    discard-paths: yes
+    file-format: VisualStudioTrx
