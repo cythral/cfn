@@ -39,6 +39,11 @@ Resources:
                 - !ImportValue cfn-metadata:DevAgentRoleArn
                 - !ImportValue cfn-metadata:ProdAgentRoleArn
 
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 14
+
   BuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -53,6 +58,11 @@ Resources:
           - Name: ARTIFACT_STORE
             Value: !Ref ArtifactStore
         Type: LINUX_CONTAINER
+      LogsConfig:
+        CloudWatchLogs:
+          GroupName: !Ref LogGroup
+          Status: ENABLED
+          StreamName: build-logs/
       Cache:
         Type: LOCAL
         Modes:
