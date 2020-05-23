@@ -107,7 +107,7 @@ namespace Cythral.CloudFormation.GithubWebhook
             if (pipelineDefinition != null)
             {
                 var hash = GetSum(pipelineDefinition);
-                var key = $"{payload.Repository.Name}/${hash}";
+                var key = $"{payload.Repository.Name}/{hash}";
 
                 parameters.Add(new Parameter
                 {
