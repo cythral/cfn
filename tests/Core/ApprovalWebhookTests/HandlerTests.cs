@@ -2,20 +2,31 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.S3;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
-using Amazon.Lambda.ApplicationLoadBalancerEvents;
 
 using Cythral.CloudFormation.Aws;
 
-using NUnit.Framework;
 using NSubstitute;
 using NSubstitute.ClearExtensions;
+
+using NUnit.Framework;
 
 using static System.Text.Json.JsonSerializer;
 
 using Handler = Cythral.CloudFormation.ApprovalWebhook.Handler;
+
+using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.S3.IAmazonS3,
+    Amazon.S3.AmazonS3Client
+>;
+
+using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.StepFunctions.IAmazonStepFunctions,
+    Amazon.StepFunctions.AmazonStepFunctionsClient
+>;
 
 namespace Cythral.CloudFormation.Tests.ApprovalWebhook
 {
@@ -118,7 +129,7 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
 
             await Handler.Handle(request);
 
-            stepFunctionsClientFactory.Received().Create();
+            await stepFunctionsClientFactory.Received().Create();
         }
 
         [Test]

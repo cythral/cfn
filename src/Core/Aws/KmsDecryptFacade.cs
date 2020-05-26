@@ -1,8 +1,12 @@
 using System.Threading.Tasks;
 using System;
 using System.IO;
-using Amazon.KeyManagementService;
 using Amazon.KeyManagementService.Model;
+
+using KmsFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.KeyManagementService.IAmazonKeyManagementService,
+    Amazon.KeyManagementService.AmazonKeyManagementServiceClient
+>;
 
 namespace Cythral.CloudFormation.Aws
 {

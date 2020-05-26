@@ -9,6 +9,16 @@ using Amazon.S3.Model;
 
 using Cythral.CloudFormation.Aws;
 
+using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.S3.IAmazonS3,
+    Amazon.S3.AmazonS3Client
+>;
+
+using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.StepFunctions.IAmazonStepFunctions,
+    Amazon.StepFunctions.AmazonStepFunctionsClient
+>;
+
 namespace Cythral.CloudFormation.DeploymentSupersession
 {
     public class Handler
@@ -21,7 +31,7 @@ namespace Cythral.CloudFormation.DeploymentSupersession
         public static async Task<Response> Handle(SQSEvent sqsEvent, ILambdaContext context = null)
         {
             var request = requestFactory.CreateFromSqsEvent(sqsEvent);
-            var stepFunctionsClient = stepFunctionsClientFactory.Create();
+            var stepFunctionsClient = await stepFunctionsClientFactory.Create();
             var bucket = Environment.GetEnvironmentVariable("STATE_STORE");
             var getObjResponse = await s3GetObjectFacade.TryGetObject<StateInfo>(bucket, $"{request.Pipeline}/state.json");
             var s3Client = await s3Factory.Create();

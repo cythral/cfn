@@ -10,6 +10,12 @@ using Amazon.S3.Model;
 
 using Cythral.CloudFormation.Aws;
 
+using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.S3.IAmazonS3,
+    Amazon.S3.AmazonS3Client
+>;
+
+
 namespace Cythral.CloudFormation.StackDeployment
 {
     public class TokenGenerator

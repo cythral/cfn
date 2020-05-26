@@ -19,6 +19,16 @@ using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
 using static System.Text.Json.JsonSerializer;
 
+using CloudFormationFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.CloudFormation.IAmazonCloudFormation,
+    Amazon.CloudFormation.AmazonCloudFormationClient
+>;
+
+using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.StepFunctions.IAmazonStepFunctions,
+    Amazon.StepFunctions.AmazonStepFunctionsClient
+>;
+
 namespace Cythral.CloudFormation.StackDeployment
 {
     public class Handler
@@ -64,7 +74,7 @@ namespace Cythral.CloudFormation.StackDeployment
             catch (NoUpdatesException)
             {
                 var outputs = await GetStackOutputs(request.StackName, request.RoleArn);
-                var client = stepFunctionsClientFactory.Create();
+                var client = await stepFunctionsClientFactory.Create();
                 var response = await client.SendTaskSuccessAsync(new SendTaskSuccessRequest
                 {
                     TaskToken = request.Token,
@@ -80,7 +90,7 @@ namespace Cythral.CloudFormation.StackDeployment
             }
             catch (Exception e)
             {
-                var client = stepFunctionsClientFactory.Create();
+                var client = await stepFunctionsClientFactory.Create();
                 var response = await client.SendTaskFailureAsync(new SendTaskFailureRequest
                 {
                     TaskToken = request.Token,

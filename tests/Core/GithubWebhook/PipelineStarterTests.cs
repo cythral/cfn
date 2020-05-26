@@ -14,6 +14,11 @@ using NSubstitute;
 using NUnit.Framework;
 using static System.Text.Json.JsonSerializer;
 
+using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.StepFunctions.IAmazonStepFunctions,
+    Amazon.StepFunctions.AmazonStepFunctionsClient
+>;
+
 namespace Cythral.CloudFormation.Tests.GithubWebhook
 {
     public class PipelineStarterTests
@@ -55,7 +60,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             };
             await pipelineStarter.StartPipelineIfExists(payload);
 
-            stepFunctionsClientFactory.Received().Create();
+            await stepFunctionsClientFactory.Received().Create();
         }
 
         [Test]

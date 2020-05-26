@@ -23,6 +23,16 @@ using NSubstitute.ClearExtensions;
 using static System.Text.Json.JsonSerializer;
 using Tag = Amazon.CloudFormation.Model.Tag;
 
+using CloudFormationFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.CloudFormation.IAmazonCloudFormation,
+    Amazon.CloudFormation.AmazonCloudFormationClient
+>;
+
+using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.StepFunctions.IAmazonStepFunctions,
+    Amazon.StepFunctions.AmazonStepFunctionsClient
+>;
+
 namespace Cythral.CloudFormation.Tests.StackDeployment
 {
     public class HandlerTests
@@ -378,7 +388,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             stackDeployer.Deploy(Arg.Any<DeployStackContext>()).Returns(x => throw new Exception(message));
             await Handler.Handle(sqs);
 
-            stepFunctionsClientFactory.Received().Create();
+            await stepFunctionsClientFactory.Received().Create();
             await stepFunctionsClient.Received().SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req =>
                 req.TaskToken == clientRequestToken &&
                 req.Cause == message

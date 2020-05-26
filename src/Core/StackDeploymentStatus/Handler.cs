@@ -18,6 +18,21 @@ using Octokit;
 
 using static System.Text.Json.JsonSerializer;
 
+using CloudFormationFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.CloudFormation.IAmazonCloudFormation,
+    Amazon.CloudFormation.AmazonCloudFormationClient
+>;
+
+using SqsFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.SQS.IAmazonSQS,
+    Amazon.SQS.AmazonSQSClient
+>;
+
+using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.StepFunctions.IAmazonStepFunctions,
+    Amazon.StepFunctions.AmazonStepFunctionsClient
+>;
+
 namespace Cythral.CloudFormation.StackDeploymentStatus
 {
     public class Handler
@@ -36,7 +51,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
         {
             Console.WriteLine($"Received request: {Serialize(snsRequest)}");
 
-            var client = stepFunctionsClientFactory.Create();
+            var client = await stepFunctionsClientFactory.Create();
             var request = requestFactory.CreateFromSnsEvent(snsRequest);
             var status = request.ResourceStatus;
 

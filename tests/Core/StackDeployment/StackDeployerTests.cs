@@ -15,6 +15,11 @@ using NUnit.Framework;
 
 using static Amazon.CloudFormation.OnFailure;
 
+using CloudFormationFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.CloudFormation.IAmazonCloudFormation,
+    Amazon.CloudFormation.AmazonCloudFormationClient
+>;
+
 namespace Cythral.CloudFormation.Tests.GithubWebhook
 {
     public class StackDeployerTests
