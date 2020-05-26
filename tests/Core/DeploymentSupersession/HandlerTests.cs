@@ -16,6 +16,16 @@ using NSubstitute.ClearExtensions;
 using NUnit.Framework;
 using static System.Text.Json.JsonSerializer;
 
+using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.S3.IAmazonS3,
+    Amazon.S3.AmazonS3Client
+>;
+
+using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.StepFunctions.IAmazonStepFunctions,
+    Amazon.StepFunctions.AmazonStepFunctionsClient
+>;
+
 namespace Cythral.CloudFormation.Tests.DeploymentSupersession
 {
     public class HandlerTests
@@ -100,7 +110,7 @@ namespace Cythral.CloudFormation.Tests.DeploymentSupersession
 
             await Handler.Handle(sqsEvent);
 
-            stepFunctionsClientFactory.Received().Create();
+            await stepFunctionsClientFactory.Received().Create();
         }
 
         [Test]

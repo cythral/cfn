@@ -16,6 +16,11 @@ using Cythral.CloudFormation.GithubUtils;
 
 using Octokit;
 
+using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.S3.IAmazonS3,
+    Amazon.S3.AmazonS3Client
+>;
+
 namespace Cythral.CloudFormation.S3Deployment
 {
     public class Handler

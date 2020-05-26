@@ -16,6 +16,21 @@ using Amazon.StepFunctions.Model;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.S3.Model;
 
+using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.S3.IAmazonS3,
+    Amazon.S3.AmazonS3Client
+>;
+
+using SnsFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.SimpleNotificationService.IAmazonSimpleNotificationService,
+    Amazon.SimpleNotificationService.AmazonSimpleNotificationServiceClient
+>;
+
+using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.StepFunctions.IAmazonStepFunctions,
+    Amazon.StepFunctions.AmazonStepFunctionsClient
+>;
+
 namespace Cythral.CloudFormation.ApprovalNotification
 {
     public class Handler
@@ -109,7 +124,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
 
         private async Task CancelPreviousApproval(Request request, S3Object location)
         {
-            using (var stepFunctionsClient = stepFunctionsClientFactory.Create())
+            using (var stepFunctionsClient = await stepFunctionsClientFactory.Create())
             using (var s3Client = await s3Factory.Create())
             {
                 var approvalInfo = await s3GetObjectFacade.GetObject<ApprovalInfo>(location.BucketName, location.Key);

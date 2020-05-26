@@ -12,6 +12,16 @@ using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.StepFunctions.Model;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 
+using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.S3.IAmazonS3,
+    Amazon.S3.AmazonS3Client
+>;
+
+using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.StepFunctions.IAmazonStepFunctions,
+    Amazon.StepFunctions.AmazonStepFunctionsClient
+>;
+
 namespace Cythral.CloudFormation.ApprovalWebhook
 {
     public class Handler
@@ -25,7 +35,7 @@ namespace Cythral.CloudFormation.ApprovalWebhook
         {
             string body = null;
 
-            using (var stepFunctionsClient = stepFunctionsClientFactory.Create())
+            using (var stepFunctionsClient = await stepFunctionsClientFactory.Create())
             using (var s3Client = await s3Factory.Create())
             {
                 var action = request.QueryStringParameters["action"];

@@ -11,6 +11,11 @@ using static Amazon.CloudFormation.OnFailure;
 
 using Cythral.CloudFormation.Aws;
 
+using CloudFormationFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.CloudFormation.IAmazonCloudFormation,
+    Amazon.CloudFormation.AmazonCloudFormationClient
+>;
+
 namespace Cythral.CloudFormation.StackDeployment
 {
     public class DeployStackFacade

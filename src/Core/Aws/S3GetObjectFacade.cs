@@ -10,6 +10,11 @@ using Amazon.S3.Util;
 
 using Cythral.CloudFormation.Aws;
 
+using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.S3.IAmazonS3,
+    Amazon.S3.AmazonS3Client
+>;
+
 namespace Cythral.CloudFormation.Aws
 {
     public class S3GetObjectFacade

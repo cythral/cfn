@@ -13,6 +13,12 @@ using NSubstitute;
 using NUnit.Framework;
 using static System.Text.Json.JsonSerializer;
 
+using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+    Amazon.S3.IAmazonS3,
+    Amazon.S3.AmazonS3Client
+>;
+
+
 namespace Cythral.CloudFormation.Tests.StackDeployment
 {
     public class TokenGeneratorTests
@@ -32,7 +38,6 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private const string notificationArn = "notificationArn";
         private const string clientRequestToken = "clientRequestToken";
         private const string clientRequestTokenSum = "272A689245B6118F1AAB392CED48E3D07C3894CC2EF6A3500F298628CE87F88A";
-        private string templateConfiguration = "templateConfiguration";
         private string sqsArn = "arn:sqs:aws:us-east-1:5:testQueue";
         private string receiptHandle = "5";
         private string sqsUrl = "https://sqs.us-east-1.amazonaws.com/5/testQueue";
