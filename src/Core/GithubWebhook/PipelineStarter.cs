@@ -1,11 +1,9 @@
 using System;
 using System.Threading.Tasks;
-using Cythral.CloudFormation.Events;
-using Cythral.CloudFormation.Aws;
 using Amazon.StepFunctions.Model;
 using static System.Text.Json.JsonSerializer;
 
-using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.StepFunctions.IAmazonStepFunctions,
     Amazon.StepFunctions.AmazonStepFunctionsClient
 >;

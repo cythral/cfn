@@ -6,14 +6,19 @@ using System.Threading.Tasks;
 using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
 using Amazon.Lambda.Core;
+using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.Lambda.SNSEvents;
 
-using Cythral.CloudFormation.Events;
 using Cythral.CloudFormation.UpdateTargets.DnsResolver;
 using Cythral.CloudFormation.UpdateTargets.Request;
 
 using static System.Text.Json.JsonSerializer;
 using static Amazon.ElasticLoadBalancingV2.TargetHealthStateEnum;
+
+using ElbClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
+    Amazon.ElasticLoadBalancingV2.IAmazonElasticLoadBalancingV2,
+    Amazon.ElasticLoadBalancingV2.AmazonElasticLoadBalancingV2Client
+>;
 
 namespace Cythral.CloudFormation.UpdateTargets
 {
@@ -23,13 +28,14 @@ namespace Cythral.CloudFormation.UpdateTargets
         private static ElbClientFactory elbClientFactory = new ElbClientFactory();
         private static UpdateTargetsRequestFactory requestFactory = new UpdateTargetsRequestFactory();
 
+        [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
         public static async Task<Response> Handle(
             SNSEvent snsRequest,
             ILambdaContext context = null
         )
         {
             var resolver = dnsResolverFactory.Create();
-            var elbClient = elbClientFactory.Create();
+            var elbClient = await elbClientFactory.Create();
             var request = requestFactory.CreateFromSnsEvent(snsRequest);
 
             Console.WriteLine($"Received transformed request: {Serialize(request)}");

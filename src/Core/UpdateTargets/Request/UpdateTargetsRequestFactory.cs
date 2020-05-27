@@ -1,5 +1,5 @@
-using Cythral.CloudFormation.Events;
 using Amazon.Lambda.SNSEvents;
+
 using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.UpdateTargets.Request

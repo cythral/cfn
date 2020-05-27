@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.ApplicationLoadBalancerEvents" Version="2.0.0" />
+    <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.0.1" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.111.3" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.3.104.50" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AwsUtils\SimpleStorageService\SimpleStorageService.csproj" />
+    <ProjectReference Include="..\AwsUtils\Common\AwsUtils.Common.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+
+</Project>

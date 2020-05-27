@@ -2,9 +2,8 @@
 
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 
-using Cythral.CloudFormation.Entities;
-using Cythral.CloudFormation.Events;
-using Cythral.CloudFormation.Exceptions;
+using Cythral.CloudFormation.GithubWebhook.Entities;
+using Cythral.CloudFormation.GithubWebhook.Exceptions;
 using Cythral.CloudFormation.GithubWebhook;
 
 using NUnit.Framework;
