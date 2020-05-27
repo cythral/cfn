@@ -16,7 +16,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
 
         public Task<Response> Create()
         {
-            if (new AutoRun().Execute(new string[] { }) != 0)
+            if (new AutoRun().Execute(new string[] { "--result:/dev/null" }) != 0)
             {
                 throw new Exception("End to end tests failed.");
             }
