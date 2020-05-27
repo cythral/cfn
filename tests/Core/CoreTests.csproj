@@ -16,6 +16,14 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Core\Core.csproj" />
+    <ProjectReference Include="..\..\src\Core\UpdateTargets\UpdateTargets.csproj" />
+    <ProjectReference Include="..\..\src\Core\StackDeploymentStatus\StackDeploymentStatus.csproj" />
+    <ProjectReference Include="..\..\src\Core\StackDeployment\StackDeployment.csproj" />
+    <ProjectReference Include="..\..\src\Core\S3Deployment\S3Deployment.csproj" />
+    <ProjectReference Include="..\..\src\Core\GithubWebhook\GithubWebhook.csproj" />
+    <ProjectReference Include="..\..\src\Core\ExtractFileFromZip\ExtractFileFromZip.csproj" />
+    <ProjectReference Include="..\..\src\Core\DeploymentSupersession\DeploymentSupersession.csproj" />
+    <ProjectReference Include="..\..\src\Core\ApprovalNotification\ApprovalNotification.csproj" />
+    <ProjectReference Include="..\..\src\Core\ApprovalWebhook\ApprovalWebhook.csproj" />
   </ItemGroup>
 </Project>

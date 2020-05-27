@@ -8,15 +8,16 @@ using System.Threading.Tasks;
 using static System.Text.Json.JsonSerializer;
 
 using Amazon.Lambda.Core;
+using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.GithubUtils;
 
 using Octokit;
 
-using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.S3.IAmazonS3,
     Amazon.S3.AmazonS3Client
 >;
@@ -29,6 +30,7 @@ namespace Cythral.CloudFormation.S3Deployment
         private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
         private static PutCommitStatusFacade putCommitStatusFacade = new PutCommitStatusFacade();
 
+        [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
         public static async Task<object> Handle(Request request, ILambdaContext context = null)
         {
             await PutCommitStatus(request, CommitState.Pending);
@@ -92,8 +94,6 @@ namespace Cythral.CloudFormation.S3Deployment
                 GithubOwner = request.CommitInfo?.GithubOwner,
                 GithubRepo = request.CommitInfo?.GithubRepository,
                 GithubRef = request.CommitInfo?.GithubRef,
-                GoogleClientId = request.SsoConfig?.GoogleClientId,
-                IdentityPoolId = request.SsoConfig?.IdentityPoolId
             });
         }
     }

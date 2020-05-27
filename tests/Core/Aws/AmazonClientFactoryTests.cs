@@ -1,7 +1,7 @@
 using System;
 using NUnit.Framework;
 using System.Threading.Tasks;
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils;
 
 using Amazon.S3;
 using Amazon.SecurityToken;

@@ -4,9 +4,8 @@ using System.Threading.Tasks;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
-using Cythral.CloudFormation.Aws;
-using Cythral.CloudFormation.Entities;
-using Cythral.CloudFormation.Events;
+using Cythral.CloudFormation.AwsUtils;
+using Cythral.CloudFormation.GithubWebhook.Entities;
 using Cythral.CloudFormation.GithubWebhook;
 
 using NSubstitute;
@@ -14,7 +13,7 @@ using NSubstitute;
 using NUnit.Framework;
 using static System.Text.Json.JsonSerializer;
 
-using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.StepFunctions.IAmazonStepFunctions,
     Amazon.StepFunctions.AmazonStepFunctionsClient
 >;

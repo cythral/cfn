@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.ExtractFileFromZip;
 
 using NSubstitute;

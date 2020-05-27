@@ -9,7 +9,8 @@ using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 using Amazon.Lambda.SQSEvents;
 
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
+using Cythral.CloudFormation.AwsUtils.CloudFormation;
 using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.StackDeployment;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
@@ -23,12 +24,12 @@ using NSubstitute.ClearExtensions;
 using static System.Text.Json.JsonSerializer;
 using Tag = Amazon.CloudFormation.Model.Tag;
 
-using CloudFormationFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using CloudFormationFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.CloudFormation.IAmazonCloudFormation,
     Amazon.CloudFormation.AmazonCloudFormationClient
 >;
 
-using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.StepFunctions.IAmazonStepFunctions,
     Amazon.StepFunctions.AmazonStepFunctionsClient
 >;
@@ -186,11 +187,6 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                     GithubOwner = githubOwner,
                     GithubRepository = githubRepo,
                     GithubRef = githubRef,
-                },
-                SsoConfig = new SsoConfig
-                {
-                    GoogleClientId = googleClientId,
-                    IdentityPoolId = identityPoolId
                 }
             };
 
@@ -225,9 +221,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef &&
-                req.GoogleClientId == googleClientId &&
-                req.IdentityPoolId == identityPoolId
+                req.GithubRef == githubRef
             ));
         }
 
@@ -352,9 +346,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef &&
-                req.GoogleClientId == googleClientId &&
-                req.IdentityPoolId == identityPoolId
+                req.GithubRef == githubRef
             ));
         }
 
@@ -413,9 +405,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef &&
-                req.GoogleClientId == googleClientId &&
-                req.IdentityPoolId == identityPoolId
+                req.GithubRef == githubRef
             ));
         }
     }

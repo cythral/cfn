@@ -5,7 +5,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.Lambda.SQSEvents;
 
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.StackDeployment;
 
 using NSubstitute;
@@ -13,7 +13,7 @@ using NSubstitute;
 using NUnit.Framework;
 using static System.Text.Json.JsonSerializer;
 
-using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.S3.IAmazonS3,
     Amazon.S3.AmazonS3Client
 >;

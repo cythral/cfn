@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.S3Deployment;
 
@@ -17,7 +17,7 @@ using Octokit;
 
 using NUnit.Framework;
 
-using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.S3.IAmazonS3,
     Amazon.S3.AmazonS3Client
 >;
@@ -77,11 +77,6 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                     GithubOwner = githubOwner,
                     GithubRepository = githubRepo,
                     GithubRef = githubRef,
-                },
-                SsoConfig = new SsoConfig
-                {
-                    GoogleClientId = googleClientId,
-                    IdentityPoolId = identityPoolId
                 }
             };
         }
@@ -111,9 +106,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef &&
-                req.GoogleClientId == googleClientId &&
-                req.IdentityPoolId == identityPoolId
+                req.GithubRef == githubRef
             ));
         }
 
@@ -214,9 +207,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef &&
-                req.GoogleClientId == googleClientId &&
-                req.IdentityPoolId == identityPoolId
+                req.GithubRef == githubRef
             ));
         }
 
@@ -249,9 +240,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef &&
-                req.GoogleClientId == googleClientId &&
-                req.IdentityPoolId == identityPoolId
+                req.GithubRef == githubRef
             ));
         }
 
@@ -272,9 +261,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 req.EnvironmentName == environmentName &&
                 req.GithubOwner == githubOwner &&
                 req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef &&
-                req.GoogleClientId == googleClientId &&
-                req.IdentityPoolId == identityPoolId
+                req.GithubRef == githubRef
             ));
         }
 
