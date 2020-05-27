@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 using Octokit;
 
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils.KeyManagementService;
 
 namespace Cythral.CloudFormation.GithubUtils
 {

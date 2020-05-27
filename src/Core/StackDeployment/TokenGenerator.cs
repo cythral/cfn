@@ -8,9 +8,9 @@ using static System.Text.Json.JsonSerializer;
 using Amazon.Lambda.SQSEvents;
 using Amazon.S3.Model;
 
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils;
 
-using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.S3.IAmazonS3,
     Amazon.S3.AmazonS3Client
 >;
@@ -48,8 +48,6 @@ namespace Cythral.CloudFormation.StackDeployment
                         GithubRepo = request.CommitInfo?.GithubRepository,
                         GithubRef = request.CommitInfo?.GithubRef,
                         EnvironmentName = request.EnvironmentName,
-                        GoogleClientId = request.SsoConfig?.GoogleClientId,
-                        IdentityPoolId = request.SsoConfig?.IdentityPoolId
                     })
                 });
 

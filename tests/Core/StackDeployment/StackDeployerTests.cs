@@ -7,7 +7,7 @@ using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 
 using Cythral.CloudFormation.StackDeployment;
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils.CloudFormation;
 
 using NSubstitute;
 
@@ -15,7 +15,7 @@ using NUnit.Framework;
 
 using static Amazon.CloudFormation.OnFailure;
 
-using CloudFormationFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using CloudFormationFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.CloudFormation.IAmazonCloudFormation,
     Amazon.CloudFormation.AmazonCloudFormationClient
 >;

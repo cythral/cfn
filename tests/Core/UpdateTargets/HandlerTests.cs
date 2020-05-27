@@ -16,6 +16,11 @@ using NUnit.Framework;
 
 using static Amazon.ElasticLoadBalancingV2.TargetHealthStateEnum;
 
+using ElbClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
+    Amazon.ElasticLoadBalancingV2.IAmazonElasticLoadBalancingV2,
+    Amazon.ElasticLoadBalancingV2.AmazonElasticLoadBalancingV2Client
+>;
+
 namespace Cythral.CloudFormation.Tests.UpdateTargets
 {
     public class HandlerTests

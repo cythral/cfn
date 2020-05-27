@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.Core;
+using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.Lambda.SQSEvents;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
@@ -13,18 +14,19 @@ using Amazon.CloudFormation.Model;
 
 using Octokit;
 
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
+using Cythral.CloudFormation.AwsUtils.CloudFormation;
 using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
 using static System.Text.Json.JsonSerializer;
 
-using CloudFormationFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using CloudFormationFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.CloudFormation.IAmazonCloudFormation,
     Amazon.CloudFormation.AmazonCloudFormationClient
 >;
 
-using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.StepFunctions.IAmazonStepFunctions,
     Amazon.StepFunctions.AmazonStepFunctionsClient
 >;
@@ -43,6 +45,7 @@ namespace Cythral.CloudFormation.StackDeployment
         private static CloudFormationFactory cloudFormationFactory = new CloudFormationFactory();
         private static PutCommitStatusFacade putCommitStatusFacade = new PutCommitStatusFacade();
 
+        [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
         public static async Task<Response> Handle(
             SQSEvent sqsEvent,
             ILambdaContext context = null
@@ -157,8 +160,6 @@ namespace Cythral.CloudFormation.StackDeployment
                 GithubOwner = request.CommitInfo?.GithubOwner,
                 GithubRepo = request.CommitInfo?.GithubRepository,
                 GithubRef = request.CommitInfo?.GithubRef,
-                GoogleClientId = request.SsoConfig?.GoogleClientId,
-                IdentityPoolId = request.SsoConfig?.IdentityPoolId
             });
         }
     }

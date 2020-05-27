@@ -13,10 +13,5 @@ namespace Cythral.CloudFormation.StackDeployment
         public string Token { get; set; }
         public string EnvironmentName { get; set; }
         public CommitInfo CommitInfo { get; set; }
-        public SsoConfig SsoConfig { get; set; }
     }
-
-
-
-
 }

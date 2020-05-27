@@ -8,6 +8,5 @@ namespace Cythral.CloudFormation.S3Deployment
         public string EnvironmentName { get; set; }
         public string ProjectName { get; set; }
         public CommitInfo CommitInfo { get; set; }
-        public SsoConfig SsoConfig { get; set; }
     }
 }

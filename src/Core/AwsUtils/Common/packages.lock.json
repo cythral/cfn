@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "dependencies": {
+    ".NETCoreApp,Version=v3.1": {
+      "AWSSDK.Core": {
+        "type": "Direct",
+        "requested": "[3.3.107.2, )",
+        "resolved": "3.3.107.2",
+        "contentHash": "V8WPPqmLAY/B9A0ojA6OfKzOs0dYkm2675sYbAey5VSLfq9vZ6lDN9kuF12ERwj0LLQMjDP6LxYC5RNS+0/iwA=="
+      },
+      "AWSSDK.SecurityToken": {
+        "type": "Direct",
+        "requested": "[3.3.105.6, )",
+        "resolved": "3.3.105.6",
+        "contentHash": "SI0txqKjqi+fgO+QtaopOLWqwHMUTBRnAvb2VOPLZqzpc+Vf1cAzeMoBwhW7hPw9HqhOGhRT+Hsv4R99t7kdRA==",
+        "dependencies": {
+          "AWSSDK.Core": "[3.3.107.2, 3.4.0)"
+        }
+      }
+    }
+  }
+}

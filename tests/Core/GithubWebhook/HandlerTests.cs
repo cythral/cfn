@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 
-using Cythral.CloudFormation.Entities;
-using Cythral.CloudFormation.Events;
+using Cythral.CloudFormation.GithubWebhook.Entities;
 using Cythral.CloudFormation.GithubWebhook;
 using Cythral.CloudFormation.StackDeployment;
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils.CloudFormation;
 
 using NSubstitute;
 
@@ -21,7 +20,7 @@ using RichardSzalay.MockHttp;
 using static System.Text.Json.JsonSerializer;
 
 using Handler = Cythral.CloudFormation.GithubWebhook.Handler;
-using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.S3.IAmazonS3,
     Amazon.S3.AmazonS3Client
 >;

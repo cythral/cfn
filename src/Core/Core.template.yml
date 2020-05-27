@@ -280,7 +280,7 @@ Resources:
       Handler: Core::Cythral.CloudFormation.GithubWebhook.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
-      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      CodeUri: ../../bin/GithubWebhook/netcoreapp3.1/publish/
       MemorySize: 256
       Policies:
         - AWSLambdaExecute
@@ -361,7 +361,7 @@ Resources:
       Handler: Core::Cythral.CloudFormation.UpdateTargets.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
-      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      CodeUri: ../../bin/UpdateTargets/netcoreapp3.1/publish/
       Policies:
         - AWSLambdaExecute
         - !Ref UpdateTargetsPolicy
@@ -397,7 +397,7 @@ Resources:
       Handler: Core::Cythral.CloudFormation.StackDeployment.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 300
-      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      CodeUri: ../../bin/StackDeployment/netcoreapp3.1/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Environment:
         Variables:
@@ -418,7 +418,7 @@ Resources:
       Handler: Core::Cythral.CloudFormation.StackDeploymentStatus.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
-      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      CodeUri: ../../bin/StackDeploymentStatus/netcoreapp3.1/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Events:
         SNS:
@@ -459,7 +459,7 @@ Resources:
       Handler: Core::Cythral.CloudFormation.ApprovalWebhook.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
-      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      CodeUri: ../../bin/ApprovalWebhook/netcoreapp3.1/publish/
       MemorySize: 256
       Policies:
         - AWSLambdaExecute
@@ -552,7 +552,7 @@ Resources:
       Runtime: dotnetcore3.1
       Timeout: 30
       MemorySize: 256
-      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      CodeUri: ../../bin/ApprovalNotification/netcoreapp3.1/publish/
       Policies:
         - AWSLambdaExecute
         - !Ref ApprovalNotificationPolicy
@@ -594,7 +594,7 @@ Resources:
       Runtime: dotnetcore3.1
       Timeout: 30
       MemorySize: 256
-      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      CodeUri: ../../bin/DeploymentSupersession/netcoreapp3.1/publish/
       Policies:
         - AWSLambdaExecute
         - !Ref DeploymentSupersessionPolicy
@@ -630,7 +630,7 @@ Resources:
       Runtime: dotnetcore3.1
       Timeout: 30
       MemorySize: 256
-      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      CodeUri: ../../bin/ExtractFileFromZip/netcoreapp3.1/publish/
       Policies:
         - AWSLambdaExecute
         - !Ref ExtractFileFromZipPolicy
@@ -657,7 +657,7 @@ Resources:
       Runtime: dotnetcore3.1
       Timeout: 300
       MemorySize: 256
-      CodeUri: bin/Release/netcoreapp3.0/linux-x64/publish/
+      CodeUri: ../../bin/S3Deployment/netcoreapp3.1/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Environment:
         Variables:
