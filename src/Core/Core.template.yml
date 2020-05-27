@@ -281,7 +281,7 @@ Resources:
       Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: ../../bin/GithubWebhook/Release/netcoreapp3.1/publish/
-      MemorySize: 256
+      MemorySize: 512
       Policies:
         - AWSLambdaExecute
         - !Ref GithubWebhookPolicy
