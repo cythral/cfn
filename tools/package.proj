@@ -30,7 +30,7 @@
         >
             <Output TaskParameter="ConsoleOutput" PropertyName="DeploymentBucket" />
         </Exec>
-
+ 
         <MSBuild 
             Condition="$(SkipDns) != 'true'" 
             Projects="$(SourceDirectory)/Dns/Dns.proj" 
