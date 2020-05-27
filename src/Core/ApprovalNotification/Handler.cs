@@ -54,11 +54,18 @@ namespace Cythral.CloudFormation.ApprovalNotification
             var rejectUrl = $"{baseUrl}?action=reject&pipeline={pipeline}&token={approvalHash}";
             var defaultMessage = $"{request.CustomMessage}.\n\nApprove:\n{approveUrl}\n\nReject:\n{rejectUrl}";
 
-
             var response = await client.PublishAsync(new PublishRequest
             {
                 TopicArn = Environment.GetEnvironmentVariable("TOPIC_ARN"),
                 MessageStructure = "json",
+                MessageAttributes = new Dictionary<string, MessageAttributeValue>
+                {
+                    ["pipeline"] = new MessageAttributeValue
+                    {
+                        DataType = "String",
+                        StringValue = request.Pipeline
+                    }
+                },
                 Message = Serialize(new Dictionary<string, string>
                 {
                     ["default"] = defaultMessage,
