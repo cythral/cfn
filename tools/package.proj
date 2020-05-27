@@ -45,7 +45,7 @@
         
         <MSBuild 
             Condition="$(SkipCore) != 'true'" 
-            Projects="$(SourceDirectory)/Core/Core.csproj" 
+            Projects="$(SourceDirectory)/Core/Core.proj" 
             Targets="Publish" 
             Properties="Deploy=false;DeploymentBucket=$(DeploymentBucket);Configuration=$(Configuration);PackagedFile=$(Destination)/Core.template.yml;Optimize=$(Optimize)" />
     </Target>

@@ -7,10 +7,11 @@ using Amazon.CloudFormation.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 using Amazon.Lambda.Core;
+using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.Lambda.SNSEvents;
 using Amazon.SQS.Model;
 
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.StackDeploymentStatus.Request;
 
@@ -18,17 +19,17 @@ using Octokit;
 
 using static System.Text.Json.JsonSerializer;
 
-using CloudFormationFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using CloudFormationFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.CloudFormation.IAmazonCloudFormation,
     Amazon.CloudFormation.AmazonCloudFormationClient
 >;
 
-using SqsFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using SqsFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.SQS.IAmazonSQS,
     Amazon.SQS.AmazonSQSClient
 >;
 
-using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.StepFunctions.IAmazonStepFunctions,
     Amazon.StepFunctions.AmazonStepFunctionsClient
 >;
@@ -44,6 +45,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
         private static CloudFormationFactory cloudFormationFactory = new CloudFormationFactory();
         private static PutCommitStatusFacade putCommitStatusFacade = new PutCommitStatusFacade();
 
+        [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
         public static async Task<Response> Handle(
             SNSEvent snsRequest,
             ILambdaContext context = null

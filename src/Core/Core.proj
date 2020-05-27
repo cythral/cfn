@@ -1,0 +1,90 @@
+<Project ToolsVersion="14.0" DefaultTargets="Publish" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <BuildTasksLocation>../../bin/BuildTasks/$(Configuration)/netcoreapp3.1/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
+    <StackName>cfn-core</StackName>
+    <TemplateFileName>Core.template.yml</TemplateFileName>
+    <ConfigFileName>Core.config.json</ConfigFileName>
+    <TemplateFile>$(MSBuildThisFileDirectory)$(TemplateFileName)</TemplateFile>
+    <ConfigFile>$(MSBuildThisFileDirectory)$(ConfigFileName)</ConfigFile>
+    <PackagedFile></PackagedFile>
+    <DeploymentBucket></DeploymentBucket>
+    <Package>true</Package>
+    <Deploy>true</Deploy>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Project Include="..\BuildTasks\BuildTasks.csproj" />
+    <Project Include="UpdateTargets\UpdateTargets.csproj" />
+    <Project Include="StackDeploymentStatus\StackDeploymentStatus.csproj" />
+    <Project Include="StackDeployment\StackDeployment.csproj" />
+    <Project Include="S3Deployment\S3Deployment.csproj" />
+    <Project Include="GithubWebhook\GithubWebhook.csproj" />
+    <Project Include="ExtractFileFromZip\ExtractFileFromZip.csproj" />
+    <Project Include="DeploymentSupersession\DeploymentSupersession.csproj" />
+    <Project Include="ApprovalNotification\ApprovalNotification.csproj" />
+    <Project Include="ApprovalWebhook\ApprovalWebhook.csproj" />
+  </ItemGroup>
+
+
+
+  <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.UpdateCodeLocation" AssemblyFile="$(BuildTasksLocation)" />
+  <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.Deploy" AssemblyFile="$(BuildTasksLocation)" />
+
+  <Target Name="Publish">
+    <MSBuild Projects="@(Project)" Targets="Publish" />
+  </Target>
+
+  <Target Name="Clean">
+    <MSBuild Projects="@(Project)" Targets="Clean" />
+  </Target>
+
+  <!-- Sets up the configuraiton file -->
+  <Target Name="Configure" Condition="!Exists('$(ConfigFileName)')">
+    <Exec Command="aws kms encrypt --key-id alias/SecretsKey --plaintext $(GithubToken) --query CiphertextBlob --output text" ConsoleToMsBuild="true">
+        <Output TaskParameter="ConsoleOutput" PropertyName="EncryptedGithubToken" />
+    </Exec>
+
+    <Exec Command="aws kms encrypt --key-id alias/SecretsKey --plaintext $(GithubSigningSecret) --query CiphertextBlob --output text" ConsoleToMsBuild="true">
+        <Output TaskParameter="ConsoleOutput" PropertyName="EncryptedGithubSigningSecret" />
+    </Exec>
+
+    <PropertyGroup>
+        <ConfigLines>
+{
+    "Parameters": {
+        "GithubOwner": "$(GithubOwner)",
+        "GithubToken": "$(EncryptedGithubToken)",
+        "GithubSigningSecret": "$(EncryptedGithubSigningSecret)",
+        "TemplateFilename": "cicd.template.yml",
+        "StackSuffix": "cicd"
+    }
+}
+        </ConfigLines>
+    </PropertyGroup>
+    
+    <WriteLinesToFile File="$(ConfigFileName)" Lines="$(ConfigLines)" Overwrite="true" />
+  </Target>
+  
+  <!-- Upload the code to S3 -->
+  <Target Name="Package" AfterTargets="Publish" Condition="$(Package) == 'true'">
+
+    <!-- Copy the config file to the same directory as the packaged file (if PackagedFile was set) -->
+    <Copy SourceFiles="$(ConfigFile)" DestinationFiles="$([System.IO.Path]::GetDirectoryName('$(PackagedFile)'))/$(ConfigFileName)" Condition="$(PackagedFile) != ''" />
+
+    <Exec Command="mktemp" ConsoleToMsBuild="true" Condition="$(PackagedFile) == ''">
+        <Output TaskParameter="ConsoleOutput" PropertyName="PackagedFile" />
+    </Exec>
+
+    <Exec Command="aws cloudformation package --template-file $(TemplateFile) --s3-bucket $(DeploymentBucket) --output-template-file $(PackagedFile)" />
+    
+    <PropertyGroup>
+      <TemplateFile>$(PackagedFile)</TemplateFile>
+    </PropertyGroup>
+  </Target>
+  
+  <!-- Deploy to CloudFormation -->
+  <Target Name="Deploy" AfterTargets="Package" Condition="$(Deploy) == 'true'" DependsOnTargets="Configure">
+    <Deploy TemplateFile="$(TemplateFile)" StackName="$(StackName)" ConfigFile="$(ConfigFile)" Capabilities="CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND" />
+  </Target>
+</Project>

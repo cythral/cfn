@@ -5,8 +5,7 @@ using System.Text.RegularExpressions;
 
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 
-using Cythral.CloudFormation.Events;
-using Cythral.CloudFormation.Exceptions;
+using Cythral.CloudFormation.GithubWebhook.Exceptions;
 
 using static System.Text.Json.JsonSerializer;
 

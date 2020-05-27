@@ -7,7 +7,7 @@ using Amazon.S3;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
-using Cythral.CloudFormation.Aws;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
 using NSubstitute;
 using NSubstitute.ClearExtensions;
@@ -18,12 +18,12 @@ using static System.Text.Json.JsonSerializer;
 
 using Handler = Cythral.CloudFormation.ApprovalWebhook.Handler;
 
-using S3Factory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.S3.IAmazonS3,
     Amazon.S3.AmazonS3Client
 >;
 
-using StepFunctionsClientFactory = Cythral.CloudFormation.Aws.AmazonClientFactory<
+using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.StepFunctions.IAmazonStepFunctions,
     Amazon.StepFunctions.AmazonStepFunctionsClient
 >;
