@@ -377,7 +377,7 @@ Resources:
   GithubWebhoookEndToEndTestRunner:
     Type: Custom::TestRunner
     Properties:
-      ServiceToken: !Ref GithubWebhookEndToEndTests
+      ServiceToken: !GetAtt GithubWebhookEndToEndTests.Arn
       Serial: !Ref Version
 
   UpdateTargetsFunction:
