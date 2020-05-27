@@ -76,7 +76,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             var assembly = Assembly.GetExecutingAssembly();
             TreeResponse response;
 
-            using (var stream = assembly.GetManifestResourceStream("EndToEnd.Resources.bucket-only.template.yml"))
+            using (var stream = assembly.GetManifestResourceStream("GithubWebhookEndToEnd.Resources.bucket-only.template.yml"))
             using (var reader = new StreamReader(stream))
             {
                 var tree = new NewTree
