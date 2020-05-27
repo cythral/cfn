@@ -241,7 +241,7 @@
                         "ProdVpcId.$": "$.UtilityOutputs.Agents[1].VpcId",
                         "DevLoadBalancerDnsName.$": "$.UtilityOutputs.Agents[0].LoadBalancerDnsName",
                         "ProdLoadBalancerDnsName.$": "$.UtilityOutputs.Agents[1].LoadBalancerDnsName",
-                        "Version.$": "$.BuildOutput.Build.BuildNumber"
+                        "Version.$": "$.head_commit.id"
                     },
                     "Capabilities": [
                         "CAPABILITY_IAM",
