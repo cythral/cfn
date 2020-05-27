@@ -277,7 +277,7 @@ Resources:
   GithubWebhook:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: Core::Cythral.CloudFormation.GithubWebhook.Handler::Handle
+      Handler: GithubWebhook::Cythral.CloudFormation.GithubWebhook.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: ../../bin/GithubWebhook/Release/netcoreapp3.1/publish/
@@ -358,7 +358,7 @@ Resources:
   UpdateTargetsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: Core::Cythral.CloudFormation.UpdateTargets.Handler::Handle
+      Handler: UpdateTargets::Cythral.CloudFormation.UpdateTargets.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: ../../bin/UpdateTargets/Release/netcoreapp3.1/publish/
@@ -394,7 +394,7 @@ Resources:
   StackDeploymentFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: Core::Cythral.CloudFormation.StackDeployment.Handler::Handle
+      Handler: StackDeployment::Cythral.CloudFormation.StackDeployment.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 300
       CodeUri: ../../bin/StackDeployment/Release/netcoreapp3.1/publish/
@@ -415,7 +415,7 @@ Resources:
   StackDeploymentStatusFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: Core::Cythral.CloudFormation.StackDeploymentStatus.Handler::Handle
+      Handler: StackDeploymentStatus::Cythral.CloudFormation.StackDeploymentStatus.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: ../../bin/StackDeploymentStatus/Release/netcoreapp3.1/publish/
@@ -456,7 +456,7 @@ Resources:
   ApprovalWebhook:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: Core::Cythral.CloudFormation.ApprovalWebhook.Handler::Handle
+      Handler: ApprovalWebhook::Cythral.CloudFormation.ApprovalWebhook.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: ../../bin/ApprovalWebhook/Release/netcoreapp3.1/publish/
@@ -548,7 +548,7 @@ Resources:
   ApprovalNotificationFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: Core::Cythral.CloudFormation.ApprovalNotification.Handler::Handle
+      Handler: ApprovalNotification::Cythral.CloudFormation.ApprovalNotification.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
       MemorySize: 256
@@ -590,7 +590,7 @@ Resources:
   DeploymentSupersessionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: Core::Cythral.CloudFormation.DeploymentSupersession.Handler::Handle
+      Handler: DeploymentSupersession::Cythral.CloudFormation.DeploymentSupersession.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
       MemorySize: 256
@@ -626,7 +626,7 @@ Resources:
   ExtractFileFromZipFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: Core::Cythral.CloudFormation.ExtractFileFromZip.Handler::Handle
+      Handler: ExtractFileFromZipFunction::Cythral.CloudFormation.ExtractFileFromZip.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
       MemorySize: 256
@@ -653,7 +653,7 @@ Resources:
   S3DeploymentFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: Core::Cythral.CloudFormation.S3Deployment.Handler::Handle
+      Handler: S3Deployment::Cythral.CloudFormation.S3Deployment.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 300
       MemorySize: 256
