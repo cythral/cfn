@@ -626,7 +626,7 @@ Resources:
   ExtractFileFromZipFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: ExtractFileFromZipFunction::Cythral.CloudFormation.ExtractFileFromZip.Handler::Handle
+      Handler: ExtractFileFromZip::Cythral.CloudFormation.ExtractFileFromZip.Handler::Handle
       Runtime: dotnetcore3.1
       Timeout: 30
       MemorySize: 256
