@@ -47,6 +47,11 @@ Parameters:
     Default: ""
     Description: DNS name of the prod load balancer
 
+  Version:
+    Type: String
+    Default: "1"
+    Description: Version of the stack being deployed
+
 Conditions:
   SetupDevAccount: !Not
     - !Equals
@@ -354,6 +359,26 @@ Resources:
           PathPatternConfig:
             Values:
               - /webhooks/github
+
+  GithubWebhookEndToEndTests:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: GithubWebhookEndToEnd::Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook.Runner::Handle
+      Runtime: dotnetcore3.1
+      Timeout: 900
+      MemorySize: 512
+      CodeUri: ../../bin/GithubWebhookEndToEnd/Release/netcoreapp3.1/publish/
+      Policies:
+        - AdministratorAccess
+      Environment:
+        Variables:
+          GITHUB_TOKEN: !Ref GithubToken
+
+  GithubWebhoookEndToEndTestRunner:
+    Type: Custom::TestRunner
+    Properties:
+      ServiceToken: !Ref GithubWebhookEndToEndTests
+      Serial: !Ref Version
 
   UpdateTargetsFunction:
     Type: AWS::Serverless::Function

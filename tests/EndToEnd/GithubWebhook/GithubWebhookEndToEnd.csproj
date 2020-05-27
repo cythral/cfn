@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.CloudFormation" Version="3.3.105.6" />
+    <PackageReference Include="Cythral.CloudFormation.CustomResource" Version="0.2.24-alpha" />
+    <PackageReference Include="NUnitLite" Version="3.12.0" />
+    <PackageReference Include="Octokit" Version="0.47.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources/bucket-only.template.yml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Core\AwsUtils\KeyManagementService\KeyManagementService.csproj" />
+  </ItemGroup>
+
+</Project>

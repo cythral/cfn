@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Project Include="..\BuildTasks\BuildTasks.csproj" />
+    <Project Include="..\..\tests\EndToEnd\GithubWebhook\GithubWebhookEndToEnd.csproj" />
     <Project Include="UpdateTargets\UpdateTargets.csproj" />
     <Project Include="StackDeploymentStatus\StackDeploymentStatus.csproj" />
     <Project Include="StackDeployment\StackDeployment.csproj" />
