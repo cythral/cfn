@@ -21,7 +21,10 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
                 throw new Exception("End to end tests failed.");
             }
 
-            return Task.FromResult(new Response { });
+            return Task.FromResult(new Response
+            {
+                PhysicalResourceId = Request.ResourceProperties.Serial
+            });
         }
 
         public Task<Response> Update()
