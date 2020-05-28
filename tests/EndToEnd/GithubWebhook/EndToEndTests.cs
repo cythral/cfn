@@ -159,96 +159,134 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
         {
             var stepFunctionsClient = new AmazonStepFunctionsClient();
             var assembly = Assembly.GetExecutingAssembly();
+            var accountId = Environment.GetEnvironmentVariable("AWS_ACCOUNT_ID");
+            var region = Environment.GetEnvironmentVariable("AWS_REGION");
+
+            Commit commit1, commit2, commit3;
+
             string pipelineDefinition = null;
 
             TreeResponse response;
 
             #region Create Commit on Master
-
-            using (var cicdFileStream = assembly.GetManifestResourceStream("GithubWebhookEndToEnd.Resources.state-machine.template.yml"))
-            using (var cicdFileReader = new StreamReader(cicdFileStream))
-            using (var pipelineFileStream = assembly.GetManifestResourceStream("GithubWebhookEndToEnd.Resources.pipeline.asl.json"))
-            using (var pipelineFileReader = new StreamReader(pipelineFileStream))
             {
-                pipelineDefinition = await pipelineFileReader.ReadToEndAsync();
-
-                var tree1 = new NewTree
+                using (var cicdFileStream = assembly.GetManifestResourceStream("GithubWebhookEndToEnd.Resources.state-machine.template.yml"))
+                using (var cicdFileReader = new StreamReader(cicdFileStream))
+                using (var pipelineFileStream = assembly.GetManifestResourceStream("GithubWebhookEndToEnd.Resources.pipeline.asl.json"))
+                using (var pipelineFileReader = new StreamReader(pipelineFileStream))
                 {
-                    BaseTree = baseTree
-                };
+                    pipelineDefinition = await pipelineFileReader.ReadToEndAsync();
 
-                tree1.Tree.Add(new NewTreeItem
-                {
-                    Path = cicdFileName,
-                    Mode = "100644",
-                    Content = await cicdFileReader.ReadToEndAsync()
-                });
+                    var tree1 = new NewTree
+                    {
+                        BaseTree = baseTree
+                    };
 
-                tree1.Tree.Add(new NewTreeItem
-                {
-                    Path = pipelineFileName,
-                    Mode = "100644",
-                    Content = pipelineDefinition
-                });
+                    tree1.Tree.Add(new NewTreeItem
+                    {
+                        Path = cicdFileName,
+                        Mode = "100644",
+                        Content = await cicdFileReader.ReadToEndAsync()
+                    });
 
-                response = await github.Git.Tree.Create(repoOwner, repoName, tree1);
+                    tree1.Tree.Add(new NewTreeItem
+                    {
+                        Path = pipelineFileName,
+                        Mode = "100644",
+                        Content = pipelineDefinition
+                    });
+
+                    response = await github.Git.Tree.Create(repoOwner, repoName, tree1);
+                }
+
+                var commit = new NewCommit("Create pipeline", response.Sha, baseTree);
+                commit1 = await github.Git.Commit.Create(repoOwner, repoName, commit);
+
+                await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit1.Sha));
             }
-
-            var commit1 = new NewCommit("Create pipeline", response.Sha, baseTree);
-            var commit1Response = await github.Git.Commit.Create(repoOwner, repoName, commit1);
-
-            await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit1Response.Sha));
-
             #endregion
 
             #region Assert State Machine was Created
-
-            await cloudformation.WaitUntilStackHasStatus(stackName, "CREATE_COMPLETE", 30);
-
-            var accountId = Environment.GetEnvironmentVariable("AWS_ACCOUNT_ID");
-            var region = Environment.GetEnvironmentVariable("AWS_REGION");
-
-            var stateMachineResponse = await stepFunctionsClient.DescribeStateMachineAsync(new DescribeStateMachineRequest
             {
-                StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:cfn-test-repo-cicd-pipeline",
-            });
+                await cloudformation.WaitUntilStackHasStatus(stackName, "CREATE_COMPLETE", 30);
 
-            Assert.That(stateMachineResponse.Definition, Is.EqualTo(pipelineDefinition));
+                var stateMachineResponse = await stepFunctionsClient.DescribeStateMachineAsync(new DescribeStateMachineRequest
+                {
+                    StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:cfn-test-repo-cicd-pipeline",
+                });
 
+                Assert.That(stateMachineResponse.Definition, Is.EqualTo(pipelineDefinition));
+            }
             #endregion
 
             #region Create Another Commit 
-
-            var updatedTree = new NewTree
             {
-                BaseTree = commit1Response.Sha
-            };
+                var updatedTree = new NewTree
+                {
+                    BaseTree = commit1.Sha
+                };
 
-            updatedTree.Tree.Add(new NewTreeItem
-            {
-                Path = "README.md",
-                Mode = "100644",
-                Content = "Poke"
-            });
+                updatedTree.Tree.Add(new NewTreeItem
+                {
+                    Path = "README.md",
+                    Mode = "100644",
+                    Content = "Poke"
+                });
 
-            var updatedTreeResponse = await github.Git.Tree.Create(repoOwner, repoName, updatedTree);
-            var commit2 = new NewCommit("Poke", updatedTreeResponse.Sha, commit1Response.Sha);
-            var commit2Response = await github.Git.Commit.Create(repoOwner, repoName, commit2);
-            var updatedReferenceResponse = await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit2Response.Sha));
+                var updatedTreeResponse = await github.Git.Tree.Create(repoOwner, repoName, updatedTree);
+                var commit = new NewCommit("Poke", updatedTreeResponse.Sha, commit1.Sha);
 
+                commit2 = await github.Git.Commit.Create(repoOwner, repoName, commit);
+                await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit2.Sha));
+            }
             #endregion
 
-            await Task.Delay(3000);
-
             #region Assert Execution was Created
-
-            var executionResponse = await stepFunctionsClient.ListExecutionsAsync(new ListExecutionsRequest
             {
-                StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:cfn-test-repo-cicd-pipeline",
-            });
+                await Task.Delay(3000);
 
-            Assert.True(executionResponse.Executions.Any(execution => execution.Name == commit2Response.Sha));
+                var executionResponse = await stepFunctionsClient.ListExecutionsAsync(new ListExecutionsRequest
+                {
+                    StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:cfn-test-repo-cicd-pipeline",
+                });
 
+                Assert.True(executionResponse.Executions.Any(execution => execution.Name == commit2.Sha));
+            }
+            #endregion
+
+            #region Create Commit with [no ci] in the message
+            {
+                var updatedTree = new NewTree
+                {
+                    BaseTree = commit1.Sha
+                };
+
+                updatedTree.Tree.Add(new NewTreeItem
+                {
+                    Path = "README.md",
+                    Mode = "100644",
+                    Content = "Poke"
+                });
+
+                var updatedTreeResponse = await github.Git.Tree.Create(repoOwner, repoName, updatedTree);
+                var commit = new NewCommit("Poke [no ci]", updatedTreeResponse.Sha, commit1.Sha);
+
+                commit3 = await github.Git.Commit.Create(repoOwner, repoName, commit);
+                await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit2.Sha));
+            }
+            #endregion
+
+            #region Assert No Execution was Created
+            {
+                await Task.Delay(3000);
+
+                var executionResponse = await stepFunctionsClient.ListExecutionsAsync(new ListExecutionsRequest
+                {
+                    StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:cfn-test-repo-cicd-pipeline",
+                });
+
+                Assert.False(executionResponse.Executions.Any(execution => execution.Name == commit3.Sha));
+            }
             #endregion
         }
     }
