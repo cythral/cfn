@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.CloudFormation" Version="3.3.105.6" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.3.104.51" />
     <PackageReference Include="Cythral.CloudFormation.CustomResource" Version="0.2.24-alpha" />
     <PackageReference Include="NUnitLite" Version="3.12.0" />
     <PackageReference Include="Octokit" Version="0.47.0" />
@@ -13,6 +14,8 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources/bucket-only.template.yml" />
+    <EmbeddedResource Include="Resources/state-machine.template.yml" />
+    <EmbeddedResource Include="Resources/pipeline.asl.json" />
   </ItemGroup>
 
   <ItemGroup>
