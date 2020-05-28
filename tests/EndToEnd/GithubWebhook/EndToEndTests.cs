@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Http;
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
@@ -9,12 +11,18 @@ using NUnit.Framework;
 using static System.Text.Json.JsonSerializer;
 using Octokit;
 
+using Cythral.CloudFormation.GithubWebhook;
+using Cythral.CloudFormation.GithubWebhook.Entities;
 using Cythral.CloudFormation.AwsUtils.KeyManagementService;
 
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
+
+using Repository = Cythral.CloudFormation.GithubWebhook.Entities.Repository;
+using User = Cythral.CloudFormation.GithubWebhook.Entities.User;
+using Commit = Cythral.CloudFormation.GithubWebhook.Entities.Commit;
 
 namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
 {
@@ -28,16 +36,23 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
         private const string stackName = "cfn-test-repo-cicd";
         private const string cicdFileName = "cicd.template.yml";
         private const string pipelineFileName = "pipeline.asl.json";
+        private const string webhookUrl = "https://brigh.id/webhooks/github";
 
         private GitHubClient github;
         private IAmazonCloudFormation cloudformation;
         private string baseTree;
+        private string signingKey;
+
+        #region Setup / Teardown
 
         [SetUp]
         public async Task SetupGithubRepository()
         {
             var encryptedToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
             var token = await kmsDecryptFacade.Decrypt(encryptedToken);
+            var encryptedSigningKey = Environment.GetEnvironmentVariable("GITHUB_SIGNING_SECRET");
+            signingKey = await kmsDecryptFacade.Decrypt(encryptedSigningKey);
+
             var headerValue = new ProductHeaderValue("Brighid");
 
             github = new GitHubClient(headerValue);
@@ -102,6 +117,10 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             }
             catch (Exception) { }
         }
+
+        #endregion
+
+        #region Github to AWS Tests
 
         [Test(Description = "Pushing to master creates a simple CICD Stack")]
         public async Task PushToMasterSimple()
@@ -168,7 +187,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             var accountId = Environment.GetEnvironmentVariable("AWS_ACCOUNT_ID");
             var region = Environment.GetEnvironmentVariable("AWS_REGION");
 
-            Commit commit1, commit2, commit3;
+            Octokit.Commit commit1, commit2, commit3;
             string pipelineDefinition = null;
 
             #region Get the Pipeline Definition
@@ -269,5 +288,111 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             }
             #endregion
         }
+
+        #endregion
+
+        #region HTTP Method Response Tests
+
+        [Test(Description = "Direct get requests to the webhook results in a bad response code")]
+        public async Task DirectGetRequest()
+        {
+            var client = new HttpClient();
+            var response = await client.GetAsync(webhookUrl);
+
+            Assert.That(response.IsSuccessStatusCode, Is.False);
+        }
+
+        [Test(Description = "Direct patch requests to the webhook results in a bad response code")]
+        public async Task DirectPatchRequest()
+        {
+            var client = new HttpClient();
+            var response = await client.PatchAsync(webhookUrl, new StringContent("test"));
+
+            Assert.That(response.IsSuccessStatusCode, Is.False);
+        }
+
+        [Test(Description = "Direct delete requests to the webhook results in a bad response code")]
+        public async Task DirectDeleteRequest()
+        {
+            var client = new HttpClient();
+            var response = await client.DeleteAsync(webhookUrl);
+
+            Assert.That(response.IsSuccessStatusCode, Is.False);
+        }
+
+        #endregion
+
+        #region Direct POST Request Tests
+
+        [Test(Description = "Signed post requests with a bad repository owner should result in a bad request response code")]
+        public async Task SignedPostRequestWithBadOwner()
+        {
+            var client = new HttpClient();
+            var response = await client.PostWithSignature(webhookUrl, signingKey, new PushEvent
+            {
+                HeadCommit = new Commit
+                {
+                    Id = baseTree
+                },
+                Repository = new Repository
+                {
+                    ContentsUrl = $"https://api.github.com/repos/{repoOwner}/{repoName}/contents/{{+path}}",
+                    Owner = new User
+                    {
+                        Name = "Codertocat"
+                    }
+                }
+            });
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        }
+
+        [Test(Description = "Signed post requests with a bad contents url should result in a bad request response code")]
+        public async Task SignedPostRequestWithBadContentsUrl()
+        {
+            var client = new HttpClient();
+            var response = await client.PostWithSignature(webhookUrl, signingKey, new PushEvent
+            {
+                HeadCommit = new Commit
+                {
+                    Id = baseTree
+                },
+                Repository = new Repository
+                {
+                    ContentsUrl = $"https://api.github.com/repos/Codertocat/{repoName}/contents/{{+path}}",
+                    Owner = new User
+                    {
+                        Name = repoOwner
+                    }
+                }
+            });
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        }
+
+        [Test(Description = "Post requests with a bad signature should result in a bad request response code")]
+        public async Task PostRequestWithBadSignature()
+        {
+            var client = new HttpClient();
+            var response = await client.PostWithSignature(webhookUrl, "bad signing key", new PushEvent
+            {
+                HeadCommit = new Commit
+                {
+                    Id = baseTree
+                },
+                Repository = new Repository
+                {
+                    ContentsUrl = $"https://api.github.com/repos/{repoOwner}/{repoName}/contents/{{+path}}",
+                    Owner = new User
+                    {
+                        Name = repoOwner
+                    }
+                }
+            });
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        }
+
+        #endregion
     }
 }
