@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Core\AwsUtils\KeyManagementService\KeyManagementService.csproj" />
+    <ProjectReference Include="..\..\..\src\Core\GithubWebhook\GithubWebhook.csproj" />
   </ItemGroup>
 
 </Project>

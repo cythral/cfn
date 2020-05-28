@@ -351,6 +351,10 @@ Resources:
         - Type: forward
           TargetGroupArn: !Ref GithubWebhookTargetGroup
       Conditions:
+        - Field: http-request-method
+          HttpRequestMethodConfig:
+            Values:
+              - POST
         - Field: host-header
           HostHeaderConfig:
             Values:
@@ -373,10 +377,13 @@ Resources:
       Environment:
         Variables:
           GITHUB_TOKEN: !Ref GithubToken
+          GITHUB_SIGNING_SECRET: !Ref GithubSigningSecret
           AWS_ACCOUNT_ID: !Ref AWS::AccountId
 
   GithubWebhoookEndToEndTestRunner:
     Type: Custom::TestRunner
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       ServiceToken: !GetAtt GithubWebhookEndToEndTests.Arn
       Serial: !Ref Version
