@@ -243,7 +243,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
 
             #region Assert Execution was Created
             {
-                await Task.Delay(3000);
+                await Task.Delay(4000);
 
                 var executionResponse = await stepFunctionsClient.ListExecutionsAsync(new ListExecutionsRequest
                 {
@@ -278,7 +278,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
 
             #region Assert No Execution was Created
             {
-                await Task.Delay(3000);
+                await Task.Delay(4000);
 
                 var executionResponse = await stepFunctionsClient.ListExecutionsAsync(new ListExecutionsRequest
                 {
