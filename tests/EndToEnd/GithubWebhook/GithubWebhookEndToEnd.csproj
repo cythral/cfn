@@ -20,6 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Core\AwsUtils\KeyManagementService\KeyManagementService.csproj" />
-  </ItemGroup>
+  </ItemGroup> 
 
 </Project>
