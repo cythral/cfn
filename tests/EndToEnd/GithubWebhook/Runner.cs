@@ -36,5 +36,10 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
         {
             return Task.FromResult(new Response { });
         }
+
+        public static void Main(string[] args)
+        {
+            new AutoRun().Execute(new string[] { "--result:/dev/null" });
+        }
     }
 }
