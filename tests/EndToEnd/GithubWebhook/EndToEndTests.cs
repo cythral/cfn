@@ -74,7 +74,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
         }
 
         [Test(Description = "Pushing to master creates a simple CICD Stack")]
-        public async Task PushToMaster()
+        public async Task PushToMasterSimple()
         {
             #region Create Commit on Master
 
@@ -141,6 +141,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             await github.Git.Reference.Create(repoOwner, repoName, new NewReference("heads/test", commitResponse.Sha));
 
             #endregion
+            await Task.Delay(2000);
 
             try
             {
