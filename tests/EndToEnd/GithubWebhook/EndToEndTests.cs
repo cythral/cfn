@@ -78,33 +78,48 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             }
         }
 
+        [OneTimeTearDown]
+        public async Task TeardownGithub()
+        {
+            try
+            {
+                await github.Repository.Delete(repoOwner, repoName);
+            }
+            catch (Exception) { }
+        }
+
+        [OneTimeTearDown]
+        public async Task TeardownCloudFormation()
+        {
+            try
+            {
+                await cloudformation.DeleteStackAsync(new DeleteStackRequest
+                {
+                    StackName = stackName
+                });
+
+                await cloudformation.WaitUntilStackDoesNotExist(stackName);
+            }
+            catch (Exception) { }
+        }
+
         [Test(Description = "Pushing to master creates a simple CICD Stack")]
         public async Task PushToMasterSimple()
         {
             #region Create Commit on Master
 
-            var assembly = Assembly.GetExecutingAssembly();
-            TreeResponse response;
-
-            using (var stream = assembly.GetManifestResourceStream("GithubWebhookEndToEnd.Resources.bucket-only.template.yml"))
-            using (var reader = new StreamReader(stream))
-            {
-                var tree = new NewTree { };
-
-                tree.Tree.Add(new NewTreeItem
+            var commitResponse = await github.Git.CreateCommit(
+                repoOwner: repoOwner,
+                repoName: repoName,
+                before: null,
+                branch: "master",
+                message: "Create pipeline",
+                files: new Dictionary<string, string>
                 {
-                    Path = cicdFileName,
-                    Mode = "100644",
-                    Content = await reader.ReadToEndAsync()
-                });
-
-                response = await github.Git.Tree.Create(repoOwner, repoName, tree);
-            }
-
-            var commit = new NewCommit("Create pipeline", response.Sha);
-            var commitResponse = await github.Git.Commit.Create(repoOwner, repoName, commit);
-
-            await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commitResponse.Sha, true));
+                    [cicdFileName] = "bucket-only.template.yml"
+                },
+                force: true
+            );
 
             #endregion
 
@@ -116,33 +131,21 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
         {
             #region Create Commit on Test Branch
 
-            var assembly = Assembly.GetExecutingAssembly();
-            TreeResponse response;
-
-            using (var stream = assembly.GetManifestResourceStream("GithubWebhookEndToEnd.Resources.bucket-only.template.yml"))
-            using (var reader = new StreamReader(stream))
-            {
-                var tree = new NewTree
+            var commitResponse = await github.Git.CreateCommit(
+                repoOwner: repoOwner,
+                repoName: repoName,
+                before: null,
+                branch: "test",
+                message: "Create pipeline",
+                files: new Dictionary<string, string>
                 {
-                    BaseTree = baseTree
-                };
-
-                tree.Tree.Add(new NewTreeItem
-                {
-                    Path = cicdFileName,
-                    Mode = "100644",
-                    Content = await reader.ReadToEndAsync()
-                });
-
-                response = await github.Git.Tree.Create(repoOwner, repoName, tree);
-            }
-
-            var commit = new NewCommit("Create pipeline", response.Sha, baseTree);
-            var commitResponse = await github.Git.Commit.Create(repoOwner, repoName, commit);
-
-            await github.Git.Reference.Create(repoOwner, repoName, new NewReference("heads/test", commitResponse.Sha));
+                    [cicdFileName] = "bucket-only.template.yml"
+                },
+                force: true
+            );
 
             #endregion
+
             await Task.Delay(2000);
 
             try
@@ -166,79 +169,61 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             var region = Environment.GetEnvironmentVariable("AWS_REGION");
 
             Commit commit1, commit2, commit3;
-
             string pipelineDefinition = null;
 
-            TreeResponse response;
+            #region Get the Pipeline Definition
+            using (var stream = assembly.GetManifestResourceStream($"GithubWebhookEndToEnd.Resources.pipeline.asl.json"))
+            {
+                pipelineDefinition = await stream.ReadAsString();
+            }
+            #endregion
 
             #region Create Commit on Master
-            {
-                using (var cicdFileStream = assembly.GetManifestResourceStream("GithubWebhookEndToEnd.Resources.state-machine.template.yml"))
-                using (var cicdFileReader = new StreamReader(cicdFileStream))
-                using (var pipelineFileStream = assembly.GetManifestResourceStream("GithubWebhookEndToEnd.Resources.pipeline.asl.json"))
-                using (var pipelineFileReader = new StreamReader(pipelineFileStream))
+
+            commit1 = await github.Git.CreateCommit(
+                repoOwner: repoOwner,
+                repoName: repoName,
+                before: null,
+                branch: "master",
+                message: "Create pipeline",
+                files: new Dictionary<string, string>
                 {
-                    pipelineDefinition = await pipelineFileReader.ReadToEndAsync();
+                    [cicdFileName] = "state-machine.template.yml",
+                    [pipelineFileName] = "pipeline.asl.json"
+                },
+                force: true
+            );
 
-                    var tree1 = new NewTree { };
-
-                    tree1.Tree.Add(new NewTreeItem
-                    {
-                        Path = cicdFileName,
-                        Mode = "100644",
-                        Content = await cicdFileReader.ReadToEndAsync()
-                    });
-
-                    tree1.Tree.Add(new NewTreeItem
-                    {
-                        Path = pipelineFileName,
-                        Mode = "100644",
-                        Content = pipelineDefinition
-                    });
-
-                    response = await github.Git.Tree.Create(repoOwner, repoName, tree1);
-                }
-
-                var commit = new NewCommit("Create pipeline", response.Sha);
-                commit1 = await github.Git.Commit.Create(repoOwner, repoName, commit);
-
-                await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit1.Sha, true));
-            }
             #endregion
 
             #region Assert State Machine was Created
+
+            await cloudformation.WaitUntilStackHasStatus(stackName, "CREATE_COMPLETE", 30);
+
+            var stateMachineResponse = await stepFunctionsClient.DescribeStateMachineAsync(new DescribeStateMachineRequest
             {
-                await cloudformation.WaitUntilStackHasStatus(stackName, "CREATE_COMPLETE", 30);
+                StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:cfn-test-repo-cicd-pipeline",
+            });
 
-                var stateMachineResponse = await stepFunctionsClient.DescribeStateMachineAsync(new DescribeStateMachineRequest
-                {
-                    StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:cfn-test-repo-cicd-pipeline",
-                });
+            Assert.That(stateMachineResponse.Definition, Is.EqualTo(pipelineDefinition));
 
-                Assert.That(stateMachineResponse.Definition, Is.EqualTo(pipelineDefinition));
-            }
             #endregion
 
             #region Create Another Commit 
-            {
-                var updatedTree = new NewTree
+
+            commit2 = await github.Git.CreateCommit(
+                repoOwner: repoOwner,
+                repoName: repoName,
+                before: commit1.Sha,
+                branch: "master",
+                message: "Add README",
+                files: new Dictionary<string, string>
                 {
-                    BaseTree = commit1.Sha
-                };
+                    ["README.md"] = "README.md.1",
+                },
+                force: true
+            );
 
-                updatedTree.Tree.Add(new NewTreeItem
-                {
-                    Path = "README.md",
-                    Mode = "100644",
-                    Content = "Poke"
-                });
-
-                var updatedTreeResponse = await github.Git.Tree.Create(repoOwner, repoName, updatedTree);
-                var commit = new NewCommit("Poke", updatedTreeResponse.Sha, commit1.Sha);
-
-                commit2 = await github.Git.Commit.Create(repoOwner, repoName, commit);
-                await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit2.Sha));
-            }
             #endregion
 
             #region Assert Execution was Created
@@ -255,25 +240,20 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             #endregion
 
             #region Create Commit with [skip ci] in the message
-            {
-                var updatedTree = new NewTree
+
+            commit3 = await github.Git.CreateCommit(
+                repoOwner: repoOwner,
+                repoName: repoName,
+                before: commit2.Sha,
+                branch: "master",
+                message: "Add README [skip ci]",
+                files: new Dictionary<string, string>
                 {
-                    BaseTree = commit2.Sha
-                };
+                    ["README.md"] = "README.md.2",
+                },
+                force: true
+            );
 
-                updatedTree.Tree.Add(new NewTreeItem
-                {
-                    Path = "README.md",
-                    Mode = "100644",
-                    Content = "Poke 2"
-                });
-
-                var updatedTreeResponse = await github.Git.Tree.Create(repoOwner, repoName, updatedTree);
-                var commit = new NewCommit("Poke [skip ci]", updatedTreeResponse.Sha, commit2.Sha);
-
-                commit3 = await github.Git.Commit.Create(repoOwner, repoName, commit);
-                await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit3.Sha));
-            }
             #endregion
 
             #region Assert No Execution was Created

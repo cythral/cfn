@@ -16,6 +16,8 @@
     <EmbeddedResource Include="Resources/bucket-only.template.yml" />
     <EmbeddedResource Include="Resources/state-machine.template.yml" />
     <EmbeddedResource Include="Resources/pipeline.asl.json" />
+    <EmbeddedResource Include="Resources/README.md.1" />
+    <EmbeddedResource Include="Resources/README.md.2" />
   </ItemGroup>
 
   <ItemGroup>
