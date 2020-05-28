@@ -373,6 +373,7 @@ Resources:
       Environment:
         Variables:
           GITHUB_TOKEN: !Ref GithubToken
+          AWS_ACCOUNT_ID: !Ref AWS::AccountId
 
   GithubWebhoookEndToEndTestRunner:
     Type: Custom::TestRunner
