@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
+using System.Linq;
 using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -12,9 +13,12 @@ using Cythral.CloudFormation.AwsUtils.KeyManagementService;
 
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
+using Amazon.StepFunctions;
+using Amazon.StepFunctions.Model;
 
 namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
 {
+    [SingleThreaded]
     public class EndToEndTests
     {
         private static KmsDecryptFacade kmsDecryptFacade = new KmsDecryptFacade();
@@ -23,6 +27,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
         private const string repoName = "cfn-test-repo";
         private const string stackName = "cfn-test-repo-cicd";
         private const string cicdFileName = "cicd.template.yml";
+        private const string pipelineFileName = "pipeline.asl.json";
 
         private GitHubClient github;
         private IAmazonCloudFormation cloudformation;
@@ -69,7 +74,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
         }
 
         [Test(Description = "Pushing to master creates a simple CICD Stack")]
-        public async Task PushToMasterCreatesSimpleCicdStack()
+        public async Task PushToMaster()
         {
             #region Create Commit on Master
 
@@ -94,8 +99,6 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
                 response = await github.Git.Tree.Create(repoOwner, repoName, tree);
             }
 
-            Console.WriteLine(Serialize(response));
-
             var commit = new NewCommit("Create pipeline", response.Sha, baseTree);
             var commitResponse = await github.Git.Commit.Create(repoOwner, repoName, commit);
 
@@ -107,7 +110,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
         }
 
         [Test(Description = "Pushing to a non default branch does not create a cicd stack")]
-        public async Task PushToNonDefaultBranchDoesntCreateCicdStack()
+        public async Task PushToNonDefaultBranch()
         {
             #region Create Commit on Test Branch
 
@@ -132,8 +135,6 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
                 response = await github.Git.Tree.Create(repoOwner, repoName, tree);
             }
 
-            Console.WriteLine(Serialize(response));
-
             var commit = new NewCommit("Create pipeline", response.Sha, baseTree);
             var commitResponse = await github.Git.Commit.Create(repoOwner, repoName, commit);
 
@@ -151,6 +152,104 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             {
                 Assert.Pass();
             }
+        }
+
+        [Test(Description = "Pushing to the default branch with a pipeline.asl.json uploads the file to S3 and its bucket/key are passed into the cicd template")]
+        public async Task PushToMasterWithPipeline()
+        {
+            var stepFunctionsClient = new AmazonStepFunctionsClient();
+            var assembly = Assembly.GetExecutingAssembly();
+            string pipelineDefinition = null;
+
+            TreeResponse response;
+
+            #region Create Commit on Master
+
+            using (var cicdFileStream = assembly.GetManifestResourceStream("GithubWebhookEndToEnd.Resources.state-machine.template.yml"))
+            using (var cicdFileReader = new StreamReader(cicdFileStream))
+            using (var pipelineFileStream = assembly.GetManifestResourceStream("GithubWebhookEndToEnd.Resources.pipeline.asl.json"))
+            using (var pipelineFileReader = new StreamReader(pipelineFileStream))
+            {
+                pipelineDefinition = await pipelineFileReader.ReadToEndAsync();
+
+                var tree1 = new NewTree
+                {
+                    BaseTree = baseTree
+                };
+
+                tree1.Tree.Add(new NewTreeItem
+                {
+                    Path = cicdFileName,
+                    Mode = "100644",
+                    Content = await cicdFileReader.ReadToEndAsync()
+                });
+
+                tree1.Tree.Add(new NewTreeItem
+                {
+                    Path = pipelineFileName,
+                    Mode = "100644",
+                    Content = pipelineDefinition
+                });
+
+                response = await github.Git.Tree.Create(repoOwner, repoName, tree1);
+            }
+
+            var commit1 = new NewCommit("Create pipeline", response.Sha, baseTree);
+            var commit1Response = await github.Git.Commit.Create(repoOwner, repoName, commit1);
+
+            await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit1Response.Sha));
+
+            #endregion
+
+            #region Assert State Machine was Created
+
+            await cloudformation.WaitUntilStackHasStatus(stackName, "CREATE_COMPLETE", 30);
+
+            var accountId = Environment.GetEnvironmentVariable("AWS_ACCOUNT_ID");
+            var region = Environment.GetEnvironmentVariable("AWS_REGION");
+
+            var stateMachineResponse = await stepFunctionsClient.DescribeStateMachineAsync(new DescribeStateMachineRequest
+            {
+                StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:cfn-test-repo-cicd-pipeline",
+            });
+
+            Assert.That(stateMachineResponse.Definition, Is.EqualTo(pipelineDefinition));
+
+            #endregion
+
+            #region Create Another Commit 
+
+            var updatedTree = new NewTree
+            {
+                BaseTree = commit1Response.Sha
+            };
+
+            updatedTree.Tree.Add(new NewTreeItem
+            {
+                Path = "README.md",
+                Mode = "100644",
+                Content = "Poke"
+            });
+
+            var updatedTreeResponse = await github.Git.Tree.Create(repoOwner, repoName, updatedTree);
+            var commit2 = new NewCommit("Poke", updatedTreeResponse.Sha, commit1Response.Sha);
+            var commit2Response = await github.Git.Commit.Create(repoOwner, repoName, commit2);
+            var updatedReferenceResponse = await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit2Response.Sha));
+
+            #endregion
+
+            await Task.Delay(3000);
+
+            #region Assert Execution was Created
+
+            var executionResponse = await stepFunctionsClient.ListExecutionsAsync(new ListExecutionsRequest
+            {
+                StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:cfn-test-repo-cicd-pipeline",
+            });
+
+            Assert.True(executionResponse.Executions.Any(execution => execution.Name == commit2Response.Sha));
+
+            #endregion
         }
     }
 }
