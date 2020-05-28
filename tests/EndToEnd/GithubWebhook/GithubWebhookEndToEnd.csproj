@@ -16,10 +16,10 @@
     <EmbeddedResource Include="Resources/bucket-only.template.yml" />
     <EmbeddedResource Include="Resources/state-machine.template.yml" />
     <EmbeddedResource Include="Resources/pipeline.asl.json" />
-  </ItemGroup> 
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Core\AwsUtils\KeyManagementService\KeyManagementService.csproj" />
-  </ItemGroup>  
+  </ItemGroup>
 
 </Project>

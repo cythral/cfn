@@ -43,15 +43,20 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             github = new GitHubClient(headerValue);
             github.Credentials = new Credentials(token);
 
-            if (await github.Repository.Exists(repoOwner, repoName))
+            if (!await github.Repository.Exists(repoOwner, repoName))
             {
-                await github.Repository.Delete(repoOwner, repoName);
+                await github.Repository.Create(repoOwner, new NewRepository(repoName)
+                {
+                    AutoInit = true,
+                    Private = true
+                });
             }
 
-            await github.Repository.Create(repoOwner, new NewRepository(repoName)
+            try
             {
-                AutoInit = true
-            });
+                await github.Git.Reference.Delete(repoOwner, repoName, "heads/test");
+            }
+            catch (Exception) { }
 
             var response = await github.Git.Tree.Get(repoOwner, repoName, "refs/heads/master");
             baseTree = response.Sha;
@@ -84,10 +89,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             using (var stream = assembly.GetManifestResourceStream("GithubWebhookEndToEnd.Resources.bucket-only.template.yml"))
             using (var reader = new StreamReader(stream))
             {
-                var tree = new NewTree
-                {
-                    BaseTree = baseTree
-                };
+                var tree = new NewTree { };
 
                 tree.Tree.Add(new NewTreeItem
                 {
@@ -99,10 +101,10 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
                 response = await github.Git.Tree.Create(repoOwner, repoName, tree);
             }
 
-            var commit = new NewCommit("Create pipeline", response.Sha, baseTree);
+            var commit = new NewCommit("Create pipeline", response.Sha);
             var commitResponse = await github.Git.Commit.Create(repoOwner, repoName, commit);
 
-            await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commitResponse.Sha));
+            await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commitResponse.Sha, true));
 
             #endregion
 
@@ -178,10 +180,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
                 {
                     pipelineDefinition = await pipelineFileReader.ReadToEndAsync();
 
-                    var tree1 = new NewTree
-                    {
-                        BaseTree = baseTree
-                    };
+                    var tree1 = new NewTree { };
 
                     tree1.Tree.Add(new NewTreeItem
                     {
@@ -200,10 +199,10 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
                     response = await github.Git.Tree.Create(repoOwner, repoName, tree1);
                 }
 
-                var commit = new NewCommit("Create pipeline", response.Sha, baseTree);
+                var commit = new NewCommit("Create pipeline", response.Sha);
                 commit1 = await github.Git.Commit.Create(repoOwner, repoName, commit);
 
-                await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit1.Sha));
+                await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit1.Sha, true));
             }
             #endregion
 
@@ -255,25 +254,25 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             }
             #endregion
 
-            #region Create Commit with [no ci] in the message
+            #region Create Commit with [skip ci] in the message
             {
                 var updatedTree = new NewTree
                 {
-                    BaseTree = commit1.Sha
+                    BaseTree = commit2.Sha
                 };
 
                 updatedTree.Tree.Add(new NewTreeItem
                 {
                     Path = "README.md",
                     Mode = "100644",
-                    Content = "Poke"
+                    Content = "Poke 2"
                 });
 
                 var updatedTreeResponse = await github.Git.Tree.Create(repoOwner, repoName, updatedTree);
-                var commit = new NewCommit("Poke [no ci]", updatedTreeResponse.Sha, commit1.Sha);
+                var commit = new NewCommit("Poke [skip ci]", updatedTreeResponse.Sha, commit2.Sha);
 
                 commit3 = await github.Git.Commit.Create(repoOwner, repoName, commit);
-                await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit2.Sha));
+                await github.Git.Reference.Update(repoOwner, repoName, "heads/master", new ReferenceUpdate(commit3.Sha));
             }
             #endregion
 
