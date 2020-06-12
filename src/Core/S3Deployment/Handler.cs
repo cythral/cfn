@@ -37,7 +37,7 @@ namespace Cythral.CloudFormation.S3Deployment
 
             try
             {
-                await MarkExistingObjectsAsDirty(request.DestinationBucket);
+                await MarkExistingObjectsAsDirty(request.RoleArn, request.DestinationBucket);
 
                 using (var stream = await s3GetObjectFacade.GetObjectStream(request.ZipLocation))
                 using (var zipStream = new ZipArchive(stream))
@@ -64,9 +64,9 @@ namespace Cythral.CloudFormation.S3Deployment
             };
         }
 
-        private static async Task MarkExistingObjectsAsDirty(string destinationBucket)
+        private static async Task MarkExistingObjectsAsDirty(string roleArn, string destinationBucket)
         {
-            using (var client = await s3Factory.Create())
+            using (var client = await s3Factory.Create(roleArn))
             {
                 var response = await client.ListObjectsV2Async(new ListObjectsV2Request
                 {
