@@ -165,6 +165,8 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             await s3Client.Received().ListObjectsV2Async(Arg.Is<ListObjectsV2Request>(req => req.BucketName == destinationBucket));
         }
 
+
+
         [Test]
         public async Task ShouldMarkExistingObjectsAsDirty([ValueSource("existingObjectKeys")] string objectKey)
         {
@@ -290,7 +292,8 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             s3Client.PutObjectAsync(null).ReturnsForAnyArgs<PutObjectResponse>(x => { throw new Exception(); });
 
             var request = CreateRequest();
-            await Handler.Handle(request);
+
+            Assert.ThrowsAsync<Exception>(() => Handler.Handle(request));
 
             await putCommitStatusFacade.DidNotReceive().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Success &&
@@ -310,7 +313,8 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             s3Client.PutObjectAsync(null).ReturnsForAnyArgs<PutObjectResponse>(x => { throw new Exception(); });
 
             var request = CreateRequest();
-            await Handler.Handle(request);
+
+            Assert.ThrowsAsync<Exception>(() => Handler.Handle(request));
 
             await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Failure &&
@@ -332,7 +336,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             var request = CreateRequest();
             request.ProjectName = null;
 
-            await Handler.Handle(request);
+            Assert.ThrowsAsync<Exception>(() => Handler.Handle(request));
 
             await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
                 req.CommitState == CommitState.Failure &&
