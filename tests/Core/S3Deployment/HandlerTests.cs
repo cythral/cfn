@@ -65,7 +65,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             TestUtils.SetPrivateStaticField(typeof(Handler), "s3GetObjectFacade", s3GetObjectFacade);
 
             s3Factory.ClearSubstitute();
-            s3Factory.Create(Arg.Any<string>()).Returns(s3Client);
+            s3Factory.Create(Arg.Is(roleArn)).Returns(s3Client);
 
             s3Client.ClearSubstitute();
 
@@ -143,6 +143,16 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 req.CommitState == CommitState.Pending &&
                 req.ProjectName == destinationBucket
             ));
+        }
+
+        [Test]
+        public async Task ShouldCreateClientWithRoleArn()
+        {
+            var request = CreateRequest();
+
+            await Handler.Handle(request);
+
+            await s3Factory.Received(3).Create(Arg.Is(roleArn));
         }
 
         [Test]
