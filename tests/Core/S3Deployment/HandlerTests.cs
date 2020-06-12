@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -43,6 +44,20 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
         private const string environmentName = "environmentName";
         private const string projectName = "projectName";
 
+        private const string existingObject1Key = "object1";
+        private const string existingObject2Key = "object2";
+
+        private static List<string> existingObjectKeys = new List<string> {
+            existingObject1Key,
+            existingObject2Key
+        };
+
+        private static List<S3Object> objects = new List<S3Object>
+        {
+            new S3Object { Key = existingObject1Key },
+            new S3Object { Key = existingObject2Key }
+        };
+
         [SetUp]
         public void SetupS3()
         {
@@ -53,7 +68,13 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             s3Factory.Create(Arg.Any<string>()).Returns(s3Client);
 
             s3Client.ClearSubstitute();
+
             s3GetObjectFacade.GetObjectStream(Arg.Any<string>()).Returns(TestZipFile.Stream);
+            s3Client.ListObjectsV2Async(Arg.Any<ListObjectsV2Request>()).Returns(new ListObjectsV2Response
+            {
+                S3Objects = objects
+            });
+
         }
 
         [SetUp]
@@ -125,6 +146,32 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
         }
 
         [Test]
+        public async Task ShouldListObjects()
+        {
+            var request = CreateRequest();
+
+            await Handler.Handle(request);
+
+            await s3Client.Received().ListObjectsV2Async(Arg.Is<ListObjectsV2Request>(req => req.BucketName == destinationBucket));
+        }
+
+        [Test]
+        public async Task ShouldMarkExistingObjectsAsDirty([ValueSource("existingObjectKeys")] string objectKey)
+        {
+            var request = CreateRequest();
+
+            await Handler.Handle(request);
+
+            await s3Client.Received().PutObjectTaggingAsync(
+                Arg.Is<PutObjectTaggingRequest>(req =>
+                    req.BucketName == destinationBucket &&
+                    req.Key == objectKey &&
+                    req.Tagging.TagSet.Any(tag => tag.Key == "dirty" && tag.Value == "true")
+                )
+            );
+        }
+
+        [Test]
         public async Task ShouldGetObjectStream()
         {
             var request = CreateRequest();
@@ -154,10 +201,11 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             var request = CreateRequest();
             await Handler.Handle(request);
 
-            await s3Client.PutObjectAsync(Arg.Is<PutObjectRequest>(req =>
+            await s3Client.Received().PutObjectAsync(Arg.Is<PutObjectRequest>(req =>
                 req.BucketName == destinationBucket &&
                 req.Key == "README.txt" &&
-                req.Headers.ContentLength == 3
+                req.Headers.ContentLength == 3 &&
+                req.TagSet.Count == 0
             ));
 
             Assert.That(streamContents, Is.EqualTo("hi\n"));
@@ -184,10 +232,11 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             var request = CreateRequest();
             await Handler.Handle(request);
 
-            await s3Client.PutObjectAsync(Arg.Is<PutObjectRequest>(req =>
+            await s3Client.Received().PutObjectAsync(Arg.Is<PutObjectRequest>(req =>
                 req.BucketName == destinationBucket &&
                 req.Key == "LICENSE.txt" &&
-                req.Headers.ContentLength == 5
+                req.Headers.ContentLength == 5 &&
+                req.TagSet.Count == 0
             ));
 
             Assert.That(streamContents, Is.EqualTo("test\n"));

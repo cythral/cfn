@@ -37,6 +37,8 @@ namespace Cythral.CloudFormation.S3Deployment
 
             try
             {
+                await MarkExistingObjectsAsDirty(request.DestinationBucket);
+
                 using (var stream = await s3GetObjectFacade.GetObjectStream(request.ZipLocation))
                 using (var zipStream = new ZipArchive(stream))
                 {
@@ -44,7 +46,8 @@ namespace Cythral.CloudFormation.S3Deployment
                     var role = request.RoleArn;
                     var entries = zipStream.Entries.ToList();
                     var tasks = entries.Select(entry => UploadEntry(entry, bucket, role));
-                    Task.WaitAll(tasks.ToArray());
+
+                    await Task.WhenAll(tasks);
                 }
 
                 await PutCommitStatus(request, CommitState.Success);
@@ -61,6 +64,39 @@ namespace Cythral.CloudFormation.S3Deployment
             };
         }
 
+        private static async Task MarkExistingObjectsAsDirty(string destinationBucket)
+        {
+            using (var client = await s3Factory.Create())
+            {
+                var response = await client.ListObjectsV2Async(new ListObjectsV2Request
+                {
+                    BucketName = destinationBucket
+                });
+
+                var tasks = new List<Task>();
+
+                foreach (var obj in response.S3Objects)
+                {
+                    tasks.Add(
+                        client.PutObjectTaggingAsync(new PutObjectTaggingRequest
+                        {
+                            BucketName = destinationBucket,
+                            Key = obj.Key,
+                            Tagging = new Tagging
+                            {
+                                TagSet = new List<Tag>
+                                {
+                                    new Tag { Key = "dirty", Value = "true" }
+                                }
+                            }
+                        })
+                    );
+                }
+
+                await Task.WhenAll(tasks);
+            }
+        }
+
         private static async Task UploadEntry(ZipArchiveEntry entry, string bucket, string role)
         {
             var method = entry.GetType().GetMethod("OpenInReadMode", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -73,6 +109,7 @@ namespace Cythral.CloudFormation.S3Deployment
                     BucketName = bucket,
                     Key = entry.FullName,
                     InputStream = stream,
+                    TagSet = new List<Tag> { }
                 };
 
                 request.Headers.ContentLength = entry.Length;
