@@ -55,7 +55,9 @@ namespace Cythral.CloudFormation.S3Deployment
             catch (Exception e)
             {
                 Console.WriteLine($"Got an error uploading files: {e.Message} {e.StackTrace}");
+
                 await PutCommitStatus(request, CommitState.Failure);
+                throw e;
             }
 
             return new Response
