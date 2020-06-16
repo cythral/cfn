@@ -88,18 +88,18 @@ Resources:
       ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
       Priority: 2
       Actions:
-        - Type: authenticate-oidc
-          Order: 1
-          AuthenticateOidcConfig:
-            Issuer: https://accounts.google.com
-            AuthorizationEndpoint: https://accounts.google.com/o/oauth2/v2/auth
-            TokenEndpoint: https://oauth2.googleapis.com/token
-            UserInfoEndpoint: https://openidconnect.googleapis.com/v1/userinfo
-            ClientId: !ImportValue sso-aws-registry:DevGoogleClientId
-            ClientSecret: !GetAtt DecryptedDevClientSecret.Plaintext
-            SessionTimeout: 86400
+        # - Type: authenticate-oidc
+        #   Order: 1
+        #   AuthenticateOidcConfig:
+        #     Issuer: https://accounts.google.com
+        #     AuthorizationEndpoint: https://accounts.google.com/o/oauth2/v2/auth
+        #     TokenEndpoint: https://oauth2.googleapis.com/token
+        #     UserInfoEndpoint: https://openidconnect.googleapis.com/v1/userinfo
+        #     ClientId: !ImportValue sso-aws-registry:DevGoogleClientId
+        #     ClientSecret: !GetAtt DecryptedDevClientSecret.Plaintext
+        #     SessionTimeout: 86400
         - Type: forward
-          Order: 2
+          Order: 1
           TargetGroupArn: !ImportValue cfn-gateway:DevTargetGroupArn
       Conditions:
         - Field: host-header
@@ -108,11 +108,11 @@ Resources:
               - "dev.*"
               - "*.dev.*"
 
-  DecryptedDevClientSecret:
-    Type: Custom::Secret
-    Properties:
-      ServiceToken: !ImportValue cfn-secret-resource:SecretLambdaArn
-      Ciphertext: !ImportValue sso-aws-registry:DevGoogleClientSecret
+  # DecryptedDevClientSecret:
+  #   Type: Custom::Secret
+  #   Properties:
+  #     ServiceToken: !ImportValue cfn-secret-resource:SecretLambdaArn
+  #     Ciphertext: !ImportValue sso-aws-registry:DevGoogleClientSecret
 
   DevTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -546,18 +546,18 @@ Resources:
       ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
       Priority: 3
       Actions:
-        - Type: authenticate-oidc
-          Order: 1
-          AuthenticateOidcConfig:
-            Issuer: https://accounts.google.com
-            AuthorizationEndpoint: https://accounts.google.com/o/oauth2/v2/auth
-            TokenEndpoint: https://oauth2.googleapis.com/token
-            UserInfoEndpoint: https://openidconnect.googleapis.com/v1/userinfo
-            ClientId: !ImportValue sso-aws-registry:SharedGoogleClientId
-            ClientSecret: !GetAtt DecryptedSharedClientSecret.Plaintext
-            SessionTimeout: 86400
+        # - Type: authenticate-oidc
+        #   Order: 1
+        #   AuthenticateOidcConfig:
+        #     Issuer: https://accounts.google.com
+        #     AuthorizationEndpoint: https://accounts.google.com/o/oauth2/v2/auth
+        #     TokenEndpoint: https://oauth2.googleapis.com/token
+        #     UserInfoEndpoint: https://openidconnect.googleapis.com/v1/userinfo
+        #     ClientId: !ImportValue sso-aws-registry:SharedGoogleClientId
+        #     ClientSecret: !GetAtt DecryptedSharedClientSecret.Plaintext
+        #     SessionTimeout: 86400
         - Type: forward
-          Order: 2
+          Order: 1
           TargetGroupArn: !Ref ApprovalWebhookTargetGroup
       Conditions:
         - Field: host-header
@@ -569,11 +569,11 @@ Resources:
             Values:
               - /webhooks/approval
 
-  DecryptedSharedClientSecret:
-    Type: Custom::Secret
-    Properties:
-      ServiceToken: !ImportValue cfn-secret-resource:SecretLambdaArn
-      Ciphertext: !ImportValue sso-aws-registry:SharedGoogleClientSecret
+  # DecryptedSharedClientSecret:
+  #   Type: Custom::Secret
+  #   Properties:
+  #     ServiceToken: !ImportValue cfn-secret-resource:SecretLambdaArn
+  #     Ciphertext: !ImportValue sso-aws-registry:SharedGoogleClientSecret
 
   ApprovalTopic:
     Type: AWS::SNS::Topic
