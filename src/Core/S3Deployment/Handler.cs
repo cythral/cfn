@@ -45,9 +45,12 @@ namespace Cythral.CloudFormation.S3Deployment
                     var bucket = request.DestinationBucket;
                     var role = request.RoleArn;
                     var entries = zipStream.Entries.ToList();
-                    var tasks = entries.Select(entry => UploadEntry(entry, bucket, role));
 
-                    await Task.WhenAll(tasks);
+                    // zip archive operations not thread safe
+                    foreach (var entry in entries)
+                    {
+                        await UploadEntry(entry, bucket, role);
+                    }
                 }
 
                 await PutCommitStatus(request, CommitState.Success);
