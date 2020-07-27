@@ -59,7 +59,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
 
             if (request.ResourceType == "AWS::CloudFormation::Stack" && request.ClientRequestToken.Length > 0)
             {
-                if (status.EndsWith("ROLLBACK_COMPLETE") || status.EndsWith("FAILED"))
+                if (status == "DELETE_COMPLETE" || status.EndsWith("ROLLBACK_COMPLETE") || status.EndsWith("FAILED"))
                 {
                     await SendFailure(request, client);
                 }

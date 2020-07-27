@@ -192,6 +192,39 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             await stepFunctionsClient.DidNotReceiveWithAnyArgs().SendTaskSuccessAsync(Arg.Any<SendTaskSuccessRequest>());
         }
 
+        public class StatusIsDeleteComplete
+        {
+            private string status = "DELETE_COMPLETE";
+            private StackDeploymentStatusRequest request;
+            private SNSEvent snsEvent;
+
+            [SetUp]
+            public void SetupRequest()
+            {
+                s3GetObjectFacade.ClearReceivedCalls();
+                stepFunctionsClient.ClearReceivedCalls();
+                sqsFactory.ClearReceivedCalls();
+                sqsClient.ClearReceivedCalls();
+                putCommitStatusFacade.ClearReceivedCalls();
+                cloudFormationClient.ClearReceivedCalls();
+                cloudFormationFactory.ClearReceivedCalls();
+
+                request = CreateRequest(stackId, tokenKey, status);
+                snsEvent = Substitute.For<SNSEvent>();
+            }
+
+            [Test]
+            public async Task FailureIsSent()
+            {
+                await Handler.Handle(snsEvent);
+
+                await s3GetObjectFacade.Received().GetObject(Arg.Is(s3Location));
+                await stepFunctionsClient
+                    .Received()
+                    .SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req => req.TaskToken == token && req.Cause == status));
+            }
+        }
+
 
         public class StatusEndsWithRollbackComplete
         {
