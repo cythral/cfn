@@ -1,264 +1,234 @@
 {
-    "StartAt": "Build",
-    "States": {
-        "Build": {
-            "Type": "Task",
-            "Resource": "arn:aws:states:::codebuild:startBuild.sync",
-            "Parameters": {
-                "ProjectName": "${BuildProject}",
-                "SourceVersion.$": "$.head_commit.id"
-            },
-            "ResultPath": "$.BuildOutput",
-            "Next": "On Default Branch?"
+  "StartAt": "Build",
+  "States": {
+    "Build": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::codebuild:startBuild.sync",
+      "Parameters": {
+        "ProjectName": "${BuildProject}",
+        "SourceVersion.$": "$.head_commit.id"
+      },
+      "ResultPath": "$.BuildOutput",
+      "Next": "On Default Branch?"
+    },
+    "On Default Branch?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.on_default_branch",
+          "BooleanEquals": true,
+          "Next": "Check if Superseded"
         },
-        "On Default Branch?": {
-            "Type": "Choice",
-            "Choices": [
-                {
-                    "Variable": "$.on_default_branch",
-                    "BooleanEquals": true,
-                    "Next": "Check if Superseded"
-                },
-                {
-                    "Variable": "$.on_default_branch",
-                    "BooleanEquals": false,
-                    "Next": "Success"
-                }
-            ]
-        },
-        "Check if Superseded": {
-            "Type": "Task",
-            "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
-            "ResultPath": "$.SupersededOutput",
-            "Next": "Was Superseded?",
-            "Parameters": {
-                "QueueUrl": "${SupersessionQueue}",
-                "MessageGroupId": "${GithubRepo}",
-                "MessageBody": {
-                    "Pipeline": "${GithubRepo}",
-                    "CommitTimestamp.$": "$.head_commit.timestamp",
-                    "Token.$": "$$.Task.Token"
-                }
-            }
-        },
-        "Was Superseded?": {
-            "Type": "Choice",
-            "Choices": [
-                {
-                    "Variable": "$.SupersededOutput.Superseded",
-                    "BooleanEquals": true,
-                    "Next": "Success"
-                },
-                {
-                    "Variable": "$.SupersededOutput.Superseded",
-                    "BooleanEquals": false,
-                    "Next": "Retrieve Network Config"
-                }
-            ]
-        },
-        "Retrieve Network Config": {
-            "Type": "Task",
-            "Resource": "${FileFromZipArn}",
-            "ResultPath": "$.NetworkingConfig",
-            "Parameters": {
-                "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
-                "Filename": "Networking.config.json"
-            },
-            "Next": "Deploy Utilities to Shared"
-        },
-        "Deploy Utilities to Shared": {
-            "Type": "Task",
-            "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
-            "ResultPath": "$.UtilityOutputs.Shared",
-            "Parameters": {
-                "QueueUrl": "${DeploymentQueue}",
-                "MessageGroupId": "${GithubRepo}",
-                "MessageBody": {
-                    "StackName": "cfn-utilities",
-                    "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
-                    "TemplateFileName": "Utilities.template.yml",
-                    "RoleArn": "${SharedRoleArn}",
-                    "Token.$": "$$.Task.Token",
-                    "Capabilities": [
-                        "CAPABILITY_NAMED_IAM"
-                    ],
-                    "EnvironmentName": "shared",
-                    "CommitInfo": {
-                        "GithubOwner": "${GithubOwner}",
-                        "GithubRepository": "${GithubRepo}",
-                        "GithubRef.$": "$.head_commit.id"
-                    }
-                }
-            },
-            "Next": "Deploy Utilities to Agents"
-        },
-        "Deploy Utilities to Agents": {
-            "Type": "Parallel",
-            "ResultPath": "$.UtilityOutputs.Agents",
-            "Branches": [
-                {
-                    "StartAt": "Dev",
-                    "States": {
-                        "Dev": {
-                            "Type": "Task",
-                            "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
-                            "Parameters": {
-                                "QueueUrl": "${DeploymentQueue}",
-                                "MessageGroupId": "${GithubRepo}-utilities-dev",
-                                "MessageBody": {
-                                    "StackName": "cfn-utilities",
-                                    "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
-                                    "TemplateFileName": "Utilities.template.yml",
-                                    "RoleArn": "${DevRoleArn}",
-                                    "Token.$": "$$.Task.Token",
-                                    "ParameterOverrides": {
-                                        "MasterAccountId": "${AccountId}",
-                                        "NetworkCidr": "10.2.0.0/16",
-                                        "PeeringConnectionId.$": "$.NetworkingConfig.DevPeeringConnectionId"
-                                    },
-                                    "Capabilities": [
-                                        "CAPABILITY_NAMED_IAM"
-                                    ],
-                                    "EnvironmentName": "dev",
-                                    "CommitInfo": {
-                                        "GithubOwner": "${GithubOwner}",
-                                        "GithubRepository": "${GithubRepo}",
-                                        "GithubRef.$": "$.head_commit.id"
-                                    }
-                                }
-                            },
-                            "End": true
-                        }
-                    }
-                },
-                {
-                    "StartAt": "Prod",
-                    "States": {
-                        "Prod": {
-                            "Type": "Task",
-                            "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
-                            "Parameters": {
-                                "QueueUrl": "${DeploymentQueue}",
-                                "MessageGroupId": "${GithubRepo}-utilities-prod",
-                                "MessageBody": {
-                                    "StackName": "cfn-utilities",
-                                    "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
-                                    "TemplateFileName": "Utilities.template.yml",
-                                    "RoleArn": "${ProdRoleArn}",
-                                    "Token.$": "$$.Task.Token",
-                                    "ParameterOverrides": {
-                                        "MasterAccountId": "${AccountId}",
-                                        "NetworkCidr": "10.3.0.0/16",
-                                        "PeeringConnectionId.$": "$.NetworkingConfig.ProdPeeringConnectionId"
-                                    },
-                                    "Capabilities": [
-                                        "CAPABILITY_NAMED_IAM"
-                                    ],
-                                    "EnvironmentName": "prod",
-                                    "CommitInfo": {
-                                        "GithubOwner": "${GithubOwner}",
-                                        "GithubRepository": "${GithubRepo}",
-                                        "GithubRef.$": "$.head_commit.id"
-                                    }
-                                }
-                            },
-                            "End": true
-                        }
-                    }
-                }
-            ],
-            "Next": "Deploy DNS"
-        },
-        "Deploy DNS": {
-            "Type": "Task",
-            "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
-            "ResultPath": null,
-            "Parameters": {
-                "QueueUrl": "${DeploymentQueue}",
-                "MessageGroupId": "${GithubRepo}",
-                "MessageBody": {
-                    "StackName": "cfn-dns",
-                    "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
-                    "TemplateFileName": "Dns.template.yml",
-                    "TemplateConfigurationFileName": "Dns.config.json",
-                    "RoleArn": "${SharedRoleArn}",
-                    "Token.$": "$$.Task.Token",
-                    "Capabilities": [
-                        "CAPABILITY_IAM"
-                    ],
-                    "EnvironmentName": "shared",
-                    "CommitInfo": {
-                        "GithubOwner": "${GithubOwner}",
-                        "GithubRepository": "${GithubRepo}",
-                        "GithubRef.$": "$.head_commit.id"
-                    }
-                }
-            },
-            "Next": "Deploy Gateway"
-        },
-        "Deploy Gateway": {
-            "Type": "Task",
-            "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
-            "ResultPath": null,
-            "Parameters": {
-                "QueueUrl": "${DeploymentQueue}",
-                "MessageGroupId": "${GithubRepo}",
-                "MessageBody": {
-                    "StackName": "cfn-gateway",
-                    "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
-                    "TemplateFileName": "Gateway.template.yml",
-                    "RoleArn": "${SharedRoleArn}",
-                    "Token.$": "$$.Task.Token",
-                    "Capabilities": [
-                        "CAPABILITY_IAM"
-                    ],
-                    "EnvironmentName": "shared",
-                    "CommitInfo": {
-                        "GithubOwner": "${GithubOwner}",
-                        "GithubRepository": "${GithubRepo}",
-                        "GithubRef.$": "$.head_commit.id"
-                    }
-                }
-            },
-            "Next": "Deploy Core"
-        },
-        "Deploy Core": {
-            "Type": "Task",
-            "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
-            "ResultPath": null,
-            "Parameters": {
-                "QueueUrl": "${DeploymentQueue}",
-                "MessageGroupId": "${GithubRepo}",
-                "MessageBody": {
-                    "StackName": "cfn-core",
-                    "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
-                    "TemplateFileName": "Core.template.yml",
-                    "TemplateConfigurationFileName": "Core.config.json",
-                    "RoleArn": "${SharedRoleArn}",
-                    "Token.$": "$$.Task.Token",
-                    "ParameterOverrides": {
-                        "DevVpcId.$": "$.UtilityOutputs.Agents[0].VpcId",
-                        "ProdVpcId.$": "$.UtilityOutputs.Agents[1].VpcId",
-                        "DevLoadBalancerDnsName.$": "$.UtilityOutputs.Agents[0].LoadBalancerDnsName",
-                        "ProdLoadBalancerDnsName.$": "$.UtilityOutputs.Agents[1].LoadBalancerDnsName",
-                        "Version.$": "$.head_commit.id"
-                    },
-                    "Capabilities": [
-                        "CAPABILITY_IAM",
-                        "CAPABILITY_AUTO_EXPAND"
-                    ],
-                    "EnvironmentName": "shared",
-                    "CommitInfo": {
-                        "GithubOwner": "${GithubOwner}",
-                        "GithubRepository": "${GithubRepo}",
-                        "GithubRef.$": "$.head_commit.id"
-                    }
-                }
-            },
-            "Next": "Success"
-        },
-        "Success": {
-            "Type": "Succeed"
+        {
+          "Variable": "$.on_default_branch",
+          "BooleanEquals": false,
+          "Next": "Success"
         }
+      ]
+    },
+    "Check if Superseded": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+      "ResultPath": "$.SupersededOutput",
+      "Next": "Was Superseded?",
+      "Parameters": {
+        "QueueUrl": "${SupersessionQueue}",
+        "MessageGroupId": "${GithubRepo}",
+        "MessageBody": {
+          "Pipeline": "${GithubRepo}",
+          "CommitTimestamp.$": "$.head_commit.timestamp",
+          "Token.$": "$$.Task.Token"
+        }
+      }
+    },
+    "Was Superseded?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.SupersededOutput.Superseded",
+          "BooleanEquals": true,
+          "Next": "Success"
+        },
+        {
+          "Variable": "$.SupersededOutput.Superseded",
+          "BooleanEquals": false,
+          "Next": "Retrieve Network Config"
+        }
+      ]
+    },
+    "Retrieve Network Config": {
+      "Type": "Task",
+      "Resource": "${FileFromZipArn}",
+      "ResultPath": "$.NetworkingConfig",
+      "Parameters": {
+        "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+        "Filename": "Networking.config.json"
+      },
+      "Next": "Deploy Utilities to Shared"
+    },
+    "Deploy Utilities to Shared": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+      "ResultPath": "$.UtilityOutputs.Shared",
+      "Parameters": {
+        "QueueUrl": "${DeploymentQueue}",
+        "MessageGroupId": "${GithubRepo}",
+        "MessageBody": {
+          "StackName": "cfn-utilities",
+          "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+          "TemplateFileName": "Utilities.template.yml",
+          "RoleArn": "${SharedRoleArn}",
+          "Token.$": "$$.Task.Token",
+          "Capabilities": ["CAPABILITY_NAMED_IAM"],
+          "EnvironmentName": "shared",
+          "CommitInfo": {
+            "GithubOwner": "${GithubOwner}",
+            "GithubRepository": "${GithubRepo}",
+            "GithubRef.$": "$.head_commit.id"
+          }
+        }
+      },
+      "Next": "Deploy Dev Utilities"
+    },
+    "Deploy Dev Utilities": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+      "Parameters": {
+        "QueueUrl": "${DeploymentQueue}",
+        "MessageGroupId": "${GithubRepo}-utilities-dev",
+        "MessageBody": {
+          "StackName": "cfn-utilities",
+          "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+          "TemplateFileName": "Utilities.template.yml",
+          "RoleArn": "${DevRoleArn}",
+          "Token.$": "$$.Task.Token",
+          "ParameterOverrides": {
+            "MasterAccountId": "${AccountId}",
+            "NetworkCidr": "10.2.0.0/16",
+            "PeeringConnectionId.$": "$.NetworkingConfig.DevPeeringConnectionId"
+          },
+          "Capabilities": ["CAPABILITY_NAMED_IAM"],
+          "EnvironmentName": "dev",
+          "CommitInfo": {
+            "GithubOwner": "${GithubOwner}",
+            "GithubRepository": "${GithubRepo}",
+            "GithubRef.$": "$.head_commit.id"
+          }
+        }
+      },
+      "Next": "Deploy Prod Utilities"
+    },
+    "Deploy Prod Utilities": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+      "Parameters": {
+        "QueueUrl": "${DeploymentQueue}",
+        "MessageGroupId": "${GithubRepo}-utilities-prod",
+        "MessageBody": {
+          "StackName": "cfn-utilities",
+          "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+          "TemplateFileName": "Utilities.template.yml",
+          "RoleArn": "${ProdRoleArn}",
+          "Token.$": "$$.Task.Token",
+          "ParameterOverrides": {
+            "MasterAccountId": "${AccountId}",
+            "NetworkCidr": "10.3.0.0/16",
+            "PeeringConnectionId.$": "$.NetworkingConfig.ProdPeeringConnectionId"
+          },
+          "Capabilities": ["CAPABILITY_NAMED_IAM"],
+          "EnvironmentName": "prod",
+          "CommitInfo": {
+            "GithubOwner": "${GithubOwner}",
+            "GithubRepository": "${GithubRepo}",
+            "GithubRef.$": "$.head_commit.id"
+          }
+        }
+      },
+      "Next": "Deploy DNS"
+    },
+    "Deploy DNS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+      "ResultPath": null,
+      "Parameters": {
+        "QueueUrl": "${DeploymentQueue}",
+        "MessageGroupId": "${GithubRepo}",
+        "MessageBody": {
+          "StackName": "cfn-dns",
+          "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+          "TemplateFileName": "Dns.template.yml",
+          "TemplateConfigurationFileName": "Dns.config.json",
+          "RoleArn": "${SharedRoleArn}",
+          "Token.$": "$$.Task.Token",
+          "Capabilities": ["CAPABILITY_IAM"],
+          "EnvironmentName": "shared",
+          "CommitInfo": {
+            "GithubOwner": "${GithubOwner}",
+            "GithubRepository": "${GithubRepo}",
+            "GithubRef.$": "$.head_commit.id"
+          }
+        }
+      },
+      "Next": "Deploy Gateway"
+    },
+    "Deploy Gateway": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+      "ResultPath": null,
+      "Parameters": {
+        "QueueUrl": "${DeploymentQueue}",
+        "MessageGroupId": "${GithubRepo}",
+        "MessageBody": {
+          "StackName": "cfn-gateway",
+          "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+          "TemplateFileName": "Gateway.template.yml",
+          "RoleArn": "${SharedRoleArn}",
+          "Token.$": "$$.Task.Token",
+          "Capabilities": ["CAPABILITY_IAM"],
+          "EnvironmentName": "shared",
+          "CommitInfo": {
+            "GithubOwner": "${GithubOwner}",
+            "GithubRepository": "${GithubRepo}",
+            "GithubRef.$": "$.head_commit.id"
+          }
+        }
+      },
+      "Next": "Deploy Core"
+    },
+    "Deploy Core": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+      "ResultPath": null,
+      "Parameters": {
+        "QueueUrl": "${DeploymentQueue}",
+        "MessageGroupId": "${GithubRepo}",
+        "MessageBody": {
+          "StackName": "cfn-core",
+          "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+          "TemplateFileName": "Core.template.yml",
+          "TemplateConfigurationFileName": "Core.config.json",
+          "RoleArn": "${SharedRoleArn}",
+          "Token.$": "$$.Task.Token",
+          "ParameterOverrides": {
+            "DevVpcId.$": "$.UtilityOutputs.Agents[0].VpcId",
+            "ProdVpcId.$": "$.UtilityOutputs.Agents[1].VpcId",
+            "DevLoadBalancerDnsName.$": "$.UtilityOutputs.Agents[0].LoadBalancerDnsName",
+            "ProdLoadBalancerDnsName.$": "$.UtilityOutputs.Agents[1].LoadBalancerDnsName",
+            "Version.$": "$.head_commit.id"
+          },
+          "Capabilities": ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"],
+          "EnvironmentName": "shared",
+          "CommitInfo": {
+            "GithubOwner": "${GithubOwner}",
+            "GithubRepository": "${GithubRepo}",
+            "GithubRef.$": "$.head_commit.id"
+          }
+        }
+      },
+      "Next": "Success"
+    },
+    "Success": {
+      "Type": "Succeed"
     }
+  }
 }

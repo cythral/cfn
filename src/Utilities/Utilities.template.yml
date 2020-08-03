@@ -122,6 +122,11 @@ Resources:
     Properties:
       VpcId: !Ref VPC
 
+  PrivateLambdaRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
   Ipv4PublicRoute:
     Type: AWS::EC2::Route
     DependsOn: InternetGatewayAttachment
