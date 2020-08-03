@@ -105,7 +105,6 @@
           "ParameterOverrides": {
             "MasterAccountId": "${AccountId}",
             "NetworkCidr": "10.2.0.0/16",
-            "PrivateNetworkCidr": "10.128.0.0/16",
             "PeeringConnectionId.$": "$.NetworkingConfig.DevPeeringConnectionId"
           },
           "Capabilities": ["CAPABILITY_NAMED_IAM"],
@@ -134,7 +133,6 @@
           "ParameterOverrides": {
             "MasterAccountId": "${AccountId}",
             "NetworkCidr": "10.3.0.0/16",
-            "PrivateNetworkCidr": "10.129.0.0/16",
             "PeeringConnectionId.$": "$.NetworkingConfig.ProdPeeringConnectionId"
           },
           "Capabilities": ["CAPABILITY_NAMED_IAM"],

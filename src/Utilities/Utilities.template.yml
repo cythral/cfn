@@ -9,11 +9,6 @@ Parameters:
     Description: Cidr to use for the VPC
     Default: 10.1.0.0/16
 
-  PrivateNetworkCidr:
-    Type: String
-    Description: Cidr to use for the private network within the VPC
-    Default: 10.127.0.0/16
-
   # DO NOT SET THIS MANUALLY
   # This value should only be controlled by CI/CD CodePipeline.
   # Setting this adds a route to the master account's VPC
@@ -106,8 +101,6 @@ Resources:
       ResourceId: !Ref VPC
       ResourceType: VPC
       TrafficType: REJECT
-
-  # Public networking
 
   Ipv6CidrBlock:
     Type: AWS::EC2::VPCCidrBlock
@@ -220,67 +213,6 @@ Resources:
     Properties:
       RouteTableId: !Ref RouteTable
       SubnetId: !Ref Subnet4
-
-  # Private Networking
-
-  PrivateIpv4Block:
-    Type: AWS::EC2::VPCCidrBlock
-    Properties:
-      CidrBlock: !Ref PrivateNetworkCidr
-      VpcId: !Ref VPC
-
-  PrivateRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-
-  NatGatewayIp:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-
-  NatGateway:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt NatGatewayIp.AllocationId
-      SubnetId: !Ref Subnet1
-
-  NatGatewayRoute:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NatGateway
-
-  PrivateSubnet1:
-    Type: AWS::EC2::Subnet
-    DependsOn: PrivateIpv4Block
-    Properties:
-      CidrBlock: !Select
-        - 0
-        - !Cidr
-          - !Select [0, !GetAtt VPC.CidrBlockAssociations]
-          - 4
-          - 14
-      AvailabilityZone: !Select [0, !GetAZs us-east-1]
-      VpcId: !Ref VPC
-
-  PrivateSubnet1RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable
-      SubnetId: !Ref PrivateSubnet1
-
-  # Misc Networking
-
-  RdsEndpoint:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      RouteTableIds:
-        - !Ref RouteTable
-      ServiceName: !Sub com.amazonaws.${AWS::Region}.rds
-      VpcEndpointType: Gateway
-      VpcId: !Ref VPC
 
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
@@ -615,12 +547,6 @@ Outputs:
         - !Ref Subnet4
     Export:
       Name: !Sub ${AWS::StackName}:SubnetIds
-
-  PrivateSubnet1:
-    Description: ID of the 1st private subnet
-    Value: !Ref PrivateSubnet1
-    Export:
-      Name: !Sub ${AWS::StackName}:PrivateSubnet1
 
   DBSubnetGroupName:
     Description: Name of the db subnet group for the primary VPC
