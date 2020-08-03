@@ -12,7 +12,7 @@ Parameters:
   PrivateNetworkCidr:
     Type: String
     Description: Cidr to use for the private network within the VPC
-    Default: 192.0.0.0/16
+    Default: 10.255.0.0/16
 
   # DO NOT SET THIS MANUALLY
   # This value should only be controlled by CI/CD CodePipeline.
