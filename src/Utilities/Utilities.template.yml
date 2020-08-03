@@ -276,7 +276,6 @@ Resources:
   RdsEndpoint:
     Type: AWS::EC2::VPCEndpoint
     Properties:
-      PrivateDnsEnabled: true
       RouteTableIds:
         - !Ref RouteTable
       SecurityGroupIds:
