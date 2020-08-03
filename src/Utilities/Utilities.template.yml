@@ -607,6 +607,12 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:SubnetIds
 
+  PrivateSubnet1:
+    Description: ID of the 1st private subnet
+    Value: !Ref PrivateSubnet1
+    Export:
+      Name: !Sub ${AWS::StackName}:PrivateSubnet1
+
   DBSubnetGroupName:
     Description: Name of the db subnet group for the primary VPC
     Value: !Ref DBSubnetGroup
