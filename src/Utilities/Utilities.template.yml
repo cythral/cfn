@@ -12,7 +12,7 @@ Parameters:
   PrivateNetworkCidr:
     Type: String
     Description: Cidr to use for the private network within the VPC
-    Default: 192.168.0.0/16
+    Default: 192.0.0.0/16
 
   # DO NOT SET THIS MANUALLY
   # This value should only be controlled by CI/CD CodePipeline.
@@ -162,6 +162,7 @@ Resources:
         !Select [0, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
       AvailabilityZone: !Select [0, !GetAZs us-east-1]
       VpcId: !Ref VPC
+      MapPublicIpOnLaunch: true
 
   Subnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -178,6 +179,7 @@ Resources:
         !Select [1, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
       AvailabilityZone: !Select [1, !GetAZs us-east-1]
       VpcId: !Ref VPC
+      MapPublicIpOnLaunch: true
 
   Subnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -194,6 +196,7 @@ Resources:
         !Select [2, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
       AvailabilityZone: !Select [2, !GetAZs us-east-1]
       VpcId: !Ref VPC
+      MapPublicIpOnLaunch: true
 
   Subnet3RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -210,6 +213,7 @@ Resources:
         !Select [3, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
       AvailabilityZone: !Select [3, !GetAZs us-east-1]
       VpcId: !Ref VPC
+      MapPublicIpOnLaunch: true
 
   Subnet4RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
