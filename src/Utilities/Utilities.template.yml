@@ -278,13 +278,6 @@ Resources:
     Properties:
       RouteTableIds:
         - !Ref RouteTable
-      SecurityGroupIds:
-        - !GetAtt VPC.DefaultSecurityGroup
-      SubnetIds:
-        - !Ref Subnet1
-        - !Ref Subnet2
-        - !Ref Subnet3
-        - !Ref Subnet4
       ServiceName: !Sub com.amazonaws.${AWS::Region}.rds
       VpcEndpointType: Gateway
       VpcId: !Ref VPC
