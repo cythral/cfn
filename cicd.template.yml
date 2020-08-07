@@ -36,6 +36,10 @@ Resources:
             ExpirationInDays: 14
             Prefix: build-artifacts
 
+          - Status: Enabled
+            ExpirationInDays: 2
+            Prefix: tokens
+
   ArtifactStorePolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
