@@ -92,6 +92,7 @@
     },
     "Deploy Dev Utilities": {
       "Type": "Task",
+      "ResultPath": "$.DevUtilityOutputs",
       "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
       "Parameters": {
         "QueueUrl": "${DeploymentQueue}",
@@ -120,6 +121,7 @@
     },
     "Deploy Prod Utilities": {
       "Type": "Task",
+      "ResultPath": "$.ProdUtilityOutputs",
       "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
       "Parameters": {
         "QueueUrl": "${DeploymentQueue}",
@@ -210,10 +212,10 @@
           "RoleArn": "${SharedRoleArn}",
           "Token.$": "$$.Task.Token",
           "ParameterOverrides": {
-            "DevVpcId.$": "$.UtilityOutputs.Agents[0].VpcId",
-            "ProdVpcId.$": "$.UtilityOutputs.Agents[1].VpcId",
-            "DevLoadBalancerDnsName.$": "$.UtilityOutputs.Agents[0].LoadBalancerDnsName",
-            "ProdLoadBalancerDnsName.$": "$.UtilityOutputs.Agents[1].LoadBalancerDnsName",
+            "DevVpcId.$": "$.DevUtilityOutputs.VpcId",
+            "ProdVpcId.$": "$.ProdUtilityOutputs.VpcId",
+            "DevLoadBalancerDnsName.$": "$.DevUtilityOutputs.LoadBalancerDnsName",
+            "ProdLoadBalancerDnsName.$": "$.ProdUtilityOutputs.LoadBalancerDnsName",
             "Version.$": "$.head_commit.id"
           },
           "Capabilities": ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"],
