@@ -12,7 +12,7 @@ phases:
     commands:
       - dotnet --info
       - dotnet test -c Release --logger trx
-      - dotnet msbuild tools/package.proj -p:Configuration=Release -p:DeploymentBucket=$ARTIFACT_STORE -p:DeploymentBucketPrefix=$ARTIFACT_PREFIX
+      - dotnet msbuild tools/package.proj -p:Configuration=Release -p:DeploymentBucket=$ARTIFACT_STORE -p:DeploymentBucketPrefix=$ARTIFACT_PREFIX/templates
       - ./tools/create-networking-config.sh > Networking.config.json
 
 artifacts:
