@@ -1,5 +1,5 @@
 {
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
-  "gitlens.mode.active": "zen"
+  "omnisharp.enableEditorConfigSupport": true
 }
