@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <Project Include="..\BuildTasks\BuildTasks.csproj" />
-    <Project Include="..\..\/tests\EndToEnd\GithubWebhook\GithubWebhookEndToEnd.csproj" />
+    <Project Include="..\..\tests\EndToEnd\GithubWebhook\GithubWebhookEndToEnd.csproj" />
     <Project Include="UpdateTargets\UpdateTargets.csproj" />
     <Project Include="StackDeploymentStatus\StackDeploymentStatus.csproj" />
     <Project Include="StackDeployment\StackDeployment.csproj" />
@@ -33,7 +33,7 @@
   <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.Deploy" AssemblyFile="$(BuildTasksLocation)" />
 
   <Target Name="Publish">
-    <MSBuild Projects="@(Project)" Targets="Publish" />
+    <MSBuild Projects="@(Project)" Targets="Publish" Properties="Package=false" />
   </Target>
 
   <Target Name="Clean">
