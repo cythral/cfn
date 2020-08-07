@@ -73,7 +73,7 @@ Resources:
           - Name: ARTIFACT_STORE
             Value: !Ref ArtifactStore
           - Name: ARTIFACT_PREFIX
-            Value: build-artifacts
+            Value: build-artifacts/dlls
         Type: LINUX_CONTAINER
       LogsConfig:
         CloudWatchLogs:
@@ -90,7 +90,7 @@ Resources:
         Name: buildResults.zip
         NamespaceType: BUILD_ID
         Packaging: ZIP
-        Path: build-artifacts
+        Path: build-artifacts/templates
       Source:
         Type: GITHUB
         Location: !Sub https://github.com/${GithubOwner}/${GithubRepo}.git
