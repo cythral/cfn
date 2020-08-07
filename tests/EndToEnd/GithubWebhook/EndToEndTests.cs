@@ -174,7 +174,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
             try
             {
                 await cloudformation.WaitUntilStackExists(stackName);
-                await cloudformation.WaitUntilStackHasStatus(stackName, "CREATE_COMPLETE");
+                await cloudformation.WaitUntilStackHasStatus(stackName, "CREATE_COMPLETE", 30);
                 Assert.Fail();
             }
             catch (Exception)
