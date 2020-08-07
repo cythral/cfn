@@ -4,19 +4,19 @@ using System.Net.Http;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
+using Amazon.S3;
 
-using Cythral.CloudFormation.GithubWebhook.Entities;
-using Cythral.CloudFormation.GithubWebhook;
-using Cythral.CloudFormation.StackDeployment;
 using Cythral.CloudFormation.AwsUtils.CloudFormation;
+using Cythral.CloudFormation.GithubWebhook;
+using Cythral.CloudFormation.GithubWebhook.Entities;
+using Cythral.CloudFormation.StackDeployment;
 
 using NSubstitute;
 
 using NUnit.Framework;
 
-using Amazon.S3;
-
 using RichardSzalay.MockHttp;
+
 using static System.Text.Json.JsonSerializer;
 
 using Handler = Cythral.CloudFormation.GithubWebhook.Handler;
@@ -79,7 +79,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 ["STACK_SUFFIX"] = "cicd",
                 ["GITHUB_SIGNING_SECRET"] = "",
                 ["ROLE_ARN"] = "arn:aws:iam::1:role/Facade",
-                ["PIPELINE_DEFINITION_FILENAME"] = "pipeline.json"
+                ["PIPELINE_DEFINITION_FILENAME"] = "pipeline.json",
             };
         }
 
@@ -128,6 +128,24 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
 
             var response = await Handler.Handle(request);
             await stackDeployer.Received().Deploy(Arg.Is<DeployStackContext>(req => req.Template == template));
+        }
+
+        [Test]
+        public async Task HandleDoesNotCallDeployIfCommitMessageIncludesSkipCiMeta()
+        {
+            var contentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}";
+            var (request, _) = CreateRequest(contentsUrl, "refs/heads/master", "master", headCommitMessage: "update docs [skip meta-ci]");
+            var template = "template";
+
+            var httpMock = new MockHttpMessageHandler();
+            CommittedFile.DefaultHttpClientFactory = () => new HttpClient(httpMock);
+
+            httpMock
+           .Expect($"https://api.github.com/repos/Codertocat/Hello-World/contents/cicd.template.yml")
+           .Respond(HttpStatusCode.OK, "text/plain", template);
+
+            var response = await Handler.Handle(request);
+            await stackDeployer.DidNotReceive().Deploy(Arg.Any<DeployStackContext>());
         }
 
         [Test]

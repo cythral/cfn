@@ -14,20 +14,17 @@ using Amazon.S3;
 using Amazon.S3.Model;
 
 using Cythral.CloudFormation.AwsUtils.CloudFormation;
-
 using Cythral.CloudFormation.GithubWebhook.Entities;
 using Cythral.CloudFormation.GithubWebhook.Exceptions;
 
-
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
-
-using WebhookConfig = Cythral.CloudFormation.GithubWebhook.Config;
 
 using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
     Amazon.S3.IAmazonS3,
     Amazon.S3.AmazonS3Client
 >;
+using WebhookConfig = Cythral.CloudFormation.GithubWebhook.Config;
 
 namespace Cythral.CloudFormation.GithubWebhook
 {
@@ -75,7 +72,7 @@ namespace Cythral.CloudFormation.GithubWebhook
 
             var tasks = new List<Task>();
 
-            if (payload.OnDefaultBranch)
+            if (payload.OnDefaultBranch && !payload.HeadCommit.Message.Contains("[skip meta-ci]"))
             {
                 tasks.Add(DeployCicdStack(payload));
             }
