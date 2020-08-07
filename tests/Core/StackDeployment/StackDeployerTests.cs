@@ -6,19 +6,15 @@ using System.Threading.Tasks;
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 
-using Cythral.CloudFormation.StackDeployment;
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.CloudFormation;
+using Cythral.CloudFormation.StackDeployment;
 
 using NSubstitute;
 
 using NUnit.Framework;
 
 using static Amazon.CloudFormation.OnFailure;
-
-using CloudFormationFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.CloudFormation.IAmazonCloudFormation,
-    Amazon.CloudFormation.AmazonCloudFormationClient
->;
 
 namespace Cythral.CloudFormation.Tests.GithubWebhook
 {
@@ -59,9 +55,9 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             .Returns(new CreateStackResponse { });
 
             var stackDeployer = new DeployStackFacade();
-            var cloudFormationFactory = Substitute.For<CloudFormationFactory>();
-            cloudFormationFactory.Create().Returns(cloudformationClient);
-            TestUtils.SetPrivateField(stackDeployer, "cloudFormationFactory", cloudFormationFactory);
+            var cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
+            cloudformationFactory.Create().Returns(cloudformationClient);
+            TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 
             await stackDeployer.Deploy(new DeployStackContext
             {
@@ -112,9 +108,9 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             .Returns(new UpdateStackResponse { });
 
             var stackDeployer = new DeployStackFacade();
-            var cloudFormationFactory = Substitute.For<CloudFormationFactory>();
-            cloudFormationFactory.Create().Returns(cloudformationClient);
-            TestUtils.SetPrivateField(stackDeployer, "cloudFormationFactory", cloudFormationFactory);
+            var cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
+            cloudformationFactory.Create().Returns(cloudformationClient);
+            TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 
 
             await stackDeployer.Deploy(new DeployStackContext
@@ -165,9 +161,9 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             .Returns<UpdateStackResponse>(x => { throw new Exception("No updates are to be performed."); });
 
             var stackDeployer = new DeployStackFacade();
-            var cloudFormationFactory = Substitute.For<CloudFormationFactory>();
-            cloudFormationFactory.Create().Returns(cloudformationClient);
-            TestUtils.SetPrivateField(stackDeployer, "cloudFormationFactory", cloudFormationFactory);
+            var cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
+            cloudformationFactory.Create().Returns(cloudformationClient);
+            TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 
 
             Assert.ThrowsAsync<NoUpdatesException>(() => stackDeployer.Deploy(new DeployStackContext
@@ -204,9 +200,9 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             .Returns<UpdateStackResponse>(x => { throw new Exception("Some other exception"); });
 
             var stackDeployer = new DeployStackFacade();
-            var cloudFormationFactory = Substitute.For<CloudFormationFactory>();
-            cloudFormationFactory.Create().Returns(cloudformationClient);
-            TestUtils.SetPrivateField(stackDeployer, "cloudFormationFactory", cloudFormationFactory);
+            var cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
+            cloudformationFactory.Create().Returns(cloudformationClient);
+            TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 
 
             Assert.ThrowsAsync<Exception>(() => stackDeployer.Deploy(new DeployStackContext

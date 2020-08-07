@@ -1,18 +1,15 @@
-using System.Threading.Tasks;
 using System;
 using System.IO;
-using Amazon.KeyManagementService.Model;
+using System.Threading.Tasks;
 
-using KmsFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.KeyManagementService.IAmazonKeyManagementService,
-    Amazon.KeyManagementService.AmazonKeyManagementServiceClient
->;
+using Amazon.KeyManagementService;
+using Amazon.KeyManagementService.Model;
 
 namespace Cythral.CloudFormation.AwsUtils.KeyManagementService
 {
     public class KmsDecryptFacade
     {
-        private KmsFactory kmsFactory = new KmsFactory();
+        private AmazonClientFactory<IAmazonKeyManagementService> kmsFactory = new AmazonClientFactory<IAmazonKeyManagementService>();
 
         public virtual async Task<string> Decrypt(string value)
         {

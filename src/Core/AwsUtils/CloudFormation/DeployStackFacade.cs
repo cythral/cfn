@@ -1,30 +1,24 @@
-using System.ComponentModel.DataAnnotations;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using static System.Text.Json.JsonSerializer;
 
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
+
+using static System.Text.Json.JsonSerializer;
 using static Amazon.CloudFormation.OnFailure;
-
-using Cythral.CloudFormation.AwsUtils;
-
-using CloudFormationFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.CloudFormation.IAmazonCloudFormation,
-    Amazon.CloudFormation.AmazonCloudFormationClient
->;
 
 namespace Cythral.CloudFormation.AwsUtils.CloudFormation
 {
     public class DeployStackFacade
     {
-        private CloudFormationFactory cloudFormationFactory = new CloudFormationFactory();
+        private AmazonClientFactory<IAmazonCloudFormation> cloudformationFactory = new AmazonClientFactory<IAmazonCloudFormation>();
 
         public virtual async Task Deploy(DeployStackContext context)
         {
-            var cloudformationClient = await cloudFormationFactory.Create(context.RoleArn);
+            var cloudformationClient = await cloudformationFactory.Create(context.RoleArn);
             var notificationArns = GetNotificationArns(context);
             var stackExists = await DoesStackExist(context, cloudformationClient);
             var parameters = (List<Parameter>)context.Parameters ?? new List<Parameter> { };

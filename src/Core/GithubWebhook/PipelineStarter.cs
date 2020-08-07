@@ -1,18 +1,18 @@
 using System;
 using System.Threading.Tasks;
-using Amazon.StepFunctions.Model;
-using static System.Text.Json.JsonSerializer;
 
-using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.StepFunctions.IAmazonStepFunctions,
-    Amazon.StepFunctions.AmazonStepFunctionsClient
->;
+using Amazon.StepFunctions;
+using Amazon.StepFunctions.Model;
+
+using Cythral.CloudFormation.AwsUtils;
+
+using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.GithubWebhook
 {
     public class PipelineStarter
     {
-        private StepFunctionsClientFactory stepFunctionsClientFactory = new StepFunctionsClientFactory();
+        private AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = new AmazonClientFactory<IAmazonStepFunctions>();
 
         public virtual async Task StartPipelineIfExists(PushEvent payload)
         {

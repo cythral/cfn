@@ -1,12 +1,14 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Amazon.S3;
 using Amazon.S3.Model;
 
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.S3Deployment;
@@ -14,21 +16,15 @@ using Cythral.CloudFormation.S3Deployment;
 using NSubstitute;
 using NSubstitute.ClearExtensions;
 
-using Octokit;
-
 using NUnit.Framework;
 
-using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.S3.IAmazonS3,
-    Amazon.S3.AmazonS3Client
->;
-
+using Octokit;
 
 namespace Cythral.CloudFormation.Tests.S3Deployment
 {
     public class HandlerTests
     {
-        private static S3Factory s3Factory = Substitute.For<S3Factory>();
+        private static AmazonClientFactory<IAmazonS3> s3Factory = Substitute.For<AmazonClientFactory<IAmazonS3>>();
         private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
         private static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
         private static PutCommitStatusFacade putCommitStatusFacade = Substitute.For<PutCommitStatusFacade>();

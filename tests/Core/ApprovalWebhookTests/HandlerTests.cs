@@ -7,6 +7,7 @@ using Amazon.S3;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
 using NSubstitute;
@@ -18,24 +19,14 @@ using static System.Text.Json.JsonSerializer;
 
 using Handler = Cythral.CloudFormation.ApprovalWebhook.Handler;
 
-using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.S3.IAmazonS3,
-    Amazon.S3.AmazonS3Client
->;
-
-using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.StepFunctions.IAmazonStepFunctions,
-    Amazon.StepFunctions.AmazonStepFunctionsClient
->;
-
 namespace Cythral.CloudFormation.Tests.ApprovalWebhook
 {
     public class HandlerTests
     {
-        private static StepFunctionsClientFactory stepFunctionsClientFactory = Substitute.For<StepFunctionsClientFactory>();
+        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = Substitute.For<AmazonClientFactory<IAmazonStepFunctions>>();
         private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
         private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
-        private static S3Factory s3Factory = Substitute.For<S3Factory>();
+        private static AmazonClientFactory<IAmazonS3> s3Factory = Substitute.For<AmazonClientFactory<IAmazonS3>>();
         private static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
 
         private const string bucket = "bucket";

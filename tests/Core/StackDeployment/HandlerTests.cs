@@ -5,34 +5,27 @@ using System.Threading.Tasks;
 
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
+using Amazon.Lambda.SQSEvents;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
-using Amazon.Lambda.SQSEvents;
 
-using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.CloudFormation;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.StackDeployment;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
 using NSubstitute;
+using NSubstitute.ClearExtensions;
+
+using NUnit.Framework;
 
 using Octokit;
 
-using NUnit.Framework;
-using NSubstitute.ClearExtensions;
 using static System.Text.Json.JsonSerializer;
+
 using Tag = Amazon.CloudFormation.Model.Tag;
-
-using CloudFormationFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.CloudFormation.IAmazonCloudFormation,
-    Amazon.CloudFormation.AmazonCloudFormationClient
->;
-
-using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.StepFunctions.IAmazonStepFunctions,
-    Amazon.StepFunctions.AmazonStepFunctionsClient
->;
 
 namespace Cythral.CloudFormation.Tests.StackDeployment
 {
@@ -44,8 +37,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
         private static TokenGenerator tokenGenerator = Substitute.For<TokenGenerator>();
         private static RequestFactory requestFactory = Substitute.For<RequestFactory>();
-        private static StepFunctionsClientFactory stepFunctionsClientFactory = Substitute.For<StepFunctionsClientFactory>();
-        private static CloudFormationFactory cloudFormationFactory = Substitute.For<CloudFormationFactory>();
+        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = Substitute.For<AmazonClientFactory<IAmazonStepFunctions>>();
+        private static AmazonClientFactory<IAmazonCloudFormation> cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
         private static IAmazonCloudFormation cloudFormationClient = Substitute.For<IAmazonCloudFormation>();
         private static PutCommitStatusFacade putCommitStatusFacade = Substitute.For<PutCommitStatusFacade>();
 
@@ -145,9 +138,9 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         [SetUp]
         public void SetupCloudFormation()
         {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "cloudFormationFactory", cloudFormationFactory);
-            cloudFormationFactory.ClearSubstitute();
-            cloudFormationFactory.Create(Arg.Any<string>()).Returns(cloudFormationClient);
+            TestUtils.SetPrivateStaticField(typeof(Handler), "cloudformationFactory", cloudformationFactory);
+            cloudformationFactory.ClearSubstitute();
+            cloudformationFactory.Create(Arg.Any<string>()).Returns(cloudFormationClient);
 
             cloudFormationClient.DescribeStacksAsync(Arg.Any<DescribeStacksRequest>()).Returns(new DescribeStacksResponse
             {
@@ -323,7 +316,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                 )
             );
 
-            await cloudFormationFactory.Received().Create(Arg.Is(roleArn));
+            await cloudformationFactory.Received().Create(Arg.Is(roleArn));
             await cloudFormationClient.Received().DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
                 req.StackName == stackName
             ));

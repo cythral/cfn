@@ -7,6 +7,7 @@ using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
 using Amazon.Lambda.SNSEvents;
 
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.UpdateTargets;
 using Cythral.CloudFormation.UpdateTargets.DnsResolver;
 using Cythral.CloudFormation.UpdateTargets.Request;
@@ -17,17 +18,13 @@ using NUnit.Framework;
 
 using static Amazon.ElasticLoadBalancingV2.TargetHealthStateEnum;
 
-using ElbClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.ElasticLoadBalancingV2.IAmazonElasticLoadBalancingV2,
-    Amazon.ElasticLoadBalancingV2.AmazonElasticLoadBalancingV2Client
->;
 
 namespace Cythral.CloudFormation.Tests.UpdateTargets
 {
     public class HandlerTests
     {
         private static DnsResolverFactory dnsResolverFactory = Substitute.For<DnsResolverFactory>();
-        private static ElbClientFactory elbClientFactory = Substitute.For<ElbClientFactory>();
+        private static AmazonClientFactory<IAmazonElasticLoadBalancingV2> elbClientFactory = Substitute.For<AmazonClientFactory<IAmazonElasticLoadBalancingV2>>();
         private static UpdateTargetsRequestFactory requestFactory = Substitute.For<UpdateTargetsRequestFactory>();
 
         private IAmazonElasticLoadBalancingV2 CreateElbClient(string targetGroupArn, List<TargetHealthDescription> targets = null)

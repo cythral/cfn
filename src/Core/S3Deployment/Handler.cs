@@ -1,32 +1,29 @@
-using System.IO;
-using System.Reflection;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
-using static System.Text.Json.JsonSerializer;
 
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.S3;
 using Amazon.S3.Model;
 
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.GithubUtils;
 
 using Octokit;
 
-using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.S3.IAmazonS3,
-    Amazon.S3.AmazonS3Client
->;
+using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.S3Deployment
 {
     public class Handler
     {
-        private static S3Factory s3Factory = new S3Factory();
+        private static AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
         private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
         private static PutCommitStatusFacade putCommitStatusFacade = new PutCommitStatusFacade();
 

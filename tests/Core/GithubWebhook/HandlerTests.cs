@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.S3;
 
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.CloudFormation;
 using Cythral.CloudFormation.GithubWebhook;
 using Cythral.CloudFormation.GithubWebhook.Entities;
@@ -20,10 +21,6 @@ using RichardSzalay.MockHttp;
 using static System.Text.Json.JsonSerializer;
 
 using Handler = Cythral.CloudFormation.GithubWebhook.Handler;
-using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.S3.IAmazonS3,
-    Amazon.S3.AmazonS3Client
->;
 
 namespace Cythral.CloudFormation.Tests.GithubWebhook
 {
@@ -32,7 +29,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
         private static RequestValidator requestValidator = Substitute.For<RequestValidator>();
         private static DeployStackFacade stackDeployer = Substitute.For<DeployStackFacade>();
         private static PipelineStarter pipelineStarter = Substitute.For<PipelineStarter>();
-        private static S3Factory s3Factory = Substitute.For<S3Factory>();
+        private static AmazonClientFactory<IAmazonS3> s3Factory = Substitute.For<AmazonClientFactory<IAmazonS3>>();
         private static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
 
         private const string repoName = "repoName";

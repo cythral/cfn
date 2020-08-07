@@ -6,6 +6,8 @@ using Amazon.SecurityToken;
 
 using Cythral.CloudFormation.AwsUtils;
 
+using FluentAssertions;
+
 using NUnit.Framework;
 
 namespace Cythral.CloudFormation.Tests.Aws
@@ -24,8 +26,17 @@ namespace Cythral.CloudFormation.Tests.Aws
         [Test]
         public async Task CreateShouldNotThrow()
         {
-            var factory = new AmazonClientFactory<IAmazonS3, AmazonS3Client>();
+            var factory = new AmazonClientFactory<IAmazonS3>();
             var client = await factory.Create();
+        }
+
+        [Test]
+        public async Task CreateShouldReturnCorrectImplementation()
+        {
+            var factory = new AmazonClientFactory<IAmazonS3>();
+            var client = await factory.Create();
+
+            client.GetType().Should().Be(typeof(AmazonS3Client));
         }
 
         [Test]
@@ -33,7 +44,7 @@ namespace Cythral.CloudFormation.Tests.Aws
         {
             Assert.ThrowsAsync<AmazonSecurityTokenServiceException>(async () =>
             {
-                var factory = new AmazonClientFactory<IAmazonS3, AmazonS3Client>();
+                var factory = new AmazonClientFactory<IAmazonS3>();
                 var client = await factory.Create("arn:aws:iam:::role/Admin");
             });
         }
