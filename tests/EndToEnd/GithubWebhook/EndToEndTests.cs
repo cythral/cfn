@@ -1,28 +1,30 @@
-using System.Net;
-using System.Net.Http;
+using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.IO;
 using System.Linq;
-using System;
+using System.Net;
+using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
-using NUnit.Framework;
-
-using static System.Text.Json.JsonSerializer;
-using Octokit;
-
-using Cythral.CloudFormation.GithubWebhook;
-using Cythral.CloudFormation.GithubWebhook.Entities;
-using Cythral.CloudFormation.AwsUtils.KeyManagementService;
 
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
+using Cythral.CloudFormation.AwsUtils.KeyManagementService;
+using Cythral.CloudFormation.GithubWebhook;
+using Cythral.CloudFormation.GithubWebhook.Entities;
+
+using NUnit.Framework;
+
+using Octokit;
+
+using static System.Text.Json.JsonSerializer;
+
+using Commit = Cythral.CloudFormation.GithubWebhook.Entities.Commit;
 using Repository = Cythral.CloudFormation.GithubWebhook.Entities.Repository;
 using User = Cythral.CloudFormation.GithubWebhook.Entities.User;
-using Commit = Cythral.CloudFormation.GithubWebhook.Entities.Commit;
 
 namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
 {
@@ -65,6 +67,8 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
                     AutoInit = true,
                     Private = true
                 });
+
+                await Task.Delay(1000);
             }
 
             try
@@ -169,7 +173,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
 
             try
             {
-                await cloudformation.WaitUntilStackExists(stackName, 15);
+                await cloudformation.WaitUntilStackExists(stackName);
                 await cloudformation.WaitUntilStackHasStatus(stackName, "CREATE_COMPLETE");
                 Assert.Fail();
             }
@@ -217,7 +221,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
 
             #region Assert State Machine was Created
 
-            await cloudformation.WaitUntilStackHasStatus(stackName, "CREATE_COMPLETE", 30);
+            await cloudformation.WaitUntilStackHasStatus(stackName, "CREATE_COMPLETE");
 
             var stateMachineResponse = await stepFunctionsClient.DescribeStateMachineAsync(new DescribeStateMachineRequest
             {
