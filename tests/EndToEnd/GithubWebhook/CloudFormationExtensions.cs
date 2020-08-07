@@ -1,6 +1,7 @@
-using System.Threading;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 
@@ -42,7 +43,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd
             }
         }
 
-        public static async Task WaitUntilStackExists(this IAmazonCloudFormation client, string stackName, int timeout = 1800)
+        public static async Task WaitUntilStackExists(this IAmazonCloudFormation client, string stackName, int timeout = 500)
         {
             int tries = 0;
 
@@ -58,7 +59,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd
             }
         }
 
-        public static async Task WaitUntilStackHasStatus(this IAmazonCloudFormation client, string stackName, string status, int timeout = 1800)
+        public static async Task WaitUntilStackHasStatus(this IAmazonCloudFormation client, string stackName, string status, int timeout = 500)
         {
             int tries = 0;
 
@@ -74,7 +75,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd
             }
         }
 
-        public static async Task WaitUntilStackDoesNotExist(this IAmazonCloudFormation client, string stackName, int timeout = 1800)
+        public static async Task WaitUntilStackDoesNotExist(this IAmazonCloudFormation client, string stackName, int timeout = 500)
         {
             int tries = 0;
 
