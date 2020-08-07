@@ -13,6 +13,7 @@ using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.S3;
 using Amazon.S3.Model;
 
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.CloudFormation;
 using Cythral.CloudFormation.GithubWebhook.Entities;
 using Cythral.CloudFormation.GithubWebhook.Exceptions;
@@ -20,10 +21,6 @@ using Cythral.CloudFormation.GithubWebhook.Exceptions;
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
-using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.S3.IAmazonS3,
-    Amazon.S3.AmazonS3Client
->;
 using WebhookConfig = Cythral.CloudFormation.GithubWebhook.Config;
 
 namespace Cythral.CloudFormation.GithubWebhook
@@ -34,7 +31,7 @@ namespace Cythral.CloudFormation.GithubWebhook
         private static RequestValidator requestValidator = new RequestValidator();
         private static DeployStackFacade stackDeployer = new DeployStackFacade();
         private static PipelineStarter pipelineStarter = new PipelineStarter();
-        private static S3Factory s3Factory = new S3Factory();
+        private static AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
 
         /// <summary>
         /// This function is called on every request to /webhooks/github

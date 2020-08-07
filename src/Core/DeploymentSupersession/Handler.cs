@@ -1,24 +1,18 @@
 using System;
 using System.Threading.Tasks;
-using static System.Text.Json.JsonSerializer;
 
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.Lambda.SQSEvents;
-using Amazon.StepFunctions.Model;
+using Amazon.S3;
 using Amazon.S3.Model;
+using Amazon.StepFunctions;
+using Amazon.StepFunctions.Model;
 
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
-using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.S3.IAmazonS3,
-    Amazon.S3.AmazonS3Client
->;
-
-using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.StepFunctions.IAmazonStepFunctions,
-    Amazon.StepFunctions.AmazonStepFunctionsClient
->;
+using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.DeploymentSupersession
 {
@@ -26,8 +20,8 @@ namespace Cythral.CloudFormation.DeploymentSupersession
     {
         private static RequestFactory requestFactory = new RequestFactory();
         private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
-        private static StepFunctionsClientFactory stepFunctionsClientFactory = new StepFunctionsClientFactory();
-        private static S3Factory s3Factory = new S3Factory();
+        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = new AmazonClientFactory<IAmazonStepFunctions>();
+        private static AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
 
         [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
         public static async Task<Response> Handle(SQSEvent sqsEvent, ILambdaContext context = null)

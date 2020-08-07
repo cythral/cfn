@@ -5,24 +5,20 @@ using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
 using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.GithubWebhook.Entities;
 using Cythral.CloudFormation.GithubWebhook;
+using Cythral.CloudFormation.GithubWebhook.Entities;
 
 using NSubstitute;
 
 using NUnit.Framework;
-using static System.Text.Json.JsonSerializer;
 
-using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.StepFunctions.IAmazonStepFunctions,
-    Amazon.StepFunctions.AmazonStepFunctionsClient
->;
+using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.Tests.GithubWebhook
 {
     public class PipelineStarterTests
     {
-        private static StepFunctionsClientFactory stepFunctionsClientFactory = Substitute.For<StepFunctionsClientFactory>();
+        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = Substitute.For<AmazonClientFactory<IAmazonStepFunctions>>();
         private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
         private static PipelineStarter pipelineStarter = new PipelineStarter();
 

@@ -1,8 +1,7 @@
-using System.IO.Compression;
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Threading.Tasks;
-using static System.Text.Json.JsonSerializer;
 
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -10,16 +9,13 @@ using Amazon.S3.Util;
 
 using Cythral.CloudFormation.AwsUtils;
 
-using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.S3.IAmazonS3,
-    Amazon.S3.AmazonS3Client
->;
+using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.AwsUtils.SimpleStorageService
 {
     public class S3GetObjectFacade
     {
-        private S3Factory s3Factory = new S3Factory();
+        private AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
 
         public virtual async Task<string> GetZipEntryInObject(string location, string entry)
         {

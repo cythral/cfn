@@ -3,24 +3,20 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Text.Json.JsonSerializer;
 
 using Amazon.Lambda.SQSEvents;
+using Amazon.S3;
 using Amazon.S3.Model;
 
 using Cythral.CloudFormation.AwsUtils;
 
-using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.S3.IAmazonS3,
-    Amazon.S3.AmazonS3Client
->;
-
+using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.StackDeployment
 {
     public class TokenGenerator
     {
-        private S3Factory s3Factory = new S3Factory();
+        private AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
 
         public virtual async Task<string> Generate(SQSEvent sqsEvent, Request request)
         {

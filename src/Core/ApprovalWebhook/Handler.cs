@@ -1,34 +1,28 @@
-using System.Net;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
-using static System.Text.Json.JsonSerializer;
-using static System.Net.HttpStatusCode;
 
-using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
-
+using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
+using Amazon.S3;
+using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
-using Amazon.Lambda.ApplicationLoadBalancerEvents;
 
-using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.S3.IAmazonS3,
-    Amazon.S3.AmazonS3Client
->;
+using Cythral.CloudFormation.AwsUtils;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
-using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.StepFunctions.IAmazonStepFunctions,
-    Amazon.StepFunctions.AmazonStepFunctionsClient
->;
+using static System.Net.HttpStatusCode;
+using static System.Text.Json.JsonSerializer;
 
 
 namespace Cythral.CloudFormation.ApprovalWebhook
 {
     public class Handler
     {
-        private static StepFunctionsClientFactory stepFunctionsClientFactory = new StepFunctionsClientFactory();
-        private static S3Factory s3Factory = new S3Factory();
+        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = new AmazonClientFactory<IAmazonStepFunctions>();
+        private static AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
         private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
 
         [LambdaSerializer(typeof(CamelCaseLambdaJsonSerializer))]

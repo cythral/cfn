@@ -1,44 +1,34 @@
-using System.Text;
-using System.Security.Cryptography;
-using System.Net;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
-using static System.Text.Json.JsonSerializer;
-using static System.Net.HttpStatusCode;
-
-using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
-using Amazon.SimpleNotificationService.Model;
-using Amazon.StepFunctions.Model;
+using Amazon.S3;
 using Amazon.S3.Model;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
+using Amazon.StepFunctions;
+using Amazon.StepFunctions.Model;
 
-using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.S3.IAmazonS3,
-    Amazon.S3.AmazonS3Client
->;
+using Cythral.CloudFormation.AwsUtils;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
-using SnsFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.SimpleNotificationService.IAmazonSimpleNotificationService,
-    Amazon.SimpleNotificationService.AmazonSimpleNotificationServiceClient
->;
-
-using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.StepFunctions.IAmazonStepFunctions,
-    Amazon.StepFunctions.AmazonStepFunctionsClient
->;
+using static System.Net.HttpStatusCode;
+using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.ApprovalNotification
 {
     public class Handler
     {
-        private SnsFactory snsFactory = new SnsFactory();
-        private S3Factory s3Factory = new S3Factory();
+        private AmazonClientFactory<IAmazonSimpleNotificationService> snsFactory = new AmazonClientFactory<IAmazonSimpleNotificationService>();
+        private AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
         private S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
-        private StepFunctionsClientFactory stepFunctionsClientFactory = new StepFunctionsClientFactory();
+        private AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = new AmazonClientFactory<IAmazonStepFunctions>();
 
         [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
         public async Task<Response> Handle(Request request, ILambdaContext context = null)

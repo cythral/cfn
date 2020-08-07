@@ -1,35 +1,27 @@
-using System.Linq;
-using System.Collections.Generic;
-using System.Text;
-using System.Security.Cryptography;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
+using Amazon.CloudFormation;
+using Amazon.CloudFormation.Model;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.Lambda.SQSEvents;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
-using Amazon.CloudFormation.Model;
 
-using Octokit;
-
-using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.CloudFormation;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
+using Octokit;
+
 using static System.Text.Json.JsonSerializer;
-
-using CloudFormationFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.CloudFormation.IAmazonCloudFormation,
-    Amazon.CloudFormation.AmazonCloudFormationClient
->;
-
-using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.StepFunctions.IAmazonStepFunctions,
-    Amazon.StepFunctions.AmazonStepFunctionsClient
->;
 
 namespace Cythral.CloudFormation.StackDeployment
 {
@@ -41,8 +33,8 @@ namespace Cythral.CloudFormation.StackDeployment
         private static ParseConfigFileFacade parseConfigFileFacade = new ParseConfigFileFacade();
         private static TokenGenerator tokenGenerator = new TokenGenerator();
         private static RequestFactory requestFactory = new RequestFactory();
-        private static StepFunctionsClientFactory stepFunctionsClientFactory = new StepFunctionsClientFactory();
-        private static CloudFormationFactory cloudFormationFactory = new CloudFormationFactory();
+        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = new AmazonClientFactory<IAmazonStepFunctions>();
+        private static AmazonClientFactory<IAmazonCloudFormation> cloudformationFactory = new AmazonClientFactory<IAmazonCloudFormation>();
         private static PutCommitStatusFacade putCommitStatusFacade = new PutCommitStatusFacade();
 
         [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
@@ -139,7 +131,7 @@ namespace Cythral.CloudFormation.StackDeployment
 
         private static async Task<Dictionary<string, string>> GetStackOutputs(string stackId, string roleArn)
         {
-            var client = await cloudFormationFactory.Create(roleArn);
+            var client = await cloudformationFactory.Create(roleArn);
             var response = await client.DescribeStacksAsync(new DescribeStacksRequest
             {
                 StackName = stackId

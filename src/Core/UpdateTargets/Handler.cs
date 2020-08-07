@@ -9,23 +9,19 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.Lambda.SNSEvents;
 
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.UpdateTargets.DnsResolver;
 using Cythral.CloudFormation.UpdateTargets.Request;
 
 using static System.Text.Json.JsonSerializer;
 using static Amazon.ElasticLoadBalancingV2.TargetHealthStateEnum;
 
-using ElbClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.ElasticLoadBalancingV2.IAmazonElasticLoadBalancingV2,
-    Amazon.ElasticLoadBalancingV2.AmazonElasticLoadBalancingV2Client
->;
-
 namespace Cythral.CloudFormation.UpdateTargets
 {
     public class Handler
     {
         private static DnsResolverFactory dnsResolverFactory = new DnsResolverFactory();
-        private static ElbClientFactory elbClientFactory = new ElbClientFactory();
+        private static AmazonClientFactory<IAmazonElasticLoadBalancingV2> elbClientFactory = new AmazonClientFactory<IAmazonElasticLoadBalancingV2>();
         private static UpdateTargetsRequestFactory requestFactory = new UpdateTargetsRequestFactory();
 
         [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]

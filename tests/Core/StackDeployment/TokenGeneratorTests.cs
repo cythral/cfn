@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using Amazon.Lambda.SQSEvents;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Amazon.Lambda.SQSEvents;
 
 using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.StackDeployment;
@@ -11,19 +11,14 @@ using Cythral.CloudFormation.StackDeployment;
 using NSubstitute;
 
 using NUnit.Framework;
+
 using static System.Text.Json.JsonSerializer;
-
-using S3Factory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.S3.IAmazonS3,
-    Amazon.S3.AmazonS3Client
->;
-
 
 namespace Cythral.CloudFormation.Tests.StackDeployment
 {
     public class TokenGeneratorTests
     {
-        public static S3Factory s3Factory = Substitute.For<S3Factory>();
+        public static AmazonClientFactory<IAmazonS3> s3Factory = Substitute.For<AmazonClientFactory<IAmazonS3>>();
         public static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
         public static TokenGenerator tokenGenerator = new TokenGenerator();
         private const string stackName = "stackName";

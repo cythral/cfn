@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
-using Amazon.StepFunctions;
-using Amazon.StepFunctions.Model;
+using Amazon.Lambda.SNSEvents;
 using Amazon.SQS;
 using Amazon.SQS.Model;
-using Amazon.Lambda.SNSEvents;
+using Amazon.StepFunctions;
+using Amazon.StepFunctions.Model;
 
+using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.StackDeploymentStatus;
@@ -19,25 +20,11 @@ using Cythral.CloudFormation.StackDeploymentStatus.Request;
 using NSubstitute;
 using NSubstitute.ClearExtensions;
 
+using NUnit.Framework;
+
 using Octokit;
 
-using NUnit.Framework;
 using static System.Text.Json.JsonSerializer;
-
-using CloudFormationFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.CloudFormation.IAmazonCloudFormation,
-    Amazon.CloudFormation.AmazonCloudFormationClient
->;
-
-using SqsFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.SQS.IAmazonSQS,
-    Amazon.SQS.AmazonSQSClient
->;
-
-using StepFunctionsClientFactory = Cythral.CloudFormation.AwsUtils.AmazonClientFactory<
-    Amazon.StepFunctions.IAmazonStepFunctions,
-    Amazon.StepFunctions.AmazonStepFunctionsClient
->;
 
 namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 {
@@ -45,12 +32,12 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
     public class HandlerTests
     {
         private static StackDeploymentStatusRequestFactory requestFactory = Substitute.For<StackDeploymentStatusRequestFactory>();
-        private static StepFunctionsClientFactory stepFunctionsClientFactory = Substitute.For<StepFunctionsClientFactory>();
+        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = Substitute.For<AmazonClientFactory<IAmazonStepFunctions>>();
         private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
         private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
-        private static SqsFactory sqsFactory = Substitute.For<SqsFactory>();
+        private static AmazonClientFactory<IAmazonSQS> sqsFactory = Substitute.For<AmazonClientFactory<IAmazonSQS>>();
         private static IAmazonSQS sqsClient = Substitute.For<IAmazonSQS>();
-        private static CloudFormationFactory cloudFormationFactory = Substitute.For<CloudFormationFactory>();
+        private static AmazonClientFactory<IAmazonCloudFormation> cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
         private static IAmazonCloudFormation cloudFormationClient = Substitute.For<IAmazonCloudFormation>();
         private static PutCommitStatusFacade putCommitStatusFacade = Substitute.For<PutCommitStatusFacade>();
         private const string stackId = "stackId";
@@ -131,10 +118,10 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         [SetUp]
         public void SetupCloudFormation()
         {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "cloudFormationFactory", cloudFormationFactory);
+            TestUtils.SetPrivateStaticField(typeof(Handler), "cloudformationFactory", cloudformationFactory);
             cloudFormationClient.ClearSubstitute();
-            cloudFormationFactory.ClearSubstitute();
-            cloudFormationFactory.Create(Arg.Any<string>()).Returns(cloudFormationClient);
+            cloudformationFactory.ClearSubstitute();
+            cloudformationFactory.Create(Arg.Any<string>()).Returns(cloudFormationClient);
 
             cloudFormationClient.DescribeStacksAsync(Arg.Any<DescribeStacksRequest>()).Returns(new DescribeStacksResponse
             {
@@ -207,7 +194,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
                 sqsClient.ClearReceivedCalls();
                 putCommitStatusFacade.ClearReceivedCalls();
                 cloudFormationClient.ClearReceivedCalls();
-                cloudFormationFactory.ClearReceivedCalls();
+                cloudformationFactory.ClearReceivedCalls();
 
                 request = CreateRequest(stackId, tokenKey, status);
                 snsEvent = Substitute.For<SNSEvent>();
@@ -241,7 +228,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
                 sqsClient.ClearReceivedCalls();
                 putCommitStatusFacade.ClearReceivedCalls();
                 cloudFormationClient.ClearReceivedCalls();
-                cloudFormationFactory.ClearReceivedCalls();
+                cloudformationFactory.ClearReceivedCalls();
 
                 request = CreateRequest(stackId, tokenKey, status);
                 snsEvent = Substitute.For<SNSEvent>();
@@ -274,7 +261,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
                 sqsClient.ClearReceivedCalls();
                 putCommitStatusFacade.ClearReceivedCalls();
                 cloudFormationClient.ClearReceivedCalls();
-                cloudFormationFactory.ClearReceivedCalls();
+                cloudformationFactory.ClearReceivedCalls();
 
                 request = CreateRequest(stackId, "", status);
                 snsEvent = Substitute.For<SNSEvent>();
@@ -381,7 +368,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
                 sqsClient.ClearReceivedCalls();
                 putCommitStatusFacade.ClearReceivedCalls();
                 cloudFormationClient.ClearReceivedCalls();
-                cloudFormationFactory.ClearReceivedCalls();
+                cloudformationFactory.ClearReceivedCalls();
 
                 request = CreateRequest(stackId, tokenKey, status);
                 serializedRequest = Serialize(request);
@@ -394,7 +381,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             {
                 await Handler.Handle(snsEvent);
 
-                await cloudFormationFactory.Received().Create(Arg.Is(roleArn));
+                await cloudformationFactory.Received().Create(Arg.Is(roleArn));
                 await cloudFormationClient.Received().DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
                     req.StackName == stackId
                 ));
@@ -441,7 +428,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
                 sqsClient.ClearReceivedCalls();
                 putCommitStatusFacade.ClearReceivedCalls();
                 cloudFormationClient.ClearReceivedCalls();
-                cloudFormationFactory.ClearReceivedCalls();
+                cloudformationFactory.ClearReceivedCalls();
 
                 request = CreateRequest(stackId, "", status);
                 serializedRequest = Serialize(request);
