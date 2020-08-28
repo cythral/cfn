@@ -282,7 +282,7 @@ Resources:
   GithubWebhook:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: GithubWebhook::Cythral.CloudFormation.GithubWebhook.Handler::Handle
+      Handler: GithubWebhook::Cythral.CloudFormation.GithubWebhook.Handler::Run
       Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: ../../bin/GithubWebhook/Release/netcoreapp3.1/publish/
