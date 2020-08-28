@@ -2,48 +2,31 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Lambdajection.Attributes;
+using Lambdajection.Encryption;
 
 using Amazon.KeyManagementService;
 using Amazon.KeyManagementService.Model;
 
 namespace Cythral.CloudFormation.GithubWebhook
 {
-    public class Config : Dictionary<string, string>
+    [LambdaOptions(typeof(Handler), "GithubWebhook")]
+    public class Config
     {
-        public static async Task<Config> Create(IEnumerable<(string, bool)> keys, IEnumerable<string> encryptedKeys = null, IAmazonKeyManagementService kmsClient = null)
-        {
-            kmsClient = kmsClient ?? new AmazonKeyManagementServiceClient();
+        public string GithubOwner { get; set; }
 
-            var config = new Config();
+        [Encrypted] public string GithubToken { get; set; }
 
-            foreach (var (key, encrypted) in keys)
-            {
-                config[key] = Environment.GetEnvironmentVariable(key) ?? "";
+        [Encrypted] public string GithubSigningSecret { get; set; }
 
-                if (encrypted)
-                {
-                    config[key] = await Decrypt(config[key], kmsClient);
-                }
-            }
+        public string TemplateFilename { get; set; }
 
-            return config;
-        }
+        public string PipelineDefinitionFilename { get; set; }
 
-        private static async Task<string> Decrypt(string value, IAmazonKeyManagementService kmsClient)
-        {
-            var stream = new MemoryStream();
-            var byteArray = Convert.FromBase64String(value);
+        public string ArtifactStore { get; set; }
 
-            await stream.WriteAsync(byteArray);
+        public string StackSuffix { get; set; }
 
-            var request = new DecryptRequest { CiphertextBlob = stream };
-            var response = await kmsClient.DecryptAsync(request);
-            var plaintextStream = response.Plaintext;
-
-            using (var reader = new StreamReader(plaintextStream))
-            {
-                return await reader.ReadToEndAsync();
-            }
-        }
+        public string RoleArn { get; set; }
     }
 }
