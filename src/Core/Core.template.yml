@@ -126,16 +126,6 @@ Resources:
       ServiceToken: !ImportValue cfn-secret-resource:SecretLambdaArn
       Ciphertext: !ImportValue sso-aws-registry:DevGoogleClientSecret
 
-  DevTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Condition: SetupDevAccount
-    Properties:
-      TargetType: ip
-      VpcId: !ImportValue cfn-utilities:VpcId
-      Port: 80
-      HealthCheckPath: /healthcheck
-      Protocol: HTTP
-
   DevTargetGroupAlarm:
     Type: AWS::CloudWatch::Alarm
     Condition: SetupDevAccount
@@ -207,16 +197,6 @@ Resources:
       DestinationCidrBlock: 10.3.0.0/16
       RouteTableId: !ImportValue cfn-utilities:RouteTableId
       VpcPeeringConnectionId: !Ref ProdPeeringConnection
-
-  ProdTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Condition: SetupProdAccount
-    Properties:
-      TargetType: ip
-      VpcId: !ImportValue cfn-utilities:VpcId
-      HealthCheckPath: /healthcheck
-      Port: 80
-      Protocol: HTTP
 
   ProdTargetGroupAlarm:
     Type: AWS::CloudWatch::Alarm
