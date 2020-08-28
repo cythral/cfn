@@ -294,15 +294,15 @@ Resources:
       AutoPublishAlias: GithubWebhook
       Environment:
         Variables:
-          GITHUB_OWNER: !Ref GithubOwner
-          GITHUB_TOKEN: !Ref GithubToken
-          GITHUB_SIGNING_SECRET: !Ref GithubSigningSecret
-          TEMPLATE_FILENAME: !Ref TemplateFilename
-          PIPELINE_DEFINITION_FILENAME: !Ref PipelineDefinitionFilename
-          STACK_SUFFIX: !Ref StackSuffix
-          ROLE_ARN: !ImportValue cfn-utilities:MasterRoleArn
+          GithubWebhook__GithubOwner: !Ref GithubOwner
+          GithubWebhook__GithubToken: !Ref GithubToken
+          GithubWebhook__GithubSigningSecret: !Ref GithubSigningSecret
+          GithubWebhook__TemplateFileName: !Ref TemplateFilename
+          GithubWebhook__PipelineDefinitionFilename: !Ref PipelineDefinitionFilename
+          GithubWebhook__StackSuffix: !Ref StackSuffix
+          GithubWebhook__RoleArn: !ImportValue cfn-utilities:MasterRoleArn
+          GithubWebhook__ArtifactStore: !Ref GithubWebhookArtifactStore
           AWS_ACCOUNT_ID: !Ref AWS::AccountId
-          ARTIFACT_STORE: !Ref GithubWebhookArtifactStore
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   GithubWebhookPolicy:
