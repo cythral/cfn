@@ -25,7 +25,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             var templateContents = "example template";
 
             var config = new Config();
-            config["GITHUB_TOKEN"] = githubToken;
+            config.GithubToken = githubToken;
 
             mockHttp
             .Expect($"https://api.github.com/repos/Codertocat/Hello-World/contents/{templateName}")
@@ -51,7 +51,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             var gitRef = "develop";
 
             var config = new Config();
-            config["GITHUB_TOKEN"] = githubToken;
+            config.GithubToken = githubToken;
 
             mockHttp
             .Expect($"https://api.github.com/repos/Codertocat/Hello-World/contents/{templateName}?ref={gitRef}")
@@ -75,7 +75,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             var githubToken = "xx508xx63817x752xx74004x30705xx92x58349x5x78f5xx34xxxxx51";
 
             var config = new Config();
-            config["GITHUB_TOKEN"] = githubToken;
+            config.GithubToken = githubToken;
 
             mockHttp
             .Expect($"https://api.github.com/repos/Codertocat/Hello-World/contents/{templateName}")
