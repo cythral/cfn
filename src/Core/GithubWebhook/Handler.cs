@@ -27,6 +27,8 @@ using static System.Text.Json.JsonSerializer;
 
 using WebhookConfig = Cythral.CloudFormation.GithubWebhook.Config;
 
+[assembly: LambdaSerializer(typeof(CamelCaseLambdaJsonSerializer))]
+
 namespace Cythral.CloudFormation.GithubWebhook
 {
 
