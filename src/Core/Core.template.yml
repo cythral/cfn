@@ -52,6 +52,14 @@ Parameters:
     Default: "1"
     Description: Version of the stack being deployed
 
+  RunEndToEndTests:
+    Type: String
+    Default: "no"
+    Description: Whether or not to run end to end tests
+    AllowedValues:
+      - "yes"
+      - "no"
+
 Conditions:
   SetupDevAccount: !Not
     - !Equals
@@ -62,6 +70,10 @@ Conditions:
     - !Equals
       - !Ref ProdVpcId
       - ""
+
+  RunEndToEndTests: !Equals
+    - !Ref RunEndToEndTests
+    - "yes"
 
 Resources:
   DevPeeringConnection:
@@ -382,6 +394,8 @@ Resources:
 
   GithubWebhoookEndToEndTestRunner:
     Type: Custom::TestRunner
+    Condition: RunEndToEndTests
+    DependsOn: GithubWebhookAliasGithubWebhook
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
