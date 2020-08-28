@@ -30,7 +30,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Entities
             var request = new HttpRequestMessage { Method = Get, RequestUri = new Uri(uri) };
 
             request.Headers.UserAgent.Add(new ProductInfoHeaderValue("brighid", "v1"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("token", config["GITHUB_TOKEN"]);
+            request.Headers.Authorization = new AuthenticationHeaderValue("token", config.GithubToken);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github.VERSION.raw"));
 
             var result = await httpClient.SendAsync(request);

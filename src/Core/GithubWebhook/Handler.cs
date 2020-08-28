@@ -13,10 +13,14 @@ using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-using Cythral.CloudFormation.AwsUtils;
+using Lambdajection.Attributes;
+using Lambdajection.Core;
+
 using Cythral.CloudFormation.AwsUtils.CloudFormation;
 using Cythral.CloudFormation.GithubWebhook.Entities;
 using Cythral.CloudFormation.GithubWebhook.Exceptions;
+
+using Microsoft.Extensions.Options;
 
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
@@ -25,13 +29,25 @@ using WebhookConfig = Cythral.CloudFormation.GithubWebhook.Config;
 
 namespace Cythral.CloudFormation.GithubWebhook
 {
-    public class Handler
+
+    [Lambda(Startup = typeof(Startup))]
+    public partial class Handler
     {
-        public static WebhookConfig Config { get; set; }
-        private static RequestValidator requestValidator = new RequestValidator();
-        private static DeployStackFacade stackDeployer = new DeployStackFacade();
-        private static PipelineStarter pipelineStarter = new PipelineStarter();
-        private static AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
+
+        private RequestValidator requestValidator = new RequestValidator();
+        private DeployStackFacade stackDeployer = new DeployStackFacade();
+        private PipelineStarter pipelineStarter = new PipelineStarter();
+        private IAwsFactory<IAmazonS3> s3Factory;
+        private Config config;
+
+        public Handler(IAwsFactory<IAmazonS3> s3Factory, RequestValidator requestValidator, DeployStackFacade stackDeployer, PipelineStarter pipelineStarter, IOptions<Config> config)
+        {
+            this.s3Factory = s3Factory;
+            this.requestValidator = requestValidator;
+            this.stackDeployer = stackDeployer;
+            this.pipelineStarter = pipelineStarter;
+            this.config = config.Value;
+        }
 
         /// <summary>
         /// This function is called on every request to /webhooks/github
@@ -39,27 +55,14 @@ namespace Cythral.CloudFormation.GithubWebhook
         /// <param name="request">Request sent by the application load balancer</param>
         /// <param name="context">The lambda context</param>
         /// <returns>A load balancer response object</returns>
-        [LambdaSerializer(typeof(CamelCaseLambdaJsonSerializer))]
-        public static async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, ILambdaContext context = null)
+
+        public async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, ILambdaContext context = null)
         {
             PushEvent payload = null;
 
-            // create the config variable if it hasn't been created already (may have been cached from previous request)
-            Config = Config ?? await WebhookConfig.Create(new List<(string, bool)> {
-                // envvar name                      encrypted? 
-                ("GITHUB_OWNER",                    false),
-                ("GITHUB_TOKEN",                    true),
-                ("GITHUB_SIGNING_SECRET",           true),
-                ("TEMPLATE_FILENAME",               false),
-                ("PIPELINE_DEFINITION_FILENAME",    false),
-                ("ARTIFACT_STORE",                  false),
-                ("STACK_SUFFIX",                    false),
-                ("ROLE_ARN",                        false),
-            });
-
             try
             {
-                payload = requestValidator.Validate(request, Config["GITHUB_OWNER"], true, Config["GITHUB_SIGNING_SECRET"]);
+                payload = requestValidator.Validate(request, config.GithubOwner, true, config.GithubSigningSecret);
             }
             catch (RequestValidationException e)
             {
@@ -79,17 +82,17 @@ namespace Cythral.CloudFormation.GithubWebhook
                 tasks.Add(pipelineStarter.StartPipelineIfExists(payload));
             }
 
-            Task.WaitAll(tasks.ToArray());
+            await Task.WhenAll(tasks);
             return CreateResponse(statusCode: OK);
         }
 
-        private static async Task DeployCicdStack(PushEvent payload)
+        private async Task DeployCicdStack(PushEvent payload)
         {
-            var stackName = $"{payload.Repository.Name}-{Config["STACK_SUFFIX"]}";
+            var stackName = $"{payload.Repository.Name}-{config.StackSuffix}";
             var contentsUrl = payload.Repository.ContentsUrl;
-            var templateContent = await CommittedFile.FromContentsUrl(contentsUrl, Config["TEMPLATE_FILENAME"], Config, payload.Ref);
-            var pipelineDefinition = await CommittedFile.FromContentsUrl(contentsUrl, Config["PIPELINE_DEFINITION_FILENAME"], Config, payload.Ref);
-            var roleArn = Config["ROLE_ARN"];
+            var templateContent = await CommittedFile.FromContentsUrl(contentsUrl, config.TemplateFilename, config, payload.Ref);
+            var pipelineDefinition = await CommittedFile.FromContentsUrl(contentsUrl, config.PipelineDefinitionFilename, config, payload.Ref);
+            var roleArn = config.RoleArn;
 
             if (templateContent == null)
             {
@@ -98,7 +101,7 @@ namespace Cythral.CloudFormation.GithubWebhook
             }
 
             var parameters = new List<Parameter> {
-                new Parameter { ParameterKey = "GithubToken", ParameterValue = Config["GITHUB_TOKEN"] },
+                new Parameter { ParameterKey = "GithubToken", ParameterValue = config.GithubToken },
                 new Parameter { ParameterKey = "GithubOwner", ParameterValue = payload.Repository.Owner.Name },
                 new Parameter { ParameterKey = "GithubRepo", ParameterValue = payload.Repository.Name },
                 new Parameter { ParameterKey = "GithubBranch", ParameterValue = payload.Repository.DefaultBranch }
@@ -112,7 +115,7 @@ namespace Cythral.CloudFormation.GithubWebhook
                 parameters.Add(new Parameter
                 {
                     ParameterKey = "PipelineDefinitionBucket",
-                    ParameterValue = Config["ARTIFACT_STORE"]
+                    ParameterValue = config.ArtifactStore
                 });
 
                 parameters.Add(new Parameter
@@ -121,12 +124,12 @@ namespace Cythral.CloudFormation.GithubWebhook
                     ParameterValue = key
                 });
 
-                if (!await IsFileAlreadyUploaded(Config["ARTIFACT_STORE"], key))
+                if (!await IsFileAlreadyUploaded(config.ArtifactStore, key))
                 {
                     var s3Client = await s3Factory.Create();
                     var response = await s3Client.PutObjectAsync(new PutObjectRequest
                     {
-                        BucketName = Config["ARTIFACT_STORE"],
+                        BucketName = config.ArtifactStore,
                         Key = key,
                         ContentBody = pipelineDefinition
                     });
@@ -161,7 +164,7 @@ namespace Cythral.CloudFormation.GithubWebhook
             }
         }
 
-        private static async Task<bool> IsFileAlreadyUploaded(string bucket, string key)
+        private async Task<bool> IsFileAlreadyUploaded(string bucket, string key)
         {
             var s3Client = await s3Factory.Create();
 
