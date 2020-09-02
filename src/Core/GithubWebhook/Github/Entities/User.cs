@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Cythral.CloudFormation.GithubWebhook.Entities
+namespace Cythral.CloudFormation.GithubWebhook.Github.Entities
 {
     public class User
     {

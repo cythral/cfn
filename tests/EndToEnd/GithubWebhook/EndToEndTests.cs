@@ -14,7 +14,8 @@ using Amazon.StepFunctions.Model;
 
 using Cythral.CloudFormation.AwsUtils.KeyManagementService;
 using Cythral.CloudFormation.GithubWebhook;
-using Cythral.CloudFormation.GithubWebhook.Entities;
+using Cythral.CloudFormation.GithubWebhook.Github;
+using Cythral.CloudFormation.GithubWebhook.Github.Entities;
 
 using NUnit.Framework;
 
@@ -22,9 +23,9 @@ using Octokit;
 
 using static System.Text.Json.JsonSerializer;
 
-using Commit = Cythral.CloudFormation.GithubWebhook.Entities.Commit;
-using Repository = Cythral.CloudFormation.GithubWebhook.Entities.Repository;
-using User = Cythral.CloudFormation.GithubWebhook.Entities.User;
+using Commit = Cythral.CloudFormation.GithubWebhook.Github.Entities.Commit;
+using Repository = Cythral.CloudFormation.GithubWebhook.Github.Entities.Repository;
+using User = Cythral.CloudFormation.GithubWebhook.Github.Entities.User;
 
 namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
 {

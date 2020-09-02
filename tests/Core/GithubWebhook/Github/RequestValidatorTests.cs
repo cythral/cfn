@@ -2,32 +2,39 @@
 
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 
-using Cythral.CloudFormation.GithubWebhook.Entities;
 using Cythral.CloudFormation.GithubWebhook.Exceptions;
-using Cythral.CloudFormation.GithubWebhook;
+using Cythral.CloudFormation.GithubWebhook.Github.Entities;
+
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation.Tests.GithubWebhook
+namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
 {
     public class RequestValidatorTests
     {
-        private static RequestValidator requestValidator = new RequestValidator();
 
         [Test]
         public void NonPostRequestsThrowMethodNotAllowed([Values("GET", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS")] string method)
         {
             var request = new ApplicationLoadBalancerRequest { HttpMethod = method };
-            Assert.Throws(Is.InstanceOf<MethodNotAllowedException>(), () => requestValidator.Validate(request, validateSignature: false));
+            var options = Options.Create(new Config { GithubOwner = "Codertocat", GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.InstanceOf<MethodNotAllowedException>(), () => requestValidator.Validate(request));
         }
 
         [Test]
         public void PostRequestsDontThrowMethodNotAllowed()
         {
             var request = new ApplicationLoadBalancerRequest { HttpMethod = "POST" };
-            Assert.Throws(Is.Not.InstanceOf<MethodNotAllowedException>(), () => requestValidator.Validate(request, validateSignature: false));
+
+            var options = Options.Create(new Config { GithubOwner = "Codertocat", GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.Not.InstanceOf<MethodNotAllowedException>(), () => requestValidator.Validate(request));
         }
 
         [Test]
@@ -40,7 +47,10 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 Body = "{}"
             };
 
-            Assert.Throws(Is.InstanceOf<EventNotAllowedException>(), () => requestValidator.Validate(request, validateSignature: false));
+            var options = Options.Create(new Config { GithubOwner = "Codertocat", GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.InstanceOf<EventNotAllowedException>(), () => requestValidator.Validate(request));
         }
 
         [Test]
@@ -53,7 +63,10 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 Body = "{}"
             };
 
-            Assert.Throws(Is.Not.InstanceOf<EventNotAllowedException>(), () => requestValidator.Validate(request, validateSignature: false));
+            var options = Options.Create(new Config { GithubOwner = "Codertocat", GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.Not.InstanceOf<EventNotAllowedException>(), () => requestValidator.Validate(request));
         }
 
         [Test]
@@ -66,7 +79,10 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 Body = body
             };
 
-            Assert.Throws(Is.InstanceOf<BodyNotJsonException>(), () => requestValidator.Validate(request, validateSignature: false));
+            var options = Options.Create(new Config { GithubOwner = "Codertocat", GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.InstanceOf<BodyNotJsonException>(), () => requestValidator.Validate(request));
         }
 
         [Test]
@@ -79,7 +95,10 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 Body = "{}"
             };
 
-            Assert.Throws(Is.Not.InstanceOf<BodyNotJsonException>(), () => requestValidator.Validate(request, validateSignature: false));
+            var options = Options.Create(new Config { GithubOwner = "Codertocat", GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.Not.InstanceOf<BodyNotJsonException>(), () => requestValidator.Validate(request));
         }
 
         [Test]
@@ -95,7 +114,10 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 })
             };
 
-            Assert.Throws(Is.InstanceOf<NoContentsUrlException>(), () => requestValidator.Validate(request, validateSignature: false));
+            var options = Options.Create(new Config { GithubOwner = "Codertocat", GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.InstanceOf<NoContentsUrlException>(), () => requestValidator.Validate(request));
         }
 
         [Test]
@@ -114,7 +136,10 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 })
             };
 
-            Assert.Throws(Is.Not.InstanceOf<NoContentsUrlException>(), () => requestValidator.Validate(request, validateSignature: false));
+            var options = Options.Create(new Config { GithubOwner = "Codertocat", GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.Not.InstanceOf<NoContentsUrlException>(), () => requestValidator.Validate(request));
         }
 
         public static IEnumerable<ApplicationLoadBalancerRequest> UnexpectedOwnerRequests()
@@ -150,12 +175,16 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
         [Test]
         public void RequestsWithUnexpectedOwnerThrowException([ValueSource("UnexpectedOwnerRequests")] ApplicationLoadBalancerRequest request)
         {
-            Assert.Throws(Is.InstanceOf<UnexpectedOwnerException>(), () => requestValidator.Validate(request, "Codertocat", validateSignature: false));
+            var options = Options.Create(new Config { GithubOwner = "Codertocat", GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.InstanceOf<UnexpectedOwnerException>(), () => requestValidator.Validate(request));
         }
 
         [Test]
         public void RequestsWithOkOwnerDontThrowException()
         {
+            var owner = "Codertocat";
             var request = new ApplicationLoadBalancerRequest
             {
                 HttpMethod = "POST",
@@ -164,13 +193,16 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 {
                     Repository = new Repository
                     {
-                        Owner = new User { Name = "Codertocat" },
+                        Owner = new User { Name = owner },
                         ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}"
                     }
                 })
             };
 
-            Assert.Throws(Is.Not.InstanceOf<UnexpectedOwnerException>(), () => requestValidator.Validate(request, "Codertocat", validateSignature: false));
+            var options = Options.Create(new Config { GithubOwner = owner, GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.Not.InstanceOf<UnexpectedOwnerException>(), () => requestValidator.Validate(request));
         }
 
         [Test]
@@ -188,6 +220,9 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                     }
                 })
             };
+
+            var options = Options.Create(new Config { GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
 
             Assert.Throws(Is.InstanceOf<InvalidSignatureException>(), () => requestValidator.Validate(request));
         }
@@ -212,7 +247,10 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 })
             };
 
-            Assert.Throws(Is.InstanceOf<InvalidSignatureException>(), () => requestValidator.Validate(request, signingKey: "test_key"));
+            var options = Options.Create(new Config { GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.InstanceOf<InvalidSignatureException>(), () => requestValidator.Validate(request));
         }
 
         [Test]
@@ -235,7 +273,10 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 })
             };
 
-            Assert.Throws(Is.Not.InstanceOf<InvalidSignatureException>(), () => requestValidator.Validate(request, signingKey: "test_key"));
+            var options = Options.Create(new Config { GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.Not.InstanceOf<InvalidSignatureException>(), () => requestValidator.Validate(request));
         }
     }
 }

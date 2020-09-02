@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Cythral.CloudFormation.GithubWebhook.Entities;
 
-namespace Cythral.CloudFormation.GithubWebhook
+using Cythral.CloudFormation.GithubWebhook.Github.Entities;
+
+namespace Cythral.CloudFormation.GithubWebhook.Github
 {
     public class PushEvent
     {
