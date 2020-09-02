@@ -1,0 +1,32 @@
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+
+using Microsoft.Extensions.Options;
+
+namespace Cythral.CloudFormation.GithubWebhook
+{
+    public class GithubHttpClient
+    {
+        private static readonly HttpClient client = new HttpClient();
+        private readonly Config config;
+
+        public GithubHttpClient(IOptions<Config> config)
+        {
+            this.config = config.Value;
+            Configure();
+        }
+
+        private void Configure()
+        {
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("brighid", "v1"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", config.GithubToken);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github.VERSION.raw"));
+        }
+
+        public virtual Task<HttpResponseMessage> SendAsync(HttpRequestMessage request)
+        {
+            return client.SendAsync(request);
+        }
+    }
+}
