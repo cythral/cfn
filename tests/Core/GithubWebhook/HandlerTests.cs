@@ -8,9 +8,16 @@ using Amazon.S3;
 
 using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.CloudFormation;
-using Cythral.CloudFormation.GithubWebhook;
-using Cythral.CloudFormation.GithubWebhook.Entities;
+using Cythral.CloudFormation.GithubWebhook.Exceptions;
+using Cythral.CloudFormation.GithubWebhook.Github;
+using Cythral.CloudFormation.GithubWebhook.Github.Entities;
+using Cythral.CloudFormation.GithubWebhook.Pipelines;
 using Cythral.CloudFormation.StackDeployment;
+
+using FluentAssertions;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using NSubstitute;
 
@@ -19,188 +26,154 @@ using NUnit.Framework;
 using RichardSzalay.MockHttp;
 
 using static System.Text.Json.JsonSerializer;
+using static NSubstitute.Arg;
 
 using Handler = Cythral.CloudFormation.GithubWebhook.Handler;
 
-namespace Cythral.CloudFormation.Tests.GithubWebhook
+namespace Cythral.CloudFormation.GithubWebhook.Tests
 {
-    // public class HandlerTests
-    // {
-    //     private static RequestValidator requestValidator = Substitute.For<RequestValidator>();
-    //     private static DeployStackFacade stackDeployer = Substitute.For<DeployStackFacade>();
-    //     private static PipelineStarter pipelineStarter = Substitute.For<PipelineStarter>();
-    //     private static AmazonClientFactory<IAmazonS3> s3Factory = Substitute.For<AmazonClientFactory<IAmazonS3>>();
-    //     private static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
 
-    //     private const string repoName = "repoName";
+    public class HandlerTests
+    {
+        public class ValidationException : RequestValidationException
+        {
+            public override HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
 
-    //     [SetUp]
-    //     public void SetupStackDeployer()
-    //     {
-    //         TestUtils.SetPrivateStaticField(typeof(Handler), "stackDeployer", stackDeployer);
-    //         stackDeployer.ClearReceivedCalls();
-    //     }
+            public ValidationException() : base("Validation Exception") { }
+        }
 
-    //     [SetUp]
-    //     public void SetupPipelineStarter()
-    //     {
-    //         TestUtils.SetPrivateStaticField(typeof(Handler), "pipelineStarter", pipelineStarter);
-    //         pipelineStarter.ClearReceivedCalls();
-    //         pipelineStarter.StartPipelineIfExists(Arg.Any<PushEvent>()).Returns(Task.Run(() => { }));
-    //     }
+        private readonly IOptions<Config> config = Options.Create(new Config
+        {
 
-    //     [SetUp]
-    //     public void SetupRequestValidator()
-    //     {
-    //         TestUtils.SetPrivateStaticField(typeof(Handler), "requestValidator", requestValidator);
-    //         requestValidator.ClearReceivedCalls();
-    //     }
+        });
 
-    //     [SetUp]
-    //     public void SetupS3()
-    //     {
-    //         TestUtils.SetPrivateStaticField(typeof(Handler), "s3Factory", s3Factory);
-    //         s3Factory.ClearReceivedCalls();
-    //         s3Factory.Create().Returns(s3Client);
-    //     }
 
-    //     [SetUp]
-    //     public void SetupConfig()
-    //     {
-    //         Handler.Config = new Config()
-    //         {
-    //             ["GITHUB_TOKEN"] = "exampletoken",
-    //             ["GITHUB_OWNER"] = "Codertocat",
-    //             ["TEMPLATE_FILENAME"] = "cicd.template.yml",
-    //             ["CONFIG_FILENAME"] = "cicd.config.yml",
-    //             ["STACK_SUFFIX"] = "cicd",
-    //             ["GITHUB_SIGNING_SECRET"] = "",
-    //             ["ROLE_ARN"] = "arn:aws:iam::1:role/Facade",
-    //             ["PIPELINE_DEFINITION_FILENAME"] = "pipeline.json",
-    //         };
-    //     }
+        [Test]
+        public async Task Handle_ReturnsBadRequest_IfValidationFails()
+        {
+            var requestValidator = Substitute.For<RequestValidator>();
+            var starter = Substitute.For<PipelineStarter>();
+            var deployer = Substitute.For<PipelineDeployer>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestValidator, starter, deployer, config, logger);
 
-    //     private (ApplicationLoadBalancerRequest, PushEvent) CreateRequest(string contentsUrl, string toRef, string defaultBranch, string head = null, string headCommitMessage = "")
-    //     {
-    //         var payload = new PushEvent
-    //         {
-    //             Ref = toRef,
-    //             Head = head,
-    //             HeadCommit = new Commit
-    //             {
-    //                 Message = headCommitMessage,
-    //             },
-    //             Repository = new Repository
-    //             {
-    //                 Name = repoName,
-    //                 Owner = new User { Name = "Codertocat" },
-    //                 ContentsUrl = contentsUrl,
-    //                 DefaultBranch = defaultBranch,
-    //             }
-    //         };
+            requestValidator
+            .When(validator => validator.Validate(Any<ApplicationLoadBalancerRequest>()))
+            .Do(x => throw new ValidationException());
 
-    //         requestValidator.Validate(null, null, true, null).ReturnsForAnyArgs(payload);
+            var response = await handler.Handle(new ApplicationLoadBalancerRequest { });
 
-    //         return (new ApplicationLoadBalancerRequest
-    //         {
-    //             Body = Serialize(payload)
-    //         }, payload);
-    //     }
+            response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+        }
 
-    //     [Test]
-    //     public async Task HandleCallsDeployIfOnDefaultBranch()
-    //     {
-    //         var contentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}";
-    //         var (request, payload) = CreateRequest(contentsUrl, "refs/heads/master", "master");
-    //         var template = "template";
+        [Test]
+        public async Task Handle_ShouldDeployPipeline_IfOnDefaultBranch_AndCommitMessageDoesntContainSkip()
+        {
+            var requestValidator = Substitute.For<RequestValidator>();
+            var starter = Substitute.For<PipelineStarter>();
+            var deployer = Substitute.For<PipelineDeployer>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestValidator, starter, deployer, config, logger);
 
-    //         Console.WriteLine(payload.OnDefaultBranch);
+            var pushEvent = new PushEvent
+            {
+                Ref = "refs/heads/master",
+                Repository = new Repository { DefaultBranch = "master" },
+                HeadCommit = new Commit { Message = "" }
+            };
 
-    //         var httpMock = new MockHttpMessageHandler();
-    //         CommittedFile.DefaultHttpClientFactory = () => new HttpClient(httpMock);
+            requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
 
-    //         httpMock
-    //        .Expect($"https://api.github.com/repos/Codertocat/Hello-World/contents/cicd.template.yml")
-    //        .Respond(HttpStatusCode.OK, "text/plain", template);
+            var response = await handler.Handle(new ApplicationLoadBalancerRequest { });
+            await deployer.Received().Deploy(Is(pushEvent));
+        }
 
-    //         var response = await Handler.Handle(request);
-    //         await stackDeployer.Received().Deploy(Arg.Is<DeployStackContext>(req => req.Template == template));
-    //     }
+        [Test]
+        public async Task Handle_ShouldNotDeployPipeline_IfOnDefaultBranch_AndCommitMessageContainsSkip()
+        {
+            var requestValidator = Substitute.For<RequestValidator>();
+            var starter = Substitute.For<PipelineStarter>();
+            var deployer = Substitute.For<PipelineDeployer>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestValidator, starter, deployer, config, logger);
 
-    //     [Test]
-    //     public async Task HandleDoesNotCallDeployIfCommitMessageIncludesSkipCiMeta()
-    //     {
-    //         var contentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}";
-    //         var (request, _) = CreateRequest(contentsUrl, "refs/heads/master", "master", headCommitMessage: "update docs [skip meta-ci]");
-    //         var template = "template";
+            var pushEvent = new PushEvent
+            {
+                Ref = "refs/heads/master",
+                Repository = new Repository { DefaultBranch = "master" },
+                HeadCommit = new Commit { Message = "[skip meta-ci]" }
+            };
 
-    //         var httpMock = new MockHttpMessageHandler();
-    //         CommittedFile.DefaultHttpClientFactory = () => new HttpClient(httpMock);
+            requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
 
-    //         httpMock
-    //        .Expect($"https://api.github.com/repos/Codertocat/Hello-World/contents/cicd.template.yml")
-    //        .Respond(HttpStatusCode.OK, "text/plain", template);
+            var response = await handler.Handle(new ApplicationLoadBalancerRequest { });
+            await deployer.DidNotReceiveWithAnyArgs().Deploy(null!);
+        }
 
-    //         var response = await Handler.Handle(request);
-    //         await stackDeployer.DidNotReceive().Deploy(Arg.Any<DeployStackContext>());
-    //     }
+        [Test]
+        public async Task Handle_ShouldNotDeployPipeline_IfNotOnDefaultBranch()
+        {
+            var requestValidator = Substitute.For<RequestValidator>();
+            var starter = Substitute.For<PipelineStarter>();
+            var deployer = Substitute.For<PipelineDeployer>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestValidator, starter, deployer, config, logger);
 
-    //     [Test]
-    //     public async Task HandleDoesNotCallDeployIfNotOnDefaultBranch()
-    //     {
-    //         var contentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}";
-    //         var (request, _) = CreateRequest(contentsUrl, "refs/heads/some-hotfix", "master");
-    //         var template = "template";
+            var pushEvent = new PushEvent
+            {
+                Ref = "refs/heads/master",
+                Repository = new Repository { DefaultBranch = "develop" },
+                HeadCommit = new Commit { Message = "" }
+            };
 
-    //         var httpMock = new MockHttpMessageHandler();
-    //         CommittedFile.DefaultHttpClientFactory = () => new HttpClient(httpMock);
+            requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
 
-    //         httpMock
-    //        .Expect($"https://api.github.com/repos/Codertocat/Hello-World/contents/cicd.template.yml")
-    //        .Respond(HttpStatusCode.OK, "text/plain", template);
+            var response = await handler.Handle(new ApplicationLoadBalancerRequest { });
+            await deployer.DidNotReceiveWithAnyArgs().Deploy(null!);
+        }
 
-    //         var response = await Handler.Handle(request);
-    //         await stackDeployer.DidNotReceive().Deploy(Arg.Any<DeployStackContext>());
-    //     }
+        [Test]
+        public async Task Handle_ShouldStartPipeline()
+        {
+            var requestValidator = Substitute.For<RequestValidator>();
+            var starter = Substitute.For<PipelineStarter>();
+            var deployer = Substitute.For<PipelineDeployer>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestValidator, starter, deployer, config, logger);
 
-    //     [Test]
-    //     public async Task HandleCallsStartPipeline()
-    //     {
-    //         var head = "head";
-    //         var pushRef = "refs/heads/some-hotfix";
-    //         var contentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}";
-    //         var (request, payload) = CreateRequest(contentsUrl, pushRef, "master", head);
-    //         var template = "template";
+            var pushEvent = new PushEvent
+            {
+                Ref = "refs/heads/master",
+                Repository = new Repository { DefaultBranch = "develop" },
+                HeadCommit = new Commit { Message = "" }
+            };
 
-    //         var httpMock = new MockHttpMessageHandler();
-    //         CommittedFile.DefaultHttpClientFactory = () => new HttpClient(httpMock);
+            requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
 
-    //         httpMock
-    //        .Expect($"https://api.github.com/repos/Codertocat/Hello-World/contents/cicd.template.yml")
-    //        .Respond(HttpStatusCode.OK, "text/plain", template);
+            var response = await handler.Handle(new ApplicationLoadBalancerRequest { });
+            await starter.Received().StartPipelineIfExists(Is(pushEvent));
+        }
 
-    //         var response = await Handler.Handle(request);
-    //         await pipelineStarter.Received().StartPipelineIfExists(Arg.Is(payload));
-    //     }
+        [Test]
+        public async Task Handle_ShouldNotStartPipeline_IfCommitMessageContainsSkip()
+        {
+            var requestValidator = Substitute.For<RequestValidator>();
+            var starter = Substitute.For<PipelineStarter>();
+            var deployer = Substitute.For<PipelineDeployer>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestValidator, starter, deployer, config, logger);
 
-    //     [Test]
-    //     public async Task HandleDoesntCallStartPipelineIfHeadCommitMessageContainsSkipCI()
-    //     {
-    //         var head = "head";
-    //         var pushRef = "refs/heads/some-hotfix";
-    //         var contentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}";
-    //         var (request, payload) = CreateRequest(contentsUrl, pushRef, "master", head, "yada yada [skip ci]");
-    //         var template = "template";
+            var pushEvent = new PushEvent
+            {
+                Ref = "refs/heads/master",
+                Repository = new Repository { DefaultBranch = "develop" },
+                HeadCommit = new Commit { Message = "[skip ci]" }
+            };
 
-    //         var httpMock = new MockHttpMessageHandler();
-    //         CommittedFile.DefaultHttpClientFactory = () => new HttpClient(httpMock);
+            requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
 
-    //         httpMock
-    //        .Expect($"https://api.github.com/repos/Codertocat/Hello-World/contents/cicd.template.yml")
-    //        .Respond(HttpStatusCode.OK, "text/plain", template);
-
-    //         var response = await Handler.Handle(request);
-    //         await pipelineStarter.DidNotReceive().StartPipelineIfExists(Arg.Any<PushEvent>());
-    //     }
-    // }
+            var response = await handler.Handle(new ApplicationLoadBalancerRequest { });
+            await starter.DidNotReceiveWithAnyArgs().StartPipelineIfExists(null!);
+        }
+    }
 }

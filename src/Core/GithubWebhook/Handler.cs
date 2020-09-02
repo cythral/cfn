@@ -13,19 +13,19 @@ using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.S3;
 using Amazon.S3.Model;
 
+using Cythral.CloudFormation.AwsUtils.CloudFormation;
+using Cythral.CloudFormation.GithubWebhook.Exceptions;
+using Cythral.CloudFormation.GithubWebhook.Github;
+using Cythral.CloudFormation.GithubWebhook.Pipelines;
+
 using Lambdajection.Attributes;
 using Lambdajection.Core;
 
-using Cythral.CloudFormation.AwsUtils.CloudFormation;
-using Cythral.CloudFormation.GithubWebhook.Entities;
-using Cythral.CloudFormation.GithubWebhook.Exceptions;
-
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
-
-using WebhookConfig = Cythral.CloudFormation.GithubWebhook.Config;
 
 [assembly: LambdaSerializer(typeof(CamelCaseLambdaJsonSerializer))]
 
@@ -36,19 +36,25 @@ namespace Cythral.CloudFormation.GithubWebhook
     public partial class Handler
     {
 
-        private RequestValidator requestValidator = new RequestValidator();
-        private DeployStackFacade stackDeployer = new DeployStackFacade();
-        private PipelineStarter pipelineStarter = new PipelineStarter();
-        private IAwsFactory<IAmazonS3> s3Factory;
-        private Config config;
+        private readonly RequestValidator requestValidator;
+        private readonly PipelineStarter pipelineStarter;
+        private readonly PipelineDeployer pipelineDeployer;
+        private readonly Config config;
+        private readonly ILogger<Handler> logger;
 
-        public Handler(IAwsFactory<IAmazonS3> s3Factory, RequestValidator requestValidator, DeployStackFacade stackDeployer, PipelineStarter pipelineStarter, IOptions<Config> config)
+        public Handler(
+            RequestValidator requestValidator,
+            PipelineStarter pipelineStarter,
+            PipelineDeployer pipelineDeployer,
+            IOptions<Config> config,
+            ILogger<Handler> logger
+        )
         {
-            this.s3Factory = s3Factory;
             this.requestValidator = requestValidator;
-            this.stackDeployer = stackDeployer;
             this.pipelineStarter = pipelineStarter;
+            this.pipelineDeployer = pipelineDeployer;
             this.config = config.Value;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -64,11 +70,11 @@ namespace Cythral.CloudFormation.GithubWebhook
 
             try
             {
-                payload = requestValidator.Validate(request, config.GithubOwner, true, config.GithubSigningSecret);
+                payload = requestValidator.Validate(request);
             }
             catch (RequestValidationException e)
             {
-                Console.WriteLine(e.Message);
+                logger.LogError(e.Message);
                 return CreateResponse(statusCode: e.StatusCode);
             }
 
@@ -76,109 +82,19 @@ namespace Cythral.CloudFormation.GithubWebhook
 
             if (payload.OnDefaultBranch && !payload.HeadCommit.Message.Contains("[skip meta-ci]"))
             {
-                tasks.Add(DeployCicdStack(payload));
+                var task = pipelineDeployer.Deploy(payload);
+                tasks.Add(task);
             }
 
             if (!payload.HeadCommit.Message.Contains("[skip ci]"))
             {
-                tasks.Add(pipelineStarter.StartPipelineIfExists(payload));
+                var task = pipelineStarter.StartPipelineIfExists(payload);
+                tasks.Add(task);
             }
 
             await Task.WhenAll(tasks);
+
             return CreateResponse(statusCode: OK);
-        }
-
-        private async Task DeployCicdStack(PushEvent payload)
-        {
-            var stackName = $"{payload.Repository.Name}-{config.StackSuffix}";
-            var contentsUrl = payload.Repository.ContentsUrl;
-            var templateContent = await CommittedFile.FromContentsUrl(contentsUrl, config.TemplateFilename, config, payload.Ref);
-            var pipelineDefinition = await CommittedFile.FromContentsUrl(contentsUrl, config.PipelineDefinitionFilename, config, payload.Ref);
-            var roleArn = config.RoleArn;
-
-            if (templateContent == null)
-            {
-                Console.WriteLine($"Couldn't find template for {payload.Repository.Name}");
-                return;
-            }
-
-            var parameters = new List<Parameter> {
-                new Parameter { ParameterKey = "GithubToken", ParameterValue = config.GithubToken },
-                new Parameter { ParameterKey = "GithubOwner", ParameterValue = payload.Repository.Owner.Name },
-                new Parameter { ParameterKey = "GithubRepo", ParameterValue = payload.Repository.Name },
-                new Parameter { ParameterKey = "GithubBranch", ParameterValue = payload.Repository.DefaultBranch }
-            };
-
-            if (pipelineDefinition != null)
-            {
-                var hash = GetSum(pipelineDefinition);
-                var key = $"{payload.Repository.Name}/{hash}";
-
-                parameters.Add(new Parameter
-                {
-                    ParameterKey = "PipelineDefinitionBucket",
-                    ParameterValue = config.ArtifactStore
-                });
-
-                parameters.Add(new Parameter
-                {
-                    ParameterKey = "PipelineDefinitionKey",
-                    ParameterValue = key
-                });
-
-                if (!await IsFileAlreadyUploaded(config.ArtifactStore, key))
-                {
-                    var s3Client = await s3Factory.Create();
-                    var response = await s3Client.PutObjectAsync(new PutObjectRequest
-                    {
-                        BucketName = config.ArtifactStore,
-                        Key = key,
-                        ContentBody = pipelineDefinition
-                    });
-
-                    Console.WriteLine($"Got response from s3 put object on the pipeline definition: {Serialize(response)}");
-                }
-            }
-
-            try
-            {
-                await stackDeployer.Deploy(new DeployStackContext
-                {
-                    StackName = stackName,
-                    Template = templateContent,
-                    PassRoleArn = roleArn,
-                    Parameters = parameters
-                });
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Failed to create/update stack: {e.Message} {e.StackTrace}");
-            }
-        }
-
-        private static string GetSum(string contents)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var fileBytes = Encoding.UTF8.GetBytes(contents);
-                var sumBytes = sha256.ComputeHash(fileBytes);
-                return string.Join("", sumBytes.Select(byt => $"{byt:X2}"));
-            }
-        }
-
-        private async Task<bool> IsFileAlreadyUploaded(string bucket, string key)
-        {
-            var s3Client = await s3Factory.Create();
-
-            try
-            {
-                await s3Client.GetObjectMetadataAsync(bucket, key);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
         }
 
         private static ApplicationLoadBalancerResponse CreateResponse(HttpStatusCode statusCode, string contentType = "text/plain", string body = "")
