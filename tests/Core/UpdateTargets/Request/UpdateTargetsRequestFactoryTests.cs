@@ -1,15 +1,17 @@
 using System.Collections.Generic;
-using static System.Text.Json.JsonSerializer;
+
 using Amazon.Lambda.SNSEvents;
 
-using Cythral.CloudFormation.GithubWebhook.Entities;
+using Cythral.CloudFormation.GithubWebhook.Github.Entities;
 using Cythral.CloudFormation.UpdateTargets;
 using Cythral.CloudFormation.UpdateTargets.Request;
 
 using NUnit.Framework;
 
-using SNSRecord = Amazon.Lambda.SNSEvents.SNSEvent.SNSRecord;
+using static System.Text.Json.JsonSerializer;
+
 using SNSMessage = Amazon.Lambda.SNSEvents.SNSEvent.SNSMessage;
+using SNSRecord = Amazon.Lambda.SNSEvents.SNSEvent.SNSRecord;
 
 namespace Cythral.CloudFormation.Tests.UpdateTargets.Request
 {

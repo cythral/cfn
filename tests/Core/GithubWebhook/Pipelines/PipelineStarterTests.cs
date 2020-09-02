@@ -6,7 +6,10 @@ using Amazon.StepFunctions.Model;
 
 using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.GithubWebhook;
-using Cythral.CloudFormation.GithubWebhook.Entities;
+using Cythral.CloudFormation.GithubWebhook.Github;
+using Cythral.CloudFormation.GithubWebhook.Github.Entities;
+
+using Microsoft.Extensions.Logging;
 
 using NSubstitute;
 
@@ -14,48 +17,15 @@ using NUnit.Framework;
 
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation.Tests.GithubWebhook
+namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
 {
     public class PipelineStarterTests
     {
-        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = Substitute.For<AmazonClientFactory<IAmazonStepFunctions>>();
-        private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
-        private static PipelineStarter pipelineStarter = new PipelineStarter();
-
-        [SetUp]
-        public void SetupStepFunctions()
-        {
-            TestUtils.SetPrivateField(pipelineStarter, "stepFunctionsClientFactory", stepFunctionsClientFactory);
-            stepFunctionsClientFactory.ClearReceivedCalls();
-            stepFunctionsClientFactory.Create().Returns(stepFunctionsClient);
-        }
-
         [SetUp]
         public void SetupEnvvars()
         {
             Environment.SetEnvironmentVariable("AWS_REGION", "us-east-1");
             Environment.SetEnvironmentVariable("AWS_ACCOUNT_ID", "5");
-        }
-
-        [Test]
-        public async Task StepFunctionsClientIsCreated()
-        {
-            var sha = "sha";
-            var repoName = "name";
-            var payload = new PushEvent
-            {
-                HeadCommit = new Commit
-                {
-                    Id = sha,
-                },
-                Repository = new Repository
-                {
-                    Name = repoName
-                }
-            };
-            await pipelineStarter.StartPipelineIfExists(payload);
-
-            await stepFunctionsClientFactory.Received().Create();
         }
 
         [Test]
@@ -75,6 +45,9 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 }
             };
             var serializedPayload = Serialize(payload);
+            var stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
+            var logger = Substitute.For<ILogger<PipelineStarter>>();
+            var pipelineStarter = new PipelineStarter(stepFunctionsClient, logger);
 
             await pipelineStarter.StartPipelineIfExists(payload);
 
@@ -84,5 +57,7 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
                 req.Input == serializedPayload
             ));
         }
+
+        // TODO: test exceptions are swallowed
     }
 }
