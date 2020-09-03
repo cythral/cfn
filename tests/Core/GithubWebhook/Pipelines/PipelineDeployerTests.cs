@@ -33,9 +33,11 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
         private const string stackSuffix = "cicd";
         private const string roleArn = "roleArn";
         private const string gitRef = "gitRef";
+        private const string commitSha = "commitSha";
         private const string contentsUrl = "contentsUrl";
         private const string templateFileName = "templateFileName";
         private const string definitionFileName = "definitionFileName";
+        private const string notificationArn = "notificationArn";
         private const string template = "template";
         private const string definition = "definition";
         private const string sum = "sum";
@@ -48,6 +50,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
             {
                 TemplateFilename = templateFileName,
                 PipelineDefinitionFilename = definitionFileName,
+                StatusNotificationTopicArn = notificationArn,
                 GithubToken = githubToken,
                 GithubOwner = githubOwner,
                 RoleArn = roleArn,
@@ -72,7 +75,8 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                     Repository = new Repository
                     {
                         ContentsUrl = contentsUrl
-                    }
+                    },
+                    HeadCommit = new Commit { Id = commitSha }
                 });
 
                 await fileFetcher.Received().Fetch(Is(contentsUrl), Is(templateFileName), Is(gitRef));
@@ -94,7 +98,8 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                     Repository = new Repository
                     {
                         ContentsUrl = contentsUrl
-                    }
+                    },
+                    HeadCommit = new Commit { Id = commitSha }
                 });
 
                 await fileFetcher.Received().Fetch(Is(contentsUrl), Is(definitionFileName), Is(gitRef));
@@ -118,7 +123,8 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                     Repository = new Repository
                     {
                         ContentsUrl = contentsUrl
-                    }
+                    },
+                    HeadCommit = new Commit { Id = commitSha }
                 });
 
                 await deployer.DidNotReceiveWithAnyArgs().Deploy(null!);
@@ -145,12 +151,15 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                         Name = githubRepo,
                         ContentsUrl = contentsUrl,
                         DefaultBranch = githubBranch
-                    }
+                    },
+                    HeadCommit = new Commit { Id = commitSha }
                 });
 
                 await deployer.Received().Deploy(Is<DeployStackContext>(req =>
                     req.PassRoleArn == roleArn &&
                     req.Template == template &&
+                    req.NotificationArn == notificationArn &&
+                    req.ClientRequestToken == commitSha &&
                     req.StackName == $"{githubRepo}-{stackSuffix}" &&
                     req.Parameters.Count() == 4 &&
                     req.Parameters.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == githubToken) &&
@@ -182,12 +191,15 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                         Name = githubRepo,
                         ContentsUrl = contentsUrl,
                         DefaultBranch = githubBranch
-                    }
+                    },
+                    HeadCommit = new Commit { Id = commitSha }
                 });
 
                 await deployer.Received().Deploy(Is<DeployStackContext>(req =>
                     req.PassRoleArn == roleArn &&
                     req.Template == template &&
+                    req.NotificationArn == notificationArn &&
+                    req.ClientRequestToken == commitSha &&
                     req.StackName == $"{githubRepo}-{stackSuffix}" &&
                     req.Parameters.Count() == 6 &&
                     req.Parameters.Any(parameter => parameter.ParameterKey == "PipelineDefinitionBucket" && parameter.ParameterValue == bucketName) &&
