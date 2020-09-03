@@ -100,6 +100,10 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
                     Parameters = parameters
                 });
             }
+            catch (NoUpdatesException)
+            {
+                await statusNotifier.NotifySuccess(payload.Repository.Name, payload.HeadCommit.Id);
+            }
             catch (Exception e)
             {
                 logger.LogError($"Failed to create/update stack: {e.Message} {e.StackTrace}");

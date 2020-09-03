@@ -238,5 +238,114 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
                 ));
             }
         }
+
+        class NotifySuccess
+        {
+            private const string repoName = "repoName";
+            private const string owner = "owner";
+            private const string sha = "sha";
+            private const string stackSuffix = "cicd";
+            private const string expectedUrl = "https://api.github.com/repos/owner/repoName/statuses/sha";
+            private const string expectedState = "success";
+            private const string expectedContext = "CloudFormation - shared (repoName-cicd)";
+            private const string expectedTargetUrl = "https://sso.brigh.id/start/shared?destination=https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId=repoName-cicd";
+            private const string expectedPendingDescription = "repoName Meta CICD Stack Deployment Succeeded";
+
+            private IOptions<Config> options = Options.Create(new Config
+            {
+                GithubOwner = owner,
+                StackSuffix = stackSuffix,
+            });
+
+            [Test]
+            public async Task NotifySuccess_ShouldSendAPostRequest()
+            {
+                var logger = Substitute.For<ILogger<GithubStatusNotifier>>();
+                var httpClient = Substitute.For<GithubHttpClient>(options);
+                var fetcher = new GithubStatusNotifier(httpClient, options, logger);
+
+                httpClient.SendAsync(Any<HttpRequestMessage>()).Returns(new HttpResponseMessage { StatusCode = OK });
+                await fetcher.NotifySuccess(repoName, sha);
+
+                await httpClient.Received().SendAsync(Is<HttpRequestMessage>(req =>
+                    req.Method == HttpMethod.Post
+                ));
+            }
+
+            [Test]
+            public async Task NotifySuccess_ShouldSendARequest_ToTheCorrectUrl()
+            {
+                var logger = Substitute.For<ILogger<GithubStatusNotifier>>();
+                var httpClient = Substitute.For<GithubHttpClient>(options);
+                var fetcher = new GithubStatusNotifier(httpClient, options, logger);
+
+                httpClient.SendAsync(Any<HttpRequestMessage>()).Returns(new HttpResponseMessage { StatusCode = OK });
+                await fetcher.NotifySuccess(repoName, sha);
+
+                await httpClient.Received().SendAsync(Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri(expectedUrl)
+                ));
+            }
+
+            [Test]
+            public async Task NotifySuccess_ShouldSendARequest_WithPendingState()
+            {
+                var logger = Substitute.For<ILogger<GithubStatusNotifier>>();
+                var httpClient = Substitute.For<GithubHttpClient>(options);
+                var fetcher = new GithubStatusNotifier(httpClient, options, logger);
+
+                httpClient.SendAsync(Any<HttpRequestMessage>()).Returns(new HttpResponseMessage { StatusCode = OK });
+                await fetcher.NotifySuccess(repoName, sha);
+
+                await httpClient.Received().SendAsync(Is<HttpRequestMessage>(req =>
+                    req.Json<CreateStatusRequest>().State == expectedState
+                ));
+            }
+
+            [Test]
+            public async Task NotifySuccess_ShouldSendARequest_WithPendingDescription()
+            {
+                var logger = Substitute.For<ILogger<GithubStatusNotifier>>();
+                var httpClient = Substitute.For<GithubHttpClient>(options);
+                var fetcher = new GithubStatusNotifier(httpClient, options, logger);
+
+                httpClient.SendAsync(Any<HttpRequestMessage>()).Returns(new HttpResponseMessage { StatusCode = OK });
+                await fetcher.NotifySuccess(repoName, sha);
+
+                await httpClient.Received().SendAsync(Is<HttpRequestMessage>(req =>
+                    req.Json<CreateStatusRequest>().Description == expectedPendingDescription
+                ));
+            }
+
+            [Test]
+            public async Task NotifySuccess_ShouldSendARequest_WithCorrectTargeturl()
+            {
+                var logger = Substitute.For<ILogger<GithubStatusNotifier>>();
+                var httpClient = Substitute.For<GithubHttpClient>(options);
+                var fetcher = new GithubStatusNotifier(httpClient, options, logger);
+
+                httpClient.SendAsync(Any<HttpRequestMessage>()).Returns(new HttpResponseMessage { StatusCode = OK });
+                await fetcher.NotifySuccess(repoName, sha);
+
+                await httpClient.Received().SendAsync(Is<HttpRequestMessage>(req =>
+                    req.Json<CreateStatusRequest>().TargetUrl == expectedTargetUrl
+                ));
+            }
+
+            [Test]
+            public async Task NotifySuccess_ShouldSendARequest_WithCorrectContext()
+            {
+                var logger = Substitute.For<ILogger<GithubStatusNotifier>>();
+                var httpClient = Substitute.For<GithubHttpClient>(options);
+                var fetcher = new GithubStatusNotifier(httpClient, options, logger);
+
+                httpClient.SendAsync(Any<HttpRequestMessage>()).Returns(new HttpResponseMessage { StatusCode = OK });
+                await fetcher.NotifySuccess(repoName, sha);
+
+                await httpClient.Received().SendAsync(Is<HttpRequestMessage>(req =>
+                    req.Json<CreateStatusRequest>().Context == expectedContext
+                ));
+            }
+        }
     }
 }
