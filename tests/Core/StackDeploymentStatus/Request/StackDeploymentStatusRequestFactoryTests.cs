@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
-using static System.Text.Json.JsonSerializer;
+
 using Amazon.Lambda.SNSEvents;
+
 using Cythral.CloudFormation.StackDeploymentStatus.Request;
 
 using NUnit.Framework;
 
-using SNSRecord = Amazon.Lambda.SNSEvents.SNSEvent.SNSRecord;
+using static System.Text.Json.JsonSerializer;
+
 using SNSMessage = Amazon.Lambda.SNSEvents.SNSEvent.SNSMessage;
+using SNSRecord = Amazon.Lambda.SNSEvents.SNSEvent.SNSRecord;
 
 namespace Cythral.CloudFormation.Tests.StackDeploymentStatus.Request
 {
@@ -28,6 +31,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus.Request
             var resourceProperties = new { A = "B" };
             var resourceStatus = "status";
             var resourceType = "type";
+            var sourceTopic = "sourceTopic";
 
             var message = @$"
                 StackId='{stackId}'
@@ -50,6 +54,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus.Request
                 Records = new List<SNSRecord> {
                     new SNSRecord {
                         Sns = new SNSMessage {
+                            TopicArn = sourceTopic,
                             Message = message
                         }
                     }
@@ -71,6 +76,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus.Request
             Assert.That(Serialize(request.ResourceProperties), Is.EqualTo(Serialize(resourceProperties)));
             Assert.That(request.ResourceStatus, Is.EqualTo(resourceStatus));
             Assert.That(request.ResourceType, Is.EqualTo(resourceType));
+            Assert.That(request.SourceTopic, Is.EqualTo(sourceTopic));
         }
     }
 }
