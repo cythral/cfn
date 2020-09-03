@@ -43,7 +43,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
                     State = state,
                     Description = description,
                     TargetUrl = $"https://sso.brigh.id/start/shared?destination={destination}",
-                    Context = $"CloudFormation - shared ({repoName}-{config.StackSuffix})",
+                    Context = $"AWS CloudFormation - shared ({repoName}-{config.StackSuffix})",
                 })
             });
 
