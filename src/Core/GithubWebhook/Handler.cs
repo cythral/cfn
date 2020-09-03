@@ -39,6 +39,7 @@ namespace Cythral.CloudFormation.GithubWebhook
         private readonly RequestValidator requestValidator;
         private readonly PipelineStarter pipelineStarter;
         private readonly PipelineDeployer pipelineDeployer;
+        private readonly GithubStatusNotifier statusNotifier;
         private readonly Config config;
         private readonly ILogger<Handler> logger;
 
@@ -46,6 +47,7 @@ namespace Cythral.CloudFormation.GithubWebhook
             RequestValidator requestValidator,
             PipelineStarter pipelineStarter,
             PipelineDeployer pipelineDeployer,
+            GithubStatusNotifier statusNotifier,
             IOptions<Config> config,
             ILogger<Handler> logger
         )
@@ -53,6 +55,7 @@ namespace Cythral.CloudFormation.GithubWebhook
             this.requestValidator = requestValidator;
             this.pipelineStarter = pipelineStarter;
             this.pipelineDeployer = pipelineDeployer;
+            this.statusNotifier = statusNotifier;
             this.config = config.Value;
             this.logger = logger;
         }
@@ -78,20 +81,21 @@ namespace Cythral.CloudFormation.GithubWebhook
                 return CreateResponse(statusCode: e.StatusCode);
             }
 
-            var tasks = new List<Task>();
-
-            if (payload.OnDefaultBranch && !payload.HeadCommit.Message.Contains("[skip meta-ci]"))
+            IEnumerable<Task> GetTasks()
             {
-                var task = pipelineDeployer.Deploy(payload);
-                tasks.Add(task);
+                if (payload.OnDefaultBranch && !payload.HeadCommit.Message.Contains("[skip meta-ci]"))
+                {
+                    yield return statusNotifier.Notify(payload.Repository.Name, payload.HeadCommit.Id);
+                    yield return pipelineDeployer.Deploy(payload);
+                }
+
+                if (!payload.HeadCommit.Message.Contains("[skip ci]"))
+                {
+                    yield return pipelineStarter.StartPipelineIfExists(payload);
+                }
             }
 
-            if (!payload.HeadCommit.Message.Contains("[skip ci]"))
-            {
-                var task = pipelineStarter.StartPipelineIfExists(payload);
-                tasks.Add(task);
-            }
-
+            var tasks = GetTasks();
             await Task.WhenAll(tasks);
 
             return CreateResponse(statusCode: OK);
