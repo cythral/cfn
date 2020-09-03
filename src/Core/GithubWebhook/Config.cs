@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Lambdajection.Attributes;
-using Lambdajection.Encryption;
 
 using Amazon.KeyManagementService;
 using Amazon.KeyManagementService.Model;
+
+using Lambdajection.Attributes;
+using Lambdajection.Encryption;
 
 namespace Cythral.CloudFormation.GithubWebhook
 {
@@ -18,6 +19,8 @@ namespace Cythral.CloudFormation.GithubWebhook
         [Encrypted] public string GithubToken { get; set; }
 
         [Encrypted] public string GithubSigningSecret { get; set; }
+
+        public string StatusNotificationTopicArn { get; set; }
 
         public string TemplateFilename { get; set; }
 

@@ -889,6 +889,14 @@
           "System.Threading": "4.3.0"
         }
       },
+      "System.Net.Http.Json": {
+        "type": "Transitive",
+        "resolved": "3.2.1",
+        "contentHash": "KkevRTwX9uMYxuxG2/wSql8FIAItB89XT36zoh6hraQkFhf2yjotDswpAKzeuaEuMhAia6c50oZMkP1PJoYufQ==",
+        "dependencies": {
+          "System.Text.Json": "4.7.2"
+        }
+      },
       "System.ObjectModel": {
         "type": "Transitive",
         "resolved": "4.3.0",
@@ -1152,6 +1160,11 @@
           "System.Text.Encoding": "4.3.0"
         }
       },
+      "System.Text.Json": {
+        "type": "Transitive",
+        "resolved": "4.7.2",
+        "contentHash": "TcMd95wcrubm9nHvJEQs70rC0H/8omiSGGpU4FQ/ZA1URIqD4pjmFJh2Mfv1yH1eHgJDWTi2hMDXwTET+zOOyg=="
+      },
       "System.Text.RegularExpressions": {
         "type": "Transitive",
         "resolved": "4.3.0",
@@ -1403,8 +1416,8 @@
           "Lambdajection": "0.3.0-beta3",
           "Lambdajection.Encryption": "0.3.0-beta3",
           "Microsoft.Extensions.Http": "3.1.7",
-          "Octokit": "0.47.0",
-          "SimpleStorageService": "1.0.0"
+          "SimpleStorageService": "1.0.0",
+          "System.Net.Http.Json": "3.2.1"
         }
       },
       "keymanagementservice": {

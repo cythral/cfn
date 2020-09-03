@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -86,6 +87,28 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
             var result = await fetcher.Fetch(url, filename, gitRef);
 
             await httpClient.Received().SendAsync(Is<HttpRequestMessage>(req => req.RequestUri == new Uri(expectedUrlWithRef)));
+        }
+
+        [Test]
+        public async Task AcceptHeaderContainsGithubRaw()
+        {
+            var config = new Config();
+            var options = Options.Create(config);
+            var logger = Substitute.For<ILogger<GithubFileFetcher>>();
+            var httpClient = Substitute.For<GithubHttpClient>(options);
+
+            httpClient.SendAsync(Any<HttpRequestMessage>()).Returns(new HttpResponseMessage
+            {
+                StatusCode = OK,
+                Content = expectedContent
+            });
+
+            var fetcher = new GithubFileFetcher(httpClient, options, logger);
+            var result = await fetcher.Fetch(url, filename, gitRef);
+
+            await httpClient.Received().SendAsync(Is<HttpRequestMessage>(req =>
+                req.Headers.Accept.Any(header => header.MediaType == "application/vnd.github.v3.raw")
+            ));
         }
 
         [Test]
