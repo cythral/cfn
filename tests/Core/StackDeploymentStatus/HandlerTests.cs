@@ -71,8 +71,6 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             GithubOwner = githubOwner,
             GithubRepo = githubRepo,
             GithubRef = githubRef,
-            GoogleClientId = googleClientId,
-            IdentityPoolId = identityPoolId
         });
 
 
@@ -344,9 +342,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
                     req.EnvironmentName == environmentName &&
                     req.GithubOwner == githubOwner &&
                     req.GithubRepo == githubRepo &&
-                    req.GithubRef == githubRef &&
-                    req.GoogleClientId == googleClientId &&
-                    req.IdentityPoolId == identityPoolId
+                    req.GithubRef == githubRef
                 ));
             }
         }
