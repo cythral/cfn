@@ -73,6 +73,20 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
 
         private static async Task<TokenInfo> GetTokenInfoFromRequest(StackDeploymentStatusRequest request)
         {
+            if (request.SourceTopic == Environment.GetEnvironmentVariable("GITHUB_TOPIC_ARN"))
+            {
+                var owner = Environment.GetEnvironmentVariable("GITHUB_OWNER");
+                var suffix = Environment.GetEnvironmentVariable("STACK_SUFFIX");
+
+                return new TokenInfo
+                {
+                    EnvironmentName = "shared",
+                    GithubOwner = owner,
+                    GithubRepo = request.StackName.Replace($"-{suffix}", ""),
+                    GithubRef = request.ClientRequestToken,
+                };
+            }
+
             var location = TranslateTokenToS3Location(request.ClientRequestToken);
             var sourceString = await s3GetObjectFacade.GetObject(location);
             return Deserialize<TokenInfo>(sourceString);
@@ -81,31 +95,40 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
         private static async Task SendFailure(StackDeploymentStatusRequest request, IAmazonStepFunctions client)
         {
             var tokenInfo = await GetTokenInfoFromRequest(request);
-            var response = await client.SendTaskFailureAsync(new SendTaskFailureRequest
+
+            if (request.SourceTopic != Environment.GetEnvironmentVariable("GITHUB_TOPIC_ARN"))
             {
-                TaskToken = tokenInfo.ClientRequestToken,
-                Cause = request.ResourceStatus
-            });
+                var response = await client.SendTaskFailureAsync(new SendTaskFailureRequest
+                {
+                    TaskToken = tokenInfo.ClientRequestToken,
+                    Cause = request.ResourceStatus
+                });
 
-            Console.WriteLine($"Received send task failure response: {Serialize(response)}");
+                Console.WriteLine($"Received send task failure response: {Serialize(response)}");
 
-            await Dequeue(tokenInfo);
+                await Dequeue(tokenInfo);
+            }
+
             await PutCommitStatus(tokenInfo, request.StackName, CommitState.Failure);
         }
 
         private static async Task SendSuccess(StackDeploymentStatusRequest request, IAmazonStepFunctions client)
         {
             var tokenInfo = await GetTokenInfoFromRequest(request);
-            var outputs = await GetStackOutputs(request.StackId, tokenInfo.RoleArn);
-            var response = await client.SendTaskSuccessAsync(new SendTaskSuccessRequest
+
+            if (request.SourceTopic != Environment.GetEnvironmentVariable("GITHUB_TOPIC_ARN"))
             {
-                TaskToken = tokenInfo.ClientRequestToken,
-                Output = Serialize(outputs)
-            });
+                var outputs = await GetStackOutputs(request.StackId, tokenInfo.RoleArn);
+                var response = await client.SendTaskSuccessAsync(new SendTaskSuccessRequest
+                {
+                    TaskToken = tokenInfo.ClientRequestToken,
+                    Output = Serialize(outputs)
+                });
 
-            Console.WriteLine($"Received send task failure response: {Serialize(response)}");
+                Console.WriteLine($"Received send task failure response: {Serialize(response)}");
+                await Dequeue(tokenInfo);
+            }
 
-            await Dequeue(tokenInfo);
             await PutCommitStatus(tokenInfo, request.StackName, CommitState.Success);
         }
 
@@ -144,8 +167,6 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
                 GithubOwner = tokenInfo.GithubOwner,
                 GithubRepo = tokenInfo.GithubRepo,
                 GithubRef = tokenInfo.GithubRef,
-                GoogleClientId = tokenInfo.GoogleClientId,
-                IdentityPoolId = tokenInfo.IdentityPoolId
             });
         }
     }

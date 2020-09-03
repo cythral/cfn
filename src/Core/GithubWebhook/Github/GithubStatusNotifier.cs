@@ -16,9 +16,9 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
     {
         private readonly GithubHttpClient client;
         private readonly Config config;
-        private readonly ILogger<GithubFileFetcher> logger;
+        private readonly ILogger<GithubStatusNotifier> logger;
 
-        public GithubStatusNotifier(GithubHttpClient client, IOptions<Config> config, ILogger<GithubFileFetcher> logger)
+        public GithubStatusNotifier(GithubHttpClient client, IOptions<Config> config, ILogger<GithubStatusNotifier> logger)
         {
             this.client = client;
             this.config = config.Value;
@@ -30,18 +30,18 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
             // Used for testing
         }
 
-        public virtual async Task Notify(string repoName, string sha)
+        private async Task Notify(string repoName, string sha, string state, string description, string filteringStatus)
         {
             var url = $"https://api.github.com/repos/{config.GithubOwner}/{repoName}/statuses/{sha}";
-            var destination = $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={repoName}-{config.StackSuffix}";
+            var destination = $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus={filteringStatus}&viewNested=true&hideStacks=false&stackId={repoName}-{config.StackSuffix}";
             var response = await client.SendAsync(new HttpRequestMessage
             {
                 Method = Post,
                 RequestUri = new Uri(url),
                 Content = JsonContent.Create(new CreateStatusRequest
                 {
-                    State = "pending",
-                    Description = $"{repoName} Meta CICD Stack Deployment In Progress",
+                    State = state,
+                    Description = description,
                     TargetUrl = $"https://sso.brigh.id/start/shared?destination={destination}",
                     Context = $"CloudFormation - shared ({repoName}-{config.StackSuffix})",
                 })
@@ -51,6 +51,17 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
             {
                 logger.LogError($"Got status code {response.StatusCode} back from GitHub when sending meta-ci commit status update.");
             }
+        }
+
+        public virtual async Task NotifyPending(string repoName, string sha)
+        {
+            await Notify(repoName, sha, "pending", $"{repoName} Meta CICD Stack Deployment In Progress", "active");
+        }
+
+
+        public virtual async Task NotifyFailure(string repoName, string sha)
+        {
+            await Notify(repoName, sha, "failure", $"{repoName} Meta CICD Stack Deployment Failed", "deleted");
         }
     }
 }

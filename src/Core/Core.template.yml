@@ -452,7 +452,12 @@ Resources:
       CodeUri: ../../bin/StackDeploymentStatus/Release/netcoreapp3.1/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Events:
-        SNS:
+        GithubWebhookStatus:
+          Type: SNS
+          Properties:
+            Topic: !Ref GithubWebhookStatusTopic
+            Region: !Ref AWS::Region
+        StackDeploymentStatus:
           Type: SNS
           Properties:
             Topic: !Ref StackDeploymentStatusTopic
@@ -461,6 +466,9 @@ Resources:
         Variables:
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
           GITHUB_TOKEN: !Ref GithubToken
+          GITHUB_OWNER: !Ref GithubOwner
+          GITHUB_TOPIC_ARN: !Ref GithubWebhookStatusTopic
+          STACK_SUFFIX: !Ref StackSuffix
 
   StackDeploymentStatusTopic:
     Type: AWS::SNS::Topic

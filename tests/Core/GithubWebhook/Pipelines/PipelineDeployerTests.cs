@@ -66,8 +66,9 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                 var fileFetcher = Substitute.For<GithubFileFetcher>();
                 var deployer = Substitute.For<DeployStackFacade>();
                 var sumComputer = Substitute.For<Sha256SumComputer>();
+                var statusNotifier = Substitute.For<GithubStatusNotifier>();
                 var s3Client = Substitute.For<IAmazonS3>();
-                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, deployer, config, logger);
+                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
 
                 await pipelineDeployer.Deploy(new PushEvent
                 {
@@ -88,9 +89,10 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                 var logger = Substitute.For<ILogger<PipelineDeployer>>();
                 var fileFetcher = Substitute.For<GithubFileFetcher>();
                 var deployer = Substitute.For<DeployStackFacade>();
+                var statusNotifier = Substitute.For<GithubStatusNotifier>();
                 var sumComputer = Substitute.For<Sha256SumComputer>();
                 var s3Client = Substitute.For<IAmazonS3>();
-                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, deployer, config, logger);
+                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
 
                 await pipelineDeployer.Deploy(new PushEvent
                 {
@@ -112,8 +114,9 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                 var fileFetcher = Substitute.For<GithubFileFetcher>();
                 var deployer = Substitute.For<DeployStackFacade>();
                 var sumComputer = Substitute.For<Sha256SumComputer>();
+                var statusNotifier = Substitute.For<GithubStatusNotifier>();
                 var s3Client = Substitute.For<IAmazonS3>();
-                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, deployer, config, logger);
+                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
 
                 fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns((string)null);
 
@@ -137,8 +140,9 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                 var fileFetcher = Substitute.For<GithubFileFetcher>();
                 var deployer = Substitute.For<DeployStackFacade>();
                 var sumComputer = Substitute.For<Sha256SumComputer>();
+                var statusNotifier = Substitute.For<GithubStatusNotifier>();
                 var s3Client = Substitute.For<IAmazonS3>();
-                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, deployer, config, logger);
+                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
 
                 fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns(template);
                 fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string)null);
@@ -176,8 +180,9 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                 var fileFetcher = Substitute.For<GithubFileFetcher>();
                 var deployer = Substitute.For<DeployStackFacade>();
                 var sumComputer = Substitute.For<Sha256SumComputer>();
+                var statusNotifier = Substitute.For<GithubStatusNotifier>();
                 var s3Client = Substitute.For<IAmazonS3>();
-                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, deployer, config, logger);
+                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
 
                 fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns(template);
                 fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns(definition);
@@ -210,6 +215,39 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                     req.Parameters.Any(parameter => parameter.ParameterKey == "GithubBranch" && parameter.ParameterValue == githubBranch)
                 ));
             }
+
+            [Test]
+            public async Task Deploy_ShouldNotifyFailure_IfStackDeploymentFails()
+            {
+                var logger = Substitute.For<ILogger<PipelineDeployer>>();
+                var fileFetcher = Substitute.For<GithubFileFetcher>();
+                var deployer = Substitute.For<DeployStackFacade>();
+                var sumComputer = Substitute.For<Sha256SumComputer>();
+                var statusNotifier = Substitute.For<GithubStatusNotifier>();
+                var s3Client = Substitute.For<IAmazonS3>();
+                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
+
+                fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns(template);
+                fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string)null);
+
+                deployer
+                .When(x => x.Deploy(Any<DeployStackContext>()))
+                .Do(x => throw new Exception());
+
+                await pipelineDeployer.Deploy(new PushEvent
+                {
+                    Ref = gitRef,
+                    Repository = new Repository
+                    {
+                        Name = githubRepo,
+                        ContentsUrl = contentsUrl,
+                        DefaultBranch = githubBranch
+                    },
+                    HeadCommit = new Commit { Id = commitSha }
+                });
+
+                await statusNotifier.Received().NotifyFailure(Is(githubRepo), Is(commitSha));
+            }
         }
 
 
@@ -221,18 +259,19 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                 var logger = Substitute.For<ILogger<PipelineDeployer>>();
                 var fileFetcher = Substitute.For<GithubFileFetcher>();
                 var deployer = Substitute.For<DeployStackFacade>();
+                var statusNotifier = Substitute.For<GithubStatusNotifier>();
                 var sumComputer = Substitute.For<Sha256SumComputer>();
-                sumComputer.ComputeSum(Any<string>()).Returns(sum);
-
+                var config = Options.Create(new Config { ArtifactStore = bucketName });
                 var s3Client = Substitute.For<IAmazonS3>();
+                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
+
                 s3Client
                 .When(client => client.GetObjectMetadataAsync(Any<string>(), Any<string>()))
                 .Do(client => throw new Exception());
 
-                var config = Options.Create(new Config { ArtifactStore = bucketName });
-                var uploader = new PipelineDeployer(s3Client, sumComputer, fileFetcher, deployer, config, logger);
 
-                var result = await uploader.UploadDefinition(githubRepo, definition);
+                sumComputer.ComputeSum(Any<string>()).Returns(sum);
+                var result = await pipelineDeployer.UploadDefinition(githubRepo, definition);
 
                 result.Should().BeEquivalentTo(expectedKey);
                 await s3Client.Received().GetObjectMetadataAsync(Is(bucketName), Is(expectedKey));
@@ -251,12 +290,12 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
                 var deployer = Substitute.For<DeployStackFacade>();
                 var s3Client = Substitute.For<IAmazonS3>();
                 var sumComputer = Substitute.For<Sha256SumComputer>();
-                sumComputer.ComputeSum(Any<string>()).Returns(sum);
-
+                var statusNotifier = Substitute.For<GithubStatusNotifier>();
                 var config = Options.Create(new Config { ArtifactStore = bucketName });
-                var uploader = new PipelineDeployer(s3Client, sumComputer, fileFetcher, deployer, config, logger);
+                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
 
-                var result = await uploader.UploadDefinition(githubRepo, definition);
+                sumComputer.ComputeSum(Any<string>()).Returns(sum);
+                var result = await pipelineDeployer.UploadDefinition(githubRepo, definition);
 
                 result.Should().BeEquivalentTo(expectedKey);
                 await s3Client.Received().GetObjectMetadataAsync(Is(bucketName), Is(expectedKey));

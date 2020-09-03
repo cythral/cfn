@@ -91,7 +91,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
             requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
 
             var response = await handler.Handle(new ApplicationLoadBalancerRequest { });
-            await statusNotifier.Received().Notify(Is(repoName), Is(sha));
+            await statusNotifier.Received().NotifyPending(Is(repoName), Is(sha));
         }
 
         [Test]
