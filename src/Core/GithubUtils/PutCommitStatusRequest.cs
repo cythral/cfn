@@ -12,7 +12,5 @@ namespace Cythral.CloudFormation.GithubUtils
         public string DetailsUrl { get; set; }
         public CommitState CommitState { get; set; }
         public string EnvironmentName { get; set; }
-        public string GoogleClientId { get; set; }
-        public string IdentityPoolId { get; set; }
     }
 }
