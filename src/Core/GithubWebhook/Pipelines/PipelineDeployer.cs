@@ -91,6 +91,8 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
                 {
                     StackName = stackName,
                     Template = templateContent,
+                    NotificationArn = config.StatusNotificationTopicArn,
+                    ClientRequestToken = payload.HeadCommit.Id,
                     PassRoleArn = roleArn,
                     Parameters = parameters
                 });

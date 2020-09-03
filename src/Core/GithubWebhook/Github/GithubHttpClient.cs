@@ -21,7 +21,6 @@ namespace Cythral.CloudFormation.GithubWebhook
         {
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("brighid", "v1"));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", config.GithubToken);
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github.VERSION.raw"));
         }
 
         public virtual Task<HttpResponseMessage> SendAsync(HttpRequestMessage request)

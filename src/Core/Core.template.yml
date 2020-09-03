@@ -271,6 +271,9 @@ Resources:
             Principal:
               AWS: !GetAtt GithubWebhookRole.Arn
 
+  GithubWebhookStatusTopic:
+    Type: AWS::SNS::Topic
+
   GithubWebhook:
     Type: AWS::Serverless::Function
     Properties:
@@ -289,6 +292,7 @@ Resources:
           GithubWebhook__GithubOwner: !Ref GithubOwner
           GithubWebhook__GithubToken: !Ref GithubToken
           GithubWebhook__GithubSigningSecret: !Ref GithubSigningSecret
+          GithubWebhook__StatusNotificationTopicArn: !Ref GithubWebhookStatusTopic
           GithubWebhook__TemplateFileName: !Ref TemplateFilename
           GithubWebhook__PipelineDefinitionFilename: !Ref PipelineDefinitionFilename
           GithubWebhook__StackSuffix: !Ref StackSuffix

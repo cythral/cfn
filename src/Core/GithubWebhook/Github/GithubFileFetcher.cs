@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -30,14 +31,13 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
 
         public virtual async Task<string> Fetch(string contentsUrl, string filename, string gitRef = null)
         {
-            var urlWithoutFilename = contentsUrl.Replace("{+path}", "").TrimEnd(new char[] { '/' });
-            var url = gitRef == null ? $"{urlWithoutFilename}/{filename}" : $"{urlWithoutFilename}/{filename}?ref={gitRef}";
-            var response = await httpClient.SendAsync(new HttpRequestMessage
-            {
-                Method = Get,
-                RequestUri = new Uri(url)
-            });
+            var url = contentsUrl.Replace("{+path}", filename);
+            url += gitRef != null ? $"?ref={gitRef}" : "";
 
+            var request = new HttpRequestMessage { Method = Get, RequestUri = new Uri(url) };
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github.v3.raw"));
+
+            var response = await httpClient.SendAsync(request);
             if (response.StatusCode != OK)
             {
                 logger.LogError($"Got status code {response.StatusCode} back from GitHub when requesting {url}");

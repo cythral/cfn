@@ -35,6 +35,10 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
 
     public class HandlerTests
     {
+
+        private const string repoName = "test";
+        private const string sha = "sha";
+
         public class ValidationException : RequestValidationException
         {
             public override HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
@@ -54,8 +58,9 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
             var requestValidator = Substitute.For<RequestValidator>();
             var starter = Substitute.For<PipelineStarter>();
             var deployer = Substitute.For<PipelineDeployer>();
+            var statusNotifier = Substitute.For<GithubStatusNotifier>();
             var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestValidator, starter, deployer, config, logger);
+            var handler = new Handler(requestValidator, starter, deployer, statusNotifier, config, logger);
 
             requestValidator
             .When(validator => validator.Validate(Any<ApplicationLoadBalancerRequest>()))
@@ -67,19 +72,43 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
         }
 
         [Test]
+        public async Task Handle_ShouldNotifyCommitStatus_IfOnDefaultBranch_AndCommitMessageDoesntContainSkip()
+        {
+            var requestValidator = Substitute.For<RequestValidator>();
+            var starter = Substitute.For<PipelineStarter>();
+            var deployer = Substitute.For<PipelineDeployer>();
+            var statusNotifier = Substitute.For<GithubStatusNotifier>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestValidator, starter, deployer, statusNotifier, config, logger);
+
+            var pushEvent = new PushEvent
+            {
+                Ref = "refs/heads/master",
+                Repository = new Repository { Name = repoName, DefaultBranch = "master" },
+                HeadCommit = new Commit { Id = sha, Message = "" }
+            };
+
+            requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
+
+            var response = await handler.Handle(new ApplicationLoadBalancerRequest { });
+            await statusNotifier.Received().Notify(Is(repoName), Is(sha));
+        }
+
+        [Test]
         public async Task Handle_ShouldDeployPipeline_IfOnDefaultBranch_AndCommitMessageDoesntContainSkip()
         {
             var requestValidator = Substitute.For<RequestValidator>();
             var starter = Substitute.For<PipelineStarter>();
             var deployer = Substitute.For<PipelineDeployer>();
+            var statusNotifier = Substitute.For<GithubStatusNotifier>();
             var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestValidator, starter, deployer, config, logger);
+            var handler = new Handler(requestValidator, starter, deployer, statusNotifier, config, logger);
 
             var pushEvent = new PushEvent
             {
                 Ref = "refs/heads/master",
-                Repository = new Repository { DefaultBranch = "master" },
-                HeadCommit = new Commit { Message = "" }
+                Repository = new Repository { Name = repoName, DefaultBranch = "master" },
+                HeadCommit = new Commit { Id = sha, Message = "" }
             };
 
             requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
@@ -94,14 +123,15 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
             var requestValidator = Substitute.For<RequestValidator>();
             var starter = Substitute.For<PipelineStarter>();
             var deployer = Substitute.For<PipelineDeployer>();
+            var statusNotifier = Substitute.For<GithubStatusNotifier>();
             var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestValidator, starter, deployer, config, logger);
+            var handler = new Handler(requestValidator, starter, deployer, statusNotifier, config, logger);
 
             var pushEvent = new PushEvent
             {
                 Ref = "refs/heads/master",
-                Repository = new Repository { DefaultBranch = "master" },
-                HeadCommit = new Commit { Message = "[skip meta-ci]" }
+                Repository = new Repository { Name = repoName, DefaultBranch = "master" },
+                HeadCommit = new Commit { Id = sha, Message = "[skip meta-ci]" }
             };
 
             requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
@@ -116,14 +146,15 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
             var requestValidator = Substitute.For<RequestValidator>();
             var starter = Substitute.For<PipelineStarter>();
             var deployer = Substitute.For<PipelineDeployer>();
+            var statusNotifier = Substitute.For<GithubStatusNotifier>();
             var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestValidator, starter, deployer, config, logger);
+            var handler = new Handler(requestValidator, starter, deployer, statusNotifier, config, logger);
 
             var pushEvent = new PushEvent
             {
                 Ref = "refs/heads/master",
-                Repository = new Repository { DefaultBranch = "develop" },
-                HeadCommit = new Commit { Message = "" }
+                Repository = new Repository { Name = repoName, DefaultBranch = "develop" },
+                HeadCommit = new Commit { Id = sha, Message = "" }
             };
 
             requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
@@ -138,14 +169,15 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
             var requestValidator = Substitute.For<RequestValidator>();
             var starter = Substitute.For<PipelineStarter>();
             var deployer = Substitute.For<PipelineDeployer>();
+            var statusNotifier = Substitute.For<GithubStatusNotifier>();
             var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestValidator, starter, deployer, config, logger);
+            var handler = new Handler(requestValidator, starter, deployer, statusNotifier, config, logger);
 
             var pushEvent = new PushEvent
             {
                 Ref = "refs/heads/master",
-                Repository = new Repository { DefaultBranch = "develop" },
-                HeadCommit = new Commit { Message = "" }
+                Repository = new Repository { Name = repoName, DefaultBranch = "develop" },
+                HeadCommit = new Commit { Id = sha, Message = "" }
             };
 
             requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
@@ -160,14 +192,15 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
             var requestValidator = Substitute.For<RequestValidator>();
             var starter = Substitute.For<PipelineStarter>();
             var deployer = Substitute.For<PipelineDeployer>();
+            var statusNotifier = Substitute.For<GithubStatusNotifier>();
             var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestValidator, starter, deployer, config, logger);
+            var handler = new Handler(requestValidator, starter, deployer, statusNotifier, config, logger);
 
             var pushEvent = new PushEvent
             {
                 Ref = "refs/heads/master",
-                Repository = new Repository { DefaultBranch = "develop" },
-                HeadCommit = new Commit { Message = "[skip ci]" }
+                Repository = new Repository { Name = repoName, DefaultBranch = "develop" },
+                HeadCommit = new Commit { Id = sha, Message = "[skip ci]" }
             };
 
             requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);

@@ -20,6 +20,7 @@ namespace Cythral.CloudFormation.GithubWebhook
             services.AddSingleton<GithubHttpClient>();
             services.AddSingleton<Sha256SumComputer>();
             services.AddSingleton<GithubFileFetcher>();
+            services.AddSingleton<GithubStatusNotifier>();
             services.AddSingleton<RequestValidator>();
             services.AddSingleton<DeployStackFacade>();
             services.AddSingleton<PipelineDeployer>();
