@@ -21,6 +21,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
         private readonly IAmazonS3 s3Client;
         private readonly Sha256SumComputer sumComputer;
         private readonly GithubFileFetcher fileFetcher;
+        private readonly GithubStatusNotifier statusNotifier;
         private readonly DeployStackFacade stackDeployer;
         private readonly Config config;
         private readonly ILogger<PipelineDeployer> logger;
@@ -29,6 +30,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
             IAmazonS3 s3Client,
             Sha256SumComputer sumComputer,
             GithubFileFetcher fileFetcher,
+            GithubStatusNotifier statusNotifier,
             DeployStackFacade stackDeployer,
             IOptions<Config> options,
             ILogger<PipelineDeployer> logger
@@ -38,6 +40,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
             this.config = options.Value;
             this.sumComputer = sumComputer;
             this.fileFetcher = fileFetcher;
+            this.statusNotifier = statusNotifier;
             this.stackDeployer = stackDeployer;
             this.logger = logger;
         }
@@ -100,6 +103,8 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
             catch (Exception e)
             {
                 logger.LogError($"Failed to create/update stack: {e.Message} {e.StackTrace}");
+
+                await statusNotifier.NotifyFailure(payload.Repository.Name, payload.HeadCommit.Id);
             }
         }
 

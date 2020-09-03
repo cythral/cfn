@@ -12,6 +12,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus.Request
         {
             var message = evnt.Records[0].Sns.Message;
             var request = new StackDeploymentStatusRequest();
+            request.SourceTopic = evnt.Records[0].Sns.TopicArn;
 
             foreach (var line in message.Split('\n'))
             {
