@@ -30,7 +30,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
             private const string stackSuffix = "cicd";
             private const string expectedUrl = "https://api.github.com/repos/owner/repoName/statuses/sha";
             private const string expectedState = "pending";
-            private const string expectedContext = "CloudFormation - shared (repoName-cicd)";
+            private const string expectedContext = "AWS CloudFormation - shared (repoName-cicd)";
             private const string expectedTargetUrl = "https://sso.brigh.id/start/shared?destination=https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId=repoName-cicd";
             private const string expectedPendingDescription = "repoName Meta CICD Stack Deployment In Progress";
 
@@ -138,7 +138,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
             private const string stackSuffix = "cicd";
             private const string expectedUrl = "https://api.github.com/repos/owner/repoName/statuses/sha";
             private const string expectedState = "failure";
-            private const string expectedContext = "CloudFormation - shared (repoName-cicd)";
+            private const string expectedContext = "AWS CloudFormation - shared (repoName-cicd)";
             private const string expectedTargetUrl = "https://sso.brigh.id/start/shared?destination=https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=deleted&viewNested=true&hideStacks=false&stackId=repoName-cicd";
             private const string expectedPendingDescription = "repoName Meta CICD Stack Deployment Failed";
 
@@ -247,7 +247,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
             private const string stackSuffix = "cicd";
             private const string expectedUrl = "https://api.github.com/repos/owner/repoName/statuses/sha";
             private const string expectedState = "success";
-            private const string expectedContext = "CloudFormation - shared (repoName-cicd)";
+            private const string expectedContext = "AWS CloudFormation - shared (repoName-cicd)";
             private const string expectedTargetUrl = "https://sso.brigh.id/start/shared?destination=https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId=repoName-cicd";
             private const string expectedPendingDescription = "repoName Meta CICD Stack Deployment Succeeded";
 
