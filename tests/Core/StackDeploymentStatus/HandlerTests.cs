@@ -73,7 +73,6 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             GithubRef = githubRef,
         });
 
-
         [SetUp]
         public void SetupRequestFactory()
         {
