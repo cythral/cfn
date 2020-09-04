@@ -134,6 +134,35 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
             }
 
             [Test]
+            public async Task Deploy_NotifyPending_IfTemplateWasFound()
+            {
+                var logger = Substitute.For<ILogger<PipelineDeployer>>();
+                var fileFetcher = Substitute.For<GithubFileFetcher>();
+                var deployer = Substitute.For<DeployStackFacade>();
+                var sumComputer = Substitute.For<Sha256SumComputer>();
+                var statusNotifier = Substitute.For<GithubStatusNotifier>();
+                var s3Client = Substitute.For<IAmazonS3>();
+                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
+
+                fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns(template);
+                fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string)null);
+
+                await pipelineDeployer.Deploy(new PushEvent
+                {
+                    Ref = gitRef,
+                    Repository = new Repository
+                    {
+                        Name = githubRepo,
+                        ContentsUrl = contentsUrl,
+                        DefaultBranch = githubBranch
+                    },
+                    HeadCommit = new Commit { Id = commitSha }
+                });
+
+                await statusNotifier.Received().NotifyPending(Is(githubRepo), Is(commitSha));
+            }
+
+            [Test]
             public async Task Deploy_ShouldDeployStack_IfTemplateWasFound()
             {
                 var logger = Substitute.For<ILogger<PipelineDeployer>>();
