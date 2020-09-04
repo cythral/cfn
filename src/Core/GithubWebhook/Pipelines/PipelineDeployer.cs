@@ -90,6 +90,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
 
             try
             {
+                await statusNotifier.NotifyPending(payload.Repository.Name, payload.HeadCommit.Id);
                 await stackDeployer.Deploy(new DeployStackContext
                 {
                     StackName = stackName,
