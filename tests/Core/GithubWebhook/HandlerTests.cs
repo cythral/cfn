@@ -72,29 +72,6 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
         }
 
         [Test]
-        public async Task Handle_ShouldNotifyCommitStatus_IfOnDefaultBranch_AndCommitMessageDoesntContainSkip()
-        {
-            var requestValidator = Substitute.For<RequestValidator>();
-            var starter = Substitute.For<PipelineStarter>();
-            var deployer = Substitute.For<PipelineDeployer>();
-            var statusNotifier = Substitute.For<GithubStatusNotifier>();
-            var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestValidator, starter, deployer, statusNotifier, config, logger);
-
-            var pushEvent = new PushEvent
-            {
-                Ref = "refs/heads/master",
-                Repository = new Repository { Name = repoName, DefaultBranch = "master" },
-                HeadCommit = new Commit { Id = sha, Message = "" }
-            };
-
-            requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
-
-            var response = await handler.Handle(new ApplicationLoadBalancerRequest { });
-            await statusNotifier.Received().NotifyPending(Is(repoName), Is(sha));
-        }
-
-        [Test]
         public async Task Handle_ShouldDeployPipeline_IfOnDefaultBranch_AndCommitMessageDoesntContainSkip()
         {
             var requestValidator = Substitute.For<RequestValidator>();

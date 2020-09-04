@@ -85,7 +85,6 @@ namespace Cythral.CloudFormation.GithubWebhook
             {
                 if (payload.OnDefaultBranch && !payload.HeadCommit.Message.Contains("[skip meta-ci]"))
                 {
-                    yield return statusNotifier.NotifyPending(payload.Repository.Name, payload.HeadCommit.Id);
                     yield return pipelineDeployer.Deploy(payload);
                 }
 
