@@ -27,12 +27,10 @@ using Microsoft.Extensions.Options;
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
-[assembly: LambdaSerializer(typeof(CamelCaseLambdaJsonSerializer))]
-
 namespace Cythral.CloudFormation.GithubWebhook
 {
 
-    [Lambda(Startup = typeof(Startup))]
+    [Lambda(typeof(Startup), Serializer = typeof(CamelCaseLambdaJsonSerializer))]
     public partial class Handler
     {
 
