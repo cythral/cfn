@@ -6,8 +6,10 @@
         <TemplateFile>$(MSBuildThisFileDirectory)$(TemplateName)</TemplateFile>
     </PropertyGroup>
 
-    <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.Deploy" AssemblyFile="../BuildTasks/bin/$(Configuration)/netcoreapp3.0/publish/Cythral.CloudFormation.BuildTasks.dll" />
-    
+    <ItemGroup>
+        <PackageReference Include="Cythral.CloudFormation.BuildTasks" Version="0.2.1" />
+    </ItemGroup>
+
     <Target Name="Publish">
         <Deploy
             StackName="$(StackName)"

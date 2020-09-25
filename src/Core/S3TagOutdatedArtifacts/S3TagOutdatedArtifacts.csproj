@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AWSSDK.S3" Version="3.5.0" />
+        <PackageReference Include="AWSSDK.SecurityToken" Version="3.5.0" />
+        <PackageReference Include="Lambdajection" Version="0.4.0-beta1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\AwsUtils\SimpleStorageService\S3GetObjectFacade.cs" />
+        <Compile Include="..\AwsUtils\Common\AmazonClientFactory.cs" />
+    </ItemGroup>
+</Project>

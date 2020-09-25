@@ -12,12 +12,7 @@
     </PropertyGroup>
     
     <Target Name="Package">
-        <MSBuild 
-            Projects="$(SourceDirectory)/BuildTasks/BuildTasks.csproj" 
-            Targets="Publish" 
-            Properties="Configuration=$(Configuration)" />
-
-        <MSBuild 
+        <MSBuild
             Projects="$(SourceDirectory)/Utilities/Utilities.proj" 
             Targets="Copy" 
             Properties="Configuration=$(Configuration);Dest=$(Destination)" />

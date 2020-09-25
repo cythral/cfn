@@ -33,7 +33,6 @@ namespace Cythral.CloudFormation.GithubWebhook
     [Lambda(typeof(Startup), Serializer = typeof(CamelCaseLambdaJsonSerializer))]
     public partial class Handler
     {
-
         private readonly RequestValidator requestValidator;
         private readonly PipelineStarter pipelineStarter;
         private readonly PipelineDeployer pipelineDeployer;
