@@ -785,3 +785,9 @@ Outputs:
     Description: ARN of the S3 Deployment function for use in step function pipelines
     Export:
       Name: !Sub ${AWS::StackName}:S3DeploymentFunctionArn
+
+  S3TagOutdatedArtifactsFunctionArn:
+    Value: !GetAtt S3TagOutdatedArtifactsFunction.Arn
+    Description: ARN of the S3 Tag Outdated Artifacts function for use in step function pipelines
+    Export:
+      Name: !Sub ${AWS::StackName}:S3TagOutdatedArtifactsFunctionArn
