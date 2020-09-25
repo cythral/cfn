@@ -706,7 +706,7 @@ Resources:
   S3TagOutdatedArtifactsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: S3TagOutdatedArtifacts::Cythral.CloudFormation.S3TagOutdatedArtifacts.Handler::Handle
+      Handler: S3TagOutdatedArtifacts::Cythral.CloudFormation.S3TagOutdatedArtifacts.Handler::Run
       Runtime: dotnetcore3.1
       Timeout: 300
       MemorySize: 256
