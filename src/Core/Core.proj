@@ -1,6 +1,7 @@
-<Project Sdk="Microsoft.Build.Traversal/2.0.12" ToolsVersion="14.0" DefaultTargets="Publish" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.Build.Traversal" ToolsVersion="14.0" DefaultTargets="Publish" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
+    <DefaultProjectTypeGuid>FAE04EC0-301F-11D3-BF4B-00C04F79EFBC</DefaultProjectTypeGuid>
     <StackName>cfn-core</StackName>
     <TemplateFileName>Core.template.yml</TemplateFileName>
     <ConfigFileName>Core.config.json</ConfigFileName>
@@ -8,8 +9,8 @@
     <ConfigFile>$(MSBuildThisFileDirectory)$(ConfigFileName)</ConfigFile>
     <PackagedFile></PackagedFile>
     <DeploymentBucket></DeploymentBucket>
-    <Package>true</Package>
-    <Deploy>true</Deploy>
+    <Package>false</Package>
+    <Deploy>false</Deploy>
   </PropertyGroup>
 
   <ItemGroup>
