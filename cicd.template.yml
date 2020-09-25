@@ -34,6 +34,9 @@ Resources:
         Rules:
           - Status: Enabled
             ExpirationInDays: 14
+            TagFilters:
+              - Key: outdated
+                Value: "true"
             Prefix: build-artifacts
 
           - Status: Enabled
