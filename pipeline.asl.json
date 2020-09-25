@@ -228,6 +228,16 @@
           }
         }
       },
+      "Next": "Tag Outdated Artifacts"
+    },
+    "Tag Outdated Artifacts": {
+      "Type": "Task",
+      "Resource": "${S3TagOutdatedArtifacts}",
+      "ResultPath": null,
+      "Parameters": {
+        "ManifestLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+        "ManifestFilename": "package-manifest.json"
+      },
       "Next": "Success"
     },
     "Success": {
