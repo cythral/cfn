@@ -46,7 +46,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts
         {
             manifest = await getObject.GetZipEntryInObject<Manifest>(request.ManifestLocation, request.ManifestFilename);
 
-            var objects = await s3Client.ListObjectsV2Async(new ListObjectsV2Request { BucketName = manifest.Bucket, Prefix = manifest.Prefix });
+            var objects = await s3Client.ListObjectsV2Async(new ListObjectsV2Request { BucketName = manifest.BucketName, Prefix = manifest.Prefix });
             var tasks = objects.S3Objects.Select(PutObjectTagging);
 
             await Task.WhenAll(tasks);
@@ -59,7 +59,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts
             var tagging = manifest.Files.ContainsValue(@object.Key) ? currentTagSet : outdatedTagSet;
             await s3Client.PutObjectTaggingAsync(new PutObjectTaggingRequest
             {
-                BucketName = manifest.Bucket,
+                BucketName = manifest.BucketName,
                 Key = @object.Key,
                 Tagging = tagging
             });

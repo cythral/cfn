@@ -42,7 +42,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts.Tests
 
         private Manifest manifest = new Manifest
         {
-            Bucket = bucketName,
+            BucketName = bucketName,
             Prefix = prefix,
             Files = new Dictionary<string, string>
             {
@@ -117,7 +117,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts.Tests
             await handler.Handle(request, context);
 
             await s3Client.Received().PutObjectTaggingAsync(Is<PutObjectTaggingRequest>(request =>
-                request.BucketName == manifest.Bucket &&
+                request.BucketName == manifest.BucketName &&
                 request.Key == oldEntry2 &&
                 request.Tagging.TagSet.Any(tag => tag.Key == "outdated" && tag.Value == "true")
             ));
@@ -142,7 +142,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts.Tests
             await handler.Handle(request, context);
 
             await s3Client.Received().PutObjectTaggingAsync(Is<PutObjectTaggingRequest>(request =>
-                request.BucketName == manifest.Bucket &&
+                request.BucketName == manifest.BucketName &&
                 request.Key == newEntry1 &&
                 request.Tagging.TagSet.Any(tag => tag.Key == "outdated" && tag.Value == "false")
             ));
