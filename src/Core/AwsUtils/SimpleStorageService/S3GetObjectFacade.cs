@@ -27,23 +27,24 @@ namespace Cythral.CloudFormation.AwsUtils.SimpleStorageService
                 Key = key,
             });
 
-            using (var zip = new ZipArchive(getObjResponse.ResponseStream))
+            using var zip = new ZipArchive(getObjResponse.ResponseStream);
+            var file = zip.GetEntry(entry);
+
+            if (file == null)
             {
-                var file = zip.GetEntry(entry);
-
-                if (file == null)
-                {
-                    throw new Exception($"{entry} could not be found in {key}");
-                }
-
-                using (var inputStream = file.Open())
-                using (var reader = new StreamReader(inputStream))
-                {
-                    var result = await reader.ReadToEndAsync();
-
-                    return result;
-                }
+                throw new Exception($"{entry} could not be found in {key}");
             }
+
+            using var inputStream = file.Open();
+            using var reader = new StreamReader(inputStream);
+            var result = await reader.ReadToEndAsync();
+            return result;
+        }
+
+        public virtual async Task<T> GetZipEntryInObject<T>(string location, string entry)
+        {
+            var contents = await GetZipEntryInObject(location, entry);
+            return Deserialize<T>(contents);
         }
 
         public virtual async Task<string> GetObject(string bucket, string key)

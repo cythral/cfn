@@ -703,6 +703,31 @@ Resources:
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
           GITHUB_TOKEN: !Ref GithubToken
 
+  S3TagOutdatedArtifactsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: S3TagOutdatedArtifacts::Cythral.CloudFormation.S3TagOutdatedArtifacts.Handler::Handle
+      Runtime: dotnetcore3.1
+      Timeout: 300
+      MemorySize: 256
+      CodeUri: ../../bin/S3TagOutdatedArtifacts/Release/netcoreapp3.1/publish/
+      Policies:
+        - AWSLambdaExecute
+        - !Ref S3TagOutdatedArtifactsPolicy
+
+  S3TagOutdatedArtifactsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:ListBucket
+              - s3:GetObject
+              - s3:PutObjectTagging
+            Resource: "*"
+
   GithubTokenSecret:
     Type: Custom::Secret
     Properties:

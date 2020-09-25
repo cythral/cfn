@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "dependencies": {
+    ".NETFramework,Version=v4.0": {
+      "Cythral.CloudFormation.BuildTasks": {
+        "type": "Direct",
+        "requested": "[0.2.1, )",
+        "resolved": "0.2.1",
+        "contentHash": "GaHLnpWCxwX/0UjyRAmJeXBvZLXF2hOOlR9AXQ9dgLGfVz5Us/K/Xtv2pYujjMHQpwL6+G3A1V5NJDveo2PocQ=="
+      }
+    }
+  }
+}
