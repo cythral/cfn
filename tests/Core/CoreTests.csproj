@@ -25,5 +25,14 @@
     <ProjectReference Include="..\..\src\Core\DeploymentSupersession\DeploymentSupersession.csproj" />
     <ProjectReference Include="..\..\src\Core\ApprovalNotification\ApprovalNotification.csproj" />
     <ProjectReference Include="..\..\src\Core\ApprovalWebhook\ApprovalWebhook.csproj" />
+    <ProjectReference Include="..\..\src\Core\S3TagOutdatedArtifacts\S3TagOutdatedArtifacts.csproj" />
   </ItemGroup>
+
+  <Target Name="AddPackageAliases" AfterTargets="ResolveProjectReferences" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
+    <ItemGroup>
+        <ReferencePath Condition="'%(FileName)'=='S3TagOutdatedArtifacts'">
+            <Aliases>S3TagOutdated</Aliases>
+        </ReferencePath>
+    </ItemGroup>
+  </Target>
 </Project>

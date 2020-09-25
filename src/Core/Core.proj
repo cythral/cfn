@@ -1,7 +1,6 @@
-<Project ToolsVersion="14.0" DefaultTargets="Publish" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.Build.Traversal/2.0.12" ToolsVersion="14.0" DefaultTargets="Publish" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <BuildTasksLocation>../../bin/BuildTasks/$(Configuration)/netcoreapp3.1/publish/Cythral.CloudFormation.BuildTasks.dll</BuildTasksLocation>
     <StackName>cfn-core</StackName>
     <TemplateFileName>Core.template.yml</TemplateFileName>
     <ConfigFileName>Core.config.json</ConfigFileName>
@@ -14,31 +13,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Project Include="..\BuildTasks\BuildTasks.csproj" />
-    <Project Include="..\..\tests\EndToEnd\GithubWebhook\GithubWebhookEndToEnd.csproj" />
-    <Project Include="UpdateTargets\UpdateTargets.csproj" />
-    <Project Include="StackDeploymentStatus\StackDeploymentStatus.csproj" />
-    <Project Include="StackDeployment\StackDeployment.csproj" />
-    <Project Include="S3Deployment\S3Deployment.csproj" />
-    <Project Include="GithubWebhook\GithubWebhook.csproj" />
-    <Project Include="ExtractFileFromZip\ExtractFileFromZip.csproj" />
-    <Project Include="DeploymentSupersession\DeploymentSupersession.csproj" />
-    <Project Include="ApprovalNotification\ApprovalNotification.csproj" />
-    <Project Include="ApprovalWebhook\ApprovalWebhook.csproj" />
+    <PackageReference Include="Cythral.CloudFormation.BuildTasks" Version="0.2.1" />
   </ItemGroup>
 
- 
-
-  <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.UpdateCodeLocation" AssemblyFile="$(BuildTasksLocation)" />
-  <UsingTask TaskName="Cythral.CloudFormation.BuildTasks.Deploy" AssemblyFile="$(BuildTasksLocation)" />
-
-  <Target Name="Publish">
-    <MSBuild Projects="@(Project)" Targets="Publish" Properties="Package=false" />
-  </Target>
-
-  <Target Name="Clean">
-    <MSBuild Projects="@(Project)" Targets="Clean" />
-  </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\..\tests\EndToEnd\GithubWebhook\GithubWebhookEndToEnd.csproj" Properties="Package=false" />
+    <ProjectReference Include="UpdateTargets\UpdateTargets.csproj" />
+    <ProjectReference Include="StackDeploymentStatus\StackDeploymentStatus.csproj" />
+    <ProjectReference Include="StackDeployment\StackDeployment.csproj" />
+    <ProjectReference Include="S3Deployment\S3Deployment.csproj" />
+    <ProjectReference Include="GithubWebhook\GithubWebhook.csproj" />
+    <ProjectReference Include="ExtractFileFromZip\ExtractFileFromZip.csproj" />
+    <ProjectReference Include="DeploymentSupersession\DeploymentSupersession.csproj" />
+    <ProjectReference Include="ApprovalNotification\ApprovalNotification.csproj" />
+    <ProjectReference Include="ApprovalWebhook\ApprovalWebhook.csproj" />
+    <ProjectReference Include="S3TagOutdatedArtifacts\S3TagOutdatedArtifacts.csproj" />
+  </ItemGroup>
 
   <!-- Sets up the configuraiton file -->
   <Target Name="Configure" Condition="!Exists('$(ConfigFileName)')">
@@ -77,7 +67,13 @@
         <Output TaskParameter="ConsoleOutput" PropertyName="PackagedFile" />
     </Exec>
 
-    <Exec Command="aws cloudformation package --template-file $(TemplateFile) --s3-bucket $(DeploymentBucket) --output-template-file $(PackagedFile) --s3-prefix $(DeploymentBucketPrefix)" />
+    <PackageTemplate
+      TemplateFile="$(TemplateFile)" 
+      PackageBucket="$(DeploymentBucket)" 
+      OutputTemplateFile="$(PackagedFile)" 
+      PackageManifestFile="$([System.IO.Path]::GetDirectoryName('$(PackagedFile)'))/package-manifest.json" 
+      Prefix="$(DeploymentBucketPrefix)" 
+    />
     
     <PropertyGroup>
       <TemplateFile>$(PackagedFile)</TemplateFile>
@@ -86,6 +82,11 @@
   
   <!-- Deploy to CloudFormation -->
   <Target Name="Deploy" AfterTargets="Package" Condition="$(Deploy) == 'true'" DependsOnTargets="Configure">
-    <Deploy TemplateFile="$(TemplateFile)" StackName="$(StackName)" ConfigFile="$(ConfigFile)" Capabilities="CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND" />
+    <Deploy 
+      TemplateFile="$(TemplateFile)" 
+      StackName="$(StackName)" 
+      ConfigFile="$(ConfigFile)" 
+      Capabilities="CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND" 
+    />
   </Target>
 </Project>
