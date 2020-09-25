@@ -1427,8 +1427,7 @@
           "AWSSDK.ElasticLoadBalancingV2": "3.5.0",
           "Amazon.Lambda.Core": "1.1.0",
           "Amazon.Lambda.SNSEvents": "1.1.0",
-          "Amazon.Lambda.Serialization.SystemTextJson": "2.0.1",
-          "AwsUtils.Common": "1.0.0"
+          "Lambdajection": "0.4.0-beta2"
         }
       }
     }

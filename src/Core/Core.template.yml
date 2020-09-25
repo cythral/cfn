@@ -389,7 +389,7 @@ Resources:
   UpdateTargetsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: UpdateTargets::Cythral.CloudFormation.UpdateTargets.Handler::Handle
+      Handler: UpdateTargets::Cythral.CloudFormation.UpdateTargets.Handler::Run
       Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: ../../bin/UpdateTargets/Release/netcoreapp3.1/publish/
