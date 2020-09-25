@@ -9,12 +9,12 @@
     <ConfigFile>$(MSBuildThisFileDirectory)$(ConfigFileName)</ConfigFile>
     <PackagedFile></PackagedFile>
     <DeploymentBucket></DeploymentBucket>
-    <Package>false</Package>
-    <Deploy>false</Deploy>
+    <Package Condition="'$(Package)' == ''">false</Package>
+    <Deploy Condition="'$(Deploy)' == ''">false</Deploy>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cythral.CloudFormation.BuildTasks" Version="0.2.1" />
+    <PackageReference Include="Cythral.CloudFormation.BuildTasks" Version="0.2.2" />
   </ItemGroup>
 
   <ItemGroup>
