@@ -711,22 +711,7 @@ Resources:
       Timeout: 300
       MemorySize: 256
       CodeUri: ../../bin/S3TagOutdatedArtifacts/Release/netcoreapp3.1/publish/
-      Policies:
-        - AWSLambdaExecute
-        - !Ref S3TagOutdatedArtifactsPolicy
-
-  S3TagOutdatedArtifactsPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action:
-              - s3:ListBucket
-              - s3:GetObject
-              - s3:PutObjectTagging
-            Resource: "*"
+      Role: !ImportValue cfn-utilities:MasterRoleArn
 
   GithubTokenSecret:
     Type: Custom::Secret
