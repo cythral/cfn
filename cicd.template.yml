@@ -160,6 +160,7 @@ Resources:
         SharedRoleArn: !ImportValue cfn-utilities:MasterRoleArn
         ApprovalNotificationFunction: !ImportValue cfn-core:ApprovalNotificationFunctionArn
         FileFromZipArn: !ImportValue cfn-core:ExtractFileFromZipFunctionArn
+        S3TagOutdatedArtifacts: !ImportValue cfn-core:S3TagOutdatedArtifactsFunctionArn
         AccountId: !Ref AWS::AccountId
     Metadata:
       cfn-lint:
