@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,53 +10,54 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.Lambda.SNSEvents;
 
-using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.UpdateTargets.DnsResolver;
 using Cythral.CloudFormation.UpdateTargets.Request;
+
+using Lambdajection.Attributes;
+
+using Microsoft.Extensions.Logging;
 
 using static System.Text.Json.JsonSerializer;
 using static Amazon.ElasticLoadBalancingV2.TargetHealthStateEnum;
 
 namespace Cythral.CloudFormation.UpdateTargets
 {
-    public class Handler
+    [Lambda(typeof(Startup))]
+    public partial class Handler
     {
-        private static DnsResolverFactory dnsResolverFactory = new DnsResolverFactory();
-        private static AmazonClientFactory<IAmazonElasticLoadBalancingV2> elbClientFactory = new AmazonClientFactory<IAmazonElasticLoadBalancingV2>();
-        private static UpdateTargetsRequestFactory requestFactory = new UpdateTargetsRequestFactory();
+        private readonly DnsResolver dnsResolver;
+        private readonly IAmazonElasticLoadBalancingV2 elbClient;
+        private readonly ILogger<Handler> logger;
+        private readonly UpdateTargetsRequestFactory requestFactory;
 
-        [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
-        public static async Task<Response> Handle(
+        public Handler(
+            DnsResolver dnsResolver,
+            IAmazonElasticLoadBalancingV2 elbClient,
+            UpdateTargetsRequestFactory requestFactory,
+            ILogger<Handler> logger
+        )
+        {
+            this.dnsResolver = dnsResolver;
+            this.elbClient = elbClient;
+            this.requestFactory = requestFactory;
+            this.logger = logger;
+        }
+
+        public async Task<Response> Handle(
             SNSEvent snsRequest,
             ILambdaContext context = null
         )
         {
-            var resolver = dnsResolverFactory.Create();
-            var elbClient = await elbClientFactory.Create();
             var request = requestFactory.CreateFromSnsEvent(snsRequest);
+            logger.LogInformation($"Received transformed request: {Serialize(request)}");
 
-            Console.WriteLine($"Received transformed request: {Serialize(request)}");
-
-            var addresses = resolver.Resolve(request.TargetDnsName).AddressList ?? new IPAddress[] { };
+            var addresses = dnsResolver.Resolve(request.TargetDnsName).AddressList ?? new IPAddress[] { };
             var targetHealthRequest = new DescribeTargetHealthRequest { TargetGroupArn = request.TargetGroupArn };
             var targetHealthResponse = await elbClient.DescribeTargetHealthAsync(targetHealthRequest);
-            Console.WriteLine($"Got target health response: {Serialize(targetHealthResponse)}");
+            logger.LogInformation($"Got target health response: {Serialize(targetHealthResponse)}");
 
             var targetHealthDescriptions = targetHealthResponse.TargetHealthDescriptions;
             var healthyTargets = from target in targetHealthDescriptions where target.TargetHealth.State != Unhealthy select target.Target;
             var unhealthyTargets = from target in targetHealthDescriptions where target.TargetHealth.State == Unhealthy select target.Target;
-
-            if (unhealthyTargets.Count() > 0)
-            {
-                var deregisterTargetsResponse = await elbClient.DeregisterTargetsAsync(new DeregisterTargetsRequest
-                {
-                    TargetGroupArn = request.TargetGroupArn,
-                    Targets = unhealthyTargets.ToList()
-                });
-
-                Console.WriteLine($"Got deregister targets response: {Serialize(deregisterTargetsResponse)}");
-            }
-
             var newTargets = from address in addresses
                              where healthyTargets.All(target => !IPAddress.Parse(target.Id).Equals(address))
                              select new TargetDescription
@@ -65,21 +67,48 @@ namespace Cythral.CloudFormation.UpdateTargets
                                  Port = 80
                              };
 
-            if (newTargets.Count() > 0)
+            await Task.WhenAll(new Task[]
             {
-                var registerTargetsResponse = await elbClient.RegisterTargetsAsync(new RegisterTargetsRequest
-                {
-                    TargetGroupArn = request.TargetGroupArn,
-                    Targets = newTargets.ToList()
-                });
-
-                Console.WriteLine($"Got register targets response: {Serialize(registerTargetsResponse)}");
-            }
+                DeregisterTargets(request.TargetGroupArn, unhealthyTargets),
+                RegisterTargets(request.TargetGroupArn, newTargets),
+            });
 
             return new Response
             {
                 Success = true
             };
+        }
+
+        private async Task DeregisterTargets(string targetGroupArn, IEnumerable<TargetDescription> targets)
+        {
+            if (targets.Count() == 0)
+            {
+                return;
+            }
+
+            var deregisterTargetsResponse = await elbClient.DeregisterTargetsAsync(new DeregisterTargetsRequest
+            {
+                TargetGroupArn = targetGroupArn,
+                Targets = targets.ToList()
+            });
+
+            logger.LogInformation($"Got deregister targets response: {Serialize(deregisterTargetsResponse)}");
+        }
+
+        private async Task RegisterTargets(string targetGroupArn, IEnumerable<TargetDescription> targets)
+        {
+            if (targets.Count() == 0)
+            {
+                return;
+            }
+
+            var registerTargetsResponse = await elbClient.RegisterTargetsAsync(new RegisterTargetsRequest
+            {
+                TargetGroupArn = targetGroupArn,
+                Targets = targets.ToList()
+            });
+
+            logger.LogInformation($"Got register targets response: {Serialize(registerTargetsResponse)}");
         }
     }
 }
