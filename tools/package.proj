@@ -42,6 +42,6 @@
             Condition="$(SkipCore) != 'true'" 
             Projects="$(SourceDirectory)/Core/Core.proj" 
             Targets="Publish" 
-            Properties="Deploy=false;DeploymentBucket=$(DeploymentBucket);DeploymentBucketPrefix=$(DeploymentBucketPrefix);Configuration=$(Configuration);PackagedFile=$(Destination)/Core.template.yml;Optimize=$(Optimize)" />
+            Properties="Package=trueDeploy=false;DeploymentBucket=$(DeploymentBucket);DeploymentBucketPrefix=$(DeploymentBucketPrefix);Configuration=$(Configuration);PackagedFile=$(Destination)/Core.template.yml;Optimize=$(Optimize)" />
     </Target>
 </Project>
