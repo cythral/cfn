@@ -1,3 +1,5 @@
+extern alias GithubWebhook;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +9,12 @@ using Amazon.CloudFormation.Model;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-using Cythral.CloudFormation.AwsUtils.CloudFormation;
-using Cythral.CloudFormation.GithubWebhook.Github;
-using Cythral.CloudFormation.GithubWebhook.Github.Entities;
-
 using FluentAssertions;
+
+using GithubWebhook::Cythral.CloudFormation.AwsUtils.CloudFormation;
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github;
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github.Entities;
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Pipelines;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -22,8 +25,10 @@ using NUnit.Framework;
 
 using static NSubstitute.Arg;
 
-namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
+namespace Cythral.CloudFormation.GithubWebhook.Pipelines
 {
+    using Config = GithubWebhook::Cythral.CloudFormation.GithubWebhook.Config;
+
     public class PipelineDeployerTests
     {
         private const string githubToken = "githubToken";

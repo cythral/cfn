@@ -1,10 +1,12 @@
+extern alias CommonAwsUtils;
+
 using System;
 using System.Threading.Tasks;
 
 using Amazon.S3;
 using Amazon.SecurityToken;
 
-using Cythral.CloudFormation.AwsUtils;
+using CommonAwsUtils::Cythral.CloudFormation.AwsUtils;
 
 using FluentAssertions;
 

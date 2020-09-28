@@ -29,7 +29,6 @@ using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.GithubWebhook
 {
-
     [Lambda(typeof(Startup), Serializer = typeof(CamelCaseLambdaJsonSerializer))]
     public partial class Handler
     {

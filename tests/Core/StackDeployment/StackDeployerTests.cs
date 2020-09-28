@@ -1,3 +1,5 @@
+extern alias StackDeployment;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,17 +8,21 @@ using System.Threading.Tasks;
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 
-using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.AwsUtils.CloudFormation;
-using Cythral.CloudFormation.StackDeployment;
+using Lambdajection.Core;
+
+using Microsoft.Extensions.Logging;
 
 using NSubstitute;
 
 using NUnit.Framework;
 
+using StackDeployment::Cythral.CloudFormation.AwsUtils;
+using StackDeployment::Cythral.CloudFormation.AwsUtils.CloudFormation;
+using StackDeployment::Cythral.CloudFormation.StackDeployment;
+
 using static Amazon.CloudFormation.OnFailure;
 
-namespace Cythral.CloudFormation.Tests.GithubWebhook
+namespace Cythral.CloudFormation.Tests.StackDeployment
 {
     public class StackDeployerTests
     {
@@ -54,8 +60,9 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             .CreateStackAsync(Arg.Any<CreateStackRequest>())
             .Returns(new CreateStackResponse { });
 
-            var stackDeployer = new DeployStackFacade();
-            var cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
+            var cloudformationFactory = Substitute.For<IAwsFactory<IAmazonCloudFormation>>();
+            var logger = Substitute.For<ILogger<DeployStackFacade>>();
+            var stackDeployer = new DeployStackFacade(cloudformationFactory, logger);
             cloudformationFactory.Create().Returns(cloudformationClient);
             TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 
@@ -107,8 +114,9 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
             .Returns(new UpdateStackResponse { });
 
-            var stackDeployer = new DeployStackFacade();
-            var cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
+            var cloudformationFactory = Substitute.For<IAwsFactory<IAmazonCloudFormation>>();
+            var logger = Substitute.For<ILogger<DeployStackFacade>>();
+            var stackDeployer = new DeployStackFacade(cloudformationFactory, logger);
             cloudformationFactory.Create().Returns(cloudformationClient);
             TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 
@@ -160,8 +168,9 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
             .Returns<UpdateStackResponse>(x => { throw new Exception("No updates are to be performed."); });
 
-            var stackDeployer = new DeployStackFacade();
-            var cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
+            var cloudformationFactory = Substitute.For<IAwsFactory<IAmazonCloudFormation>>();
+            var logger = Substitute.For<ILogger<DeployStackFacade>>();
+            var stackDeployer = new DeployStackFacade(cloudformationFactory, logger);
             cloudformationFactory.Create().Returns(cloudformationClient);
             TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 
@@ -199,8 +208,9 @@ namespace Cythral.CloudFormation.Tests.GithubWebhook
             .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
             .Returns<UpdateStackResponse>(x => { throw new Exception("Some other exception"); });
 
-            var stackDeployer = new DeployStackFacade();
-            var cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
+            var cloudformationFactory = Substitute.For<IAwsFactory<IAmazonCloudFormation>>();
+            var logger = Substitute.For<ILogger<DeployStackFacade>>();
+            var stackDeployer = new DeployStackFacade(cloudformationFactory, logger);
             cloudformationFactory.Create().Returns(cloudformationClient);
             TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 

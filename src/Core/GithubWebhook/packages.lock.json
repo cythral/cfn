@@ -8,12 +8,6 @@
         "resolved": "2.0.0",
         "contentHash": "faB8e3dvWhNsI5hABtiDvKJ5RjeQXlE3cIM3u4pMs0MtQiGbxbuzjiibEd58ojRzz0ijYImy36mxPSGWm1nVtQ=="
       },
-      "Amazon.Lambda.Core": {
-        "type": "Direct",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "ueGId8b4DEHoVWkHDs3iAJH8IUSAUGu5AqkoI/Syl4RuByzik7lz9IjoImiGAlGhtsQV02MHNeTo04IFjS37gQ=="
-      },
       "AWSSDK.CloudFormation": {
         "type": "Direct",
         "requested": "[3.5.0, )",
@@ -79,6 +73,11 @@
         "dependencies": {
           "System.Text.Json": "4.7.2"
         }
+      },
+      "Amazon.Lambda.Core": {
+        "type": "Transitive",
+        "resolved": "1.1.0",
+        "contentHash": "ueGId8b4DEHoVWkHDs3iAJH8IUSAUGu5AqkoI/Syl4RuByzik7lz9IjoImiGAlGhtsQV02MHNeTo04IFjS37gQ=="
       },
       "Amazon.Lambda.Serialization.SystemTextJson": {
         "type": "Transitive",
@@ -240,27 +239,6 @@
         "type": "Transitive",
         "resolved": "4.7.2",
         "contentHash": "TcMd95wcrubm9nHvJEQs70rC0H/8omiSGGpU4FQ/ZA1URIqD4pjmFJh2Mfv1yH1eHgJDWTi2hMDXwTET+zOOyg=="
-      },
-      "awsutils.common": {
-        "type": "Project",
-        "dependencies": {
-          "AWSSDK.Core": "3.5.0",
-          "AWSSDK.SecurityToken": "3.5.0"
-        }
-      },
-      "cloudformation": {
-        "type": "Project",
-        "dependencies": {
-          "AWSSDK.CloudFormation": "3.5.0",
-          "AwsUtils.Common": "1.0.0"
-        }
-      },
-      "simplestorageservice": {
-        "type": "Project",
-        "dependencies": {
-          "AWSSDK.S3": "3.5.0",
-          "AwsUtils.Common": "1.0.0"
-        }
       }
     }
   }

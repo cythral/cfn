@@ -1,13 +1,15 @@
+extern alias GithubWebhook;
+
 using System;
 using System.Threading.Tasks;
 
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
-using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.GithubWebhook;
-using Cythral.CloudFormation.GithubWebhook.Github;
-using Cythral.CloudFormation.GithubWebhook.Github.Entities;
+using GithubWebhook::Cythral.CloudFormation.AwsUtils;
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook;
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github;
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github.Entities;
 
 using Microsoft.Extensions.Logging;
 
@@ -19,6 +21,8 @@ using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
 {
+    using PipelineStarter = GithubWebhook::Cythral.CloudFormation.GithubWebhook.Pipelines.PipelineStarter;
+
     public class PipelineStarterTests
     {
         [SetUp]

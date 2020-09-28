@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 
+using Lambdajection.Core;
+
+using Microsoft.Extensions.Logging;
+
 using static System.Text.Json.JsonSerializer;
 using static Amazon.CloudFormation.OnFailure;
 
@@ -14,7 +18,19 @@ namespace Cythral.CloudFormation.AwsUtils.CloudFormation
 {
     public class DeployStackFacade
     {
-        private AmazonClientFactory<IAmazonCloudFormation> cloudformationFactory = new AmazonClientFactory<IAmazonCloudFormation>();
+        private readonly IAwsFactory<IAmazonCloudFormation> cloudformationFactory;
+        private readonly ILogger<DeployStackFacade> logger;
+
+        public DeployStackFacade(IAwsFactory<IAmazonCloudFormation> cloudformationFactory, ILogger<DeployStackFacade> logger)
+        {
+            this.cloudformationFactory = cloudformationFactory;
+            this.logger = logger;
+        }
+
+        internal DeployStackFacade()
+        {
+            // Used for testing
+        }
 
         public virtual async Task Deploy(DeployStackContext context)
         {
@@ -42,7 +58,7 @@ namespace Cythral.CloudFormation.AwsUtils.CloudFormation
                 };
 
                 var createStackResponse = await cloudformationClient.CreateStackAsync(createStackRequest);
-                Console.WriteLine($"Got create stack response: {Serialize(createStackResponse)}");
+                logger.LogInformation($"Got create stack response: {Serialize(createStackResponse)}");
             }
             else
             {
@@ -61,7 +77,7 @@ namespace Cythral.CloudFormation.AwsUtils.CloudFormation
                 try
                 {
                     var updateStackResponse = await cloudformationClient.UpdateStackAsync(updateStackRequest);
-                    Console.WriteLine($"Got update stack response: {Serialize(updateStackResponse)}");
+                    logger.LogInformation($"Got update stack response: {Serialize(updateStackResponse)}");
                 }
                 catch (Exception e)
                 {
@@ -83,13 +99,13 @@ namespace Cythral.CloudFormation.AwsUtils.CloudFormation
             { // if this throws, assume the stack does not exist.
                 var describeStacksRequest = new DescribeStacksRequest { StackName = context.StackName };
                 var describeStacksResponse = await cloudformationClient.DescribeStacksAsync(describeStacksRequest);
-                Console.WriteLine($"Got describe stacks response: {Serialize(describeStacksResponse)}");
+                logger.LogInformation($"Got describe stacks response: {Serialize(describeStacksResponse)}");
 
                 return describeStacksResponse.Stacks.Count() != 0;
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Describe stacks failure: {e.Message}\n{e.StackTrace}");
+                logger.LogError($"Describe stacks failure: {e.Message}\n{e.StackTrace}");
             }
 
             return false;

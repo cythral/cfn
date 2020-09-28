@@ -1,3 +1,4 @@
+using Amazon.CloudFormation;
 using Amazon.S3;
 using Amazon.StepFunctions;
 
@@ -15,8 +16,6 @@ namespace Cythral.CloudFormation.GithubWebhook
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.UseAwsService<IAmazonS3>();
-            services.UseAwsService<IAmazonStepFunctions>();
             services.AddSingleton<GithubHttpClient>();
             services.AddSingleton<Sha256SumComputer>();
             services.AddSingleton<GithubFileFetcher>();
@@ -25,6 +24,10 @@ namespace Cythral.CloudFormation.GithubWebhook
             services.AddSingleton<DeployStackFacade>();
             services.AddSingleton<PipelineDeployer>();
             services.AddSingleton<PipelineStarter>();
+
+            services.UseAwsService<IAmazonS3>();
+            services.UseAwsService<IAmazonStepFunctions>();
+            services.UseAwsService<IAmazonCloudFormation>();
         }
     }
 }

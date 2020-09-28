@@ -1,3 +1,8 @@
+extern alias CommonAwsUtils;
+extern alias CommonUtils;
+extern alias GithubUtils;
+extern alias S3AwsUtils;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,10 +13,11 @@ using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
-using Cythral.CloudFormation.GithubUtils;
+using CommonAwsUtils::Cythral.CloudFormation.AwsUtils;
+
 using Cythral.CloudFormation.S3Deployment;
+
+using GithubUtils::Cythral.CloudFormation.GithubUtils;
 
 using NSubstitute;
 using NSubstitute.ClearExtensions;
@@ -20,8 +26,12 @@ using NUnit.Framework;
 
 using Octokit;
 
+using S3AwsUtils::Cythral.CloudFormation.AwsUtils.SimpleStorageService;
+
 namespace Cythral.CloudFormation.Tests.S3Deployment
 {
+    using CommitInfo = CommonUtils::Cythral.CloudFormation.CommitInfo;
+
     public class HandlerTests
     {
         private static AmazonClientFactory<IAmazonS3> s3Factory = Substitute.For<AmazonClientFactory<IAmazonS3>>();
