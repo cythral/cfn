@@ -16,6 +16,10 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Core\AwsUtils\Common\AwsUtils.Common.csproj" />
+    <ProjectReference Include="..\..\src\Core\AwsUtils\SimpleStorageService\SimpleStorageService.csproj" />
+    <ProjectReference Include="..\..\src\Core\AwsUtils\CloudFormation\CloudFormation.csproj" />
+    <ProjectReference Include="..\..\src\Core\GithubUtils\GithubUtils.csproj" />
     <ProjectReference Include="..\..\src\Core\UpdateTargets\UpdateTargets.csproj" />
     <ProjectReference Include="..\..\src\Core\StackDeploymentStatus\StackDeploymentStatus.csproj" />
     <ProjectReference Include="..\..\src\Core\StackDeployment\StackDeployment.csproj" />
@@ -28,11 +32,37 @@
     <ProjectReference Include="..\..\src\Core\S3TagOutdatedArtifacts\S3TagOutdatedArtifacts.csproj" />
   </ItemGroup>
 
-  <Target Name="AddPackageAliases" AfterTargets="ResolveProjectReferences" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
-    <ItemGroup>
-        <ReferencePath Condition="'%(FileName)'=='S3TagOutdatedArtifacts'">
-            <Aliases>S3TagOutdated</Aliases>
-        </ReferencePath>
-    </ItemGroup>
-  </Target>
+  <ItemGroup>
+    <Reference Include="..\..\bin\AwsUtils.Common\$(Configuration)\$(TargetFramework)\AwsUtils.Common.dll">
+      <Aliases>CommonAwsUtils</Aliases>
+    </Reference>
+
+    <Reference Include="..\..\bin\Common\$(Configuration)\$(TargetFramework)\Common.dll">
+      <Aliases>CommonUtils</Aliases>
+    </Reference>
+
+    <Reference Include="..\..\bin\SimpleStorageService\$(Configuration)\$(TargetFramework)\SimpleStorageService.dll">
+      <Aliases>S3AwsUtils</Aliases>
+    </Reference>
+
+    <Reference Include="..\..\bin\CloudFormation\$(Configuration)\$(TargetFramework)\CloudFormation.dll">
+      <Aliases>CloudFormationUtils</Aliases>
+    </Reference>
+
+    <Reference Include="..\..\bin\GithubUtils\$(Configuration)\$(TargetFramework)\GithubUtils.dll">
+      <Aliases>GithubUtils</Aliases>
+    </Reference>
+
+    <Reference Include="..\..\bin\S3TagOutdatedArtifacts\$(Configuration)\$(TargetFramework)\S3TagOutdatedArtifacts.dll">
+      <Aliases>S3TagOutdated</Aliases>
+    </Reference>
+
+    <Reference Include="..\..\bin\StackDeployment\$(Configuration)\$(TargetFramework)\StackDeployment.dll">
+      <Aliases>StackDeployment</Aliases>
+    </Reference>
+
+    <Reference Include="..\..\bin\GithubWebhook\$(Configuration)\$(TargetFramework)\GithubWebhook.dll">
+      <Aliases>GithubWebhook</Aliases>
+    </Reference>
+  </ItemGroup>
 </Project>

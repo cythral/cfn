@@ -1,3 +1,5 @@
+extern alias CommonAwsUtils;
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -7,7 +9,8 @@ using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
 using Amazon.Lambda.SNSEvents;
 
-using Cythral.CloudFormation.AwsUtils;
+using CommonAwsUtils::Cythral.CloudFormation.AwsUtils;
+
 using Cythral.CloudFormation.UpdateTargets;
 using Cythral.CloudFormation.UpdateTargets.Request;
 

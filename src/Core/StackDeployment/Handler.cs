@@ -19,26 +19,49 @@ using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
+using Lambdajection.Attributes;
+
 using Octokit;
 
 using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.StackDeployment
 {
-    public class Handler
+    [Lambda(typeof(Startup))]
+    public partial class Handler
     {
         private const string notificationArnKey = "NOTIFICATION_ARN";
-        private static DeployStackFacade stackDeployer = new DeployStackFacade();
-        private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
-        private static ParseConfigFileFacade parseConfigFileFacade = new ParseConfigFileFacade();
-        private static TokenGenerator tokenGenerator = new TokenGenerator();
-        private static RequestFactory requestFactory = new RequestFactory();
-        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = new AmazonClientFactory<IAmazonStepFunctions>();
-        private static AmazonClientFactory<IAmazonCloudFormation> cloudformationFactory = new AmazonClientFactory<IAmazonCloudFormation>();
-        private static PutCommitStatusFacade putCommitStatusFacade = new PutCommitStatusFacade();
+        private readonly DeployStackFacade stackDeployer;
+        private readonly S3GetObjectFacade s3GetObjectFacade;
+        private readonly ParseConfigFileFacade parseConfigFileFacade;
+        private readonly TokenGenerator tokenGenerator;
+        private readonly RequestFactory requestFactory;
+        private readonly IAmazonStepFunctions stepFunctionsClient;
+        private readonly IAmazonCloudFormation cloudformationClient;
+        private readonly PutCommitStatusFacade putCommitStatusFacade;
 
-        [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
-        public static async Task<Response> Handle(
+        public Handler(
+            DeployStackFacade stackDeployer,
+            S3GetObjectFacade s3GetObjectFacade,
+            ParseConfigFileFacade parseConfigFileFacade,
+            TokenGenerator tokenGenerator,
+            RequestFactory requestFactory,
+            IAmazonStepFunctions stepFunctionsClient,
+            IAmazonCloudFormation cloudformationClient,
+            PutCommitStatusFacade putCommitStatusFacade
+        )
+        {
+            this.stackDeployer = stackDeployer;
+            this.s3GetObjectFacade = s3GetObjectFacade;
+            this.parseConfigFileFacade = parseConfigFileFacade;
+            this.tokenGenerator = tokenGenerator;
+            this.requestFactory = requestFactory;
+            this.stepFunctionsClient = stepFunctionsClient;
+            this.cloudformationClient = cloudformationClient;
+            this.putCommitStatusFacade = putCommitStatusFacade;
+        }
+
+        public async Task<Response> Handle(
             SQSEvent sqsEvent,
             ILambdaContext context = null
         )
@@ -69,8 +92,7 @@ namespace Cythral.CloudFormation.StackDeployment
             catch (NoUpdatesException)
             {
                 var outputs = await GetStackOutputs(request.StackName, request.RoleArn);
-                var client = await stepFunctionsClientFactory.Create();
-                var response = await client.SendTaskSuccessAsync(new SendTaskSuccessRequest
+                var response = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
                 {
                     TaskToken = request.Token,
                     Output = Serialize(outputs)
@@ -85,8 +107,7 @@ namespace Cythral.CloudFormation.StackDeployment
             }
             catch (Exception e)
             {
-                var client = await stepFunctionsClientFactory.Create();
-                var response = await client.SendTaskFailureAsync(new SendTaskFailureRequest
+                var response = await stepFunctionsClient.SendTaskFailureAsync(new SendTaskFailureRequest
                 {
                     TaskToken = request.Token,
                     Cause = e.Message
@@ -103,7 +124,7 @@ namespace Cythral.CloudFormation.StackDeployment
             throw new Exception();
         }
 
-        private static async Task<TemplateConfiguration> GetConfig(Request request)
+        private async Task<TemplateConfiguration> GetConfig(Request request)
         {
             var fileName = request.TemplateConfigurationFileName;
 
@@ -129,10 +150,9 @@ namespace Cythral.CloudFormation.StackDeployment
             return result.Select(entry => new Parameter { ParameterKey = entry.Key, ParameterValue = entry.Value }).ToList();
         }
 
-        private static async Task<Dictionary<string, string>> GetStackOutputs(string stackId, string roleArn)
+        private async Task<Dictionary<string, string>> GetStackOutputs(string stackId, string roleArn)
         {
-            var client = await cloudformationFactory.Create(roleArn);
-            var response = await client.DescribeStacksAsync(new DescribeStacksRequest
+            var response = await cloudformationClient.DescribeStacksAsync(new DescribeStacksRequest
             {
                 StackName = stackId
             });
@@ -140,7 +160,7 @@ namespace Cythral.CloudFormation.StackDeployment
             return response.Stacks[0].Outputs.ToDictionary(entry => entry.OutputKey, entry => entry.OutputValue);
         }
 
-        private static async Task PutCommitStatus(Request request, CommitState state)
+        private async Task PutCommitStatus(Request request, CommitState state)
         {
             await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
             {

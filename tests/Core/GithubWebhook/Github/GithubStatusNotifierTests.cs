@@ -1,12 +1,16 @@
+
+extern alias GithubWebhook;
+
 using System;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-using Cythral.CloudFormation.GithubWebhook.Tests;
-
 using FluentAssertions;
+
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook;
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,8 +22,11 @@ using NUnit.Framework;
 using static System.Net.HttpStatusCode;
 using static NSubstitute.Arg;
 
-namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
+
+namespace Cythral.CloudFormation.GithubWebhook.Tests.Github
 {
+    using Config = GithubWebhook::Cythral.CloudFormation.GithubWebhook.Config;
+
     public class GithubStatusNotifierTests
     {
         class NotifyPending

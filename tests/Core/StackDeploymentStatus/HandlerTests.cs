@@ -1,3 +1,8 @@
+extern alias CommonAwsUtils;
+extern alias CommonUtils;
+extern alias GithubUtils;
+extern alias S3AwsUtils;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +16,12 @@ using Amazon.SQS.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
-using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
-using Cythral.CloudFormation.GithubUtils;
+using CommonAwsUtils::Cythral.CloudFormation.AwsUtils;
+
 using Cythral.CloudFormation.StackDeploymentStatus;
 using Cythral.CloudFormation.StackDeploymentStatus.Request;
+
+using GithubUtils::Cythral.CloudFormation.GithubUtils;
 
 using NSubstitute;
 using NSubstitute.ClearExtensions;
@@ -24,10 +30,14 @@ using NUnit.Framework;
 
 using Octokit;
 
+using S3AwsUtils::Cythral.CloudFormation.AwsUtils.SimpleStorageService;
+
 using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 {
+    using TokenInfo = CommonUtils::Cythral.CloudFormation.TokenInfo;
+    
     [TestFixture]
     public class HandlerTests
     {
