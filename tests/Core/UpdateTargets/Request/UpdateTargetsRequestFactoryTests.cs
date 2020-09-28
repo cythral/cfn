@@ -2,7 +2,6 @@ using System.Collections.Generic;
 
 using Amazon.Lambda.SNSEvents;
 
-using Cythral.CloudFormation.GithubWebhook.Github.Entities;
 using Cythral.CloudFormation.UpdateTargets;
 using Cythral.CloudFormation.UpdateTargets.Request;
 

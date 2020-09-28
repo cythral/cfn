@@ -18,6 +18,8 @@ using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.Tests.StackDeployment
 {
+    using TokenInfo = StackDeployment::Cythral.CloudFormation.TokenInfo;
+
     public class TokenGeneratorTests
     {
         private const string stackName = "stackName";

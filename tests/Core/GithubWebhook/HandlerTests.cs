@@ -1,4 +1,6 @@
-﻿using System;
+﻿extern alias GithubWebhook;
+
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -6,14 +8,14 @@ using System.Threading.Tasks;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.S3;
 
-using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.AwsUtils.CloudFormation;
-using Cythral.CloudFormation.GithubWebhook.Exceptions;
-using Cythral.CloudFormation.GithubWebhook.Github;
-using Cythral.CloudFormation.GithubWebhook.Github.Entities;
-using Cythral.CloudFormation.GithubWebhook.Pipelines;
-
 using FluentAssertions;
+
+using GithubWebhook::Cythral.CloudFormation.AwsUtils;
+using GithubWebhook::Cythral.CloudFormation.AwsUtils.CloudFormation;
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Exceptions;
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github;
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github.Entities;
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Pipelines;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -27,10 +29,10 @@ using RichardSzalay.MockHttp;
 using static System.Text.Json.JsonSerializer;
 using static NSubstitute.Arg;
 
-using Handler = Cythral.CloudFormation.GithubWebhook.Handler;
-
 namespace Cythral.CloudFormation.GithubWebhook.Tests
 {
+    using Config = GithubWebhook::Cythral.CloudFormation.GithubWebhook.Config;
+    using Handler = GithubWebhook::Cythral.CloudFormation.GithubWebhook.Handler;
 
     public class HandlerTests
     {

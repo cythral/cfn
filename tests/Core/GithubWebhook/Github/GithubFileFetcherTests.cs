@@ -1,11 +1,13 @@
+extern alias GithubWebhook;
+
 using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-using Cythral.CloudFormation.GithubWebhook.Github;
-
 using FluentAssertions;
+
+using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -19,6 +21,9 @@ using static NSubstitute.Arg;
 
 namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
 {
+    using Config = GithubWebhook::Cythral.CloudFormation.GithubWebhook.Config;
+    using GithubHttpClient = GithubWebhook::Cythral.CloudFormation.GithubWebhook.GithubHttpClient;
+
     public class GithubFileFetcherTests
     {
         private const string url = "http://url/test/{+path}";

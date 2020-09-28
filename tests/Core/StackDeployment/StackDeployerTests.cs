@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 
+using Lambdajection.Core;
+
+using Microsoft.Extensions.Logging;
+
 using NSubstitute;
 
 using NUnit.Framework;
@@ -56,8 +60,9 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             .CreateStackAsync(Arg.Any<CreateStackRequest>())
             .Returns(new CreateStackResponse { });
 
-            var stackDeployer = new DeployStackFacade();
-            var cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
+            var cloudformationFactory = Substitute.For<IAwsFactory<IAmazonCloudFormation>>();
+            var logger = Substitute.For<ILogger<DeployStackFacade>>();
+            var stackDeployer = new DeployStackFacade(cloudformationFactory, logger);
             cloudformationFactory.Create().Returns(cloudformationClient);
             TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 
@@ -109,8 +114,9 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
             .Returns(new UpdateStackResponse { });
 
-            var stackDeployer = new DeployStackFacade();
-            var cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
+            var cloudformationFactory = Substitute.For<IAwsFactory<IAmazonCloudFormation>>();
+            var logger = Substitute.For<ILogger<DeployStackFacade>>();
+            var stackDeployer = new DeployStackFacade(cloudformationFactory, logger);
             cloudformationFactory.Create().Returns(cloudformationClient);
             TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 
@@ -162,8 +168,9 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
             .Returns<UpdateStackResponse>(x => { throw new Exception("No updates are to be performed."); });
 
-            var stackDeployer = new DeployStackFacade();
-            var cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
+            var cloudformationFactory = Substitute.For<IAwsFactory<IAmazonCloudFormation>>();
+            var logger = Substitute.For<ILogger<DeployStackFacade>>();
+            var stackDeployer = new DeployStackFacade(cloudformationFactory, logger);
             cloudformationFactory.Create().Returns(cloudformationClient);
             TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 
@@ -201,8 +208,9 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             .UpdateStackAsync(Arg.Any<UpdateStackRequest>())
             .Returns<UpdateStackResponse>(x => { throw new Exception("Some other exception"); });
 
-            var stackDeployer = new DeployStackFacade();
-            var cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
+            var cloudformationFactory = Substitute.For<IAwsFactory<IAmazonCloudFormation>>();
+            var logger = Substitute.For<ILogger<DeployStackFacade>>();
+            var stackDeployer = new DeployStackFacade(cloudformationFactory, logger);
             cloudformationFactory.Create().Returns(cloudformationClient);
             TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 

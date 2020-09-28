@@ -1309,7 +1309,8 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.CloudFormation": "3.5.0",
-          "AwsUtils.Common": "1.0.0"
+          "AwsUtils.Common": "1.0.0",
+          "Lambdajection.Core": "0.4.0-beta2"
         }
       },
       "common": {
@@ -1349,11 +1350,8 @@
           "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.0.0",
-          "Amazon.Lambda.Core": "1.1.0",
-          "CloudFormation": "1.0.0",
           "Lambdajection": "0.4.0-beta2",
           "Lambdajection.Encryption": "0.4.0-beta2",
-          "SimpleStorageService": "1.0.0",
           "System.Net.Http.Json": "3.2.1"
         }
       },

@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.ApplicationLoadBalancerEvents" Version="2.0.0" />
-    <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
     <PackageReference Include="AWSSDK.CloudFormation" Version="3.5.0" />
     <PackageReference Include="AWSSDK.S3" Version="3.5.0" />
     <PackageReference Include="AWSSDK.StepFunctions" Version="3.5.0" />
@@ -18,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AwsUtils\CloudFormation\CloudFormation.csproj" />
-    <ProjectReference Include="..\AwsUtils\SimpleStorageService\SimpleStorageService.csproj" />
+    <Compile Include="..\AwsUtils\CloudFormation\*.cs" />
+    <Compile Include="..\AwsUtils\SimpleStorageService\*.cs" />
+    <Compile Include="..\AwsUtils\Common\*.cs" />
   </ItemGroup>
-
 </Project>

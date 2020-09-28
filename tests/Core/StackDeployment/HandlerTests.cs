@@ -32,6 +32,7 @@ using Tag = Amazon.CloudFormation.Model.Tag;
 
 namespace Cythral.CloudFormation.Tests.StackDeployment
 {
+
     using CommitInfo = StackDeployment::Cythral.CloudFormation.CommitInfo;
 
     public class HandlerTests
