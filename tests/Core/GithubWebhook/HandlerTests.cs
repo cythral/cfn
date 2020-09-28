@@ -12,7 +12,6 @@ using Cythral.CloudFormation.GithubWebhook.Exceptions;
 using Cythral.CloudFormation.GithubWebhook.Github;
 using Cythral.CloudFormation.GithubWebhook.Github.Entities;
 using Cythral.CloudFormation.GithubWebhook.Pipelines;
-using Cythral.CloudFormation.StackDeployment;
 
 using FluentAssertions;
 

@@ -425,7 +425,7 @@ Resources:
   StackDeploymentFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: StackDeployment::Cythral.CloudFormation.StackDeployment.Handler::Handle
+      Handler: StackDeployment::Cythral.CloudFormation.StackDeployment.Handler::Run
       Runtime: dotnetcore3.1
       Timeout: 300
       CodeUri: ../../bin/StackDeployment/Release/netcoreapp3.1/publish/

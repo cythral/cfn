@@ -1,3 +1,5 @@
+extern alias StackDeployment;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,17 +8,17 @@ using System.Threading.Tasks;
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 
-using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.AwsUtils.CloudFormation;
-using Cythral.CloudFormation.StackDeployment;
-
 using NSubstitute;
 
 using NUnit.Framework;
 
+using StackDeployment::Cythral.CloudFormation.AwsUtils;
+using StackDeployment::Cythral.CloudFormation.AwsUtils.CloudFormation;
+using StackDeployment::Cythral.CloudFormation.StackDeployment;
+
 using static Amazon.CloudFormation.OnFailure;
 
-namespace Cythral.CloudFormation.Tests.GithubWebhook
+namespace Cythral.CloudFormation.Tests.StackDeployment
 {
     public class StackDeployerTests
     {

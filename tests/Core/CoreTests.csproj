@@ -33,6 +33,10 @@
         <ReferencePath Condition="'%(FileName)'=='S3TagOutdatedArtifacts'">
             <Aliases>S3TagOutdated</Aliases>
         </ReferencePath>
+
+        <ReferencePath Condition="'%(FileName)'=='StackDeployment'">
+            <Aliases>StackDeployment</Aliases>
+        </ReferencePath>
     </ItemGroup>
   </Target>
 </Project>

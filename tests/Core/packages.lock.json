@@ -1396,15 +1396,13 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.CloudFormation": "3.5.0",
+          "AWSSDK.KeyManagementService": "3.5.0",
+          "AWSSDK.S3": "3.5.0",
+          "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
-          "Amazon.Lambda.Core": "1.1.0",
           "Amazon.Lambda.SQSEvents": "1.1.0",
-          "Amazon.Lambda.Serialization.SystemTextJson": "2.0.1",
-          "CloudFormation": "1.0.0",
-          "Common": "1.0.0",
-          "GithubUtils": "1.0.0",
-          "Octokit": "0.47.0",
-          "SimpleStorageService": "1.0.0"
+          "Lambdajection": "0.4.0-beta2",
+          "Octokit": "0.47.0"
         }
       },
       "stackdeploymentstatus": {

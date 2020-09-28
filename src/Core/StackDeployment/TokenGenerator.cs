@@ -16,39 +16,46 @@ namespace Cythral.CloudFormation.StackDeployment
 {
     public class TokenGenerator
     {
-        private AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
+        private readonly IAmazonS3 s3Client;
+
+        public TokenGenerator(IAmazonS3 s3Client)
+        {
+            this.s3Client = s3Client;
+        }
+
+        internal TokenGenerator()
+        {
+            // Used for testing
+        }
 
         public virtual async Task<string> Generate(SQSEvent sqsEvent, Request request)
         {
-            using (var client = await s3Factory.Create())
-            using (SHA256 mySHA256 = SHA256.Create())
+            using SHA256 mySHA256 = SHA256.Create();
+            var sqsRecord = sqsEvent.Records[0];
+            var token = request.Token;
+            var bytes = Encoding.UTF8.GetBytes(token);
+            var sumBytes = mySHA256.ComputeHash(bytes);
+            var sum = string.Join("", sumBytes.Select(byt => $"{byt:X2}"));
+
+            var (bucket, _) = GetBucketAndKey(request.ZipLocation);
+            var response = await s3Client.PutObjectAsync(new PutObjectRequest
             {
-                var sqsRecord = sqsEvent.Records[0];
-                var token = request.Token;
-                var bytes = Encoding.UTF8.GetBytes(token);
-                var sumBytes = mySHA256.ComputeHash(bytes);
-                var sum = string.Join("", sumBytes.Select(byt => $"{byt:X2}"));
-
-                var (bucket, _) = GetBucketAndKey(request.ZipLocation);
-                var response = await client.PutObjectAsync(new PutObjectRequest
+                BucketName = bucket,
+                Key = $"tokens/{sum}",
+                ContentBody = Serialize(new TokenInfo
                 {
-                    BucketName = bucket,
-                    Key = $"tokens/{sum}",
-                    ContentBody = Serialize(new TokenInfo
-                    {
-                        ClientRequestToken = token,
-                        QueueUrl = ConvertQueueArnToUrl(sqsRecord.EventSourceArn),
-                        ReceiptHandle = sqsRecord.ReceiptHandle,
-                        RoleArn = request.RoleArn,
-                        GithubOwner = request.CommitInfo?.GithubOwner,
-                        GithubRepo = request.CommitInfo?.GithubRepository,
-                        GithubRef = request.CommitInfo?.GithubRef,
-                        EnvironmentName = request.EnvironmentName,
-                    })
-                });
+                    ClientRequestToken = token,
+                    QueueUrl = ConvertQueueArnToUrl(sqsRecord.EventSourceArn),
+                    ReceiptHandle = sqsRecord.ReceiptHandle,
+                    RoleArn = request.RoleArn,
+                    GithubOwner = request.CommitInfo?.GithubOwner,
+                    GithubRepo = request.CommitInfo?.GithubRepository,
+                    GithubRef = request.CommitInfo?.GithubRef,
+                    EnvironmentName = request.EnvironmentName,
+                })
+            });
 
-                return $"{bucket}-{sum}";
-            }
+            return $"{bucket}-{sum}";
         }
 
         private (string, string) GetBucketAndKey(string location)

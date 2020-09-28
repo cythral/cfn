@@ -1,3 +1,5 @@
+extern alias StackDeployment;
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -5,12 +7,12 @@ using Amazon.Lambda.SQSEvents;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.StackDeployment;
-
 using NSubstitute;
 
 using NUnit.Framework;
+
+using StackDeployment::Cythral.CloudFormation.AwsUtils;
+using StackDeployment::Cythral.CloudFormation.StackDeployment;
 
 using static System.Text.Json.JsonSerializer;
 
@@ -18,9 +20,6 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
 {
     public class TokenGeneratorTests
     {
-        public static AmazonClientFactory<IAmazonS3> s3Factory = Substitute.For<AmazonClientFactory<IAmazonS3>>();
-        public static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
-        public static TokenGenerator tokenGenerator = new TokenGenerator();
         private const string stackName = "stackName";
         private const string bucket = "bucket";
         private const string key = "key";
@@ -37,16 +36,6 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         private string receiptHandle = "5";
         private string sqsUrl = "https://sqs.us-east-1.amazonaws.com/5/testQueue";
         private static List<string> Locations = new List<string> { $"s3://{bucket}/{key}", $"arn:s3:aws:::{bucket}/{key}" };
-
-        [SetUp]
-        public void SetupS3()
-        {
-            TestUtils.SetPrivateField(tokenGenerator, "s3Factory", s3Factory);
-            s3Factory.ClearReceivedCalls();
-            s3Client.ClearReceivedCalls();
-
-            s3Factory.Create().Returns(s3Client);
-        }
 
         private Request CreateRequest()
         {
@@ -75,20 +64,12 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         }
 
         [Test]
-        public async Task S3ClientIsCreated()
-        {
-            var request = CreateRequest();
-            var sqsEvent = CreateSQSEvent();
-            await tokenGenerator.Generate(sqsEvent, request);
-
-            await s3Factory.Received().Create();
-        }
-
-        [Test]
         public async Task PutObjectIsCalled([ValueSource("Locations")] string location)
         {
             var request = CreateRequest();
             var sqsEvent = CreateSQSEvent();
+            var s3Client = Substitute.For<IAmazonS3>();
+            var tokenGenerator = new TokenGenerator(s3Client);
             request.ZipLocation = location;
 
             var contentBody = Serialize(new TokenInfo
@@ -113,6 +94,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var sqsEvent = CreateSQSEvent();
+            var s3Client = Substitute.For<IAmazonS3>();
+            var tokenGenerator = new TokenGenerator(s3Client);
             request.ZipLocation = location;
 
             var result = await tokenGenerator.Generate(sqsEvent, request);
