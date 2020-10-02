@@ -1,5 +1,3 @@
-extern alias StackDeployment;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +9,9 @@ using Amazon.Lambda.SQSEvents;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
+using Cythral.CloudFormation.StackDeployment.Github;
+using Cythral.CloudFormation.StackDeployment.TemplateConfig;
+
 using Lambdajection.Core;
 
 using NSubstitute;
@@ -20,23 +21,13 @@ using NUnit.Framework;
 
 using Octokit;
 
-using StackDeployment::Cythral.CloudFormation;
-using StackDeployment::Cythral.CloudFormation.AwsUtils;
-using StackDeployment::Cythral.CloudFormation.AwsUtils.CloudFormation;
-using StackDeployment::Cythral.CloudFormation.AwsUtils.SimpleStorageService;
-using StackDeployment::Cythral.CloudFormation.GithubUtils;
-using StackDeployment::Cythral.CloudFormation.StackDeployment;
-using StackDeployment::Cythral.CloudFormation.StackDeployment.TemplateConfig;
-
 using static System.Text.Json.JsonSerializer;
+using static NSubstitute.Arg;
 
 using Tag = Amazon.CloudFormation.Model.Tag;
 
-namespace Cythral.CloudFormation.Tests.StackDeployment
+namespace Cythral.CloudFormation.StackDeployment.Tests
 {
-
-    using CommitInfo = StackDeployment::Cythral.CloudFormation.CommitInfo;
-
     public class HandlerTests
     {
         private const string stackName = "stackName";
@@ -91,7 +82,7 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
                 Token = clientRequestToken,
                 Capabilities = capabilities,
                 EnvironmentName = environmentName,
-                CommitInfo = new CommitInfo
+                CommitInfo = new GithubCommitInfo
                 {
                     GithubOwner = githubOwner,
                     GithubRepository = githubRepo,
@@ -100,10 +91,9 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             };
         }
 
-        private S3GetObjectFacade CreateS3GetObjectFacade()
+        private S3Util CreateS3Util()
         {
-            var s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
-            s3GetObjectFacade.ClearReceivedCalls();
+            var s3GetObjectFacade = Substitute.For<S3Util>();
             s3GetObjectFacade.GetZipEntryInObject(Arg.Any<string>(), Arg.Is(templateFileName)).Returns(template);
             s3GetObjectFacade.GetZipEntryInObject(Arg.Any<string>(), Arg.Is(templateConfigurationFileName)).Returns(templateConfiguration);
             return s3GetObjectFacade;
@@ -173,10 +163,10 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             return factory;
         }
 
-        private PutCommitStatusFacade CreatePutCommitStatusFacade()
+        private GithubStatusNotifier CreateStatusNotifier()
         {
-            var putCommitStatusFacade = Substitute.For<PutCommitStatusFacade>();
-            return putCommitStatusFacade;
+            var statusNotifier = Substitute.For<GithubStatusNotifier>();
+            return statusNotifier;
         }
 
         private RequestFactory CreateRequestFactory(Request request)
@@ -191,14 +181,14 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var putCommitStatusFacade = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
             var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
 
@@ -212,29 +202,20 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var statusNotifier = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
-            var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
+            var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, statusNotifier);
 
             Assert.ThrowsAsync<Exception>(() => handler.Handle(sqs));
 
-            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
-                req.CommitState == CommitState.Pending &&
-                req.ServiceName == "AWS CloudFormation" &&
-                req.ProjectName == stackName &&
-                req.DetailsUrl == $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={stackName}" &&
-                req.EnvironmentName == environmentName &&
-                req.GithubOwner == githubOwner &&
-                req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef
-            ));
+            await statusNotifier.Received().NotifyPending(Is(githubOwner), Is(githubRepo), Is(githubRef), Is(stackName), Is(environmentName));
         }
 
         [Test]
@@ -242,14 +223,14 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var putCommitStatusFacade = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
             var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
 
@@ -263,14 +244,14 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var putCommitStatusFacade = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
             var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
 
@@ -284,14 +265,14 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var putCommitStatusFacade = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
             var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
 
@@ -305,14 +286,14 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var putCommitStatusFacade = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
             var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
 
@@ -328,14 +309,14 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var putCommitStatusFacade = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
             var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
 
@@ -351,14 +332,14 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var putCommitStatusFacade = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
             var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
 
@@ -384,14 +365,14 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var putCommitStatusFacade = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
             var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
 
@@ -417,30 +398,21 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var statusNotifier = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
-            var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
+            var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, statusNotifier);
 
             deployer.Deploy(null).ReturnsForAnyArgs(x => { throw new NoUpdatesException("no updates"); });
             await handler.Handle(sqs);
 
-            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
-                req.CommitState == CommitState.Success &&
-                req.ServiceName == "AWS CloudFormation" &&
-                req.ProjectName == stackName &&
-                req.DetailsUrl == $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={stackName}" &&
-                req.EnvironmentName == environmentName &&
-                req.GithubOwner == githubOwner &&
-                req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef
-            ));
+            await statusNotifier.Received().NotifySuccess(Is(githubOwner), Is(githubRepo), Is(githubRef), Is(stackName), Is(environmentName));
         }
 
         [Test]
@@ -448,14 +420,14 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var putCommitStatusFacade = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
             var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
 
@@ -478,14 +450,14 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var putCommitStatusFacade = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
             var message = "message";
             var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
@@ -505,31 +477,22 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
         {
             var request = CreateRequest();
             var deployer = CreateStackDeployer();
-            var s3GetObjectFacade = CreateS3GetObjectFacade();
+            var s3GetObjectFacade = CreateS3Util();
             var parseConfigFileFacade = CreateParseConfigFileFacade();
             var tokenGenerator = CreateTokenGenerator();
             var requestFactory = CreateRequestFactory(request);
             var stepFunctionsClient = CreateStepFunctions();
             var cloudformationClient = CreateCloudFormation();
             var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var putCommitStatusFacade = CreatePutCommitStatusFacade();
+            var statusNotifier = CreateStatusNotifier();
             var sqs = Substitute.For<SQSEvent>();
             var message = "message";
-            var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade);
+            var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, statusNotifier);
 
             deployer.Deploy(Arg.Any<DeployStackContext>()).Returns(x => throw new Exception(message));
             await handler.Handle(sqs);
 
-            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
-                req.CommitState == CommitState.Failure &&
-                req.ServiceName == "AWS CloudFormation" &&
-                req.ProjectName == stackName &&
-                req.DetailsUrl == $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={stackName}" &&
-                req.EnvironmentName == environmentName &&
-                req.GithubOwner == githubOwner &&
-                req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef
-            ));
+            await statusNotifier.Received().NotifyFailure(Is(githubOwner), Is(githubRepo), Is(githubRef), Is(stackName), Is(environmentName));
         }
     }
 }

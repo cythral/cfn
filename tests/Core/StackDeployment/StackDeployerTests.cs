@@ -1,5 +1,3 @@
-extern alias StackDeployment;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,13 +14,9 @@ using NSubstitute;
 
 using NUnit.Framework;
 
-using StackDeployment::Cythral.CloudFormation.AwsUtils;
-using StackDeployment::Cythral.CloudFormation.AwsUtils.CloudFormation;
-using StackDeployment::Cythral.CloudFormation.StackDeployment;
-
 using static Amazon.CloudFormation.OnFailure;
 
-namespace Cythral.CloudFormation.Tests.StackDeployment
+namespace Cythral.CloudFormation.StackDeployment.Tests
 {
     public class StackDeployerTests
     {
@@ -63,8 +57,8 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             var cloudformationFactory = Substitute.For<IAwsFactory<IAmazonCloudFormation>>();
             var logger = Substitute.For<ILogger<DeployStackFacade>>();
             var stackDeployer = new DeployStackFacade(cloudformationFactory, logger);
+
             cloudformationFactory.Create().Returns(cloudformationClient);
-            TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
 
             await stackDeployer.Deploy(new DeployStackContext
             {
@@ -118,8 +112,6 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             var logger = Substitute.For<ILogger<DeployStackFacade>>();
             var stackDeployer = new DeployStackFacade(cloudformationFactory, logger);
             cloudformationFactory.Create().Returns(cloudformationClient);
-            TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
-
 
             await stackDeployer.Deploy(new DeployStackContext
             {
@@ -172,8 +164,6 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             var logger = Substitute.For<ILogger<DeployStackFacade>>();
             var stackDeployer = new DeployStackFacade(cloudformationFactory, logger);
             cloudformationFactory.Create().Returns(cloudformationClient);
-            TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
-
 
             Assert.ThrowsAsync<NoUpdatesException>(() => stackDeployer.Deploy(new DeployStackContext
             {
@@ -212,8 +202,6 @@ namespace Cythral.CloudFormation.Tests.StackDeployment
             var logger = Substitute.For<ILogger<DeployStackFacade>>();
             var stackDeployer = new DeployStackFacade(cloudformationFactory, logger);
             cloudformationFactory.Create().Returns(cloudformationClient);
-            TestUtils.SetPrivateField(stackDeployer, "cloudformationFactory", cloudformationFactory);
-
 
             Assert.ThrowsAsync<Exception>(() => stackDeployer.Deploy(new DeployStackContext
             {

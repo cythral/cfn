@@ -1394,13 +1394,13 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.CloudFormation": "3.5.0",
-          "AWSSDK.KeyManagementService": "3.5.0",
           "AWSSDK.S3": "3.5.0",
           "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
           "Amazon.Lambda.SQSEvents": "1.1.0",
           "Lambdajection": "0.4.0",
-          "Octokit": "0.47.0"
+          "Lambdajection.Encryption": "0.4.0",
+          "System.Net.Http.Json": "3.2.1"
         }
       },
       "stackdeploymentstatus": {

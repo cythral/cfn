@@ -13,16 +13,11 @@ using Amazon.Lambda.SQSEvents;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
-using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.AwsUtils.CloudFormation;
-using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
-using Cythral.CloudFormation.GithubUtils;
+using Cythral.CloudFormation.StackDeployment.Github;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
 using Lambdajection.Attributes;
 using Lambdajection.Core;
-
-using Octokit;
 
 using static System.Text.Json.JsonSerializer;
 
@@ -33,33 +28,33 @@ namespace Cythral.CloudFormation.StackDeployment
     {
         private const string notificationArnKey = "NOTIFICATION_ARN";
         private readonly DeployStackFacade stackDeployer;
-        private readonly S3GetObjectFacade s3GetObjectFacade;
+        private readonly S3Util s3Util;
         private readonly ParseConfigFileFacade parseConfigFileFacade;
         private readonly TokenGenerator tokenGenerator;
         private readonly RequestFactory requestFactory;
         private readonly IAmazonStepFunctions stepFunctionsClient;
         private readonly IAwsFactory<IAmazonCloudFormation> cloudformationFactory;
-        private readonly PutCommitStatusFacade putCommitStatusFacade;
+        private readonly GithubStatusNotifier statusNotifier;
 
         public Handler(
             DeployStackFacade stackDeployer,
-            S3GetObjectFacade s3GetObjectFacade,
+            S3Util s3Util,
             ParseConfigFileFacade parseConfigFileFacade,
             TokenGenerator tokenGenerator,
             RequestFactory requestFactory,
             IAmazonStepFunctions stepFunctionsClient,
             IAwsFactory<IAmazonCloudFormation> cloudformationFactory,
-            PutCommitStatusFacade putCommitStatusFacade
+            GithubStatusNotifier statusNotifier
         )
         {
             this.stackDeployer = stackDeployer;
-            this.s3GetObjectFacade = s3GetObjectFacade;
+            this.s3Util = s3Util;
             this.parseConfigFileFacade = parseConfigFileFacade;
             this.tokenGenerator = tokenGenerator;
             this.requestFactory = requestFactory;
             this.stepFunctionsClient = stepFunctionsClient;
             this.cloudformationFactory = cloudformationFactory;
-            this.putCommitStatusFacade = putCommitStatusFacade;
+            this.statusNotifier = statusNotifier;
         }
 
         public async Task<Response> Handle(
@@ -68,15 +63,20 @@ namespace Cythral.CloudFormation.StackDeployment
         )
         {
             var request = requestFactory.CreateFromSqsEvent(sqsEvent);
+            var owner = request.CommitInfo.GithubOwner;
+            var repository = request.CommitInfo.GithubRepository;
+            var sha = request.CommitInfo.GithubRef;
+            var stackName = request.StackName;
+            var environmentName = request.EnvironmentName;
 
             try
             {
                 var notificationArn = Environment.GetEnvironmentVariable(notificationArnKey);
-                var template = await s3GetObjectFacade.GetZipEntryInObject(request.ZipLocation, request.TemplateFileName);
+                var template = await s3Util.GetZipEntryInObject(request.ZipLocation, request.TemplateFileName);
                 var config = await GetConfig(request);
                 var token = await tokenGenerator.Generate(sqsEvent, request);
 
-                await PutCommitStatus(request, CommitState.Pending);
+                await statusNotifier.NotifyPending(owner, repository, sha, stackName, environmentName);
                 await stackDeployer.Deploy(new DeployStackContext
                 {
                     StackName = request.StackName,
@@ -99,7 +99,7 @@ namespace Cythral.CloudFormation.StackDeployment
                     Output = Serialize(outputs)
                 });
 
-                await PutCommitStatus(request, CommitState.Success);
+                await statusNotifier.NotifySuccess(owner, repository, sha, stackName, environmentName);
 
                 return new Response
                 {
@@ -114,7 +114,7 @@ namespace Cythral.CloudFormation.StackDeployment
                     Cause = e.Message
                 });
 
-                await PutCommitStatus(request, CommitState.Failure);
+                await statusNotifier.NotifyFailure(owner, repository, sha, stackName, environmentName);
 
                 return new Response
                 {
@@ -131,7 +131,7 @@ namespace Cythral.CloudFormation.StackDeployment
 
             if (fileName != null && fileName != "")
             {
-                var source = await s3GetObjectFacade.GetZipEntryInObject(request.ZipLocation, fileName);
+                var source = await s3Util.GetZipEntryInObject(request.ZipLocation, fileName);
                 return parseConfigFileFacade.Parse(source);
             }
 
@@ -160,21 +160,6 @@ namespace Cythral.CloudFormation.StackDeployment
             });
 
             return response.Stacks[0].Outputs.ToDictionary(entry => entry.OutputKey, entry => entry.OutputValue);
-        }
-
-        private async Task PutCommitStatus(Request request, CommitState state)
-        {
-            await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
-            {
-                CommitState = state,
-                ServiceName = "AWS CloudFormation",
-                DetailsUrl = $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={request.StackName}",
-                ProjectName = request.StackName,
-                EnvironmentName = request.EnvironmentName,
-                GithubOwner = request.CommitInfo?.GithubOwner,
-                GithubRepo = request.CommitInfo?.GithubRepository,
-                GithubRef = request.CommitInfo?.GithubRef,
-            });
         }
     }
 }
