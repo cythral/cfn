@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+
+using Cythral.CloudFormation.StackDeployment.Github;
+
 namespace Cythral.CloudFormation.StackDeployment
 {
     public class Request
@@ -12,6 +15,6 @@ namespace Cythral.CloudFormation.StackDeployment
         public string RoleArn { get; set; }
         public string Token { get; set; }
         public string EnvironmentName { get; set; }
-        public CommitInfo CommitInfo { get; set; }
+        public GithubCommitInfo CommitInfo { get; set; }
     }
 }

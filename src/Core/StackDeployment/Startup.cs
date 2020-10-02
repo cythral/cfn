@@ -2,9 +2,7 @@ using Amazon.CloudFormation;
 using Amazon.S3;
 using Amazon.StepFunctions;
 
-using Cythral.CloudFormation.AwsUtils.CloudFormation;
-using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
-using Cythral.CloudFormation.GithubUtils;
+using Cythral.CloudFormation.StackDeployment.Github;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
 using Lambdajection.Core;
@@ -18,11 +16,12 @@ namespace Cythral.CloudFormation.StackDeployment
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<DeployStackFacade>();
-            services.AddSingleton<S3GetObjectFacade>();
+            services.AddSingleton<S3Util>();
             services.AddSingleton<ParseConfigFileFacade>();
             services.AddSingleton<TokenGenerator>();
             services.AddSingleton<RequestFactory>();
-            services.AddSingleton<PutCommitStatusFacade>();
+            services.AddSingleton<GithubHttpClient>();
+            services.AddSingleton<GithubStatusNotifier>();
 
             services.UseAwsService<IAmazonStepFunctions>();
             services.UseAwsService<IAmazonCloudFormation>();
