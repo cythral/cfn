@@ -446,7 +446,7 @@ Resources:
   StackDeploymentStatusFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: StackDeploymentStatus::Cythral.CloudFormation.StackDeploymentStatus.Handler::Handle
+      Handler: StackDeploymentStatus::Cythral.CloudFormation.StackDeploymentStatus.Handler::Run
       Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: ../../bin/StackDeploymentStatus/Release/netcoreapp3.1/publish/
@@ -465,10 +465,10 @@ Resources:
       Environment:
         Variables:
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
-          GITHUB_TOKEN: !Ref GithubToken
-          GITHUB_OWNER: !Ref GithubOwner
-          GITHUB_TOPIC_ARN: !Ref GithubWebhookStatusTopic
-          STACK_SUFFIX: !Ref StackSuffix
+          Config__GithubToken: !Ref GithubToken
+          Config__GithubOwner: !Ref GithubOwner
+          Config__GithubTopicArn: !Ref GithubWebhookStatusTopic
+          Config__StackSuffix: !Ref StackSuffix
 
   StackDeploymentStatusTopic:
     Type: AWS::SNS::Topic

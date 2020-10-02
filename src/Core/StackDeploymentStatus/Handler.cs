@@ -13,35 +13,59 @@ using Amazon.SQS.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
-using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
-using Cythral.CloudFormation.GithubUtils;
+using Cythral.CloudFormation.StackDeploymentStatus.Github;
 using Cythral.CloudFormation.StackDeploymentStatus.Request;
 
-using Octokit;
+using Lambdajection.Attributes;
+using Lambdajection.Core;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.StackDeploymentStatus
 {
-    public class Handler
+    [Lambda(typeof(Startup))]
+    public partial class Handler
     {
-        private static StackDeploymentStatusRequestFactory requestFactory = new StackDeploymentStatusRequestFactory();
-        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = new AmazonClientFactory<IAmazonStepFunctions>();
-        private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
-        private static AmazonClientFactory<IAmazonSQS> sqsFactory = new AmazonClientFactory<IAmazonSQS>();
-        private static AmazonClientFactory<IAmazonCloudFormation> cloudformationFactory = new AmazonClientFactory<IAmazonCloudFormation>();
-        private static PutCommitStatusFacade putCommitStatusFacade = new PutCommitStatusFacade();
+        private readonly StackDeploymentStatusRequestFactory requestFactory;
+        private readonly IAmazonStepFunctions stepFunctionsClient;
+        private readonly IAmazonSQS sqsClient;
+        private readonly IAwsFactory<IAmazonCloudFormation> cloudformationFactory;
+        private readonly GithubStatusNotifier githubStatusNotifier;
+        private readonly TokenInfoRepository tokenInfoRepository;
+        private readonly Config config;
+        private readonly ILogger<Handler> logger;
 
-        [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
-        public static async Task<Response> Handle(
+        public Handler(
+            StackDeploymentStatusRequestFactory requestFactory,
+            IAmazonStepFunctions stepFunctionsClient,
+            IAmazonSQS sqsClient,
+            IAwsFactory<IAmazonCloudFormation> cloudformationFactory,
+            GithubStatusNotifier githubStatusNotifier,
+            TokenInfoRepository tokenInfoRepository,
+            IOptions<Config> config,
+            ILogger<Handler> logger
+        )
+        {
+            this.requestFactory = requestFactory;
+            this.stepFunctionsClient = stepFunctionsClient;
+            this.sqsClient = sqsClient;
+            this.cloudformationFactory = cloudformationFactory;
+            this.tokenInfoRepository = tokenInfoRepository;
+            this.githubStatusNotifier = githubStatusNotifier;
+            this.config = config.Value;
+            this.logger = logger;
+        }
+
+        public async Task<Response> Handle(
             SNSEvent snsRequest,
             ILambdaContext context = null
         )
         {
-            Console.WriteLine($"Received request: {Serialize(snsRequest)}");
+            logger.LogInformation($"Received request: {Serialize(snsRequest)}");
 
-            var client = await stepFunctionsClientFactory.Create();
             var request = requestFactory.CreateFromSnsEvent(snsRequest);
             var status = request.ResourceStatus;
 
@@ -49,12 +73,12 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             {
                 if (status == "DELETE_COMPLETE" || status.EndsWith("ROLLBACK_COMPLETE") || status.EndsWith("FAILED"))
                 {
-                    await SendFailure(request, client);
+                    await SendFailure(request);
                 }
 
                 if (status.EndsWith("COMPLETE"))
                 {
-                    await SendSuccess(request, client);
+                    await SendSuccess(request);
                 }
 
             }
@@ -62,77 +86,57 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             return new Response { Success = true };
         }
 
-        private static string TranslateTokenToS3Location(string clientRequestToken)
+        private async Task SendFailure(StackDeploymentStatusRequest request)
         {
-            var index = clientRequestToken.LastIndexOf("-");
-            var bucket = clientRequestToken[0..index];
-            var key = clientRequestToken[(index + 1)..];
+            var tokenInfo = await tokenInfoRepository.FindByRequest(request);
 
-            return $"s3://{bucket}/tokens/{key}";
-        }
-
-        private static async Task<TokenInfo> GetTokenInfoFromRequest(StackDeploymentStatusRequest request)
-        {
-            if (request.SourceTopic == Environment.GetEnvironmentVariable("GITHUB_TOPIC_ARN"))
+            if (request.SourceTopic != config.GithubTopicArn)
             {
-                var owner = Environment.GetEnvironmentVariable("GITHUB_OWNER");
-                var suffix = Environment.GetEnvironmentVariable("STACK_SUFFIX");
-
-                return new TokenInfo
-                {
-                    EnvironmentName = "shared",
-                    GithubOwner = owner,
-                    GithubRepo = request.StackName.Replace($"-{suffix}", ""),
-                    GithubRef = request.ClientRequestToken,
-                };
-            }
-
-            var location = TranslateTokenToS3Location(request.ClientRequestToken);
-            var sourceString = await s3GetObjectFacade.GetObject(location);
-            return Deserialize<TokenInfo>(sourceString);
-        }
-
-        private static async Task SendFailure(StackDeploymentStatusRequest request, IAmazonStepFunctions client)
-        {
-            var tokenInfo = await GetTokenInfoFromRequest(request);
-
-            if (request.SourceTopic != Environment.GetEnvironmentVariable("GITHUB_TOPIC_ARN"))
-            {
-                var response = await client.SendTaskFailureAsync(new SendTaskFailureRequest
+                var response = await stepFunctionsClient.SendTaskFailureAsync(new SendTaskFailureRequest
                 {
                     TaskToken = tokenInfo.ClientRequestToken,
                     Cause = request.ResourceStatus
                 });
 
-                Console.WriteLine($"Received send task failure response: {Serialize(response)}");
-
+                logger.LogInformation($"Received send task failure response: {Serialize(response)}");
                 await Dequeue(tokenInfo);
             }
 
-            await PutCommitStatus(tokenInfo, request.StackName, CommitState.Failure);
+            await githubStatusNotifier.NotifyFailure(
+                tokenInfo.GithubOwner,
+                tokenInfo.GithubRepo,
+                tokenInfo.GithubRef,
+                request.StackName,
+                tokenInfo.EnvironmentName
+            );
         }
 
-        private static async Task SendSuccess(StackDeploymentStatusRequest request, IAmazonStepFunctions client)
+        private async Task SendSuccess(StackDeploymentStatusRequest request)
         {
-            var tokenInfo = await GetTokenInfoFromRequest(request);
-
-            if (request.SourceTopic != Environment.GetEnvironmentVariable("GITHUB_TOPIC_ARN"))
+            var tokenInfo = await tokenInfoRepository.FindByRequest(request);
+            if (request.SourceTopic != config.GithubTopicArn)
             {
                 var outputs = await GetStackOutputs(request.StackId, tokenInfo.RoleArn);
-                var response = await client.SendTaskSuccessAsync(new SendTaskSuccessRequest
+                var response = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
                 {
                     TaskToken = tokenInfo.ClientRequestToken,
                     Output = Serialize(outputs)
                 });
 
-                Console.WriteLine($"Received send task failure response: {Serialize(response)}");
+                logger.LogInformation($"Received send task success response: {Serialize(response)}");
                 await Dequeue(tokenInfo);
             }
 
-            await PutCommitStatus(tokenInfo, request.StackName, CommitState.Success);
+            await githubStatusNotifier.NotifySuccess(
+                tokenInfo.GithubOwner,
+                tokenInfo.GithubRepo,
+                tokenInfo.GithubRef,
+                request.StackName,
+                tokenInfo.EnvironmentName
+            );
         }
 
-        private static async Task<Dictionary<string, string>> GetStackOutputs(string stackId, string roleArn)
+        private async Task<Dictionary<string, string>> GetStackOutputs(string stackId, string roleArn)
         {
             var client = await cloudformationFactory.Create(roleArn);
             var response = await client.DescribeStacksAsync(new DescribeStacksRequest
@@ -143,31 +147,15 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             return response.Stacks[0].Outputs.ToDictionary(entry => entry.OutputKey, entry => entry.OutputValue);
         }
 
-        private static async Task Dequeue(TokenInfo tokenInfo)
+        private async Task Dequeue(TokenInfo tokenInfo)
         {
-            var client = await sqsFactory.Create();
-            var response = await client.DeleteMessageAsync(new DeleteMessageRequest
+            var response = await sqsClient.DeleteMessageAsync(new DeleteMessageRequest
             {
                 QueueUrl = tokenInfo.QueueUrl,
                 ReceiptHandle = tokenInfo.ReceiptHandle,
             });
 
-            Console.WriteLine($"Got delete message response: {Serialize(response)}");
-        }
-
-        private static async Task PutCommitStatus(TokenInfo tokenInfo, string stackName, CommitState state)
-        {
-            await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
-            {
-                CommitState = state,
-                ServiceName = "AWS CloudFormation",
-                DetailsUrl = $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={stackName}",
-                ProjectName = stackName,
-                EnvironmentName = tokenInfo.EnvironmentName,
-                GithubOwner = tokenInfo.GithubOwner,
-                GithubRepo = tokenInfo.GithubRepo,
-                GithubRef = tokenInfo.GithubRef,
-            });
+            logger.LogInformation($"Got delete message response: {Serialize(response)}");
         }
     }
 }
