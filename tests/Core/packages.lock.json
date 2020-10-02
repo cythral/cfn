@@ -1407,14 +1407,14 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.CloudFormation": "3.5.0",
+          "AWSSDK.S3": "3.5.0",
           "AWSSDK.SQS": "3.5.0",
+          "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
-          "Amazon.Lambda.Core": "1.1.0",
           "Amazon.Lambda.SNSEvents": "1.1.0",
-          "Amazon.Lambda.Serialization.SystemTextJson": "2.0.1",
-          "Common": "1.0.0",
-          "GithubUtils": "1.0.0",
-          "SimpleStorageService": "1.0.0"
+          "Lambdajection": "0.4.0",
+          "Lambdajection.Encryption": "0.4.0",
+          "System.Net.Http.Json": "3.2.1"
         }
       },
       "updatetargets": {
