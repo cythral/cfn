@@ -58,7 +58,6 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
             await Notify(repoName, sha, "pending", $"{repoName} Meta CICD Stack Deployment In Progress", "active");
         }
 
-
         public virtual async Task NotifyFailure(string repoName, string sha)
         {
             await Notify(repoName, sha, "failure", $"{repoName} Meta CICD Stack Deployment Failed", "deleted");

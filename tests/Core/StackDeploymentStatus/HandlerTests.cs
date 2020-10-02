@@ -1,8 +1,3 @@
-extern alias CommonAwsUtils;
-extern alias CommonUtils;
-extern alias GithubUtils;
-extern alias S3AwsUtils;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +11,14 @@ using Amazon.SQS.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
-using CommonAwsUtils::Cythral.CloudFormation.AwsUtils;
-
 using Cythral.CloudFormation.StackDeploymentStatus;
+using Cythral.CloudFormation.StackDeploymentStatus.Github;
 using Cythral.CloudFormation.StackDeploymentStatus.Request;
 
-using GithubUtils::Cythral.CloudFormation.GithubUtils;
+using Lambdajection.Core;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using NSubstitute;
 using NSubstitute.ClearExtensions;
@@ -30,26 +27,15 @@ using NUnit.Framework;
 
 using Octokit;
 
-using S3AwsUtils::Cythral.CloudFormation.AwsUtils.SimpleStorageService;
-
 using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 {
-    using TokenInfo = CommonUtils::Cythral.CloudFormation.TokenInfo;
-    
+    using TokenInfo = Cythral.CloudFormation.StackDeploymentStatus.TokenInfo;
+
     [TestFixture]
     public class HandlerTests
     {
-        private static StackDeploymentStatusRequestFactory requestFactory = Substitute.For<StackDeploymentStatusRequestFactory>();
-        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = Substitute.For<AmazonClientFactory<IAmazonStepFunctions>>();
-        private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
-        private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
-        private static AmazonClientFactory<IAmazonSQS> sqsFactory = Substitute.For<AmazonClientFactory<IAmazonSQS>>();
-        private static IAmazonSQS sqsClient = Substitute.For<IAmazonSQS>();
-        private static AmazonClientFactory<IAmazonCloudFormation> cloudformationFactory = Substitute.For<AmazonClientFactory<IAmazonCloudFormation>>();
-        private static IAmazonCloudFormation cloudFormationClient = Substitute.For<IAmazonCloudFormation>();
-        private static PutCommitStatusFacade putCommitStatusFacade = Substitute.For<PutCommitStatusFacade>();
         private const string stackId = "stackId";
         private const string bucket = "bucket";
         private const string key = "key";
@@ -62,7 +48,9 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         private const string roleArn = "roleArn";
         private const string githubOwner = "githubOwner";
         private const string githubRepo = "githubRepo";
+        private const string githubToken = "githubToken";
         private const string githubRef = "githubRef";
+        private const string githubTopicArn = "githubTopicArn";
         private const string googleClientId = "googleClientId";
         private const string identityPoolId = "identityPoolId";
         private const string environmentName = "environmentName";
@@ -71,7 +59,10 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         {
             ["A"] = "B"
         };
-        private static string tokenInfo = Serialize(new TokenInfo
+
+        private static string serializedOutputs = Serialize(outputs);
+
+        private static TokenInfo tokenInfo = new TokenInfo
         {
             ClientRequestToken = token,
             ReceiptHandle = receiptHandle,
@@ -81,56 +72,32 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             GithubOwner = githubOwner,
             GithubRepo = githubRepo,
             GithubRef = githubRef,
-        });
+        };
 
-        [SetUp]
-        public void SetupRequestFactory()
+        public StackDeploymentStatusRequestFactory CreateRequestFactory(StackDeploymentStatusRequest request)
         {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "requestFactory", requestFactory);
-            requestFactory.ClearSubstitute();
+            var factory = Substitute.For<StackDeploymentStatusRequestFactory>();
+            factory.CreateFromSnsEvent(Arg.Any<SNSEvent>()).Returns(request);
+            return factory;
         }
 
-        [SetUp]
-        public void SetupStepFunctionsClientFactory()
+        public IAmazonStepFunctions CreateStepFunctions()
         {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "stepFunctionsClientFactory", stepFunctionsClientFactory);
-            stepFunctionsClientFactory.ClearSubstitute();
+            var client = Substitute.For<IAmazonStepFunctions>();
+            return client;
         }
 
-        [SetUp]
-        public void SetupStepFunctionsClient()
+        public IAmazonSQS CreateSQS()
         {
-            stepFunctionsClient.ClearSubstitute();
-            stepFunctionsClientFactory.Create().Returns(stepFunctionsClient);
+            var client = Substitute.For<IAmazonSQS>();
+            return client;
         }
 
-        [SetUp]
-        public void SetupS3GetObjectFacade()
+        public IAmazonCloudFormation CreateCloudFormation()
         {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "s3GetObjectFacade", s3GetObjectFacade);
-            s3GetObjectFacade.ClearSubstitute();
-            s3GetObjectFacade.GetObject(Arg.Any<string>()).Returns(tokenInfo);
-        }
+            var client = Substitute.For<IAmazonCloudFormation>();
 
-        [SetUp]
-        public void SetupSQS()
-        {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "sqsFactory", sqsFactory);
-            sqsFactory.ClearSubstitute();
-            sqsFactory.Create().Returns(sqsClient);
-
-            sqsClient.ClearSubstitute();
-        }
-
-        [SetUp]
-        public void SetupCloudFormation()
-        {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "cloudformationFactory", cloudformationFactory);
-            cloudFormationClient.ClearSubstitute();
-            cloudformationFactory.ClearSubstitute();
-            cloudformationFactory.Create(Arg.Any<string>()).Returns(cloudFormationClient);
-
-            cloudFormationClient.DescribeStacksAsync(Arg.Any<DescribeStacksRequest>()).Returns(new DescribeStacksResponse
+            client.DescribeStacksAsync(Arg.Any<DescribeStacksRequest>()).Returns(new DescribeStacksResponse
             {
                 Stacks = new List<Stack>
                 {
@@ -142,24 +109,43 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
                     }
                 }
             });
+
+            return client;
         }
 
-        [SetUp]
-        public void SetupPutCommitStatusFacade()
+        public IAwsFactory<IAmazonCloudFormation> CreateCloudFormationFactory(IAmazonCloudFormation client)
         {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "putCommitStatusFacade", putCommitStatusFacade);
-            putCommitStatusFacade.ClearSubstitute();
+            var factory = Substitute.For<IAwsFactory<IAmazonCloudFormation>>();
+            factory.Create(Arg.Any<string>()).Returns(client);
+            return factory;
         }
 
-        [SetUp]
-        public void SetupEnvironment()
+        public GithubStatusNotifier CreateStatusNotifier()
         {
-            Environment.SetEnvironmentVariable("AWS_REGION", "us-east-1");
+            var client = Substitute.For<GithubStatusNotifier>();
+            return client;
         }
 
-        private static StackDeploymentStatusRequest CreateRequest(string stackId, string token, string status = "CREATE_COMPLETE", string resourceType = "AWS::CloudFormation::Stack")
+        public TokenInfoRepository CreateTokenInfoRepository()
         {
-            var request = new StackDeploymentStatusRequest
+            var repository = Substitute.For<TokenInfoRepository>();
+            repository.FindByRequest(Arg.Any<StackDeploymentStatusRequest>()).Returns(tokenInfo);
+            return repository;
+        }
+
+        public IOptions<Config> CreateConfig()
+        {
+            return Options.Create(new Config
+            {
+                GithubOwner = githubOwner,
+                GithubToken = githubToken,
+                GithubTopicArn = githubTopicArn,
+            });
+        }
+
+        public StackDeploymentStatusRequest CreateRequest(string stackId, string token, string status = "CREATE_COMPLETE", string resourceType = "AWS::CloudFormation::Stack")
+        {
+            return new StackDeploymentStatusRequest
             {
                 StackId = stackId,
                 StackName = stackName,
@@ -168,302 +154,202 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
                 ResourceType = resourceType,
                 Namespace = accountId,
             };
-
-            requestFactory.CreateFromSnsEvent(Arg.Any<SNSEvent>()).Returns(request);
-            return request;
         }
 
         [Test]
-        public async Task ShouldDoNothingIfResourceIsNotAStack()
+        [TestCase("AWS::S3::Bucket", "token")]
+        [TestCase("AWS::CloudFormation::Stack", "")]
+        public async Task ShouldDoNothing(string resourceType, string clientRequestToken)
         {
-            var request = CreateRequest(stackId, tokenKey, null, "AWS::S3::Bucket");
+            var request = CreateRequest(stackId, clientRequestToken, null, resourceType);
+            var requestFactory = CreateRequestFactory(request);
+            var stepFunctions = CreateStepFunctions();
+            var sqs = CreateSQS();
+            var cloudformationClient = CreateCloudFormation();
+            var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
+            var statusNotifier = CreateStatusNotifier();
+            var tokenInfoRepository = CreateTokenInfoRepository();
             var snsEvent = Substitute.For<SNSEvent>();
+            var config = CreateConfig();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
 
-            await Handler.Handle(snsEvent);
+            await handler.Handle(snsEvent);
 
-            await s3GetObjectFacade.DidNotReceiveWithAnyArgs().GetObject(Arg.Any<string>());
-            await stepFunctionsClient.DidNotReceiveWithAnyArgs().SendTaskFailureAsync(Arg.Any<SendTaskFailureRequest>());
-            await stepFunctionsClient.DidNotReceiveWithAnyArgs().SendTaskSuccessAsync(Arg.Any<SendTaskSuccessRequest>());
+            await stepFunctions.DidNotReceiveWithAnyArgs().SendTaskFailureAsync(Arg.Any<SendTaskFailureRequest>());
+            await stepFunctions.DidNotReceiveWithAnyArgs().SendTaskSuccessAsync(Arg.Any<SendTaskSuccessRequest>());
         }
 
-        public class StatusIsDeleteComplete
+        [Test]
+        [TestCase("DELETE_COMPLETE")]
+        [TestCase("UPDATE_ROLLBACK_COMPLETE")]
+        [TestCase("UPDATE_ROLLBACK_FAILED")]
+        [TestCase("CREATE_FAILED")]
+        public async Task AllSourcesNotified_OfFailure_WhenSourceTopicIsNotGithub(string status)
         {
-            private string status = "DELETE_COMPLETE";
-            private StackDeploymentStatusRequest request;
-            private SNSEvent snsEvent;
+            var request = CreateRequest(stackId, tokenKey, status);
+            var requestFactory = CreateRequestFactory(request);
+            var stepFunctions = CreateStepFunctions();
+            var sqs = CreateSQS();
+            var cloudformationClient = CreateCloudFormation();
+            var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
+            var statusNotifier = CreateStatusNotifier();
+            var tokenInfoRepository = CreateTokenInfoRepository();
+            var snsEvent = Substitute.For<SNSEvent>();
+            var config = CreateConfig();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
 
-            [SetUp]
-            public void SetupRequest()
-            {
-                s3GetObjectFacade.ClearReceivedCalls();
-                stepFunctionsClient.ClearReceivedCalls();
-                sqsFactory.ClearReceivedCalls();
-                sqsClient.ClearReceivedCalls();
-                putCommitStatusFacade.ClearReceivedCalls();
-                cloudFormationClient.ClearReceivedCalls();
-                cloudformationFactory.ClearReceivedCalls();
+            await handler.Handle(snsEvent);
 
-                request = CreateRequest(stackId, tokenKey, status);
-                snsEvent = Substitute.For<SNSEvent>();
-            }
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Arg.Is(request));
 
-            [Test]
-            public async Task FailureIsSent()
-            {
-                await Handler.Handle(snsEvent);
+            await stepFunctions
+                .Received()
+                .SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req => req.TaskToken == token && req.Cause == status));
 
-                await s3GetObjectFacade.Received().GetObject(Arg.Is(s3Location));
-                await stepFunctionsClient
-                    .Received()
-                    .SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req => req.TaskToken == token && req.Cause == status));
-            }
+            await sqs
+                .Received()
+                .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
+
+            await statusNotifier
+                .Received()
+                .NotifyFailure(Arg.Is(githubOwner), Arg.Is(githubRepo), Arg.Is(githubRef), Arg.Is(stackName), Arg.Is(environmentName));
         }
 
-
-        public class StatusEndsWithRollbackComplete
+        [Test]
+        [TestCase("DELETE_COMPLETE")]
+        [TestCase("UPDATE_ROLLBACK_COMPLETE")]
+        [TestCase("UPDATE_ROLLBACK_FAILED")]
+        [TestCase("CREATE_FAILED")]
+        public async Task OnlyGithubNotified_OfFailure_WhenSourceTopicIsGithub(string status)
         {
-            private string status = "UPDATE_ROLLBACK_COMPLETE";
-            private StackDeploymentStatusRequest request;
-            private SNSEvent snsEvent;
+            var request = CreateRequest(stackId, tokenKey, status);
+            var requestFactory = CreateRequestFactory(request);
+            var stepFunctions = CreateStepFunctions();
+            var sqs = CreateSQS();
+            var cloudformationClient = CreateCloudFormation();
+            var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
+            var statusNotifier = CreateStatusNotifier();
+            var tokenInfoRepository = CreateTokenInfoRepository();
+            var snsEvent = Substitute.For<SNSEvent>();
+            var config = CreateConfig();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
 
-            [SetUp]
-            public void SetupRequest()
-            {
-                s3GetObjectFacade.ClearReceivedCalls();
-                stepFunctionsClient.ClearReceivedCalls();
-                sqsFactory.ClearReceivedCalls();
-                sqsClient.ClearReceivedCalls();
-                putCommitStatusFacade.ClearReceivedCalls();
-                cloudFormationClient.ClearReceivedCalls();
-                cloudformationFactory.ClearReceivedCalls();
+            request.SourceTopic = githubTopicArn;
 
-                request = CreateRequest(stackId, tokenKey, status);
-                snsEvent = Substitute.For<SNSEvent>();
-            }
+            await handler.Handle(snsEvent);
 
-            [Test]
-            public async Task FailureIsSent()
-            {
-                await Handler.Handle(snsEvent);
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Arg.Is(request));
 
-                await s3GetObjectFacade.Received().GetObject(Arg.Is(s3Location));
-                await stepFunctionsClient
-                    .Received()
-                    .SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req => req.TaskToken == token && req.Cause == status));
-            }
+            await stepFunctions
+                .DidNotReceive()
+                .SendTaskFailureAsync(Arg.Any<SendTaskFailureRequest>());
+
+            await sqs
+                .DidNotReceive()
+                .DeleteMessageAsync(Arg.Any<DeleteMessageRequest>());
+
+            await statusNotifier
+                .Received()
+                .NotifyFailure(Arg.Is(githubOwner), Arg.Is(githubRepo), Arg.Is(githubRef), Arg.Is(stackName), Arg.Is(environmentName));
         }
 
-        public class StatusEndsWithFailedAndTokenNotProvided
+        [Test]
+        [TestCase("UPDATE_COMPLETE")]
+        [TestCase("CREATE_COMPLETE")]
+        public async Task AllSourcesNotified_OfSuccess_WhenSourceTopicIsNotGithub(string status)
         {
-            private string status = "CREATE_FAILED";
-            private StackDeploymentStatusRequest request;
-            private SNSEvent snsEvent;
+            var request = CreateRequest(stackId, tokenKey, status);
+            var requestFactory = CreateRequestFactory(request);
+            var stepFunctions = CreateStepFunctions();
+            var sqs = CreateSQS();
+            var cloudformationClient = CreateCloudFormation();
+            var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
+            var statusNotifier = CreateStatusNotifier();
+            var tokenInfoRepository = CreateTokenInfoRepository();
+            var snsEvent = Substitute.For<SNSEvent>();
+            var config = CreateConfig();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
 
-            [SetUp]
-            public void SetupRequest()
-            {
-                s3GetObjectFacade.ClearReceivedCalls();
-                stepFunctionsClient.ClearReceivedCalls();
-                sqsFactory.ClearReceivedCalls();
-                sqsClient.ClearReceivedCalls();
-                putCommitStatusFacade.ClearReceivedCalls();
-                cloudFormationClient.ClearReceivedCalls();
-                cloudformationFactory.ClearReceivedCalls();
+            await handler.Handle(snsEvent);
 
-                request = CreateRequest(stackId, "", status);
-                snsEvent = Substitute.For<SNSEvent>();
-            }
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Arg.Is(request));
 
-            [Test]
-            public async Task SendsFailure()
-            {
-                await Handler.Handle(snsEvent);
+            await cloudformationFactory
+                .Received()
+                .Create(Arg.Is(roleArn));
 
-                await s3GetObjectFacade.DidNotReceive().GetObject(Arg.Is(s3Location));
-                await stepFunctionsClient
-                    .DidNotReceive()
-                    .SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req => req.TaskToken == token && req.Cause == status));
-            }
+            await cloudformationClient
+                .Received()
+                .DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req => req.StackName == stackId));
 
-            [Test]
-            public async Task DeletesMessageFromQueue()
-            {
-                await Handler.Handle(snsEvent);
+            await stepFunctions
+                .Received()
+                .SendTaskSuccessAsync(Arg.Is<SendTaskSuccessRequest>(req => req.TaskToken == token && req.Output == serializedOutputs));
 
-                await sqsFactory.DidNotReceive().Create();
-                await sqsClient
-                    .DidNotReceive()
-                    .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
-            }
+            await sqs
+                .Received()
+                .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
+
+            await statusNotifier
+                .Received()
+                .NotifySuccess(Arg.Is(githubOwner), Arg.Is(githubRepo), Arg.Is(githubRef), Arg.Is(stackName), Arg.Is(environmentName));
         }
 
-        public class StatusEndsWithFailedAndTokenProvided
+        [Test]
+        [TestCase("UPDATE_COMPLETE")]
+        [TestCase("CREATE_COMPLETE")]
+        public async Task OnlyGithubNotified_OfSuccess_WhenSourceTopicIsGithub(string status)
         {
-            private string status = "CREATE_FAILED";
-            private StackDeploymentStatusRequest request;
-            private SNSEvent snsEvent;
+            var request = CreateRequest(stackId, tokenKey, status);
+            var requestFactory = CreateRequestFactory(request);
+            var stepFunctions = CreateStepFunctions();
+            var sqs = CreateSQS();
+            var cloudformationClient = CreateCloudFormation();
+            var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
+            var statusNotifier = CreateStatusNotifier();
+            var tokenInfoRepository = CreateTokenInfoRepository();
+            var snsEvent = Substitute.For<SNSEvent>();
+            var config = CreateConfig();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
 
-            [SetUp]
-            public void Setup()
-            {
-                s3GetObjectFacade.ClearReceivedCalls();
-                stepFunctionsClient.ClearReceivedCalls();
-                sqsFactory.ClearReceivedCalls();
-                sqsClient.ClearReceivedCalls();
-                putCommitStatusFacade.ClearReceivedCalls();
+            request.SourceTopic = githubTopicArn;
 
-                request = CreateRequest(stackId, tokenKey, status);
-                snsEvent = Substitute.For<SNSEvent>();
-            }
+            await handler.Handle(snsEvent);
 
-            [Test]
-            public async Task SendsFailure()
-            {
-                await Handler.Handle(snsEvent);
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Arg.Is(request));
 
-                await s3GetObjectFacade.Received().GetObject(Arg.Is(s3Location));
-                await stepFunctionsClient
-                    .Received()
-                    .SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req => req.TaskToken == token && req.Cause == status));
-            }
+            await cloudformationFactory
+                .DidNotReceive()
+                .Create(Arg.Is(roleArn));
 
-            [Test]
-            public async Task DeletesMessageFromQueue()
-            {
-                await Handler.Handle(snsEvent);
+            await cloudformationClient
+                .DidNotReceive()
+                .DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req => req.StackName == stackId));
 
-                await sqsFactory.Received().Create();
-                await sqsClient
-                    .Received()
-                    .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
-            }
+            await stepFunctions
+                .DidNotReceive()
+                .SendTaskSuccessAsync(Arg.Is<SendTaskSuccessRequest>(req => req.TaskToken == token && req.Output == serializedOutputs));
 
-            [Test]
-            public async Task PutsFailureCommitStatus()
-            {
-                await Handler.Handle(snsEvent);
+            await sqs
+                .DidNotReceive()
+                .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
 
-                await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
-                    req.CommitState == CommitState.Failure &&
-                    req.ServiceName == "AWS CloudFormation" &&
-                    req.ProjectName == stackName &&
-                    req.DetailsUrl == $"https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId={stackName}" &&
-                    req.EnvironmentName == environmentName &&
-                    req.GithubOwner == githubOwner &&
-                    req.GithubRepo == githubRepo &&
-                    req.GithubRef == githubRef
-                ));
-            }
-        }
-
-        public class StatusEndsWithComplete
-        {
-            private string status = "CREATE_COMPLETE";
-            private StackDeploymentStatusRequest request;
-            private string serializedRequest;
-            private string serializedOutput;
-            private SNSEvent snsEvent;
-
-            [SetUp]
-            public void SetupRequest()
-            {
-                s3GetObjectFacade.ClearReceivedCalls();
-                stepFunctionsClient.ClearReceivedCalls();
-                sqsFactory.ClearReceivedCalls();
-                sqsClient.ClearReceivedCalls();
-                putCommitStatusFacade.ClearReceivedCalls();
-                cloudFormationClient.ClearReceivedCalls();
-                cloudformationFactory.ClearReceivedCalls();
-
-                request = CreateRequest(stackId, tokenKey, status);
-                serializedRequest = Serialize(request);
-                snsEvent = Substitute.For<SNSEvent>();
-                serializedOutput = Serialize(outputs);
-            }
-
-            [Test]
-            public async Task StacksAreDescribed()
-            {
-                await Handler.Handle(snsEvent);
-
-                await cloudformationFactory.Received().Create(Arg.Is(roleArn));
-                await cloudFormationClient.Received().DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req =>
-                    req.StackName == stackId
-                ));
-            }
-
-            [Test]
-            public async Task SendTaskSuccessIsCalled()
-            {
-                await Handler.Handle(snsEvent);
-
-                await s3GetObjectFacade.Received().GetObject(Arg.Is(s3Location));
-                await stepFunctionsClient
-                    .Received()
-                    .SendTaskSuccessAsync(Arg.Is<SendTaskSuccessRequest>(req => req.TaskToken == token && req.Output == serializedOutput));
-            }
-
-            [Test]
-            public async Task MessageIsDeletedFromQueue()
-            {
-                await Handler.Handle(snsEvent);
-
-                await sqsFactory.Received().Create();
-                await sqsClient
-                    .Received()
-                    .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
-            }
-
-        }
-
-        public class StatusEndsWithCompleteAndTokenNotProvided
-        {
-            private string status = "CREATE_COMPLETE";
-            private StackDeploymentStatusRequest request;
-            private string serializedRequest;
-            private string serializedOutput;
-            private SNSEvent snsEvent;
-
-            [SetUp]
-            public void SetupRequest()
-            {
-                s3GetObjectFacade.ClearReceivedCalls();
-                stepFunctionsClient.ClearReceivedCalls();
-                sqsFactory.ClearReceivedCalls();
-                sqsClient.ClearReceivedCalls();
-                putCommitStatusFacade.ClearReceivedCalls();
-                cloudFormationClient.ClearReceivedCalls();
-                cloudformationFactory.ClearReceivedCalls();
-
-                request = CreateRequest(stackId, "", status);
-                serializedRequest = Serialize(request);
-                snsEvent = Substitute.For<SNSEvent>();
-                serializedOutput = Serialize(outputs);
-            }
-
-
-
-            [Test]
-            public async Task SendTaskSuccessIsNotCalled()
-            {
-                await Handler.Handle(snsEvent);
-
-                await s3GetObjectFacade.DidNotReceive().GetObject(Arg.Is(s3Location));
-                await stepFunctionsClient
-                    .DidNotReceive()
-                    .SendTaskSuccessAsync(Arg.Is<SendTaskSuccessRequest>(req => req.TaskToken == token && req.Output == serializedOutput));
-            }
-
-            [Test]
-            public async Task MessageIsDeletedFromQueue()
-            {
-                await Handler.Handle(snsEvent);
-
-                await sqsFactory.DidNotReceive().Create();
-                await sqsClient
-                    .DidNotReceive()
-                    .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
-            }
+            await statusNotifier
+                .Received()
+                .NotifySuccess(Arg.Is(githubOwner), Arg.Is(githubRepo), Arg.Is(githubRef), Arg.Is(stackName), Arg.Is(environmentName));
         }
     }
 }

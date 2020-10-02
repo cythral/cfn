@@ -20,6 +20,7 @@ using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 
 using Lambdajection.Attributes;
+using Lambdajection.Core;
 
 using Octokit;
 
@@ -37,7 +38,7 @@ namespace Cythral.CloudFormation.StackDeployment
         private readonly TokenGenerator tokenGenerator;
         private readonly RequestFactory requestFactory;
         private readonly IAmazonStepFunctions stepFunctionsClient;
-        private readonly IAmazonCloudFormation cloudformationClient;
+        private readonly IAwsFactory<IAmazonCloudFormation> cloudformationFactory;
         private readonly PutCommitStatusFacade putCommitStatusFacade;
 
         public Handler(
@@ -47,7 +48,7 @@ namespace Cythral.CloudFormation.StackDeployment
             TokenGenerator tokenGenerator,
             RequestFactory requestFactory,
             IAmazonStepFunctions stepFunctionsClient,
-            IAmazonCloudFormation cloudformationClient,
+            IAwsFactory<IAmazonCloudFormation> cloudformationFactory,
             PutCommitStatusFacade putCommitStatusFacade
         )
         {
@@ -57,7 +58,7 @@ namespace Cythral.CloudFormation.StackDeployment
             this.tokenGenerator = tokenGenerator;
             this.requestFactory = requestFactory;
             this.stepFunctionsClient = stepFunctionsClient;
-            this.cloudformationClient = cloudformationClient;
+            this.cloudformationFactory = cloudformationFactory;
             this.putCommitStatusFacade = putCommitStatusFacade;
         }
 
@@ -152,7 +153,8 @@ namespace Cythral.CloudFormation.StackDeployment
 
         private async Task<Dictionary<string, string>> GetStackOutputs(string stackId, string roleArn)
         {
-            var response = await cloudformationClient.DescribeStacksAsync(new DescribeStacksRequest
+            var client = await cloudformationFactory.Create(roleArn);
+            var response = await client.DescribeStacksAsync(new DescribeStacksRequest
             {
                 StackName = stackId
             });
