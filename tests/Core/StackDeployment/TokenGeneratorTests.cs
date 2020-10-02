@@ -1,5 +1,3 @@
-extern alias StackDeployment;
-
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,15 +9,10 @@ using NSubstitute;
 
 using NUnit.Framework;
 
-using StackDeployment::Cythral.CloudFormation.AwsUtils;
-using StackDeployment::Cythral.CloudFormation.StackDeployment;
-
 using static System.Text.Json.JsonSerializer;
 
-namespace Cythral.CloudFormation.Tests.StackDeployment
+namespace Cythral.CloudFormation.StackDeployment.Tests
 {
-    using TokenInfo = StackDeployment::Cythral.CloudFormation.TokenInfo;
-
     public class TokenGeneratorTests
     {
         private const string stackName = "stackName";

@@ -8,8 +8,6 @@ using Amazon.Lambda.SQSEvents;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-using Cythral.CloudFormation.AwsUtils;
-
 using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.StackDeployment

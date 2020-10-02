@@ -17,15 +17,6 @@
           "AWSSDK.Core": "[3.5.0, 3.6.0)"
         }
       },
-      "AWSSDK.KeyManagementService": {
-        "type": "Direct",
-        "requested": "[3.5.0, )",
-        "resolved": "3.5.0",
-        "contentHash": "I0Ln1RZ6hVBP2rnRMk+Sw0vtJVt6f7ehWQcMZU5oqg1oVQmul+crZCFRZtLI49gOhPZqfkOx8zZrDtvY4lF1oQ==",
-        "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
-        }
-      },
       "AWSSDK.S3": {
         "type": "Direct",
         "requested": "[3.5.0, )",
@@ -65,11 +56,23 @@
           "Lambdajection.Generator": "0.4.0"
         }
       },
-      "Octokit": {
+      "Lambdajection.Encryption": {
         "type": "Direct",
-        "requested": "[0.47.0, )",
-        "resolved": "0.47.0",
-        "contentHash": "q1TWsMEjxG7Eb7YFrXm3MWgSPsMvPKxrIF//tuUPd9i/SS/fG7PerKr088E8AOoAFcHqMqouSrW0iAg2WgskDA=="
+        "requested": "[0.4.0, )",
+        "resolved": "0.4.0",
+        "contentHash": "oWay3RcwdJMSAne5B0Ip9jQxPi1TOPxMomgfb/kSHn1j6dlrjqX7tHA/kclx6eK1yP6gvSDYH/1ill0q9nJUHg==",
+        "dependencies": {
+          "AWSSDK.KeyManagementService": "3.5.0.22"
+        }
+      },
+      "System.Net.Http.Json": {
+        "type": "Direct",
+        "requested": "[3.2.1, )",
+        "resolved": "3.2.1",
+        "contentHash": "KkevRTwX9uMYxuxG2/wSql8FIAItB89XT36zoh6hraQkFhf2yjotDswpAKzeuaEuMhAia6c50oZMkP1PJoYufQ==",
+        "dependencies": {
+          "System.Text.Json": "4.7.2"
+        }
       },
       "Amazon.Lambda.Core": {
         "type": "Transitive",
@@ -86,8 +89,16 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "bC5slbW3f1QgYlJK/I/zDUlixHq8YzktTwreJHwoOCpnRFB/IHV4EIgdEGwQnWOneJwRfwq4ZB0OhlrM3aT2pw=="
+        "resolved": "3.5.1.20",
+        "contentHash": "F5ySGV/HiWnNBcei0Fr0A6JXAb+wGYSxCnawuCzoEQGq4BDMEcjpTmrmzxcepaq3kPFJESlosqB/T4DZqIOp5g=="
+      },
+      "AWSSDK.KeyManagementService": {
+        "type": "Transitive",
+        "resolved": "3.5.0.22",
+        "contentHash": "sFCtvLNcfdyVxrANC/VFMb7pLzAwhUE6rHz0EfzC2VXvtcRp1PL8bbImBsAAoyjM3NupVyXH8tlYdJSoo4B5iA==",
+        "dependencies": {
+          "AWSSDK.Core": "[3.5.1.20, 3.6.0)"
+        }
       },
       "Cythral.CodeGeneration.Roslyn.Tool": {
         "type": "Transitive",
@@ -223,6 +234,11 @@
         "type": "Transitive",
         "resolved": "3.1.8",
         "contentHash": "XcIoXQhT0kwnEhOKv/LmpWR6yF6QWmBTy9Fcsz4aHuCOgTJ7Zd23ELtUA4BfwlYoFlSedavS+vURz9tNekd44g=="
+      },
+      "System.Text.Json": {
+        "type": "Transitive",
+        "resolved": "4.7.2",
+        "contentHash": "TcMd95wcrubm9nHvJEQs70rC0H/8omiSGGpU4FQ/ZA1URIqD4pjmFJh2Mfv1yH1eHgJDWTi2hMDXwTET+zOOyg=="
       }
     }
   }
