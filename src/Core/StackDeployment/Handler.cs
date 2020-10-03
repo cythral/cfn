@@ -19,6 +19,8 @@ using Cythral.CloudFormation.StackDeployment.TemplateConfig;
 using Lambdajection.Attributes;
 using Lambdajection.Core;
 
+using Microsoft.Extensions.Options;
+
 using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.StackDeployment
@@ -35,6 +37,7 @@ namespace Cythral.CloudFormation.StackDeployment
         private readonly IAmazonStepFunctions stepFunctionsClient;
         private readonly IAwsFactory<IAmazonCloudFormation> cloudformationFactory;
         private readonly GithubStatusNotifier statusNotifier;
+        private readonly Config config;
 
         public Handler(
             DeployStackFacade stackDeployer,
@@ -44,7 +47,8 @@ namespace Cythral.CloudFormation.StackDeployment
             RequestFactory requestFactory,
             IAmazonStepFunctions stepFunctionsClient,
             IAwsFactory<IAmazonCloudFormation> cloudformationFactory,
-            GithubStatusNotifier statusNotifier
+            GithubStatusNotifier statusNotifier,
+            IOptions<Config> config
         )
         {
             this.stackDeployer = stackDeployer;
@@ -55,6 +59,7 @@ namespace Cythral.CloudFormation.StackDeployment
             this.stepFunctionsClient = stepFunctionsClient;
             this.cloudformationFactory = cloudformationFactory;
             this.statusNotifier = statusNotifier;
+            this.config = config.Value;
         }
 
         public async Task<Response> Handle(
@@ -73,7 +78,7 @@ namespace Cythral.CloudFormation.StackDeployment
             {
                 var notificationArn = Environment.GetEnvironmentVariable(notificationArnKey);
                 var template = await s3Util.GetZipEntryInObject(request.ZipLocation, request.TemplateFileName);
-                var config = await GetConfig(request);
+                var stackConfig = await GetConfig(request);
                 var token = await tokenGenerator.Generate(sqsEvent, request);
 
                 await statusNotifier.NotifyPending(owner, repository, sha, stackName, environmentName);
@@ -82,10 +87,10 @@ namespace Cythral.CloudFormation.StackDeployment
                     StackName = request.StackName,
                     Template = template,
                     RoleArn = request.RoleArn,
-                    NotificationArn = notificationArn,
-                    Parameters = MergeParameters(config?.Parameters, request.ParameterOverrides),
-                    Tags = config?.Tags,
-                    StackPolicyBody = config?.StackPolicy?.Value,
+                    NotificationArn = config.NotificationArn,
+                    Parameters = MergeParameters(stackConfig?.Parameters, request.ParameterOverrides),
+                    Tags = stackConfig?.Tags,
+                    StackPolicyBody = stackConfig?.StackPolicy?.Value,
                     ClientRequestToken = token,
                     Capabilities = request.Capabilities,
                 });

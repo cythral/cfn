@@ -432,9 +432,9 @@ Resources:
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Environment:
         Variables:
-          NOTIFICATION_ARN: !Ref StackDeploymentStatusTopic
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
-          GITHUB_TOKEN: !Ref GithubToken
+          Config__NotificationArn: !Ref StackDeploymentStatusTopic
+          Config__GithubToken: !Ref GithubToken
 
   StackDeploymentFunctionRetryPolicy:
     Type: AWS::Lambda::EventInvokeConfig
