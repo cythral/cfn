@@ -7,5 +7,6 @@ namespace Cythral.CloudFormation.StackDeployment
     public class Config
     {
         [Encrypted] public string GithubToken { get; set; }
+        public string NotificationArn { get; set; }
     }
 }
