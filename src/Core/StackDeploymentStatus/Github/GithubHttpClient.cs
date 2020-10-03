@@ -20,7 +20,6 @@ namespace Cythral.CloudFormation.StackDeploymentStatus.Github
 
         private void Configure()
         {
-            client.BaseAddress = new Uri("https://api.github.com");
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("brighid", "v1"));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", config.GithubToken);
         }
