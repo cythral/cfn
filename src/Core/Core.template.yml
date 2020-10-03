@@ -432,8 +432,8 @@ Resources:
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Environment:
         Variables:
-          NOTIFICATION_ARN: !Ref StackDeploymentStatusTopic
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
+          Config__NotificationArn: !Ref StackDeploymentStatusTopic
           Config__GithubToken: !Ref GithubToken
 
   StackDeploymentFunctionRetryPolicy:
