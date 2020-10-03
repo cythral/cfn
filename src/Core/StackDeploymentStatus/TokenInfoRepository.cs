@@ -42,7 +42,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             }
 
             var (bucket, key) = GetBucketAndKeyFromRequestToken(request.ClientRequestToken);
-            var sourceString = await GetObject(bucket, key);
+            var sourceString = await GetObject(bucket, $"tokens/{key}");
             return Deserialize<TokenInfo>(sourceString);
         }
 
