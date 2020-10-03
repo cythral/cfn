@@ -30,7 +30,7 @@ namespace Cythral.CloudFormation.StackDeployment.Github
             await httpClient.SendAsync(new HttpRequestMessage
             {
                 Method = Post,
-                RequestUri = new Uri($"/repos/{owner}/{repo}/statuses/{sha}"),
+                RequestUri = new Uri($"https://api.github.com/repos/{owner}/{repo}/statuses/{sha}"),
                 Content = JsonContent.Create(new CreateStatusRequest
                 {
                     State = state,
