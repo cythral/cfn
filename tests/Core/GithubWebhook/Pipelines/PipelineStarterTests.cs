@@ -33,7 +33,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
         }
 
         [Test]
-        public async Task StartExecutionIsCalled()
+        public async Task StartExecutionIsCalled_ForPushEvent()
         {
             var repoName = "name";
             var sha = "sha";
@@ -55,8 +55,44 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
 
             await pipelineStarter.StartPipelineIfExists(payload);
 
+            var StateMachineArn = $"arn:aws:states:us-east-1:5:stateMachine:{repoName}-cicd-pipeline";
             await stepFunctionsClient.Received().StartExecutionAsync(Arg.Is<StartExecutionRequest>(req =>
-                req.StateMachineArn == $"arn:aws:states:us-east-1:5:stateMachine:{repoName}-cicd-pipeline" &&
+                req.StateMachineArn == StateMachineArn &&
+                req.Name == sha &&
+                req.Input == serializedPayload
+            ));
+        }
+
+        [Test]
+        public async Task StartExecutionIsCalled_ForPREvent()
+        {
+            var repoName = "name";
+            var sha = "sha";
+            var payload = new PullRequestEvent
+            {
+                PullRequest = new PullRequest
+                {
+                    Head = new PullRequestHead
+                    {
+                        Sha = sha
+                    }
+                },
+                Repository = new Repository
+                {
+                    Name = repoName
+                }
+            };
+
+            var serializedPayload = Serialize(payload);
+            var stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
+            var logger = Substitute.For<ILogger<PipelineStarter>>();
+            var pipelineStarter = new PipelineStarter(stepFunctionsClient, logger);
+
+            await pipelineStarter.StartPipelineIfExists(payload);
+
+            var StateMachineArn = $"arn:aws:states:us-east-1:5:stateMachine:{repoName}-cicd-pipeline";
+            await stepFunctionsClient.Received().StartExecutionAsync(Arg.Is<StartExecutionRequest>(req =>
+                req.StateMachineArn == StateMachineArn &&
                 req.Name == sha &&
                 req.Input == serializedPayload
             ));
