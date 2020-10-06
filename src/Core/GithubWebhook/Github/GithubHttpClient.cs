@@ -1,5 +1,6 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
@@ -17,6 +18,11 @@ namespace Cythral.CloudFormation.GithubWebhook
             Configure();
         }
 
+        internal GithubHttpClient()
+        {
+            // for testing only
+        }
+
         private void Configure()
         {
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("brighid", "v1"));
@@ -26,6 +32,11 @@ namespace Cythral.CloudFormation.GithubWebhook
         public virtual Task<HttpResponseMessage> SendAsync(HttpRequestMessage request)
         {
             return client.SendAsync(request);
+        }
+
+        public virtual Task<T> GetAsync<T>(string url)
+        {
+            return client.GetFromJsonAsync<T>(url);
         }
     }
 }

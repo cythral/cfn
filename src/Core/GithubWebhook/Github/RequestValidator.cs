@@ -28,13 +28,31 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
             // used for testing
         }
 
-        public virtual PushEvent Validate(ApplicationLoadBalancerRequest request)
+        public virtual GithubEvent Validate(ApplicationLoadBalancerRequest request)
         {
-            PushEvent payload;
+            GithubEvent payload = null!;
+            string eventType;
 
             ValidateMethod(request);
-            ValidateEvent(request);
-            ValidateBodyFormat(request, out payload);
+            ValidateEvent(request, out eventType);
+
+            switch (eventType)
+            {
+                case "push":
+                    {
+                        ValidatePushBodyFormat(request, out var pushPayload);
+                        payload = pushPayload;
+                        break;
+                    }
+
+                case "pull_request":
+                    {
+                        ValidatePullRequestBodyFormat(request, out var pullPayload);
+                        payload = pullPayload;
+                        break;
+                    }
+            }
+
             ValidateContentsUrlPresent(payload);
             ValidateOwner(payload);
             ValidateSignature(request);
@@ -50,18 +68,22 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
             }
         }
 
-        private static void ValidateEvent(ApplicationLoadBalancerRequest request)
+        private static void ValidateEvent(ApplicationLoadBalancerRequest request, out string eventType)
         {
-            string evnt = null;
-            request.Headers?.TryGetValue("x-github-event", out evnt);
+            string @event = "";
 
-            if (evnt.ToLower() != "push")
+            request.Headers?.TryGetValue("x-github-event", out @event);
+            @event = @event.ToLower();
+
+            if (@event != "push" && @event != "pull_request")
             {
-                throw new EventNotAllowedException($"Event '{evnt}' not allowed");
+                throw new EventNotAllowedException($"Event '{@event}' not allowed");
             }
+
+            eventType = @event;
         }
 
-        private static void ValidateBodyFormat(ApplicationLoadBalancerRequest request, out PushEvent payload)
+        private static void ValidatePushBodyFormat(ApplicationLoadBalancerRequest request, out PushEvent payload)
         {
             try
             {
@@ -74,7 +96,25 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
             }
         }
 
-        private static void ValidateContentsUrlPresent(PushEvent payload)
+        private static void ValidatePullRequestBodyFormat(ApplicationLoadBalancerRequest request, out PullRequestEvent payload)
+        {
+            try
+            {
+                payload = Deserialize<PullRequestEvent>(request.Body);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                throw new BodyNotJsonException();
+            }
+
+            if (payload.Action != "opened" && payload.Action != "synchronize")
+            {
+                throw new ActionNotAllowedException();
+            }
+        }
+
+        private static void ValidateContentsUrlPresent(GithubEvent payload)
         {
             if (payload.Repository?.ContentsUrl == null)
             {
@@ -82,7 +122,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
             }
         }
 
-        private void ValidateOwner(PushEvent payload)
+        private void ValidateOwner(GithubEvent payload)
         {
             var expectedOwner = config.GithubOwner;
 

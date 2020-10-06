@@ -24,6 +24,7 @@ namespace Cythral.CloudFormation.GithubWebhook
             services.AddSingleton<DeployStackFacade>();
             services.AddSingleton<PipelineDeployer>();
             services.AddSingleton<PipelineStarter>();
+            services.AddSingleton<GithubCommitMessageFetcher>();
 
             services.UseAwsService<IAmazonS3>();
             services.UseAwsService<IAmazonStepFunctions>();
