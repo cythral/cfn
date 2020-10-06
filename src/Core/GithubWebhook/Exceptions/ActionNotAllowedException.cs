@@ -4,11 +4,11 @@ using static System.Net.HttpStatusCode;
 
 namespace Cythral.CloudFormation.GithubWebhook.Exceptions
 {
-    public class EventNotAllowedException : RequestValidationException
+    public class ActionNotAllowedException : RequestValidationException
     {
 
         public override HttpStatusCode StatusCode => BadRequest;
 
-        public EventNotAllowedException(string message) : base(message) { }
+        public ActionNotAllowedException() : base("Action is not allowed.") { }
     }
 }

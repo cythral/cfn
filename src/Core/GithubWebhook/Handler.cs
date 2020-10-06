@@ -36,6 +36,7 @@ namespace Cythral.CloudFormation.GithubWebhook
         private readonly PipelineStarter pipelineStarter;
         private readonly PipelineDeployer pipelineDeployer;
         private readonly GithubStatusNotifier statusNotifier;
+        private readonly GithubCommitMessageFetcher commitMessageFetcher;
         private readonly Config config;
         private readonly ILogger<Handler> logger;
 
@@ -44,6 +45,7 @@ namespace Cythral.CloudFormation.GithubWebhook
             PipelineStarter pipelineStarter,
             PipelineDeployer pipelineDeployer,
             GithubStatusNotifier statusNotifier,
+            GithubCommitMessageFetcher commitMessageFetcher,
             IOptions<Config> config,
             ILogger<Handler> logger
         )
@@ -52,6 +54,7 @@ namespace Cythral.CloudFormation.GithubWebhook
             this.pipelineStarter = pipelineStarter;
             this.pipelineDeployer = pipelineDeployer;
             this.statusNotifier = statusNotifier;
+            this.commitMessageFetcher = commitMessageFetcher;
             this.config = config.Value;
             this.logger = logger;
         }
@@ -65,7 +68,7 @@ namespace Cythral.CloudFormation.GithubWebhook
 
         public async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, ILambdaContext context = null)
         {
-            PushEvent payload = null;
+            GithubEvent payload = null;
 
             try
             {
@@ -77,14 +80,17 @@ namespace Cythral.CloudFormation.GithubWebhook
                 return CreateResponse(statusCode: e.StatusCode);
             }
 
+            var commitMessage = await commitMessageFetcher.FetchCommitMessage(payload);
+            payload.HeadCommitMessage = commitMessage;
+            
             IEnumerable<Task> GetTasks()
             {
-                if (payload.OnDefaultBranch && !payload.HeadCommit.Message.Contains("[skip meta-ci]"))
+                if (payload is PushEvent pushEvent && pushEvent.OnDefaultBranch && !commitMessage.Contains("[skip meta-ci]"))
                 {
-                    yield return pipelineDeployer.Deploy(payload);
+                    yield return pipelineDeployer.Deploy(pushEvent);
                 }
 
-                if (!payload.HeadCommit.Message.Contains("[skip ci]"))
+                if (!commitMessage.Contains("[skip ci]"))
                 {
                     yield return pipelineStarter.StartPipelineIfExists(payload);
                 }
