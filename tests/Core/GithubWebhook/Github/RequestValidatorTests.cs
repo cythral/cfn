@@ -211,6 +211,21 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
                     }
                 })
             };
+
+            yield return new ApplicationLoadBalancerRequest
+            {
+                HttpMethod = "POST",
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "pull_request" },
+                Body = Serialize(new PullRequestEvent
+                {
+                    Action = "opened",
+                    Repository = new Repository
+                    {
+                        Owner = new User { Login = "MaliciousUser" },
+                        ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}"
+                    }
+                })
+            };
         }
 
         [Test]
@@ -222,11 +237,9 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
             Assert.Throws(Is.InstanceOf<UnexpectedOwnerException>(), () => requestValidator.Validate(request));
         }
 
-        [Test]
-        public void RequestsWithOkOwnerDontThrowException()
+        public static IEnumerable<ApplicationLoadBalancerRequest> ExpectedOwnerRequests()
         {
-            var owner = "Codertocat";
-            var request = new ApplicationLoadBalancerRequest
+            yield return new ApplicationLoadBalancerRequest
             {
                 HttpMethod = "POST",
                 Headers = new Dictionary<string, string> { ["x-github-event"] = "push" },
@@ -234,12 +247,32 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
                 {
                     Repository = new Repository
                     {
-                        Owner = new User { Name = owner },
+                        Owner = new User { Name = "Codertocat" },
                         ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}"
                     }
                 })
             };
 
+            yield return new ApplicationLoadBalancerRequest
+            {
+                HttpMethod = "POST",
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "pull_request" },
+                Body = Serialize(new PullRequestEvent
+                {
+                    Action = "opened",
+                    Repository = new Repository
+                    {
+                        Owner = new User { Login = "Codertocat" },
+                        ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}"
+                    }
+                })
+            };
+        }
+
+        [Test]
+        public void RequestsWithOkOwnerDontThrowException([ValueSource("ExpectedOwnerRequests")] ApplicationLoadBalancerRequest request)
+        {
+            var owner = "Codertocat";
             var options = Options.Create(new Config { GithubOwner = owner, GithubSigningSecret = "test_key" });
             var requestValidator = new RequestValidator(options);
 
