@@ -28,18 +28,22 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
             // used for testing
         }
 
-        public virtual async Task StartPipelineIfExists(PushEvent payload)
+        public virtual async Task StartPipelineIfExists(GithubEvent payload)
         {
             try
             {
                 var accountId = Environment.GetEnvironmentVariable("AWS_ACCOUNT_ID");
                 var region = Environment.GetEnvironmentVariable("AWS_REGION");
 
+                var pushEventInput = payload is PushEvent pushEvent ? Serialize(pushEvent) : null;
+                var prEventInput = payload is PullRequestEvent pullEvent ? Serialize(pullEvent) : null;
+                var input = pushEventInput ?? prEventInput;
+
                 var response = await stepFunctionsClient.StartExecutionAsync(new StartExecutionRequest
                 {
                     StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:{payload.Repository.Name}-cicd-pipeline",
-                    Name = payload.HeadCommit.Id,
-                    Input = Serialize(payload)
+                    Name = payload.HeadCommitId,
+                    Input = input
                 });
 
                 logger.LogInformation($"Received start execution response: {Serialize(response)}");

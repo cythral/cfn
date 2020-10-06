@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 using Cythral.CloudFormation.GithubWebhook.Github.Entities;
 
 namespace Cythral.CloudFormation.GithubWebhook.Github
 {
-    public class PushEvent
+    public class PushEvent : GithubEvent
     {
         [JsonPropertyName("ref")]
         public string Ref { get; set; }
@@ -34,10 +35,10 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
         [JsonPropertyName("sender")]
         public User Sender { get; set; }
 
-        [JsonPropertyName("repository")]
-        public Repository Repository { get; set; }
-
         [JsonPropertyName("on_default_branch")]
         public virtual bool OnDefaultBranch => Ref == $"refs/heads/{Repository.DefaultBranch}";
+
+        [JsonPropertyName("head_commit_id")]
+        public override string HeadCommitId => HeadCommit?.Id;
     }
 }

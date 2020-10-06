@@ -43,7 +43,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
         }
 
         [Test]
-        public void NonPushEventsThrowEventNotAllowed([Values("PR_OPENED")] string evnt)
+        public void OnlyPushAndPullRequestEventsAreAllowed([Values("package_pushed")] string evnt)
         {
             var request = new ApplicationLoadBalancerRequest
             {
@@ -59,12 +59,12 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
         }
 
         [Test]
-        public void PushEventsDontThrowEventNotAllowed()
+        public void AllowedEventsDontThrow([Values("push", "pull_request")] string @event)
         {
             var request = new ApplicationLoadBalancerRequest
             {
                 HttpMethod = "POST",
-                Headers = new Dictionary<string, string> { ["x-github-event"] = "push" },
+                Headers = new Dictionary<string, string> { ["x-github-event"] = @event },
                 Body = "{}"
             };
 
@@ -72,6 +72,42 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
             var requestValidator = new RequestValidator(options);
 
             Assert.Throws(Is.Not.InstanceOf<EventNotAllowedException>(), () => requestValidator.Validate(request));
+        }
+
+        [Test]
+        public void PullRequestEventsThatAreNotOpenedOrSynchronizeActionsThrow()
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
+                HttpMethod = "POST",
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "pull_request" },
+                Body = @"{
+                    ""action"": ""bad""
+                }"
+            };
+
+            var options = Options.Create(new Config { GithubOwner = "Codertocat", GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.InstanceOf<ActionNotAllowedException>(), () => requestValidator.Validate(request));
+        }
+
+        [Test]
+        public void PullRequestEventsThatAreOpenedOrSynchronizeActionsDDoNotThrow([Values("opened", "synchronize")] string action)
+        {
+            var request = new ApplicationLoadBalancerRequest
+            {
+                HttpMethod = "POST",
+                Headers = new Dictionary<string, string> { ["x-github-event"] = "pull_request" },
+                Body = $@"{{
+                    ""action"": ""{action}""
+                }}"
+            };
+
+            var options = Options.Create(new Config { GithubOwner = "Codertocat", GithubSigningSecret = "test_key" });
+            var requestValidator = new RequestValidator(options);
+
+            Assert.Throws(Is.Not.InstanceOf<ActionNotAllowedException>(), () => requestValidator.Validate(request));
         }
 
         [Test]
@@ -259,7 +295,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
         }
 
         [Test]
-        public void RequestsWithGoodSignatureDoesntThrow()
+        public void RequestsWithGoodSignatureDontThrow()
         {
             var request = new ApplicationLoadBalancerRequest
             {
@@ -267,7 +303,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
                 Headers = new Dictionary<string, string>
                 {
                     ["x-github-event"] = "push",
-                    ["x-hub-signature"] = "sha1=18f5e4779090fcaf575a4a4c9948d950efc81fcd"
+                    ["x-hub-signature"] = "sha1=9df818278c8fd1d5013f435a6f135f47238c71f7"
                 },
                 Body = Serialize(new PushEvent
                 {
