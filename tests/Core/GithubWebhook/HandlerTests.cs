@@ -150,7 +150,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
         }
 
         [Test]
-        public async Task Handle_ShouldStartPipeline()
+        public async Task Handle_ShouldStartPipeline_OnDefaultBranch()
         {
             var requestValidator = Substitute.For<RequestValidator>();
             var starter = Substitute.For<PipelineStarter>();
@@ -163,8 +163,30 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
             var pushEvent = new PushEvent
             {
                 Ref = "refs/heads/master",
-                Repository = new Repository { Name = repoName, DefaultBranch = "develop" },
+                Repository = new Repository { Name = repoName, DefaultBranch = "master" },
                 HeadCommit = new Commit { Id = sha, Message = "" }
+            };
+
+            requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
+
+            var response = await handler.Handle(new ApplicationLoadBalancerRequest { });
+            await starter.Received().StartPipelineIfExists(Is(pushEvent));
+        }
+
+        [Test]
+        public async Task Handle_ShouldStartPipeline_ForAllPrEvents()
+        {
+            var requestValidator = Substitute.For<RequestValidator>();
+            var starter = Substitute.For<PipelineStarter>();
+            var deployer = Substitute.For<PipelineDeployer>();
+            var statusNotifier = Substitute.For<GithubStatusNotifier>();
+            var commitMessageFetcher = Substitute.For<GithubCommitMessageFetcher>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestValidator, starter, deployer, statusNotifier, commitMessageFetcher, config, logger);
+
+            var pushEvent = new PullRequestEvent
+            {
+                Repository = new Repository { Name = repoName, DefaultBranch = "develop" },
             };
 
             requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);

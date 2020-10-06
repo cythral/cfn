@@ -82,24 +82,45 @@ namespace Cythral.CloudFormation.GithubWebhook
 
             var commitMessage = await commitMessageFetcher.FetchCommitMessage(payload);
             payload.HeadCommitMessage = commitMessage;
-            
+
             IEnumerable<Task> GetTasks()
             {
-                if (payload is PushEvent pushEvent && pushEvent.OnDefaultBranch && !commitMessage.Contains("[skip meta-ci]"))
+                switch (payload)
                 {
-                    yield return pipelineDeployer.Deploy(pushEvent);
+                    case PushEvent pushEvent: return GetPushEventTasks(pushEvent);
+                    case PullRequestEvent prEvent: return GetPullRequestEventTasks(prEvent);
                 }
 
-                if (!commitMessage.Contains("[skip ci]"))
-                {
-                    yield return pipelineStarter.StartPipelineIfExists(payload);
-                }
+                return Array.Empty<Task>();
             }
 
             var tasks = GetTasks();
             await Task.WhenAll(tasks);
 
             return CreateResponse(statusCode: OK);
+        }
+
+        private IEnumerable<Task> GetPushEventTasks(PushEvent pushEvent)
+        {
+            if (!pushEvent.OnDefaultBranch)
+            {
+                yield break;
+            }
+
+            if (!pushEvent.HeadCommitMessage.Contains("[skip meta-ci]"))
+            {
+                yield return pipelineDeployer.Deploy(pushEvent);
+            }
+
+            if (!pushEvent.HeadCommitMessage.Contains("[skip ci]"))
+            {
+                yield return pipelineStarter.StartPipelineIfExists(pushEvent);
+            }
+        }
+
+        private IEnumerable<Task> GetPullRequestEventTasks(PullRequestEvent prEvent)
+        {
+            yield return pipelineStarter.StartPipelineIfExists(prEvent);
         }
 
         private static ApplicationLoadBalancerResponse CreateResponse(HttpStatusCode statusCode, string contentType = "text/plain", string body = "")
