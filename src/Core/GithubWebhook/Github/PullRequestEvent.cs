@@ -15,6 +15,6 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
         public PullRequest PullRequest { get; set; }
 
         [JsonPropertyName("head_commit_id")]
-        public override string HeadCommitId => PullRequest.Head.Sha;
+        public override string HeadCommitId => PullRequest?.Head?.Sha;
     }
 }
