@@ -122,6 +122,17 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
             }
         }
 
+        private static string GetOwner(GithubEvent githubEvent)
+        {
+            switch (githubEvent)
+            {
+                case PushEvent pushEvent: return pushEvent.Repository?.Owner?.Name;
+                case PullRequestEvent pullRequestEvent: return pullRequestEvent.Repository?.Owner?.Login;
+            }
+
+            return "";
+        }
+
         private void ValidateOwner(GithubEvent payload)
         {
             var expectedOwner = config.GithubOwner;
@@ -132,7 +143,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
             }
 
             var matcher = new Regex("https:\\/\\/api\\.github\\.com\\/repos\\/([a-zA-Z0-9\\-\\._]+)\\/([a-zA-Z0-9\\-\\._]+)\\/contents\\/{\\+path}");
-            var repositoryOwner = payload.Repository?.Owner?.Name;
+            var repositoryOwner = GetOwner(payload);
             var contentsUrlMatches = matcher.Match(payload.Repository?.ContentsUrl).Groups[1]?.Captures;
             var contentsUrlOwner = contentsUrlMatches.Count == 1 ? contentsUrlMatches[0].Value : null;
 
