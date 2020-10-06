@@ -36,7 +36,7 @@ namespace Cythral.CloudFormation.StackDeployment.Github
                     State = state,
                     Description = description,
                     TargetUrl = $"https://sso.brigh.id/start/{environmentName}?destination={destination}",
-                    Context = $"AWS CloudFormation - {environmentName} ({repo})",
+                    Context = $"AWS CloudFormation - {environmentName} ({stackName})",
                 })
             });
         }
