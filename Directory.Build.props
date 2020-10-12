@@ -1,5 +1,9 @@
 <Project>
     <PropertyGroup>
+        <LambdajectionVersion>0.5.0-beta1</LambdajectionVersion>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <RestoreLockedMode>true</RestoreLockedMode>
         <OutputPath>$(MSBuildThisFileDirectory)bin/$(MSBuildProjectName)/$(Configuration)</OutputPath>

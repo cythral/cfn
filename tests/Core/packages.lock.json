@@ -179,33 +179,33 @@
       },
       "Cythral.CodeGeneration.Roslyn.Tool": {
         "type": "Transitive",
-        "resolved": "0.9.1",
-        "contentHash": "oDpJq1WkzEt7DQ/t04ul4Em/cAjx43mNUHvDp9Wc/EgM++/Axrjs8vqJm9e+IMmar1F48V7zHyaaGfs7mCcKvQ=="
+        "resolved": "0.9.2",
+        "contentHash": "ooBD6ai3rQG9LeZpyvQZXGnwVyxRimAOQoCZDafjB56cTOTNOQYOxFvHr17C/VhqdHWNmHknXv0S6e4+yfEa/Q=="
       },
       "Lambdajection": {
         "type": "Transitive",
-        "resolved": "0.4.0",
-        "contentHash": "SLFR5fO7s0GyVK0EER8SmfXHPItPoN7QcKN+81kV0U9rVNV6NP4/cCatBtEwQGOBAT+z1/sc14yAXOgnjEaqng==",
+        "resolved": "0.5.0-beta1",
+        "contentHash": "mCd7w7/sEmQM/JThubBrs+JKmlW7MrZJywBwE697sZdG1aIEklOP64izbKoPElnV+NxebDgkhrVILEViDgxxXg==",
         "dependencies": {
-          "Cythral.CodeGeneration.Roslyn.Tool": "0.9.1",
-          "Lambdajection.Attributes": "0.4.0",
-          "Lambdajection.Core": "0.4.0",
-          "Lambdajection.Generator": "0.4.0"
+          "Cythral.CodeGeneration.Roslyn.Tool": "0.9.2",
+          "Lambdajection.Attributes": "0.5.0-beta1",
+          "Lambdajection.Core": "0.5.0-beta1",
+          "Lambdajection.Generator": "0.5.0-beta1"
         }
       },
       "Lambdajection.Attributes": {
         "type": "Transitive",
-        "resolved": "0.4.0",
-        "contentHash": "HRyXUjgrxVZ9Rn9IODOXJmFGR2ByyawRT8zveu8Nr7OJKRvnw3RnCso845btUDn7chRuIS19e8ZdsVukI7SjVQ=="
+        "resolved": "0.5.0-beta1",
+        "contentHash": "/F9MXl6EVS0lmsDtDMdkQvczfBaaW9LCzFT6r7JItniCtuyS5UizU4kDTS7rk2PywCGbTdauVtCp3rigfuuiUw=="
       },
       "Lambdajection.Core": {
         "type": "Transitive",
-        "resolved": "0.4.0",
-        "contentHash": "KdIq7bWb6uWJg/LsmUQPF08/8ooi8ipNC7P+pqDjDsPbO+dapbquwpSl/9x5yp/nGAP7iH9XaXIKNylMBnIRzQ==",
+        "resolved": "0.5.0-beta1",
+        "contentHash": "DoV2/DALuSwRHONN5SaxroydTgnXsuMHeINpkOij1MpX/od0KUJw2ACxDzVgZYJ9Q37uPs12CvzAlJxQB75UsQ==",
         "dependencies": {
           "Amazon.Lambda.Core": "1.1.0",
           "Amazon.Lambda.Serialization.SystemTextJson": "2.0.2",
-          "Lambdajection.Attributes": "0.4.0",
+          "Lambdajection.Attributes": "0.5.0-beta1",
           "Microsoft.Extensions.Configuration": "3.1.8",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "3.1.8",
           "Microsoft.Extensions.DependencyInjection": "3.1.8",
@@ -215,16 +215,16 @@
       },
       "Lambdajection.Encryption": {
         "type": "Transitive",
-        "resolved": "0.4.0",
-        "contentHash": "oWay3RcwdJMSAne5B0Ip9jQxPi1TOPxMomgfb/kSHn1j6dlrjqX7tHA/kclx6eK1yP6gvSDYH/1ill0q9nJUHg==",
+        "resolved": "0.5.0-beta1",
+        "contentHash": "DCf7PJa8AW/Xn2SceJXzfIGtB89Ielr47XK86xKmPyuc8NPO9uHlaJsc20JqRFEuPjn1VEeP03Hvv8QEZKFEsQ==",
         "dependencies": {
           "AWSSDK.KeyManagementService": "3.5.0.22"
         }
       },
       "Lambdajection.Generator": {
         "type": "Transitive",
-        "resolved": "0.4.0",
-        "contentHash": "O/9CKIj6lELGTyg1GG2uJZPZK937zOFtLu03w3WrbLXIq3kLGc4Oe18SYQQawdLPf6pLiW/NyLwrP28YhYt9Bw=="
+        "resolved": "0.5.0-beta1",
+        "contentHash": "18Y4s8gJYwzNNSxDE2LlcAn7lzQDL0j2grawkBpeZ5VdzDbxsRT7jetyBh5udcAlna2DrGA9KFHX0+OQCDLMcQ=="
       },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
@@ -1350,8 +1350,8 @@
           "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.0.0",
-          "Lambdajection": "0.4.0",
-          "Lambdajection.Encryption": "0.4.0",
+          "Lambdajection": "0.5.0-beta1",
+          "Lambdajection.Encryption": "0.5.0-beta1",
           "System.Net.Http.Json": "3.2.1"
         }
       },
@@ -1380,7 +1380,7 @@
         "dependencies": {
           "AWSSDK.S3": "3.5.0",
           "AWSSDK.SecurityToken": "3.5.0",
-          "Lambdajection": "0.4.0"
+          "Lambdajection": "0.5.0-beta1"
         }
       },
       "simplestorageservice": {
@@ -1398,8 +1398,8 @@
           "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
           "Amazon.Lambda.SQSEvents": "1.1.0",
-          "Lambdajection": "0.4.0",
-          "Lambdajection.Encryption": "0.4.0",
+          "Lambdajection": "0.5.0-beta1",
+          "Lambdajection.Encryption": "0.5.0-beta1",
           "System.Net.Http.Json": "3.2.1"
         }
       },
@@ -1412,8 +1412,8 @@
           "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
           "Amazon.Lambda.SNSEvents": "1.1.0",
-          "Lambdajection": "0.4.0",
-          "Lambdajection.Encryption": "0.4.0",
+          "Lambdajection": "0.5.0-beta1",
+          "Lambdajection.Encryption": "0.5.0-beta1",
           "System.Net.Http.Json": "3.2.1"
         }
       },
@@ -1423,7 +1423,7 @@
           "AWSSDK.ElasticLoadBalancingV2": "3.5.0",
           "Amazon.Lambda.Core": "1.1.0",
           "Amazon.Lambda.SNSEvents": "1.1.0",
-          "Lambdajection": "0.4.0"
+          "Lambdajection": "0.5.0-beta1"
         }
       }
     }
