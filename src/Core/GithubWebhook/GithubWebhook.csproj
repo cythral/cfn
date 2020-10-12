@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <LambdajectionVersion>0.4.0</LambdajectionVersion>
   </PropertyGroup>
 
   <ItemGroup>
