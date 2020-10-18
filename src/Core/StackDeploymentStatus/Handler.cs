@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
 using Amazon.Lambda.Core;
-using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.Lambda.SNSEvents;
 using Amazon.SQS;
 using Amazon.SQS.Model;
@@ -21,8 +21,6 @@ using Lambdajection.Core;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
-using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.StackDeploymentStatus
 {
@@ -64,7 +62,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             ILambdaContext context = null
         )
         {
-            logger.LogInformation($"Received request: {Serialize(snsRequest)}");
+            logger.LogInformation($"Received request: {JsonSerializer.Serialize(snsRequest)}");
 
             var request = requestFactory.CreateFromSnsEvent(snsRequest);
             var status = request.ResourceStatus;
@@ -98,7 +96,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
                     Cause = request.ResourceStatus
                 });
 
-                logger.LogInformation($"Received send task failure response: {Serialize(response)}");
+                logger.LogInformation($"Received send task failure response: {JsonSerializer.Serialize(response)}");
                 await Dequeue(tokenInfo);
             }
 
@@ -120,10 +118,10 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
                 var response = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
                 {
                     TaskToken = tokenInfo.ClientRequestToken,
-                    Output = Serialize(outputs)
+                    Output = JsonSerializer.Serialize(outputs)
                 });
 
-                logger.LogInformation($"Received send task success response: {Serialize(response)}");
+                logger.LogInformation($"Received send task success response: {JsonSerializer.Serialize(response)}");
                 await Dequeue(tokenInfo);
             }
 
@@ -155,7 +153,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
                 ReceiptHandle = tokenInfo.ReceiptHandle,
             });
 
-            logger.LogInformation($"Got delete message response: {Serialize(response)}");
+            logger.LogInformation($"Got delete message response: {JsonSerializer.Serialize(response)}");
         }
     }
 }

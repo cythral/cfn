@@ -2,15 +2,19 @@ version: 0.2
 env:
   variables:
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: "true"
+    DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
 
 phases:
   install:
     runtime-versions:
-      dotnet: 3.1
+      docker: 19
+    
+    commands:
+      - dotnet-install.sh --jsonfile global.json
+      - dotnet --info
 
   build:
     commands:
-      - dotnet --info
       - dotnet test -c Release --logger trx
       - dotnet msbuild tools/package.proj -p:Configuration=Release -p:DeploymentBucket=$ARTIFACT_STORE -p:DeploymentBucketPrefix=$ARTIFACT_PREFIX
       - ./tools/create-networking-config.sh > Networking.config.json
