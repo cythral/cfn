@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 using Amazon.ElasticLoadBalancingV2;
@@ -15,9 +16,6 @@ using Cythral.CloudFormation.UpdateTargets.Request;
 using Lambdajection.Attributes;
 
 using Microsoft.Extensions.Logging;
-
-using static System.Text.Json.JsonSerializer;
-using static Amazon.ElasticLoadBalancingV2.TargetHealthStateEnum;
 
 namespace Cythral.CloudFormation.UpdateTargets
 {
@@ -48,16 +46,16 @@ namespace Cythral.CloudFormation.UpdateTargets
         )
         {
             var request = requestFactory.CreateFromSnsEvent(snsRequest);
-            logger.LogInformation($"Received transformed request: {Serialize(request)}");
+            logger.LogInformation($"Received transformed request: {JsonSerializer.Serialize(request)}");
 
             var addresses = dnsResolver.Resolve(request.TargetDnsName).AddressList ?? new IPAddress[] { };
             var targetHealthRequest = new DescribeTargetHealthRequest { TargetGroupArn = request.TargetGroupArn };
             var targetHealthResponse = await elbClient.DescribeTargetHealthAsync(targetHealthRequest);
-            logger.LogInformation($"Got target health response: {Serialize(targetHealthResponse)}");
+            logger.LogInformation($"Got target health response: {JsonSerializer.Serialize(targetHealthResponse)}");
 
             var targetHealthDescriptions = targetHealthResponse.TargetHealthDescriptions;
-            var healthyTargets = from target in targetHealthDescriptions where target.TargetHealth.State != Unhealthy select target.Target;
-            var unhealthyTargets = from target in targetHealthDescriptions where target.TargetHealth.State == Unhealthy select target.Target;
+            var healthyTargets = from target in targetHealthDescriptions where target.TargetHealth.State != TargetHealthStateEnum.Unhealthy select target.Target;
+            var unhealthyTargets = from target in targetHealthDescriptions where target.TargetHealth.State == TargetHealthStateEnum.Unhealthy select target.Target;
             var newTargets = from address in addresses
                              where healthyTargets.All(target => !IPAddress.Parse(target.Id).Equals(address))
                              select new TargetDescription
@@ -92,7 +90,7 @@ namespace Cythral.CloudFormation.UpdateTargets
                 Targets = targets.ToList()
             });
 
-            logger.LogInformation($"Got deregister targets response: {Serialize(deregisterTargetsResponse)}");
+            logger.LogInformation($"Got deregister targets response: {JsonSerializer.Serialize(deregisterTargetsResponse)}");
         }
 
         private async Task RegisterTargets(string targetGroupArn, IEnumerable<TargetDescription> targets)
@@ -108,7 +106,7 @@ namespace Cythral.CloudFormation.UpdateTargets
                 Targets = targets.ToList()
             });
 
-            logger.LogInformation($"Got register targets response: {Serialize(registerTargetsResponse)}");
+            logger.LogInformation($"Got register targets response: {JsonSerializer.Serialize(registerTargetsResponse)}");
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 using Amazon.CloudFormation;
@@ -20,8 +21,6 @@ using Lambdajection.Attributes;
 using Lambdajection.Core;
 
 using Microsoft.Extensions.Options;
-
-using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.StackDeployment
 {
@@ -101,7 +100,7 @@ namespace Cythral.CloudFormation.StackDeployment
                 var response = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
                 {
                     TaskToken = request.Token,
-                    Output = Serialize(outputs)
+                    Output = JsonSerializer.Serialize(outputs)
                 });
 
                 await statusNotifier.NotifySuccess(owner, repository, sha, stackName, environmentName);

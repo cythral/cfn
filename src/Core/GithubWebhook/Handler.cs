@@ -24,9 +24,6 @@ using Lambdajection.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using static System.Net.HttpStatusCode;
-using static System.Text.Json.JsonSerializer;
-
 namespace Cythral.CloudFormation.GithubWebhook
 {
     [Lambda(typeof(Startup), Serializer = typeof(CamelCaseLambdaJsonSerializer))]
@@ -97,7 +94,7 @@ namespace Cythral.CloudFormation.GithubWebhook
             var tasks = GetTasks();
             await Task.WhenAll(tasks);
 
-            return CreateResponse(statusCode: OK);
+            return CreateResponse(statusCode: HttpStatusCode.OK);
         }
 
         private IEnumerable<Task> GetPushEventTasks(PushEvent pushEvent)
