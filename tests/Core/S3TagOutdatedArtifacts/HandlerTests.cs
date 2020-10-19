@@ -1,5 +1,3 @@
-extern alias S3TagOutdated;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,18 +7,16 @@ using Amazon.Lambda.Core;
 using Amazon.S3;
 using Amazon.S3.Model;
 
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
+using Cythral.CloudFormation.S3TagOutdatedArtifacts;
+
 using FluentAssertions;
 
 using NSubstitute;
 
 using NUnit.Framework;
 
-using S3TagOutdated::Cythral.CloudFormation.S3TagOutdatedArtifacts;
-
 using static NSubstitute.Arg;
-
-using S3GetObjectFacade = S3TagOutdated::Cythral.CloudFormation.AwsUtils.SimpleStorageService.S3GetObjectFacade;
-
 
 namespace Cythral.CloudFormation.S3TagOutdatedArtifacts.Tests
 {

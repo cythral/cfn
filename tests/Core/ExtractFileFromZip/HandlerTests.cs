@@ -1,15 +1,12 @@
-extern alias S3AwsUtils;
-
 using System.Text.Json;
 using System.Threading.Tasks;
 
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.ExtractFileFromZip;
 
 using NSubstitute;
 
 using NUnit.Framework;
-
-using S3AwsUtils::Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
 using Handler = Cythral.CloudFormation.ExtractFileFromZip.Handler;
 

@@ -1309,6 +1309,20 @@
           "System.Threading": "4.3.0",
           "System.Xml.ReaderWriter": "4.3.0"
         }
+      },
+      "awsutils.common": {
+        "type": "Project",
+        "dependencies": {
+          "AWSSDK.Core": "3.5.0",
+          "AWSSDK.SecurityToken": "3.5.0"
+        }
+      },
+      "simplestorageservice": {
+        "type": "Project",
+        "dependencies": {
+          "AWSSDK.S3": "3.5.0",
+          "AwsUtils.Common": "1.0.0"
+        }
       }
     }
   }

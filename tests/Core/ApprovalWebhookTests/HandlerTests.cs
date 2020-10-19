@@ -1,7 +1,3 @@
-extern alias CommonAwsUtils;
-extern alias CommonUtils;
-extern alias S3AwsUtils;
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,14 +7,13 @@ using Amazon.S3;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
-using CommonAwsUtils::Cythral.CloudFormation.AwsUtils;
+using Cythral.CloudFormation.AwsUtils;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
 using NSubstitute;
 using NSubstitute.ClearExtensions;
 
 using NUnit.Framework;
-
-using S3AwsUtils::Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
 using static System.Text.Json.JsonSerializer;
 
@@ -26,8 +21,6 @@ using Handler = Cythral.CloudFormation.ApprovalWebhook.Handler;
 
 namespace Cythral.CloudFormation.Tests.ApprovalWebhook
 {
-    using ApprovalInfo = CommonUtils::Cythral.CloudFormation.ApprovalInfo;
-
     public class HandlerTests
     {
         private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = Substitute.For<AmazonClientFactory<IAmazonStepFunctions>>();

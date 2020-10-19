@@ -1,6 +1,3 @@
-extern alias CommonAwsUtils;
-extern alias S3AwsUtils;
-
 using System;
 using System.Threading.Tasks;
 
@@ -10,16 +7,14 @@ using Amazon.S3.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
-using CommonAwsUtils::Cythral.CloudFormation.AwsUtils;
-
+using Cythral.CloudFormation.AwsUtils;
+using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.DeploymentSupersession;
 
 using NSubstitute;
 using NSubstitute.ClearExtensions;
 
 using NUnit.Framework;
-
-using S3AwsUtils::Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
 using static System.Text.Json.JsonSerializer;
 

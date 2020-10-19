@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
+    <RuntimeIdentifiers>osx-x64;linux-x64</RuntimeIdentifiers>
+    <SelfContained>false</SelfContained>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,12 +14,11 @@
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.5.0" />
     <PackageReference Include="Lambdajection" Version="$(LambdajectionVersion)" />
     <PackageReference Include="Lambdajection.Encryption" Version="$(LambdajectionVersion)" />
+    <PackageReference Include="Lambdajection.Runtime" Version="$(LambdajectionVersion)" />
     <PackageReference Include="System.Net.Http.Json" Version="3.2.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\AwsUtils\CloudFormation\*.cs" />
-    <Compile Include="..\AwsUtils\SimpleStorageService\*.cs" />
-    <Compile Include="..\AwsUtils\Common\*.cs" />
+    <ProjectReference Include="..\AwsUtils\CloudFormation\CloudFormation.csproj" />
   </ItemGroup>
 </Project>

@@ -1,12 +1,10 @@
-﻿extern alias GithubWebhook;
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 
-using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Exceptions;
-using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github;
-using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github.Entities;
+using Cythral.CloudFormation.GithubWebhook.Exceptions;
+using Cythral.CloudFormation.GithubWebhook.Github;
+using Cythral.CloudFormation.GithubWebhook.Github.Entities;
 
 using Microsoft.Extensions.Options;
 
@@ -16,8 +14,6 @@ using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
 {
-    using Config = GithubWebhook::Cythral.CloudFormation.GithubWebhook.Config;
-
     public class RequestValidatorTests
     {
 

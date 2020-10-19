@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <PreserveCompilationContext>false</PreserveCompilationContext>
     </PropertyGroup>
 
     <ItemGroup>
@@ -11,7 +10,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="..\AwsUtils\SimpleStorageService\S3GetObjectFacade.cs" />
-        <Compile Include="..\AwsUtils\Common\AmazonClientFactory.cs" />
+        <ProjectReference Include="..\AwsUtils\SimpleStorageService\SimpleStorageService.csproj" />
     </ItemGroup>
 </Project>
