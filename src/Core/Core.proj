@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cythral.CloudFormation.BuildTasks" Version="0.2.2" />
+    <PackageReference Include="Cythral.CloudFormation.BuildTasks" Version="0.2.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,15 +34,15 @@
   <!-- Sets up the configuraiton file -->
   <Target Name="Configure" Condition="!Exists('$(ConfigFileName)')">
     <Exec Command="aws kms encrypt --key-id alias/SecretsKey --plaintext $(GithubToken) --query CiphertextBlob --output text" ConsoleToMsBuild="true">
-        <Output TaskParameter="ConsoleOutput" PropertyName="EncryptedGithubToken" />
+      <Output TaskParameter="ConsoleOutput" PropertyName="EncryptedGithubToken" />
     </Exec>
 
     <Exec Command="aws kms encrypt --key-id alias/SecretsKey --plaintext $(GithubSigningSecret) --query CiphertextBlob --output text" ConsoleToMsBuild="true">
-        <Output TaskParameter="ConsoleOutput" PropertyName="EncryptedGithubSigningSecret" />
+      <Output TaskParameter="ConsoleOutput" PropertyName="EncryptedGithubSigningSecret" />
     </Exec>
 
     <PropertyGroup>
-        <ConfigLines>
+      <ConfigLines>
 {
     "Parameters": {
         "GithubOwner": "$(GithubOwner)",
@@ -54,10 +54,10 @@
 }
         </ConfigLines>
     </PropertyGroup>
-    
+
     <WriteLinesToFile File="$(ConfigFileName)" Lines="$(ConfigLines)" Overwrite="true" />
   </Target>
-  
+
   <!-- Upload the code to S3 -->
   <Target Name="Package" AfterTargets="Publish" Condition="$(Package) == 'true'">
 
@@ -65,29 +65,18 @@
     <Copy SourceFiles="$(ConfigFile)" DestinationFiles="$([System.IO.Path]::GetDirectoryName('$(PackagedFile)'))/$(ConfigFileName)" Condition="$(PackagedFile) != ''" />
 
     <Exec Command="mktemp" ConsoleToMsBuild="true" Condition="$(PackagedFile) == ''">
-        <Output TaskParameter="ConsoleOutput" PropertyName="PackagedFile" />
+      <Output TaskParameter="ConsoleOutput" PropertyName="PackagedFile" />
     </Exec>
 
-    <PackageTemplate
-      TemplateFile="$(TemplateFile)" 
-      PackageBucket="$(DeploymentBucket)" 
-      OutputTemplateFile="$(PackagedFile)" 
-      PackageManifestFile="$([System.IO.Path]::GetDirectoryName('$(PackagedFile)'))/package-manifest.json" 
-      Prefix="$(DeploymentBucketPrefix)" 
-    />
-    
+    <PackageTemplate TemplateFile="$(TemplateFile)" PackageBucket="$(DeploymentBucket)" OutputTemplateFile="$(PackagedFile)" PackageManifestFile="$([System.IO.Path]::GetDirectoryName('$(PackagedFile)'))/package-manifest.json" Prefix="$(DeploymentBucketPrefix)" />
+
     <PropertyGroup>
       <TemplateFile>$(PackagedFile)</TemplateFile>
     </PropertyGroup>
   </Target>
-  
+
   <!-- Deploy to CloudFormation -->
   <Target Name="Deploy" AfterTargets="Package" Condition="$(Deploy) == 'true'" DependsOnTargets="Configure">
-    <Deploy 
-      TemplateFile="$(TemplateFile)" 
-      StackName="$(StackName)" 
-      ConfigFile="$(ConfigFile)" 
-      Capabilities="CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND" 
-    />
+    <Deploy TemplateFile="$(TemplateFile)" StackName="$(StackName)" ConfigFile="$(ConfigFile)" Capabilities="CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND" />
   </Target>
 </Project>

@@ -4,9 +4,9 @@
     ".NETFramework,Version=v4.0": {
       "Cythral.CloudFormation.BuildTasks": {
         "type": "Direct",
-        "requested": "[0.2.2, )",
-        "resolved": "0.2.2",
-        "contentHash": "OLVBWLxR0YXStbr2IMoV3NMWcWCKv1F+nXHRJU90Q7+bRWLiypg5vyRKA/w06+Ljo68rll4X1rc+067ZAX13Kw=="
+        "requested": "[0.2.3, )",
+        "resolved": "0.2.3",
+        "contentHash": "vJJBdT7ZbOBG2e+YNNM8E8yN7aribZFX+UkcWIWVmA2Ly0POqAzAS31B9vCwpB8ilo+PTg0r6vGt/c7ARfC8dw=="
       }
     }
   }
