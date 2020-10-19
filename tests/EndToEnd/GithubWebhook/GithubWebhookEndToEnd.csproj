@@ -22,8 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\..\src\Core\GithubWebhook\Github\Entities\*.cs" />
+    <Compile Include="..\..\..\src\Core\GithubWebhook\Github\GithubEvent.cs" />
+    <Compile Include="..\..\..\src\Core\GithubWebhook\Github\PushEvent.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\src\Core\AwsUtils\KeyManagementService\KeyManagementService.csproj" />
-    <ProjectReference Include="..\..\..\src\Core\GithubWebhook\GithubWebhook.csproj" />
   </ItemGroup>
 
 </Project>

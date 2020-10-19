@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    ".NETCoreApp,Version=v3.1": {
+    ".NETCoreApp,Version=v5.0": {
       "FluentAssertions": {
         "type": "Direct",
         "requested": "[5.9.0, )",
@@ -72,6 +72,15 @@
         "type": "Transitive",
         "resolved": "1.1.0",
         "contentHash": "ueGId8b4DEHoVWkHDs3iAJH8IUSAUGu5AqkoI/Syl4RuByzik7lz9IjoImiGAlGhtsQV02MHNeTo04IFjS37gQ=="
+      },
+      "Amazon.Lambda.RuntimeSupport": {
+        "type": "Transitive",
+        "resolved": "1.1.1",
+        "contentHash": "ctOEoYGLQ8ZG4Mr9HGE6gbxyvVFnTRFvcC829cQQWAQwJsTL5oeCY+K87kscF5Vnyai7pjvLsWyMriyLMgL/+w==",
+        "dependencies": {
+          "Amazon.Lambda.Core": "1.1.0",
+          "NSwag.MSBuild": "12.0.4"
+        }
       },
       "Amazon.Lambda.Serialization.SystemTextJson": {
         "type": "Transitive",
@@ -232,6 +241,14 @@
           "Lambdajection.Encryption": "0.5.0-beta2",
           "Microsoft.CodeAnalysis": "3.8.0-4.final",
           "Microsoft.CodeAnalysis.CSharp.Workspaces": "3.8.0-4.final"
+        }
+      },
+      "Lambdajection.Runtime": {
+        "type": "Transitive",
+        "resolved": "0.5.0-beta2",
+        "contentHash": "bIYs4K9THqBEYCi5tJkjLrII8P4cOWcvY0EyW/V2k3U+ZRKn6Wi4uek2X9RIE/sI4hKaYABChFI0GeOZJ5Y/oA==",
+        "dependencies": {
+          "Amazon.Lambda.RuntimeSupport": "1.1.1"
         }
       },
       "Microsoft.Bcl.AsyncInterfaces": {
@@ -563,6 +580,11 @@
           "System.Xml.ReaderWriter": "4.0.11",
           "System.Xml.XDocument": "4.0.11"
         }
+      },
+      "NSwag.MSBuild": {
+        "type": "Transitive",
+        "resolved": "12.0.4",
+        "contentHash": "4Gqf64I2j3Y5UyxtdvPW4H8h8RgY2e6Cp6++T30/v0aXS9UhErPKg35GKz3nSKRUesjYQh7Duy3cPnDCDdGlMg=="
       },
       "Octokit": {
         "type": "Transitive",
@@ -1117,10 +1139,7 @@
       "System.Reflection.Metadata": {
         "type": "Transitive",
         "resolved": "5.0.0-preview.8.20407.11",
-        "contentHash": "gS/9KNzFSuRrODXNQFyMJAT0JcKgiIVVIDqfgxemGO1oceuNYPIQAh2TLofv+CgesXhKh54EkNi9yxGw2+UyYQ==",
-        "dependencies": {
-          "System.Collections.Immutable": "5.0.0-preview.8.20407.11"
-        }
+        "contentHash": "gS/9KNzFSuRrODXNQFyMJAT0JcKgiIVVIDqfgxemGO1oceuNYPIQAh2TLofv+CgesXhKh54EkNi9yxGw2+UyYQ=="
       },
       "System.Reflection.Primitives": {
         "type": "Transitive",
@@ -1524,8 +1543,10 @@
           "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.0.0",
+          "CloudFormation": "1.0.0",
           "Lambdajection": "0.5.0-beta2",
           "Lambdajection.Encryption": "0.5.0-beta2",
+          "Lambdajection.Runtime": "0.5.0-beta2",
           "System.Net.Http.Json": "3.2.1"
         }
       },
@@ -1554,7 +1575,8 @@
         "dependencies": {
           "AWSSDK.S3": "3.5.0",
           "AWSSDK.SecurityToken": "3.5.0",
-          "Lambdajection": "0.5.0-beta2"
+          "Lambdajection": "0.5.0-beta2",
+          "SimpleStorageService": "1.0.0"
         }
       },
       "simplestorageservice": {

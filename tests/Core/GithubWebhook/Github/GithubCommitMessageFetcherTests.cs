@@ -1,14 +1,12 @@
-extern alias GithubWebhook;
-
 using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-using FluentAssertions;
+using Cythral.CloudFormation.GithubWebhook.Github;
+using Cythral.CloudFormation.GithubWebhook.Github.Entities;
 
-using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github;
-using GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github.Entities;
+using FluentAssertions;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -22,9 +20,6 @@ using static NSubstitute.Arg;
 
 namespace Cythral.CloudFormation.Tests.GithubWebhook.Github
 {
-    using GithubCommitMessageFetcher = GithubWebhook::Cythral.CloudFormation.GithubWebhook.Github.GithubCommitMessageFetcher;
-    using GithubHttpClient = GithubWebhook::Cythral.CloudFormation.GithubWebhook.GithubHttpClient;
-
     public class GithubCommitMessageFetcherTests
     {
         private const string repoName = "repoName";

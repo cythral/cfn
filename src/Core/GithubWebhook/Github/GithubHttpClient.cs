@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
 
-namespace Cythral.CloudFormation.GithubWebhook
+namespace Cythral.CloudFormation.GithubWebhook.Github
 {
     public class GithubHttpClient
     {
