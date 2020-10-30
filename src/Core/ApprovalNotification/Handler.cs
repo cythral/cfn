@@ -1,53 +1,63 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.Core;
-using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
-using Amazon.StepFunctions;
-using Amazon.StepFunctions.Model;
 
-using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
+using Lambdajection.Attributes;
 
-using static System.Net.HttpStatusCode;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
 using static System.Text.Json.JsonSerializer;
+
+public delegate string ComputeHash(string plaintext);
 
 namespace Cythral.CloudFormation.ApprovalNotification
 {
-    public class Handler
+    [Lambda(typeof(Startup))]
+    public partial class Handler
     {
-        private AmazonClientFactory<IAmazonSimpleNotificationService> snsFactory = new AmazonClientFactory<IAmazonSimpleNotificationService>();
-        private AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
-        private S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
-        private AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = new AmazonClientFactory<IAmazonStepFunctions>();
+        private readonly IAmazonSimpleNotificationService snsClient;
+        private readonly IAmazonS3 s3Client;
+        private readonly ApprovalCanceler approvalCanceler;
+        private readonly ComputeHash computeHash;
+        private readonly Config config;
+        private readonly ILogger<Handler> logger;
 
-        [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
+        public Handler(
+            IAmazonSimpleNotificationService snsClient,
+            IAmazonS3 s3Client,
+            ApprovalCanceler approvalCanceler,
+            ComputeHash hash,
+            IOptions<Config> config,
+            ILogger<Handler> logger
+        )
+        {
+            this.snsClient = snsClient;
+            this.s3Client = s3Client;
+            this.approvalCanceler = approvalCanceler;
+            this.computeHash = hash;
+            this.config = config.Value;
+            this.logger = logger;
+        }
+
         public async Task<Response> Handle(Request request, ILambdaContext context = null)
         {
-            Console.WriteLine($"Recieved request: {Serialize(request)}");
-
-            await CancelPreviousApprovals(request);
+            logger.LogDebug($"Received request: {Serialize(request)}");
+            await approvalCanceler.CancelPreviousApprovalsForPipeline(request.Pipeline);
 
             var approvalHash = await CreateApprovalObject(request);
-            var client = await snsFactory.Create();
-            var baseUrl = Environment.GetEnvironmentVariable("BASE_URL");
             var pipeline = request.Pipeline;
-            var approveUrl = $"{baseUrl}?action=approve&pipeline={pipeline}&token={approvalHash}";
-            var rejectUrl = $"{baseUrl}?action=reject&pipeline={pipeline}&token={approvalHash}";
+            var approveUrl = $"{config.BaseUrl}?action=approve&pipeline={pipeline}&token={approvalHash}";
+            var rejectUrl = $"{config.BaseUrl}?action=reject&pipeline={pipeline}&token={approvalHash}";
             var defaultMessage = $"{request.CustomMessage}.\n\nApprove:\n{approveUrl}\n\nReject:\n{rejectUrl}";
-
-            var response = await client.PublishAsync(new PublishRequest
+            var response = await snsClient.PublishAsync(new PublishRequest
             {
-                TopicArn = Environment.GetEnvironmentVariable("TOPIC_ARN"),
+                TopicArn = config.TopicArn,
                 MessageStructure = "json",
                 MessageAttributes = new Dictionary<string, MessageAttributeValue>
                 {
@@ -61,7 +71,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
                 {
                     ["default"] = defaultMessage,
                     ["email"] = defaultMessage,
-                    ["email - json "] = Serialize(new
+                    ["email - json"] = Serialize(new
                     {
                         Pipeline = request.Pipeline,
                         Message = request.CustomMessage,
@@ -71,6 +81,8 @@ namespace Cythral.CloudFormation.ApprovalNotification
                 })
             });
 
+            logger.LogDebug($"Publish response: {Serialize(response)}");
+
             return new Response
             {
                 Success = true
@@ -79,74 +91,21 @@ namespace Cythral.CloudFormation.ApprovalNotification
 
         private async Task<string> CreateApprovalObject(Request request)
         {
-            using (var sha256 = SHA256.Create())
-            using (var client = await s3Factory.Create())
+            var key = computeHash(request.Token);
+            var bucket = config.StateStore;
+            var pipeline = request.Pipeline;
+            var response = await s3Client.PutObjectAsync(new PutObjectRequest
             {
-                var tokenBytes = Encoding.UTF8.GetBytes(request.Token);
-                var hashBytes = sha256.ComputeHash(tokenBytes);
-                var hash = string.Join("", hashBytes.Select(byt => $"{byt:X2}"));
-                var bucket = Environment.GetEnvironmentVariable("STATE_STORE");
-                var pipeline = request.Pipeline;
-
-                var response = await client.PutObjectAsync(new PutObjectRequest
+                BucketName = bucket,
+                Key = $"{pipeline}/approvals/{computeHash}",
+                ContentBody = Serialize(new ApprovalInfo
                 {
-                    BucketName = bucket,
-                    Key = $"{pipeline}/approvals/{hash}",
-                    ContentBody = Serialize(new ApprovalInfo
-                    {
-                        Token = request.Token
-                    })
-                });
+                    Token = request.Token
+                })
+            });
 
-                Console.WriteLine($"Put object response: {Serialize(response)}");
-                return hash;
-            }
-        }
-
-        private async Task CancelPreviousApprovals(Request request)
-        {
-            using (var client = await s3Factory.Create())
-            {
-                var bucket = Environment.GetEnvironmentVariable("STATE_STORE");
-                var pipeline = request.Pipeline;
-                var approvals = await client.ListObjectsV2Async(new ListObjectsV2Request
-                {
-                    BucketName = bucket,
-                    Prefix = $"{pipeline}/approvals"
-                });
-
-                var tasks = approvals.S3Objects.Select(location => CancelPreviousApproval(request, location));
-                Task.WaitAll(tasks.ToArray());
-            }
-        }
-
-        private async Task CancelPreviousApproval(Request request, S3Object location)
-        {
-            using (var stepFunctionsClient = await stepFunctionsClientFactory.Create())
-            using (var s3Client = await s3Factory.Create())
-            {
-                var approvalInfo = await s3GetObjectFacade.GetObject<ApprovalInfo>(location.BucketName, location.Key);
-
-                try
-                {
-                    var sendTaskCancelResponse = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
-                    {
-                        TaskToken = approvalInfo.Token,
-                        Output = Serialize(new
-                        {
-                            Action = "reject"
-                        })
-                    });
-
-                    Console.WriteLine($"Cancellation response: {Serialize(sendTaskCancelResponse)}");
-                }
-                catch (TaskTimedOutException) { }
-                catch (TaskDoesNotExistException) { }
-
-
-                var deleteResponse = await s3Client.DeleteObjectAsync(location.BucketName, location.Key);
-                Console.WriteLine($"Delete approval object response: {Serialize(deleteResponse)}");
-            }
+            logger.LogDebug($"Put object response: {Serialize(response)}");
+            return key;
         }
     }
 }
