@@ -589,7 +589,7 @@ Resources:
   ApprovalNotificationFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: ApprovalNotification::Cythral.CloudFormation.ApprovalNotification.Handler::Handle
+      Handler: ApprovalNotification::Cythral.CloudFormation.ApprovalNotification.Handler::Run
       Runtime: dotnetcore3.1
       Timeout: 30
       MemorySize: 256
@@ -599,9 +599,9 @@ Resources:
         - !Ref ApprovalNotificationPolicy
       Environment:
         Variables:
-          TOPIC_ARN: !Ref ApprovalTopic
-          BASE_URL: https://brigh.id/webhooks/approval
-          STATE_STORE: !Ref StateStore
+          Lambda__TopicArn: !Ref ApprovalTopic
+          Lambda__BaseUrl: https://brigh.id/webhooks/approval
+          Lambda__StateStore: !Ref StateStore
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   ApprovalNotificationPolicy:
