@@ -60,16 +60,6 @@ Parameters:
       - "yes"
       - "no"
   
-  AwsIpRanges1:
-    Type: CommaDelimitedList
-    Default: ""
-    Description: A comma separated list of IP ranges that AWS uses.
-      
-  AwsIpRanges2:
-    Type: CommaDelimitedList
-    Default: ""
-    Description: A comma separated list of IP ranges that AWS uses.
-
 Conditions:
   SetupDevAccount: !Not
     - !Equals
@@ -118,18 +108,13 @@ Resources:
             Values:
               - "dev.*"
               - "*.dev.*"
-        - Field: source-ip
-          SourceIpConfig:
-            Values: !Split # Combines two ranges into one
-              - ','
-              - !Join 
-                - ','
-                - - !Join 
-                    - ','
-                    - !Ref AwsIpRanges1
-                  - !Join
-                    - ','
-                    - !Ref AwsIpRanges2
+        - Field: http-header
+          HttpHeaderConfig:
+            HttpHeaderName: x-amz-sns-topic-arn
+            Values:
+              - !Sub
+                - arn:aws:sns:${AWS::Region}:${AccountId}:*
+                - AccountId: !ImportValue cfn-metadata:DevAccountId
 
   DevListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
