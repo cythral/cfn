@@ -97,7 +97,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
             var response = await s3Client.PutObjectAsync(new PutObjectRequest
             {
                 BucketName = bucket,
-                Key = $"{pipeline}/approvals/{computeHash}",
+                Key = $"{pipeline}/approvals/{key}",
                 ContentBody = Serialize(new ApprovalInfo
                 {
                     Token = request.Token
