@@ -59,7 +59,12 @@ Parameters:
     AllowedValues:
       - "yes"
       - "no"
-
+  
+  AwsIpRanges:
+    Type: CommaDelimitedList
+    Default: ""
+    Description: A comma separated list of IP ranges that AWS uses.
+      
 Conditions:
   SetupDevAccount: !Not
     - !Equals
@@ -92,13 +97,32 @@ Resources:
       DestinationCidrBlock: 10.2.0.0/16
       RouteTableId: !ImportValue cfn-utilities:RouteTableId
       VpcPeeringConnectionId: !Ref DevPeeringConnection
+  
+  InternalDevListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Condition: SetupDevAccount
+    Properties:
+      ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
+      Priority: 2
+      Actions:
+        - Type: forward
+          TargetGroupArn: !ImportValue cfn-gateway:DevTargetGroupArn
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - "dev.*"
+              - "*.dev.*"
+        - Field: source-ip
+          SourceIpConfig:
+            Values: !Ref AwsIpRanges
 
   DevListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Condition: SetupDevAccount
     Properties:
       ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
-      Priority: 9
+      Priority: 3
       Actions:
         - Type: authenticate-oidc
           Order: 1
