@@ -217,9 +217,7 @@
             "DevLoadBalancerDnsName.$": "$.DevUtilityOutputs.LoadBalancerDnsName",
             "ProdLoadBalancerDnsName.$": "$.ProdUtilityOutputs.LoadBalancerDnsName",
             "Version.$": "$.head_commit.id",
-            "RunEndToEndTests": "yes",
-            "AwsIpRanges1.$": "$.NetworkingConfig.AwsIpRanges1",
-            "AwsIpRanges2.$": "$.NetworkingConfig.AwsIpRanges2"
+            "RunEndToEndTests": "yes"
           },
           "Capabilities": ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"],
           "EnvironmentName": "shared",
