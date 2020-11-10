@@ -65,8 +65,8 @@
       },
       "Amazon.Lambda.ApplicationLoadBalancerEvents": {
         "type": "Transitive",
-        "resolved": "2.0.0",
-        "contentHash": "faB8e3dvWhNsI5hABtiDvKJ5RjeQXlE3cIM3u4pMs0MtQiGbxbuzjiibEd58ojRzz0ijYImy36mxPSGWm1nVtQ=="
+        "resolved": "2.1.0",
+        "contentHash": "lxOKr4kuooqQV84YsNjgrJp7c4lcYDe+RPIMcdvpLEM6XlLzar38OoG4DeCdzsgnxy0aFQ25nzaDUnrqjIFC/A=="
       },
       "Amazon.Lambda.Core": {
         "type": "Transitive",
@@ -102,10 +102,10 @@
       },
       "AWSSDK.CloudFormation": {
         "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "AS9lPQ+znYz20fos5wf0APTcEHpa7Csko9W1rORm1R0LX5N8Jv7tnjqDWN4E0waN2tAcjw/d8r2qmoXZUeVxng==",
+        "resolved": "3.5.0.36",
+        "contentHash": "EtqZbg1X9CZ/CoMxRq7Hlt4azg0k+YsyhfkO3i2ep//DuYenWbP2LQq9/N95I2JQmp0mahKk3i1yQaDCvB36CA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.5.1.34, 3.6.0)"
         }
       },
       "AWSSDK.Core": {
@@ -131,18 +131,18 @@
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "CLlXO0FGY8CnzBJGyVrLAi4rTDYaNUzbitEZ6B7qvnVRUOG8HnWS3KU7nk/wm6fJVTpa+CSHoittUzHfZbY2+g==",
+        "resolved": "3.5.4",
+        "contentHash": "IHaHZE5T/JQsM4+l+eHBdqPRuCfq36QpkqFn+ftLAmt1oKmdKQVOcEiE3rkMhVJiB3poqLCVncaul+YtfO94Kw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.5.1.34, 3.6.0)"
         }
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "rrhQYdiSynCneAUlTFZivo7eo6+Sm+FKSWGvfLRN0FmERb53yOB28O5w/o0dmr3B7rZ1kReCU0O0De/WGzA4vw==",
+        "resolved": "3.5.1.16",
+        "contentHash": "xUrfxRPl0/epQ/1qkpfBUWcRwE0bF+mzaHaumz3oj0pBqQxNko5ktPJq2tV5jJaGAjb3bCCoFcTUcRxfSKNKdw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.5.1.34, 3.6.0)"
         }
       },
       "AWSSDK.SimpleNotificationService": {
@@ -163,10 +163,10 @@
       },
       "AWSSDK.StepFunctions": {
         "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "qYYacB39ZTHjrOD/oqnZW/rL6IDfMP+YRC8z3q1zNRbDhl9eYWwzhGfyEpK3q628yDFyRmPmIntRsTvETFfYEA==",
+        "resolved": "3.5.2.23",
+        "contentHash": "v84TzkcvbP/fMk9Py2otEkN7wPb6Dz+7Qn4oHFVlX8bYvVvu7/xiXkoUuPmwFI/1mZ/r87LGKzgKofpC9qSr/Q==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.5.1.34, 3.6.0)"
         }
       },
       "Castle.Core": {
@@ -859,11 +859,8 @@
       },
       "System.Net.Http.Json": {
         "type": "Transitive",
-        "resolved": "3.2.1",
-        "contentHash": "KkevRTwX9uMYxuxG2/wSql8FIAItB89XT36zoh6hraQkFhf2yjotDswpAKzeuaEuMhAia6c50oZMkP1PJoYufQ==",
-        "dependencies": {
-          "System.Text.Json": "4.7.2"
-        }
+        "resolved": "5.0.0",
+        "contentHash": "3CPSQpCzEmI9o+1G79TnPCjF40omCdnoXj2Rg76BDwGj5+LZnFPjV+t35eedlvl+uthmholk/XXxXTYgJWSexw=="
       },
       "System.ObjectModel": {
         "type": "Transitive",
@@ -1128,11 +1125,6 @@
           "System.Text.Encoding": "4.3.0"
         }
       },
-      "System.Text.Json": {
-        "type": "Transitive",
-        "resolved": "4.7.2",
-        "contentHash": "TcMd95wcrubm9nHvJEQs70rC0H/8omiSGGpU4FQ/ZA1URIqD4pjmFJh2Mfv1yH1eHgJDWTi2hMDXwTET+zOOyg=="
-      },
       "System.Text.RegularExpressions": {
         "type": "Transitive",
         "resolved": "4.3.0",
@@ -1373,16 +1365,16 @@
       "githubwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.5.0",
-          "AWSSDK.S3": "3.5.0",
-          "AWSSDK.SecurityToken": "3.5.0",
-          "AWSSDK.StepFunctions": "3.5.0",
-          "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.0.0",
+          "AWSSDK.CloudFormation": "3.5.0.36",
+          "AWSSDK.S3": "3.5.4",
+          "AWSSDK.SecurityToken": "3.5.1.16",
+          "AWSSDK.StepFunctions": "3.5.2.23",
+          "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
           "CloudFormation": "1.0.0",
           "Lambdajection": "0.5.0",
           "Lambdajection.Encryption": "0.5.0",
           "Lambdajection.Runtime": "0.5.0",
-          "System.Net.Http.Json": "3.2.1"
+          "System.Net.Http.Json": "5.0.0"
         }
       },
       "keymanagementservice": {
