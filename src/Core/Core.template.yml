@@ -613,10 +613,12 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: ApprovalNotification::Cythral.CloudFormation.ApprovalNotification.Handler::Run
-      Runtime: dotnetcore3.1
+      Runtime: provided.al2
       Timeout: 30
       MemorySize: 256
-      CodeUri: ../../bin/ApprovalNotification/Release/netcoreapp3.1/publish/
+      CodeUri: ../../bin/ApprovalNotification/Release/net5.0/linux-x64/publish/
+      Layers:
+        - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:net5:3
       Policies:
         - AWSLambdaExecute
         - !Ref ApprovalNotificationPolicy
