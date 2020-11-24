@@ -448,6 +448,7 @@ Resources:
               AWS: !If
                 - IsMasterAccount
                 - - !Sub arn:aws:iam::${AWS::AccountId}:root
+                  - !GetAtt BuilderRole.Arn
                 - - !Sub arn:aws:iam::${AWS::AccountId}:root
                   - !Sub arn:aws:iam::${MasterAccountId}:root
           - Effect: Allow
