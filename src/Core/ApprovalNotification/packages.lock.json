@@ -29,6 +29,19 @@
           "AWSSDK.Core": "[3.5.1.34, 3.6.0)"
         }
       },
+      "Brighid.Identity.Client": {
+        "type": "Direct",
+        "requested": "[0.1.24, )",
+        "resolved": "0.1.24",
+        "contentHash": "tZY1Lgx/0UIJIye3SwsSxZJwx3O+vmjasiKBLBxLqQPlpZyBMxQn6MFOHfB0vo1xA6RRr/p+fjsZGrkwb6TOzg==",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration": "5.0.0",
+          "Microsoft.Extensions.DependencyInjection": "5.0.0",
+          "Microsoft.Extensions.Http": "5.0.0",
+          "Microsoft.Extensions.Options": "5.0.0",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "5.0.0"
+        }
+      },
       "Lambdajection": {
         "type": "Direct",
         "requested": "[0.5.0, )",
@@ -38,6 +51,15 @@
           "Lambdajection.Attributes": "0.5.0",
           "Lambdajection.Core": "0.5.0",
           "Lambdajection.Generator": "0.5.0"
+        }
+      },
+      "Lambdajection.Encryption": {
+        "type": "Direct",
+        "requested": "[0.5.0, )",
+        "resolved": "0.5.0",
+        "contentHash": "ZaV/FgWEH8OU5cVZAnsn5Z8Y0jzFnGY9oHkNaaM/sKz+Bzxi622mFTOCfqyp3jnhYUAA4+9RsqgyE1qahQXHFQ==",
+        "dependencies": {
+          "AWSSDK.KeyManagementService": "3.5.0.36"
         }
       },
       "Lambdajection.Runtime": {
@@ -75,6 +97,14 @@
         "type": "Transitive",
         "resolved": "3.5.1.34",
         "contentHash": "U7+LuL8NN20NP+Fg3l9HfH5nuKi+EPxh1zaP1JLg7Twj2OnIf6TuUkJyoTCggJ7mXzfmiLr3YyGu6/MjcvoMrA=="
+      },
+      "AWSSDK.KeyManagementService": {
+        "type": "Transitive",
+        "resolved": "3.5.0.36",
+        "contentHash": "I1GFu123/0+WRDyCT3OiUZRraCtQLQXWw5nr8tAG7s9aa3/CS+X26BW+gcynTiRf4we72nkwLI2K0uD4zmpenw==",
+        "dependencies": {
+          "AWSSDK.Core": "[3.5.1.34, 3.6.0)"
+        }
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
@@ -155,6 +185,17 @@
         "type": "Transitive",
         "resolved": "5.0.0",
         "contentHash": "ORj7Zh81gC69TyvmcUm9tSzytcy8AVousi+IVRAI8nLieQjOFryRusSFh7+aLk16FN9pQNqJAiMd7BTKINK0kA=="
+      },
+      "Microsoft.Extensions.Http": {
+        "type": "Transitive",
+        "resolved": "5.0.0",
+        "contentHash": "kT1ijDKZuSUhBtYoC1sXrmVKP7mA08h9Xrsr4VrS/QOtiKCEtUTTd7dd3XI9dwAb46tZSak13q/zdIcr4jqbyg==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Logging": "5.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Options": "5.0.0"
+        }
       },
       "Microsoft.Extensions.Logging": {
         "type": "Transitive",
