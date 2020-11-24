@@ -7,6 +7,8 @@ using Amazon.S3.Model;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 
+using Cythral.CloudFormation.ApprovalNotification.Links;
+
 using Lambdajection.Attributes;
 
 using Microsoft.Extensions.Logging;
@@ -25,6 +27,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
         private readonly IAmazonS3 s3Client;
         private readonly ApprovalCanceler approvalCanceler;
         private readonly ComputeHash computeHash;
+        private readonly ILinkService linkService;
         private readonly Config config;
         private readonly ILogger<Handler> logger;
 
@@ -33,6 +36,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
             IAmazonS3 s3Client,
             ApprovalCanceler approvalCanceler,
             ComputeHash hash,
+            ILinkService linkService,
             IOptions<Config> config,
             ILogger<Handler> logger
         )
@@ -41,6 +45,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
             this.s3Client = s3Client;
             this.approvalCanceler = approvalCanceler;
             this.computeHash = hash;
+            this.linkService = linkService;
             this.config = config.Value;
             this.logger = logger;
         }
@@ -52,8 +57,9 @@ namespace Cythral.CloudFormation.ApprovalNotification
 
             var approvalHash = await CreateApprovalObject(request);
             var pipeline = request.Pipeline;
-            var approveUrl = $"{config.BaseUrl}?action=approve&pipeline={pipeline}&token={approvalHash}";
-            var rejectUrl = $"{config.BaseUrl}?action=reject&pipeline={pipeline}&token={approvalHash}";
+            var approveUrl = await linkService.Shorten($"{config.BaseUrl}?action=approve&pipeline={pipeline}&token={approvalHash}");
+            var rejectUrl = await linkService.Shorten($"{config.BaseUrl}?action=reject&pipeline={pipeline}&token={approvalHash}");
+
             var defaultMessage = $"{request.CustomMessage}.\n\nApprove:\n{approveUrl}\n\nReject:\n{rejectUrl}";
             var response = await snsClient.PublishAsync(new PublishRequest
             {
