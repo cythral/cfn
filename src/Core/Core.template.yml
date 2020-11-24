@@ -644,6 +644,7 @@ Resources:
           - Effect: Allow
             Action:
               - states:SendTaskSuccess
+              - kms:Decrypt
             Resource: "*"
           - Effect: Allow
             Action:
