@@ -7,5 +7,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Entities
         [JsonPropertyName("sha")]
         public string Sha { get; set; }
 
+        [JsonPropertyName("ref")]
+        public string Ref { get; set; }
     }
 }
