@@ -15,26 +15,53 @@ using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.GithubUtils;
 
+using Lambdajection.Attributes;
+using Lambdajection.Core;
+
+using Microsoft.Extensions.Logging;
+
 using Octokit;
 
 using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.S3Deployment
 {
-    public class Handler
+    [Lambda(typeof(Startup))]
+    public partial class Handler : IDisposable
     {
-        private static AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
-        private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
-        private static PutCommitStatusFacade putCommitStatusFacade = new PutCommitStatusFacade();
+        private readonly IAwsFactory<IAmazonS3> s3Factory;
+        private readonly GithubStatusNotifier githubStatusNotifier;
+        private readonly S3GetObjectFacade s3GetObjectFacade;
+        private readonly ILogger<Handler> logger;
+        private IAmazonS3 s3Client;
+        private bool disposed;
 
-        [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
-        public static async Task<object> Handle(Request request, ILambdaContext context = null)
+        public Handler(
+            IAwsFactory<IAmazonS3> s3Factory,
+            GithubStatusNotifier githubStatusNotifier,
+            S3GetObjectFacade s3GetObjectFacade,
+            ILogger<Handler> logger
+        )
         {
-            await PutCommitStatus(request, CommitState.Pending);
+            this.s3Factory = s3Factory;
+            this.githubStatusNotifier = githubStatusNotifier;
+            this.s3GetObjectFacade = s3GetObjectFacade;
+            this.logger = logger;
+        }
+
+        public async Task<object> Handle(Request request, ILambdaContext context = null)
+        {
+            await githubStatusNotifier.NotifyPending(
+                bucketName: request.DestinationBucket,
+                repoName: request.CommitInfo.GithubRepository,
+                sha: request.CommitInfo.GithubRef
+            );
+
+            s3Client = await s3Factory.Create(request.RoleArn);
 
             try
             {
-                await MarkExistingObjectsAsDirty(request.RoleArn, request.DestinationBucket);
+                await MarkExistingObjectsAsDirty(request.DestinationBucket);
 
                 using (var stream = await s3GetObjectFacade.GetObjectStream(request.ZipLocation))
                 using (var zipStream = new ZipArchive(stream))
@@ -50,14 +77,23 @@ namespace Cythral.CloudFormation.S3Deployment
                     }
                 }
 
-                await PutCommitStatus(request, CommitState.Success);
+                await githubStatusNotifier.NotifySuccess(
+                    bucketName: request.DestinationBucket,
+                    repoName: request.CommitInfo.GithubRepository,
+                    sha: request.CommitInfo.GithubRef
+                );
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Got an error uploading files: {e.Message} {e.StackTrace}");
+                logger.LogError($"Got an error uploading files: {e.Message} {e.StackTrace}");
 
-                await PutCommitStatus(request, CommitState.Failure);
-                throw e;
+                await githubStatusNotifier.NotifyFailure(
+                    bucketName: request.DestinationBucket,
+                    repoName: request.CommitInfo.GithubRepository,
+                    sha: request.CommitInfo.GithubRef
+                );
+
+                throw new AggregateException(e);
             }
 
             return new Response
@@ -66,74 +102,55 @@ namespace Cythral.CloudFormation.S3Deployment
             };
         }
 
-        private static async Task MarkExistingObjectsAsDirty(string roleArn, string destinationBucket)
+        private async Task MarkExistingObjectsAsDirty(string destinationBucket)
         {
-            using (var client = await s3Factory.Create(roleArn))
+            var request = new ListObjectsV2Request { BucketName = destinationBucket };
+            var response = await s3Client.ListObjectsV2Async(request);
+            var dirtyTag = new Tag { Key = "dirty", Value = "true" };
+            var tagging = new Tagging
             {
-                var response = await client.ListObjectsV2Async(new ListObjectsV2Request
+                TagSet = new List<Tag> { dirtyTag }
+            };
+
+            var tasks = response.S3Objects.Select(obj =>
+                s3Client.PutObjectTaggingAsync(new PutObjectTaggingRequest
                 {
-                    BucketName = destinationBucket
-                });
+                    BucketName = destinationBucket,
+                    Key = obj.Key,
+                    Tagging = tagging,
+                })
+            );
 
-                var tasks = new List<Task>();
-
-                foreach (var obj in response.S3Objects)
-                {
-                    tasks.Add(
-                        client.PutObjectTaggingAsync(new PutObjectTaggingRequest
-                        {
-                            BucketName = destinationBucket,
-                            Key = obj.Key,
-                            Tagging = new Tagging
-                            {
-                                TagSet = new List<Tag>
-                                {
-                                    new Tag { Key = "dirty", Value = "true" }
-                                }
-                            }
-                        })
-                    );
-                }
-
-                await Task.WhenAll(tasks);
-            }
+            await Task.WhenAll(tasks);
         }
 
-        private static async Task UploadEntry(ZipArchiveEntry entry, string bucket, string role)
+        private async Task UploadEntry(ZipArchiveEntry entry, string bucket, string role)
         {
-            var method = entry.GetType().GetMethod("OpenInReadMode", BindingFlags.NonPublic | BindingFlags.Instance);
-
-            using (var client = await s3Factory.Create(role))
-            using (var stream = method.Invoke(entry, new object[] { false }) as Stream)
+            using var stream = entry.OpenInReadMode();
+            var request = new PutObjectRequest
             {
-                var request = new PutObjectRequest
-                {
-                    BucketName = bucket,
-                    Key = entry.FullName,
-                    InputStream = stream,
-                    TagSet = new List<Tag> { }
-                };
+                BucketName = bucket,
+                Key = entry.FullName,
+                InputStream = stream,
+                TagSet = new List<Tag> { },
+            };
 
-                request.Headers.ContentLength = entry.Length;
+            request.Headers.ContentLength = entry.Length;
+            await s3Client.PutObjectAsync(request);
 
-                await client.PutObjectAsync(request);
-                Console.WriteLine($"Uploaded {entry.FullName}");
-            }
+            logger.LogInformation($"Uploaded {entry.FullName}");
         }
 
-        private static async Task PutCommitStatus(Request request, CommitState state)
+        public void Dispose()
         {
-            await putCommitStatusFacade.PutCommitStatus(new PutCommitStatusRequest
+            if (disposed)
             {
-                CommitState = state,
-                ServiceName = "AWS S3",
-                DetailsUrl = $"https://s3.console.aws.amazon.com/s3/buckets/{request.DestinationBucket}/?region=us-east-1",
-                ProjectName = request.ProjectName ?? request.DestinationBucket,
-                EnvironmentName = request.EnvironmentName,
-                GithubOwner = request.CommitInfo?.GithubOwner,
-                GithubRepo = request.CommitInfo?.GithubRepository,
-                GithubRef = request.CommitInfo?.GithubRef,
-            });
+                return;
+            }
+
+            s3Client.Dispose();
+            s3Client = null;
+            disposed = true;
         }
     }
 }

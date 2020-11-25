@@ -1,21 +1,32 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
+    <SelfContained>false</SelfContained>
+    <RuntimeIdentifiers>osx-x64;linux-x64</RuntimeIdentifiers>
+    <RootNamespace>Cythral.CloudFormation.S3Deployment</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
-    <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.0.1" />
     <PackageReference Include="AWSSDK.S3" Version="3.5.0" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.5.1.22" />
     <PackageReference Include="Octokit" Version="0.47.0" />
+    <PackageReference Include="Lambdajection" Version="$(LambdajectionVersion)" />
+    <PackageReference Include="Lambdajection.Encryption" Version="$(LambdajectionVersion)" />
+    <PackageReference Include="Lambdajection.Runtime" Version="$(LambdajectionVersion)" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AwsUtils\SimpleStorageService\SimpleStorageService.csproj" />
     <ProjectReference Include="..\AwsUtils\Common\AwsUtils.Common.csproj" />
     <ProjectReference Include="..\GithubUtils\GithubUtils.csproj" />
-    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PreprocessFile Include="..\Common\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
 </Project>

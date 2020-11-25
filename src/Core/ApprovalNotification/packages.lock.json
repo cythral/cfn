@@ -280,9 +280,6 @@
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },
-      "common": {
-        "type": "Project"
-      },
       "simplestorageservice": {
         "type": "Project",
         "dependencies": {
