@@ -7,6 +7,7 @@ using Amazon.S3;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
+using Cythral.CloudFormation.ApprovalWebhook;
 using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
@@ -16,8 +17,6 @@ using NSubstitute.ClearExtensions;
 using NUnit.Framework;
 
 using static System.Text.Json.JsonSerializer;
-
-using Handler = Cythral.CloudFormation.ApprovalWebhook.Handler;
 
 namespace Cythral.CloudFormation.Tests.ApprovalWebhook
 {

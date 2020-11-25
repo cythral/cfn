@@ -1,4 +1,4 @@
-namespace Cythral.CloudFormation
+namespace __Namespace__
 {
     public class TokenInfo
     {

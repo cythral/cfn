@@ -13,6 +13,12 @@ using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.S3Deployment;
 
+using FluentAssertions;
+
+using Lambdajection.Core;
+
+using Microsoft.Extensions.Logging;
+
 using NSubstitute;
 using NSubstitute.ClearExtensions;
 
@@ -20,14 +26,17 @@ using NUnit.Framework;
 
 using Octokit;
 
+using static NSubstitute.Arg;
+
 namespace Cythral.CloudFormation.Tests.S3Deployment
 {
     public class HandlerTests
     {
-        private static AmazonClientFactory<IAmazonS3> s3Factory = Substitute.For<AmazonClientFactory<IAmazonS3>>();
+        private static IAwsFactory<IAmazonS3> s3Factory = Substitute.For<IAwsFactory<IAmazonS3>>();
         private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
         private static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
-        private static PutCommitStatusFacade putCommitStatusFacade = Substitute.For<PutCommitStatusFacade>();
+        private static GithubStatusNotifier statusNotifier = Substitute.For<GithubStatusNotifier>();
+        private static ILogger<Handler> logger = Substitute.For<ILogger<Handler>>();
 
         private const string zipLocation = "zipLocation";
         private const string destinationBucket = "destinationBucket";
@@ -57,27 +66,23 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
         [SetUp]
         public void SetupS3()
         {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "s3Factory", s3Factory);
-            TestUtils.SetPrivateStaticField(typeof(Handler), "s3GetObjectFacade", s3GetObjectFacade);
-
             s3Factory.ClearSubstitute();
-            s3Factory.Create(Arg.Is(roleArn)).Returns(s3Client);
-
             s3Client.ClearSubstitute();
+            s3GetObjectFacade.ClearSubstitute();
+
+            s3Factory.Create(Arg.Is(roleArn)).Returns(s3Client);
 
             s3GetObjectFacade.GetObjectStream(Arg.Any<string>()).Returns(TestZipFile.Stream);
             s3Client.ListObjectsV2Async(Arg.Any<ListObjectsV2Request>()).Returns(new ListObjectsV2Response
             {
                 S3Objects = objects
             });
-
         }
 
         [SetUp]
-        public void SetupGithub()
+        public void SetupStatusNotifier()
         {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "putCommitStatusFacade", putCommitStatusFacade);
-            putCommitStatusFacade.ClearSubstitute();
+            statusNotifier.ClearSubstitute();
         }
 
         private Request CreateRequest()
@@ -102,76 +107,54 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
         [Test]
         public void TestStreamIsGood()
         {
-            using (var stream = TestZipFile.Stream)
-            using (var archive = new ZipArchive(stream))
-            {
-                Assert.That(archive.Entries.Any(entry => entry.FullName == "README.txt"), Is.EqualTo(true));
-                Assert.That(archive.Entries.Any(entry => entry.FullName == "LICENSE.txt"), Is.EqualTo(true));
-            }
+            using var stream = TestZipFile.Stream;
+            using var archive = new ZipArchive(stream);
+            archive.Entries.Should().Contain(entry => entry.FullName == "README.txt");
+            archive.Entries.Should().Contain(entry => entry.FullName == "LICENSE.txt");
         }
 
         [Test]
         public async Task ShouldPutPendingCommitStatus()
         {
+            var handler = new Handler(s3Factory, statusNotifier, s3GetObjectFacade, logger);
             var request = CreateRequest();
-            await Handler.Handle(request);
+            await handler.Handle(request);
 
-            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
-                req.CommitState == CommitState.Pending &&
-                req.ServiceName == "AWS S3" &&
-                req.ProjectName == projectName &&
-                req.EnvironmentName == environmentName &&
-                req.GithubOwner == githubOwner &&
-                req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef
-            ));
-        }
-
-        [Test]
-        public async Task ShouldPutPendingCommitStatusWithDestinationBucketIfProjectNameNotSpecified()
-        {
-            var request = CreateRequest();
-            request.ProjectName = null;
-
-            await Handler.Handle(request);
-
-            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
-                req.CommitState == CommitState.Pending &&
-                req.ProjectName == destinationBucket
-            ));
+            await statusNotifier.Received().NotifyPending(Is(destinationBucket), Is(environmentName), Is(githubRepo), Is(githubRef));
         }
 
         [Test]
         public async Task ShouldCreateClientWithRoleArn()
         {
+            var handler = new Handler(s3Factory, statusNotifier, s3GetObjectFacade, logger);
             var request = CreateRequest();
 
-            await Handler.Handle(request);
+            await handler.Handle(request);
 
-            await s3Factory.Received(3).Create(Arg.Is(roleArn));
+            await s3Factory.Received().Create(Is(roleArn));
         }
 
         [Test]
         public async Task ShouldListObjects()
         {
+            var handler = new Handler(s3Factory, statusNotifier, s3GetObjectFacade, logger);
             var request = CreateRequest();
 
-            await Handler.Handle(request);
+            await handler.Handle(request);
 
-            await s3Client.Received().ListObjectsV2Async(Arg.Is<ListObjectsV2Request>(req => req.BucketName == destinationBucket));
+            await s3Client.Received().ListObjectsV2Async(Is<ListObjectsV2Request>(req => req.BucketName == destinationBucket));
         }
-
-
 
         [Test]
         public async Task ShouldMarkExistingObjectsAsDirty([ValueSource("existingObjectKeys")] string objectKey)
         {
+            var handler = new Handler(s3Factory, statusNotifier, s3GetObjectFacade, logger);
             var request = CreateRequest();
 
-            await Handler.Handle(request);
+            await handler.Handle(request);
 
             await s3Client.Received().PutObjectTaggingAsync(
-                Arg.Is<PutObjectTaggingRequest>(req =>
+                Is<PutObjectTaggingRequest>(req =>
                     req.BucketName == destinationBucket &&
                     req.Key == objectKey &&
                     req.Tagging.TagSet.Any(tag => tag.Key == "dirty" && tag.Value == "true")
@@ -182,10 +165,11 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
         [Test]
         public async Task ShouldGetObjectStream()
         {
+            var handler = new Handler(s3Factory, statusNotifier, s3GetObjectFacade, logger);
             var request = CreateRequest();
-            await Handler.Handle(request);
+            await handler.Handle(request);
 
-            await s3GetObjectFacade.Received().GetObjectStream(Arg.Is(zipLocation));
+            await s3GetObjectFacade.Received().GetObjectStream(Is(zipLocation));
         }
 
         [Test]
@@ -197,17 +181,16 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             .PutObjectAsync(Arg.Is<PutObjectRequest>(req => req.Key == "README.txt"))
             .Returns(x =>
             {
-                using (var stream = x.ArgAt<PutObjectRequest>(0).InputStream)
-                using (var reader = new StreamReader(stream))
-                {
-                    streamContents = reader.ReadToEnd();
-                }
+                using var stream = x.ArgAt<PutObjectRequest>(0).InputStream;
+                using var reader = new StreamReader(stream);
+                streamContents = reader.ReadToEnd();
 
                 return (PutObjectResponse)null;
             });
 
+            var handler = new Handler(s3Factory, statusNotifier, s3GetObjectFacade, logger);
             var request = CreateRequest();
-            await Handler.Handle(request);
+            await handler.Handle(request);
 
             await s3Client.Received().PutObjectAsync(Arg.Is<PutObjectRequest>(req =>
                 req.BucketName == destinationBucket &&
@@ -216,7 +199,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 req.TagSet.Count == 0
             ));
 
-            Assert.That(streamContents, Is.EqualTo("hi\n"));
+            streamContents.Should().Be("hi\n");
         }
 
         [Test]
@@ -237,8 +220,9 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 return (PutObjectResponse)null;
             });
 
+            var handler = new Handler(s3Factory, statusNotifier, s3GetObjectFacade, logger);
             var request = CreateRequest();
-            await Handler.Handle(request);
+            await handler.Handle(request);
 
             await s3Client.Received().PutObjectAsync(Arg.Is<PutObjectRequest>(req =>
                 req.BucketName == destinationBucket &&
@@ -247,39 +231,17 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 req.TagSet.Count == 0
             ));
 
-            Assert.That(streamContents, Is.EqualTo("test\n"));
+            streamContents.Should().Be("test\n");
         }
 
         [Test]
         public async Task ShouldPutSuccessCommitStatus()
         {
+            var handler = new Handler(s3Factory, statusNotifier, s3GetObjectFacade, logger);
             var request = CreateRequest();
-            await Handler.Handle(request);
+            await handler.Handle(request);
 
-            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
-                req.CommitState == CommitState.Success &&
-                req.ServiceName == "AWS S3" &&
-                req.ProjectName == projectName &&
-                req.DetailsUrl == $"https://s3.console.aws.amazon.com/s3/buckets/{destinationBucket}/?region=us-east-1" &&
-                req.EnvironmentName == environmentName &&
-                req.GithubOwner == githubOwner &&
-                req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef
-            ));
-        }
-
-        [Test]
-        public async Task ShouldPutSuccessCommitStatusWithDestinationBucketIfNoProjectName()
-        {
-            var request = CreateRequest();
-            request.ProjectName = null;
-
-            await Handler.Handle(request);
-
-            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
-                req.CommitState == CommitState.Success &&
-                req.ProjectName == destinationBucket
-            ));
+            await statusNotifier.Received().NotifySuccess(Is(destinationBucket), Is(environmentName), Is(githubRepo), Is(githubRef));
         }
 
         [Test]
@@ -287,19 +249,12 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
         {
             s3Client.PutObjectAsync(null).ReturnsForAnyArgs<PutObjectResponse>(x => { throw new Exception(); });
 
+            var handler = new Handler(s3Factory, statusNotifier, s3GetObjectFacade, logger);
             var request = CreateRequest();
 
-            Assert.ThrowsAsync<Exception>(() => Handler.Handle(request));
+            Assert.ThrowsAsync<AggregateException>(() => handler.Handle(request));
 
-            await putCommitStatusFacade.DidNotReceive().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
-                req.CommitState == CommitState.Success &&
-                req.ServiceName == "AWS S3" &&
-                req.DetailsUrl == $"https://s3.console.aws.amazon.com/s3/buckets/{destinationBucket}/?region=us-east-1" &&
-                req.EnvironmentName == environmentName &&
-                req.GithubOwner == githubOwner &&
-                req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef
-            ));
+            await statusNotifier.DidNotReceive().NotifySuccess(Any<string>(), Any<string>(), Any<string>(), Any<string>());
         }
 
 
@@ -308,36 +263,12 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
         {
             s3Client.PutObjectAsync(null).ReturnsForAnyArgs<PutObjectResponse>(x => { throw new Exception(); });
 
+            var handler = new Handler(s3Factory, statusNotifier, s3GetObjectFacade, logger);
             var request = CreateRequest();
 
-            Assert.ThrowsAsync<Exception>(() => Handler.Handle(request));
+            Assert.ThrowsAsync<AggregateException>(() => handler.Handle(request));
 
-            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
-                req.CommitState == CommitState.Failure &&
-                req.ServiceName == "AWS S3" &&
-                req.ProjectName == projectName &&
-                req.DetailsUrl == $"https://s3.console.aws.amazon.com/s3/buckets/{destinationBucket}/?region=us-east-1" &&
-                req.EnvironmentName == environmentName &&
-                req.GithubOwner == githubOwner &&
-                req.GithubRepo == githubRepo &&
-                req.GithubRef == githubRef
-            ));
-        }
-
-        [Test]
-        public async Task ShouldPutFailedCommitStatusIfFailedWithDestinationBucket()
-        {
-            s3Client.PutObjectAsync(null).ReturnsForAnyArgs<PutObjectResponse>(x => { throw new Exception(); });
-
-            var request = CreateRequest();
-            request.ProjectName = null;
-
-            Assert.ThrowsAsync<Exception>(() => Handler.Handle(request));
-
-            await putCommitStatusFacade.Received().PutCommitStatus(Arg.Is<PutCommitStatusRequest>(req =>
-                req.CommitState == CommitState.Failure &&
-                req.ProjectName == destinationBucket
-            ));
+            await statusNotifier.Received().NotifyFailure(Is(destinationBucket), Is(environmentName), Is(githubRepo), Is(githubRef));
         }
     }
 }

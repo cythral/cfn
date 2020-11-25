@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <SelfContained>false</SelfContained>
     <RuntimeIdentifiers>osx-x64;linux-x64</RuntimeIdentifiers>
+    <RootNamespace>Cythral.CloudFormation.ApprovalNotification</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,8 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\AwsUtils\SimpleStorageService\SimpleStorageService.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PreprocessFile Include="..\Common\*.cs" />
+  </ItemGroup>
 </Project>

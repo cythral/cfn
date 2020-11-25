@@ -1,0 +1,22 @@
+<Project>
+    <Target Name="GetProprocessFilesHash" BeforeTargets="CoreCompile">
+        <GetFileHash Files="@(PreprocessFile)">
+            <Output TaskParameter="Items" ItemName="PreprocessFileWithHash" />
+        </GetFileHash>
+    </Target>
+
+    <Target Name="Preprocess" AfterTargets="GetProprocessFilesHash" Inputs="@(PreprocessFileWithHash)" Outputs="$(IntermediateOutputPath)PreprocessedFiles%(PreprocessFileWithHash.RecursiveDir)/%(PreprocessFileWithHash.FileHash).%(PreprocessFileWithHash.FileName).cs">
+        <PropertyGroup>
+            <OutputFile>$(IntermediateOutputPath)PreprocessedFiles%(PreprocessFileWithHash.RecursiveDir)/%(PreprocessFileWithHash.FileHash).%(PreprocessFileWithHash.FileName).cs</OutputFile>
+            <FileContents>$([System.IO.File]::ReadAllText(%(PreprocessFileWithHash.Identity)).Replace('__Namespace__', '$(RootNamespace)'))</FileContents>
+        </PropertyGroup>
+
+        <Message Importance="High" Text="$(OutputFile)" />
+        <WriteLinesToFile File="$(OutputFile)" Lines="$(FileContents)" Overwrite="true" />
+
+        <ItemGroup>
+            <FileWrites Include="$(OutputFile)" />
+            <Compile Include="$(OutputFile)" />
+        </ItemGroup>
+    </Target>
+</Project>

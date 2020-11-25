@@ -730,16 +730,19 @@ Resources:
   S3DeploymentFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: S3Deployment::Cythral.CloudFormation.S3Deployment.Handler::Handle
-      Runtime: dotnetcore3.1
+      Handler: S3Deployment::Cythral.CloudFormation.S3Deployment.Handler::Run
+      Runtime: provided.al2
       Timeout: 300
       MemorySize: 256
-      CodeUri: ../../bin/S3Deployment/Release/netcoreapp3.1/publish/
+      CodeUri: ../../bin/S3Deployment/Release/net5.0/linux-x64/publish/
+      Layers:
+        - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:net5:3
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Environment:
         Variables:
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
-          GITHUB_TOKEN: !Ref GithubToken
+          Lambda__GithubToken: !Ref GithubToken
+          Lambda__GithubOwner: !Ref GithubOwner
 
   S3TagOutdatedArtifactsFunction:
     Type: AWS::Serverless::Function
