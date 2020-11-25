@@ -53,6 +53,7 @@ namespace Cythral.CloudFormation.S3Deployment
         {
             await githubStatusNotifier.NotifyPending(
                 bucketName: request.DestinationBucket,
+                envName: request.EnvironmentName,
                 repoName: request.CommitInfo.GithubRepository,
                 sha: request.CommitInfo.GithubRef
             );
@@ -79,6 +80,7 @@ namespace Cythral.CloudFormation.S3Deployment
 
                 await githubStatusNotifier.NotifySuccess(
                     bucketName: request.DestinationBucket,
+                    envName: request.EnvironmentName,
                     repoName: request.CommitInfo.GithubRepository,
                     sha: request.CommitInfo.GithubRef
                 );
@@ -89,6 +91,7 @@ namespace Cythral.CloudFormation.S3Deployment
 
                 await githubStatusNotifier.NotifyFailure(
                     bucketName: request.DestinationBucket,
+                    envName: request.EnvironmentName,
                     repoName: request.CommitInfo.GithubRepository,
                     sha: request.CommitInfo.GithubRef
                 );

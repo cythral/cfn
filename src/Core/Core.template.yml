@@ -734,7 +734,7 @@ Resources:
       Runtime: provided.al2
       Timeout: 300
       MemorySize: 256
-      CodeUri: ../../bin/S3Deployment/Release/netcoreapp3.1/publish/
+      CodeUri: ../../bin/S3Deployment/Release/net5.0/linux-x64/publish/
       Layers:
         - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:net5:3
       Role: !ImportValue cfn-utilities:MasterRoleArn

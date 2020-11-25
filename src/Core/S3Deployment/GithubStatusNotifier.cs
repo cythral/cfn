@@ -33,6 +33,7 @@ namespace Cythral.CloudFormation.S3Deployment
 
         private async Task Notify(
             string bucketName,
+            string envName,
             string repoName,
             string sha,
             string state,
@@ -50,7 +51,7 @@ namespace Cythral.CloudFormation.S3Deployment
                 {
                     State = state,
                     Description = description,
-                    TargetUrl = $"https://sso.brigh.id/start/shared?destination={destination}",
+                    TargetUrl = $"https://sso.brigh.id/start/{envName}?destination={destination}",
                     Context = $"AWS S3 ({bucketName})",
                 })
             };
@@ -66,10 +67,11 @@ namespace Cythral.CloudFormation.S3Deployment
             }
         }
 
-        public virtual async Task NotifyPending(string bucketName, string repoName, string sha)
+        public virtual async Task NotifyPending(string bucketName, string envName, string repoName, string sha)
         {
             await Notify(
                 bucketName: bucketName,
+                envName: envName,
                 repoName: repoName,
                 sha: sha,
                 state: "pending",
@@ -78,10 +80,11 @@ namespace Cythral.CloudFormation.S3Deployment
             );
         }
 
-        public virtual async Task NotifyFailure(string bucketName, string repoName, string sha)
+        public virtual async Task NotifyFailure(string bucketName, string envName, string repoName, string sha)
         {
             await Notify(
                 bucketName: bucketName,
+                envName: envName,
                 repoName: repoName,
                 sha: sha,
                 state: "failure",
@@ -90,10 +93,11 @@ namespace Cythral.CloudFormation.S3Deployment
             );
         }
 
-        public virtual async Task NotifySuccess(string bucketName, string repoName, string sha)
+        public virtual async Task NotifySuccess(string bucketName, string envName, string repoName, string sha)
         {
             await Notify(
                 bucketName: bucketName,
+                envName: envName,
                 repoName: repoName,
                 sha: sha,
                 state: "success",

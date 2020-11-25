@@ -120,7 +120,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             var request = CreateRequest();
             await handler.Handle(request);
 
-            await statusNotifier.Received().NotifyPending(Is(destinationBucket), Is(githubRepo), Is(githubRef));
+            await statusNotifier.Received().NotifyPending(Is(destinationBucket), Is(environmentName), Is(githubRepo), Is(githubRef));
         }
 
         [Test]
@@ -241,7 +241,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
             var request = CreateRequest();
             await handler.Handle(request);
 
-            await statusNotifier.Received().NotifySuccess(Is(destinationBucket), Is(githubRepo), Is(githubRef));
+            await statusNotifier.Received().NotifySuccess(Is(destinationBucket), Is(environmentName), Is(githubRepo), Is(githubRef));
         }
 
         [Test]
@@ -254,7 +254,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
 
             Assert.ThrowsAsync<AggregateException>(() => handler.Handle(request));
 
-            await statusNotifier.DidNotReceive().NotifySuccess(Any<string>(), Any<string>(), Any<string>());
+            await statusNotifier.DidNotReceive().NotifySuccess(Any<string>(), Any<string>(), Any<string>(), Any<string>());
         }
 
 
@@ -268,7 +268,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
 
             Assert.ThrowsAsync<AggregateException>(() => handler.Handle(request));
 
-            await statusNotifier.Received().NotifyFailure(Is(destinationBucket), Is(githubRepo), Is(githubRef));
+            await statusNotifier.Received().NotifyFailure(Is(destinationBucket), Is(environmentName), Is(githubRepo), Is(githubRef));
         }
     }
 }
