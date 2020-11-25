@@ -11,7 +11,7 @@ namespace Cythral.CloudFormation.StackDeployment.Github
 {
     public class GithubStatusNotifier
     {
-        private const string BaseDetailsUrl = "https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId=";
+        private const string BaseDetailsUrl = "https://console.aws.amazon.com/cloudformation/home?region=us-east-1%23/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false&stackId=";
         private readonly GithubHttpClient httpClient;
 
         public GithubStatusNotifier(GithubHttpClient httpClient)
