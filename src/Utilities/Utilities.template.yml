@@ -304,6 +304,13 @@ Resources:
           FromPort: 3306
           ToPort: 3306
           CidrIp: !Ref NetworkCidr
+        - !If
+          - IsMasterAccount
+          - !Ref AWS::NoValue
+          - IpProtocol: tcp
+            FromPort: 3306
+            ToPort: 3306
+            CidrIp: 10.1.0.0/16
       VpcId: !Ref VPC
 
   # Security - Roles & Policies
