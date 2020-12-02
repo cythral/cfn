@@ -60,6 +60,7 @@ Resources:
                 - !Ref AWS::AccountId
                 - !ImportValue cfn-metadata:DevAgentRoleArn
                 - !ImportValue cfn-metadata:ProdAgentRoleArn
+                - !ImportValue cfn-metadata:OssAgentRoleArn
 
   LogGroup:
     Type: AWS::Logs::LogGroup
@@ -161,7 +162,7 @@ Resources:
         DevRoleArn: !ImportValue cfn-metadata:DevAgentRoleArn
         ProdRoleArn: !ImportValue cfn-metadata:ProdAgentRoleArn
         SharedRoleArn: !ImportValue cfn-utilities:MasterRoleArn
-        OssRoleArn: !ImportValue cfn-metadata:OssRoleArn
+        OssRoleArn: !ImportValue cfn-metadata:OssAgentRoleArn
         ApprovalNotificationFunction: !ImportValue cfn-core:ApprovalNotificationFunctionArn
         FileFromZipArn: !ImportValue cfn-core:ExtractFileFromZipFunctionArn
         S3TagOutdatedArtifacts: !ImportValue cfn-core:S3TagOutdatedArtifactsFunctionArn
