@@ -146,6 +146,37 @@
           }
         }
       },
+      "Next": "Deploy OSS Utilities"
+    },
+    "Deploy OSS Utilities": {
+      "Type": "Task",
+      "ResultPath": "$.OssUtilityOutputs",
+      "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+      "Parameters": {
+        "QueueUrl": "${DeploymentQueue}",
+        "MessageGroupId": "${GithubRepo}-utilities-oss",
+        "MessageBody": {
+          "StackName": "cfn-utilities",
+          "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+          "TemplateFileName": "Utilities.template.yml",
+          "RoleArn": "${OssRoleArn}",
+          "Token.$": "$$.Task.Token",
+          "ParameterOverrides": {
+            "MasterAccountId": "${AccountId}",
+            "NetworkCidr": "10.4.0.0/16",
+            "SkipLoadBalancer": "true"
+          },
+          "Capabilities": [
+            "CAPABILITY_NAMED_IAM"
+          ],
+          "EnvironmentName": "oss",
+          "CommitInfo": {
+            "GithubOwner": "${GithubOwner}",
+            "GithubRepository": "${GithubRepo}",
+            "GithubRef.$": "$.head_commit.id"
+          }
+        }
+      },
       "Next": "Deploy DNS"
     },
     "Deploy DNS": {
@@ -214,6 +245,7 @@
           "ParameterOverrides": {
             "DevVpcId.$": "$.DevUtilityOutputs.VpcId",
             "ProdVpcId.$": "$.ProdUtilityOutputs.VpcId",
+            "OssVpcId.$": "$.OssUtilityOutputs.VpcId",
             "DevLoadBalancerDnsName.$": "$.DevUtilityOutputs.LoadBalancerDnsName",
             "ProdLoadBalancerDnsName.$": "$.ProdUtilityOutputs.LoadBalancerDnsName",
             "Version.$": "$.head_commit.id",

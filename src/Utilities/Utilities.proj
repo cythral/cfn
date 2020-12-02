@@ -1,21 +1,36 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TemplateName>Utilities.template.yml</TemplateName>
     <Template>$(MSBuildThisFileDirectory)$(TemplateName)</Template>
     <StackName Condition="$(StackName) == ''">cfn-utilities</StackName>
+    <SkipLoadBalancer Condition="$(SkipLoadBalancer) == ''">false</SkipLoadBalancer>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Overrides Include="MasterAccountId=$(MasterAccountId)" Condition="$(MasterAccountId) != ''" />
+    <Overrides Include="SkipLoadBalancer=$(SkipLoadBalancer)" Condition="$(SkipLoadBalancer) != ''" />
+    <Overrides Include="NetworkCidr=$(NetworkCidr)" Condition="'$(NetworkCidr)' != ''" />
+  </ItemGroup>
 
   <ItemGroup>
     <Flags Include="--template-file $(Template)" />
     <Flags Include="--stack-name $(StackName)" />
     <Flags Include="--capabilities CAPABILITY_NAMED_IAM" />
     <Flags Include="--no-fail-on-empty-changeset" />
-    <Flags Include="--parameter-overrides MasterAccountId=$(MasterAccountId)" Condition="$(MasterAccountId) != ''" />
+
     <Flags Include="--profile $(Profile)" Condition="$(Profile) != ''" />
   </ItemGroup>
 
   <Target Name="Build">
+    <PropertyGroup>
+      <ParameterOverrides>@(Overrides, ' ')</ParameterOverrides>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Flags Include="--parameter-overrides $(ParameterOverrides)" Condition="$(ParameterOverrides) != ''" />
+    </ItemGroup>
+
     <Exec Command="aws cloudformation deploy @(Flags, ' ')" />
   </Target>
 
