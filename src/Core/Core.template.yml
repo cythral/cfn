@@ -37,6 +37,11 @@ Parameters:
     Default: ""
     Description: ID of the VPC to peer to in prod
 
+  OssVpcId:
+    Type: String
+    Default: ""
+    Description: ID of the VPC to peer to in oss
+
   DevLoadBalancerDnsName:
     Type: String
     Default: ""
@@ -76,6 +81,23 @@ Conditions:
     - "yes"
 
 Resources:
+  OssPeeringConnection:
+    Type: AWS::EC2::VPCPeeringConnection
+    Condition: SetupDevAccount
+    Properties:
+      PeerOwnerId: !ImportValue cfn-metadata:OssAccountId
+      PeerRoleArn: !ImportValue cfn-metadata:OssAgentRoleArn
+      PeerVpcId: !Ref OssVpcId
+      VpcId: !ImportValue cfn-utilities:VpcId
+
+  OssPeeringRoute:
+    Type: AWS::EC2::Route
+    Condition: SetupDevAccount
+    Properties:
+      DestinationCidrBlock: 10.4.0.0/16
+      RouteTableId: !ImportValue cfn-utilities:RouteTableId
+      VpcPeeringConnectionId: !Ref OssPeeringConnection
+
   DevPeeringConnection:
     Type: AWS::EC2::VPCPeeringConnection
     Condition: SetupDevAccount
@@ -511,6 +533,7 @@ Resources:
               AWS:
                 - !ImportValue cfn-metadata:DevAgentRoleArn
                 - !ImportValue cfn-metadata:ProdAgentRoleArn
+                - !ImportValue cfn-metadata:OssAgentRoleArn
       Topics:
         - !Ref StackDeploymentStatusTopic
 
