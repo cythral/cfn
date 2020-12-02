@@ -22,6 +22,14 @@ Parameters:
     Description: Master account cidr block. A route to the peering connection is setup with this range
     Default: 10.1.0.0/16
 
+  SkipLoadBalancer:
+    Type: String
+    Description: Whether or not to skip setting up a load balancer for the account.
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+
 Conditions:
   # Master/Shared account - one that has control of "agent" accounts like (dev/staging/prod)
   IsMasterAccount: !Equals
@@ -39,6 +47,16 @@ Conditions:
     - !Equals
       - !Ref PeeringConnectionId
       - ""
+
+  # Whether or not to setup a load balancer.
+  SetupLoadBalancing: !And 
+    - !Not
+      - !Equals 
+        - !Ref MasterAccountId
+        - ""
+    - !Equals 
+      - !Ref SkipLoadBalancer
+      - "false"
 
 Resources:
   # Storage
@@ -226,7 +244,7 @@ Resources:
 
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    Condition: IsAgentAccount
+    Condition: SetupLoadBalancing
     Properties:
       IpAddressType: ipv4
       Scheme: internal
@@ -240,7 +258,7 @@ Resources:
 
   HttpListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
-    Condition: IsAgentAccount
+    Condition: SetupLoadBalancing
     Properties:
       DefaultActions:
         - Type: fixed-response
@@ -252,7 +270,7 @@ Resources:
 
   HealthcheckListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Condition: IsAgentAccount
+    Condition: SetupLoadBalancing
     Properties:
       ListenerArn: !Ref HttpListener
       Priority: 1
@@ -659,28 +677,28 @@ Outputs:
 
   LoadBalancerArn:
     Description: ARN of the internal load balancer
-    Condition: IsAgentAccount
+    Condition: SetupLoadBalancing
     Value: !Ref LoadBalancer
     Export:
       Name: !Sub ${AWS::StackName}:LoadBalancerArn
 
   LoadBalancerFullName:
     Description: Name of the internal load balancer
-    Condition: IsAgentAccount
+    Condition: SetupLoadBalancing
     Value: !GetAtt LoadBalancer.LoadBalancerFullName
     Export:
       Name: !Sub ${AWS::StackName}:LoadBalancerFullName
 
   LoadBalancerDnsName:
     Description: DNS name of the internal load balancer
-    Condition: IsAgentAccount
+    Condition: SetupLoadBalancing
     Value: !GetAtt LoadBalancer.DNSName
     Export:
       Name: !Sub ${AWS::StackName}:LoadBalancerDnsName
 
   HttpListenerArn:
     Description: ARN of the http listener for the internal load balancer
-    Condition: IsAgentAccount
+    Condition: SetupLoadBalancing
     Value: !Ref HttpListener
     Export:
       Name: !Sub ${AWS::StackName}:HttpListenerArn
