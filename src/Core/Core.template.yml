@@ -805,6 +805,13 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:ProdPeeringConnectionId
 
+  OssPeeringConnectionId:
+    Value: !Ref ProdPeeringConnection
+    Condition: SetupProdAccount
+    Description: Id of the peering connection with the prod account
+    Export:
+      Name: !Sub ${AWS::StackName}:ProdPeeringConnectionId
+
   StackDeploymentFunctionArn:
     Value: !GetAtt StackDeploymentFunction.Arn
     Description: ARN of the stack deployment function for use in step function pipelines
