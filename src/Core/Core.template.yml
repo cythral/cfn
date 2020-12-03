@@ -810,7 +810,7 @@ Outputs:
     Condition: SetupProdAccount
     Description: Id of the peering connection with the prod account
     Export:
-      Name: !Sub ${AWS::StackName}:ProdPeeringConnectionId
+      Name: !Sub ${AWS::StackName}:OssPeeringConnectionId
 
   StackDeploymentFunctionArn:
     Value: !GetAtt StackDeploymentFunction.Arn
