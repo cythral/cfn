@@ -806,7 +806,7 @@ Outputs:
       Name: !Sub ${AWS::StackName}:ProdPeeringConnectionId
 
   OssPeeringConnectionId:
-    Value: !Ref ProdPeeringConnection
+    Value: !Ref OssPeeringConnection
     Condition: SetupProdAccount
     Description: Id of the peering connection with the prod account
     Export:
