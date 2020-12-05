@@ -178,6 +178,33 @@
           }
         }
       },
+      "Next": "Deploy Layers"
+    },
+    "Deploy Layers": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+      "ResultPath": null,
+      "Parameters": {
+        "QueueUrl": "${DeploymentQueue}",
+        "MessageGroupId": "${GithubRepo}",
+        "MessageBody": {
+          "StackName": "cfn-layers",
+          "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+          "TemplateFileName": "Layers.template.yml",
+          "TemplateConfigurationFileName": "Layers.config.json",
+          "RoleArn": "${SharedRoleArn}",
+          "Token.$": "$$.Task.Token",
+          "Capabilities": [
+            "CAPABILITY_IAM"
+          ],
+          "EnvironmentName": "shared",
+          "CommitInfo": {
+            "GithubOwner": "${GithubOwner}",
+            "GithubRepository": "${GithubRepo}",
+            "GithubRef.$": "$.head_commit.id"
+          }
+        }
+      },
       "Next": "Deploy DNS"
     },
     "Deploy DNS": {
