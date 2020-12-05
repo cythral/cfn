@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <TemplateName>Layer.template.yml</TemplateName>
-    <ConfigName>Layer.config.json</ConfigName>
+    <TemplateName>Layers.template.yml</TemplateName>
+    <ConfigName>Layers.config.json</ConfigName>
     <Template>$(MSBuildThisFileDirectory)$(TemplateName)</Template>
     <ConfigFile>$(MSBuildThisFileDirectory)$(ConfigName)</ConfigFile>
     <StackName Condition="$(StackName) == ''">cfn-layers</StackName>
