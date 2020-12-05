@@ -195,7 +195,8 @@
           "RoleArn": "${SharedRoleArn}",
           "Token.$": "$$.Task.Token",
           "Capabilities": [
-            "CAPABILITY_IAM"
+            "CAPABILITY_IAM",
+            "CAPABILITY_AUTO_EXPAND"
           ],
           "EnvironmentName": "shared",
           "CommitInfo": {
