@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Package" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>  
+    <PropertyGroup>
         <SourceDirectory>$(MSBuildThisFileDirectory)../src</SourceDirectory>
         <UtilitiesStackName>cfn-utilities</UtilitiesStackName>
         <Destination>$(MSBuildThisFileDirectory)..</Destination>
@@ -9,39 +9,23 @@
         <SkipDns>false</SkipDns>
         <SkipGateway>false</SkipGateway>
         <SkipCore>false</SkipCore>
+        <SkipLayers>false</SkipLayers>
     </PropertyGroup>
-    
+
     <Target Name="Package">
-        <MSBuild
-            Projects="$(SourceDirectory)/Utilities/Utilities.proj" 
-            Targets="Copy" 
-            Properties="Configuration=$(Configuration);Dest=$(Destination)" />
+        <MSBuild Projects="$(SourceDirectory)/Utilities/Utilities.proj" Targets="Copy" Properties="Configuration=$(Configuration);Dest=$(Destination)" />
 
         <!-- Get the Utility Bucket name -->
-        <Exec 
-            Command="aws cloudformation list-exports --query Exports[?Name==\`cfn-utilities:UtilityBucketName\`].Value --output text" 
-            ConsoleToMsBuild="true"
-            Condition="$(DeploymentBucket) == ''"
-        >
+        <Exec Command="aws cloudformation list-exports --query Exports[?Name==\`cfn-utilities:UtilityBucketName\`].Value --output text" ConsoleToMsBuild="true" Condition="$(DeploymentBucket) == ''">
             <Output TaskParameter="ConsoleOutput" PropertyName="DeploymentBucket" />
         </Exec>
- 
-        <MSBuild 
-            Condition="$(SkipDns) != 'true'" 
-            Projects="$(SourceDirectory)/Dns/Dns.proj" 
-            Targets="Copy" 
-            Properties="Configuration=$(Configuration);Dest=$(Destination)" />
 
-        <MSBuild 
-            Condition="$(SkipGateway) != 'true'" 
-            Projects="$(SourceDirectory)/Gateway/Gateway.proj" 
-            Targets="Copy" 
-            Properties="Configuration=$(Configuration);Dest=$(Destination)" />
-        
-        <MSBuild 
-            Condition="$(SkipCore) != 'true'" 
-            Projects="$(SourceDirectory)/Core/Core.proj" 
-            Targets="Publish" 
-            Properties="Package=true;Deploy=false;DeploymentBucket=$(DeploymentBucket);DeploymentBucketPrefix=$(DeploymentBucketPrefix);Configuration=$(Configuration);PackagedFile=$(Destination)/Core.template.yml;Optimize=$(Optimize)" />
+        <MSBuild Condition="$(SkipLayers) != 'true'" Projects="$(SourceDirectory)/Layers/Layers.proj" Targets="Copy" Properties="Configuration=$(Configuration);Dest=$(Destination)" />
+
+        <MSBuild Condition="$(SkipDns) != 'true'" Projects="$(SourceDirectory)/Dns/Dns.proj" Targets="Copy" Properties="Configuration=$(Configuration);Dest=$(Destination)" />
+
+        <MSBuild Condition="$(SkipGateway) != 'true'" Projects="$(SourceDirectory)/Gateway/Gateway.proj" Targets="Copy" Properties="Configuration=$(Configuration);Dest=$(Destination)" />
+
+        <MSBuild Condition="$(SkipCore) != 'true'" Projects="$(SourceDirectory)/Core/Core.proj" Targets="Publish" Properties="Package=true;Deploy=false;DeploymentBucket=$(DeploymentBucket);DeploymentBucketPrefix=$(DeploymentBucketPrefix);Configuration=$(Configuration);PackagedFile=$(Destination)/Core.template.yml;Optimize=$(Optimize)" />
     </Target>
 </Project>

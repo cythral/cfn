@@ -1,0 +1,21 @@
+Description: Commonly used Lambda Layers
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  LambdajectionVersion:
+    Type: String
+    Description: Version of Lambdajection to use.
+
+Resources:
+  Lambdajection:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location:
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:918601311641:applications/lambdajection-layer
+        SemanticVersion: !Ref LambdajectionVersion
+
+Outputs:
+  LambdajectionArn:
+    Description: ARN of the Lambdajection Layer
+    Value: !GetAtt Lambdajection.LayerArn
+    Export:
+      Name: !Sub ${AWS::StackName}:LambdajectionArn

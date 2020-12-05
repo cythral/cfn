@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TemplateName>Layers.template.yml</TemplateName>
+    <ConfigName>Layers.config.json</ConfigName>
+    <Template>$(MSBuildThisFileDirectory)$(TemplateName)</Template>
+    <ConfigFile>$(MSBuildThisFileDirectory)$(ConfigName)</ConfigFile>
+    <StackName Condition="$(StackName) == ''">cfn-layers</StackName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Overrides Include="LambdajectionVersion=$(LambdajectionVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Flags Include="--template-file $(Template)" />
+    <Flags Include="--stack-name $(StackName)" />
+    <Flags Include="--no-fail-on-empty-changeset" />
+
+    <Flags Include="--profile $(Profile)" Condition="$(Profile) != ''" />
+  </ItemGroup>
+
+  <Target Name="Build">
+    <PropertyGroup>
+      <ParameterOverrides>@(Overrides, ' ')</ParameterOverrides>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Flags Include="--parameter-overrides $(ParameterOverrides)" Condition="$(ParameterOverrides) != ''" />
+    </ItemGroup>
+
+    <Exec Command="aws cloudformation deploy @(Flags, ' ')" />
+  </Target>
+
+  <Target Name="Copy" Condition="$(Dest) != ''">
+    <Copy SourceFiles="$(Template);$(ConfigFile)" DestinationFiles="$(Dest)/$(TemplateName);$(Dest)/$(ConfigName)" />
+  </Target>
+</Project>
