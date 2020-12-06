@@ -16,6 +16,6 @@ Resources:
 Outputs:
   LambdajectionArn:
     Description: ARN of the Lambdajection Layer
-    Value: !GetAtt Lambdajection.LayerArn
+    Value: !GetAtt Lambdajection.Outputs.LayerArn
     Export:
       Name: !Sub ${AWS::StackName}:LambdajectionArn
