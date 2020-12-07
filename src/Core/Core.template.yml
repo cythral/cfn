@@ -64,6 +64,10 @@ Parameters:
     AllowedValues:
       - "yes"
       - "no"
+
+  LambdajectionLayerArn:
+    Type: String
+    Description: ARN of the Lambda Layer containing Lambdajection + its dependencies
   
 Conditions:
   SetupDevAccount: !Not
@@ -329,6 +333,7 @@ Resources:
       MemorySize: 512
       Layers:
         - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:net5:3
+        - !Ref LambdajectionLayerArn
       Policies:
         - AWSLambdaExecute
         - !Ref GithubWebhookPolicy
