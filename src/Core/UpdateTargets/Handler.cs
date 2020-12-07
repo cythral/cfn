@@ -40,10 +40,7 @@ namespace Cythral.CloudFormation.UpdateTargets
             this.logger = logger;
         }
 
-        public async Task<Response> Handle(
-            SNSEvent snsRequest,
-            ILambdaContext context = null
-        )
+        public async Task<Response> Handle(SNSEvent snsRequest)
         {
             var request = requestFactory.CreateFromSnsEvent(snsRequest);
             logger.LogInformation($"Received transformed request: {JsonSerializer.Serialize(request)}");

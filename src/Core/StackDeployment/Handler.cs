@@ -61,10 +61,7 @@ namespace Cythral.CloudFormation.StackDeployment
             this.config = config.Value;
         }
 
-        public async Task<Response> Handle(
-            SQSEvent sqsEvent,
-            ILambdaContext context = null
-        )
+        public async Task<Response> Handle(SQSEvent sqsEvent)
         {
             var request = requestFactory.CreateFromSqsEvent(sqsEvent);
             var owner = request.CommitInfo.GithubOwner;

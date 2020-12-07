@@ -57,10 +57,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             this.logger = logger;
         }
 
-        public async Task<Response> Handle(
-            SNSEvent snsRequest,
-            ILambdaContext context = null
-        )
+        public async Task<Response> Handle(SNSEvent snsRequest)
         {
             logger.LogInformation($"Received request: {JsonSerializer.Serialize(snsRequest)}");
 

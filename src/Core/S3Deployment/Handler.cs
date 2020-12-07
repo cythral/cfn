@@ -49,7 +49,7 @@ namespace Cythral.CloudFormation.S3Deployment
             this.logger = logger;
         }
 
-        public async Task<object> Handle(Request request, ILambdaContext context = null)
+        public async Task<object> Handle(Request request)
         {
             await githubStatusNotifier.NotifyPending(
                 bucketName: request.DestinationBucket,

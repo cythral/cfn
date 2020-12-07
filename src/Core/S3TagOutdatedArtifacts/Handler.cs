@@ -42,7 +42,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts
             this.getObject = getObject;
         }
 
-        public async Task<bool> Handle(Request request, ILambdaContext context)
+        public async Task<bool> Handle(Request request)
         {
             manifest = await getObject.GetZipEntryInObject<Manifest>(request.ManifestLocation, request.ManifestFilename);
 

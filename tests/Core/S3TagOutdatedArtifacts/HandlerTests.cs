@@ -51,7 +51,6 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts.Tests
         {
             var getObject = Substitute.For<S3GetObjectFacade>();
             var s3Client = Substitute.For<IAmazonS3>();
-            var context = Substitute.For<ILambdaContext>();
 
             getObject.GetZipEntryInObject<Manifest>(Any<string>(), Any<string>()).Returns(manifest);
             s3Client.ListObjectsV2Async(Any<ListObjectsV2Request>()).Returns(new ListObjectsV2Response
@@ -63,7 +62,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts.Tests
             });
 
             var handler = new Handler(s3Client, getObject);
-            await handler.Handle(request, context);
+            await handler.Handle(request);
 
             await getObject.Received().GetZipEntryInObject<Manifest>(Is(manifestLocation), Is(manifestFilename));
         }
@@ -73,7 +72,6 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts.Tests
         {
             var getObject = Substitute.For<S3GetObjectFacade>();
             var s3Client = Substitute.For<IAmazonS3>();
-            var context = Substitute.For<ILambdaContext>();
 
             getObject.GetZipEntryInObject<Manifest>(Any<string>(), Any<string>()).Returns(manifest);
             s3Client.ListObjectsV2Async(Any<ListObjectsV2Request>()).Returns(new ListObjectsV2Response
@@ -85,7 +83,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts.Tests
             });
 
             var handler = new Handler(s3Client, getObject);
-            await handler.Handle(request, context);
+            await handler.Handle(request);
 
             await s3Client.Received().ListObjectsV2Async(Is<ListObjectsV2Request>(request =>
                 request.BucketName == bucketName &&
@@ -98,7 +96,6 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts.Tests
         {
             var getObject = Substitute.For<S3GetObjectFacade>();
             var s3Client = Substitute.For<IAmazonS3>();
-            var context = Substitute.For<ILambdaContext>();
 
             getObject.GetZipEntryInObject<Manifest>(Any<string>(), Any<string>()).Returns(manifest);
             s3Client.ListObjectsV2Async(Any<ListObjectsV2Request>()).Returns(new ListObjectsV2Response
@@ -110,7 +107,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts.Tests
             });
 
             var handler = new Handler(s3Client, getObject);
-            await handler.Handle(request, context);
+            await handler.Handle(request);
 
             await s3Client.Received().PutObjectTaggingAsync(Is<PutObjectTaggingRequest>(request =>
                 request.BucketName == manifest.BucketName &&
@@ -124,7 +121,6 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts.Tests
         {
             var getObject = Substitute.For<S3GetObjectFacade>();
             var s3Client = Substitute.For<IAmazonS3>();
-            var context = Substitute.For<ILambdaContext>();
 
             getObject.GetZipEntryInObject<Manifest>(Any<string>(), Any<string>()).Returns(manifest);
             s3Client.ListObjectsV2Async(Any<ListObjectsV2Request>()).Returns(new ListObjectsV2Response
@@ -135,7 +131,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts.Tests
                 }
             });
             var handler = new Handler(s3Client, getObject);
-            await handler.Handle(request, context);
+            await handler.Handle(request);
 
             await s3Client.Received().PutObjectTaggingAsync(Is<PutObjectTaggingRequest>(request =>
                 request.BucketName == manifest.BucketName &&
