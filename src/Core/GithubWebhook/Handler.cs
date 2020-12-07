@@ -63,7 +63,7 @@ namespace Cythral.CloudFormation.GithubWebhook
         /// <param name="context">The lambda context</param>
         /// <returns>A load balancer response object</returns>
 
-        public async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, ILambdaContext context = null)
+        public async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request)
         {
             GithubEvent payload = null;
 

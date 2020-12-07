@@ -50,7 +50,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
             this.logger = logger;
         }
 
-        public async Task<Response> Handle(Request request, ILambdaContext context = null)
+        public async Task<Response> Handle(Request request)
         {
             logger.LogDebug($"Received request: {Serialize(request)}");
             await approvalCanceler.CancelPreviousApprovalsForPipeline(request.Pipeline);

@@ -15,6 +15,7 @@
     <PackageReference Include="Lambdajection" Version="$(LambdajectionVersion)" />
     <PackageReference Include="Lambdajection.Encryption" Version="$(LambdajectionVersion)" />
     <PackageReference Include="Lambdajection.Runtime" Version="$(LambdajectionVersion)" />
+    <PackageReference Include="Lambdajection.Layer" Version="$(LambdajectionVersion)" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
   </ItemGroup>
 
