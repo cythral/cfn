@@ -352,6 +352,7 @@ Resources:
           GithubWebhook__ArtifactStore: !Ref GithubWebhookArtifactStore
           AWS_ACCOUNT_ID: !Ref AWS::AccountId
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
+          DOTNET_SHARED_STORE: /opt/
 
   GithubWebhookPolicy:
     Type: AWS::IAM::ManagedPolicy
