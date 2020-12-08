@@ -14,6 +14,11 @@ using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using NSubstitute;
 using NSubstitute.ClearExtensions;
 
+using FluentAssertions;
+
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+
 using NUnit.Framework;
 
 using static System.Text.Json.JsonSerializer;
@@ -22,12 +27,6 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
 {
     public class HandlerTests
     {
-        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = Substitute.For<AmazonClientFactory<IAmazonStepFunctions>>();
-        private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
-        private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
-        private static AmazonClientFactory<IAmazonS3> s3Factory = Substitute.For<AmazonClientFactory<IAmazonS3>>();
-        private static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
-
         private const string bucket = "bucket";
         private const string token = "token";
         private const string pipeline = "pipeline";
@@ -37,30 +36,10 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
             Token = token
         };
 
-        [SetUp]
-        public void SetupStepFunctions()
+        private static IOptions<Config> config = Options.Create(new Config
         {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "stepFunctionsClientFactory", stepFunctionsClientFactory);
-            stepFunctionsClientFactory.ClearSubstitute();
-            stepFunctionsClient.ClearSubstitute();
-
-            stepFunctionsClientFactory.Create().Returns(stepFunctionsClient);
-            stepFunctionsClient.SendTaskSuccessAsync(Arg.Any<SendTaskSuccessRequest>()).Returns(new SendTaskSuccessResponse { });
-        }
-
-        [SetUp]
-        public void SetupS3()
-        {
-            Environment.SetEnvironmentVariable("STATE_STORE", bucket);
-            TestUtils.SetPrivateStaticField(typeof(Handler), "s3Factory", s3Factory);
-            TestUtils.SetPrivateStaticField(typeof(Handler), "s3GetObjectFacade", s3GetObjectFacade);
-            s3GetObjectFacade.ClearSubstitute();
-            s3Client.ClearSubstitute();
-            s3Factory.ClearSubstitute();
-
-            s3Factory.Create().Returns(s3Client);
-            s3GetObjectFacade.GetObject<ApprovalInfo>(Arg.Any<string>(), Arg.Any<string>()).Returns(approvalInfo);
-        }
+            StateStore = bucket,
+        });
 
         [Test]
         public async Task ShouldReturnCorrectStatusCode()
@@ -77,9 +56,16 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
                 }
             };
 
-            var response = await Handler.Handle(request);
+            var stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
+            var s3Client = Substitute.For<IAmazonS3>();
+            var s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(stepFunctionsClient, s3Client, s3GetObjectFacade, config, logger);
 
-            Assert.That(response.StatusCode, Is.EqualTo(200));
+            s3GetObjectFacade.GetObject<ApprovalInfo>(Arg.Any<string>(), Arg.Any<string>()).Returns(approvalInfo);
+
+            var response = await handler.Handle(request);
+            response.StatusCode.Should().Be(200);
         }
 
         [Test]
@@ -97,49 +83,16 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
                 }
             };
 
-            var response = await Handler.Handle(request);
+            var stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
+            var s3Client = Substitute.For<IAmazonS3>();
+            var s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(stepFunctionsClient, s3Client, s3GetObjectFacade, config, logger);
 
-            Assert.That(response.StatusDescription, Is.EqualTo("200 OK"));
-        }
+            s3GetObjectFacade.GetObject<ApprovalInfo>(Arg.Any<string>(), Arg.Any<string>()).Returns(approvalInfo);
 
-        [Test]
-        public async Task ShouldCreateStepFunctionsClient()
-        {
-            var tokenHash = "tokenHash";
-            var action = "approve";
-            var request = new ApplicationLoadBalancerRequest
-            {
-                QueryStringParameters = new Dictionary<string, string>
-                {
-                    ["token"] = tokenHash,
-                    ["action"] = action,
-                    ["pipeline"] = pipeline,
-                }
-            };
-
-            await Handler.Handle(request);
-
-            await stepFunctionsClientFactory.Received().Create();
-        }
-
-        [Test]
-        public async Task ShouldCreateS3Client()
-        {
-            var tokenHash = "tokenHash";
-            var action = "approve";
-            var request = new ApplicationLoadBalancerRequest
-            {
-                QueryStringParameters = new Dictionary<string, string>
-                {
-                    ["token"] = tokenHash,
-                    ["action"] = action,
-                    ["pipeline"] = pipeline,
-                }
-            };
-
-            await Handler.Handle(request);
-
-            await s3Factory.Received().Create();
+            var response = await handler.Handle(request);
+            response.StatusDescription.Should().Be("200 OK");
         }
 
         [Test]
@@ -158,7 +111,15 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
                 }
             };
 
-            await Handler.Handle(request);
+            var stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
+            var s3Client = Substitute.For<IAmazonS3>();
+            var s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(stepFunctionsClient, s3Client, s3GetObjectFacade, config, logger);
+
+            s3GetObjectFacade.GetObject<ApprovalInfo>(Arg.Any<string>(), Arg.Any<string>()).Returns(approvalInfo);
+
+            await handler.Handle(request);
 
             await s3GetObjectFacade.Received().GetObject<ApprovalInfo>(Arg.Is(bucket), Arg.Is($"{pipeline}/approvals/{tokenHash}"));
         }
@@ -179,8 +140,15 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
                 }
             };
 
-            await Handler.Handle(request);
+            var stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
+            var s3Client = Substitute.For<IAmazonS3>();
+            var s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(stepFunctionsClient, s3Client, s3GetObjectFacade, config, logger);
 
+            s3GetObjectFacade.GetObject<ApprovalInfo>(Arg.Any<string>(), Arg.Any<string>()).Returns(approvalInfo);
+
+            await handler.Handle(request);
             await stepFunctionsClient.Received().SendTaskSuccessAsync(Arg.Is<SendTaskSuccessRequest>(req =>
                 req.TaskToken == token &&
                 req.Output == serializedOutput
@@ -203,8 +171,15 @@ namespace Cythral.CloudFormation.Tests.ApprovalWebhook
                 }
             };
 
-            await Handler.Handle(request);
+            var stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
+            var s3Client = Substitute.For<IAmazonS3>();
+            var s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(stepFunctionsClient, s3Client, s3GetObjectFacade, config, logger);
 
+            s3GetObjectFacade.GetObject<ApprovalInfo>(Arg.Any<string>(), Arg.Any<string>()).Returns(approvalInfo);
+
+            await handler.Handle(request);
             await s3Client.Received().DeleteObjectAsync(Arg.Is(bucket), Arg.Is($"{pipeline}/approvals/{tokenHash}"));
         }
     }

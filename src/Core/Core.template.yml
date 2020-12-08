@@ -549,18 +549,18 @@ Resources:
   ApprovalWebhook:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: ApprovalWebhook::Cythral.CloudFormation.ApprovalWebhook.Handler::Handle
+      Handler: ApprovalWebhook::Cythral.CloudFormation.ApprovalWebhook.Handler::Run
       Runtime: dotnetcore3.1
       Timeout: 30
       CodeUri: ../../bin/ApprovalWebhook/Release/netcoreapp3.1/publish/
-      MemorySize: 256
+      MemorySize: 512
       Policies:
         - AWSLambdaExecute
         - !Ref ApprovalWebhookPolicy
       AutoPublishAlias: ApprovalWebhook
       Environment:
         Variables:
-          STATE_STORE: !Ref StateStore
+          Lambda__StateStore: !Ref StateStore
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   ApprovalWebhookPolicy:
