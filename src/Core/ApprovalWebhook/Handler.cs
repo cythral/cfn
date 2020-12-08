@@ -13,48 +13,66 @@ using Amazon.StepFunctions.Model;
 using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
+using Lambdajection.Core;
+using Lambdajection.Attributes;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
 using static System.Net.HttpStatusCode;
 using static System.Text.Json.JsonSerializer;
 
 
 namespace Cythral.CloudFormation.ApprovalWebhook
 {
-    public class Handler
+    [Lambda(typeof(Startup), Serializer = typeof(CamelCaseLambdaJsonSerializer))]
+    public partial class Handler
     {
-        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = new AmazonClientFactory<IAmazonStepFunctions>();
-        private static AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
-        private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
+        private readonly IAmazonStepFunctions stepFunctionsClient;
+        private readonly IAmazonS3 s3Client;
+        private readonly S3GetObjectFacade s3GetObjectFacade;
+        private readonly Config config;
+        private readonly ILogger<Handler> logger;
 
-        [LambdaSerializer(typeof(CamelCaseLambdaJsonSerializer))]
-        public static async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, ILambdaContext context = null)
+        public Handler(
+            IAmazonStepFunctions stepFunctionsClient,
+            IAmazonS3 s3Client,
+            S3GetObjectFacade s3GetObjectFacade,
+            IOptions<Config> config,
+            ILogger<Handler> logger
+        )
         {
-            string body = null;
+            this.stepFunctionsClient = stepFunctionsClient;
+            this.s3Client = s3Client;
+            this.s3GetObjectFacade = s3GetObjectFacade;
+            this.config = config.Value;
+            this.logger = logger;
+        }
 
-            using (var stepFunctionsClient = await stepFunctionsClientFactory.Create())
-            using (var s3Client = await s3Factory.Create())
+        public async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request)
+        {
+            var action = request.QueryStringParameters["action"];
+            var pipeline = request.QueryStringParameters["pipeline"];
+            var tokenHash = request.QueryStringParameters["token"];
+            var key = $"{pipeline}/approvals/{tokenHash}";
+            var bucket = config.StateStore;
+            var approvalInfo = await s3GetObjectFacade.GetObject<ApprovalInfo>(bucket, key);
+
+            var sendTaskResponse = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
             {
-                var action = request.QueryStringParameters["action"];
-                var pipeline = request.QueryStringParameters["pipeline"];
-                var tokenHash = request.QueryStringParameters["token"];
-                var key = $"{pipeline}/approvals/{tokenHash}";
-                var bucket = Environment.GetEnvironmentVariable("STATE_STORE");
-                var approvalInfo = await s3GetObjectFacade.GetObject<ApprovalInfo>(bucket, key);
-
-                var sendTaskResponse = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
+                TaskToken = approvalInfo.Token,
+                Output = Serialize(new
                 {
-                    TaskToken = approvalInfo.Token,
-                    Output = Serialize(new
-                    {
-                        Action = action,
-                    })
-                });
-                Console.WriteLine($"Send task success response: {Serialize(sendTaskResponse)}");
+                    Action = action,
+                })
+            });
 
-                var deleteResponse = await s3Client.DeleteObjectAsync(bucket, key);
-                Console.WriteLine($"Received delete response: {Serialize(deleteResponse)}");
+            logger.LogInformation($"Send task success response: {Serialize(sendTaskResponse)}");
 
-                body = action == "approve" ? "approved" : "rejected";
-            }
+            var deleteResponse = await s3Client.DeleteObjectAsync(bucket, key);
+            logger.LogInformation($"Received delete response: {Serialize(deleteResponse)}");
+
+            var body = action == "approve" ? "approved" : "rejected";
 
             return new ApplicationLoadBalancerResponse
             {

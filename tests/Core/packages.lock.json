@@ -1341,9 +1341,8 @@
           "AWSSDK.S3": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.0.0",
-          "Amazon.Lambda.Core": "1.1.0",
-          "Amazon.Lambda.Serialization.SystemTextJson": "2.0.1",
           "AwsUtils.Common": "1.0.0",
+          "Lambdajection": "0.6.0-beta3",
           "SimpleStorageService": "1.0.0"
         }
       },
