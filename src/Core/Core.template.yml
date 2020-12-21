@@ -661,8 +661,6 @@ Resources:
           Lambda__TopicArn: !Ref ApprovalTopic
           Lambda__BaseUrl: https://brigh.id/webhooks/approval
           Lambda__StateStore: !Ref StateStore
-          Lambda__ClientId: !GetAtt ApprovalNotificationClient.ClientId
-          Lambda__ClientSecret: !GetAtt ApprovalNotificationClient.ClientSecret
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   ApprovalNotificationPolicy:
@@ -689,14 +687,6 @@ Resources:
             Resource:
               - !Sub arn:aws:s3:::${StateStore}
               - !Sub arn:aws:s3:::${StateStore}/*
-
-  ApprovalNotificationClient:
-    Type: Custom::IdentityApplication
-    Properties:
-      ServiceToken: !ImportValue cfn-metadata:ProdShorturlsTopicArn
-      Name: brighid-cicd-approval-notifier
-      Roles:
-        - shorturls-link-admin
 
   DeploymentSupersessionFunction:
     Type: AWS::Serverless::Function
