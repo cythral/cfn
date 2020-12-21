@@ -661,8 +661,8 @@ Resources:
           Lambda__TopicArn: !Ref ApprovalTopic
           Lambda__BaseUrl: https://brigh.id/webhooks/approval
           Lambda__StateStore: !Ref StateStore
-          Lambda__ClientId: !GetAtt ApprovalNotificationClient.ClientId
-          Lambda__ClientSecret: !GetAtt ApprovalNotificationClient.ClientSecret
+          Lambda__ClientId: !GetAtt ApprovalNotificationClient.Id
+          Lambda__ClientSecret: !GetAtt ApprovalNotificationClient.EncryptedSecret
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   ApprovalNotificationPolicy:
