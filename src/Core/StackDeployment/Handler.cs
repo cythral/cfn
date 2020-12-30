@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Amazon.CloudFormation;
@@ -61,7 +62,7 @@ namespace Cythral.CloudFormation.StackDeployment
             this.config = config.Value;
         }
 
-        public async Task<Response> Handle(SQSEvent sqsEvent)
+        public async Task<Response> Handle(SQSEvent sqsEvent, CancellationToken cancellationToken = default)
         {
             var request = requestFactory.CreateFromSqsEvent(sqsEvent);
             var owner = request.CommitInfo.GithubOwner;

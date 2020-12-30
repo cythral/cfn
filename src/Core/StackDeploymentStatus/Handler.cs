@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Amazon.CloudFormation;
@@ -57,7 +58,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             this.logger = logger;
         }
 
-        public async Task<Response> Handle(SNSEvent snsRequest)
+        public async Task<Response> Handle(SNSEvent snsRequest, CancellationToken cancellationToken = default)
         {
             logger.LogInformation($"Received request: {JsonSerializer.Serialize(snsRequest)}");
 

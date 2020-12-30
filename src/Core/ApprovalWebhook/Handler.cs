@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
@@ -13,8 +14,8 @@ using Amazon.StepFunctions.Model;
 using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
-using Lambdajection.Core;
 using Lambdajection.Attributes;
+using Lambdajection.Core;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -49,7 +50,7 @@ namespace Cythral.CloudFormation.ApprovalWebhook
             this.logger = logger;
         }
 
-        public async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request)
+        public async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, CancellationToken cancellationToken = default)
         {
             var action = request.QueryStringParameters["action"];
             var pipeline = request.QueryStringParameters["pipeline"];
