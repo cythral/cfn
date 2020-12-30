@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.Core;
@@ -50,7 +51,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
             this.logger = logger;
         }
 
-        public async Task<Response> Handle(Request request)
+        public async Task<Response> Handle(Request request, CancellationToken cancellationToken = default)
         {
             logger.LogDebug($"Received request: {Serialize(request)}");
             await approvalCanceler.CancelPreviousApprovalsForPipeline(request.Pipeline);

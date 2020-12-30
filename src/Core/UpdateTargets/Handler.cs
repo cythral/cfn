@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Amazon.ElasticLoadBalancingV2;
@@ -40,7 +41,7 @@ namespace Cythral.CloudFormation.UpdateTargets
             this.logger = logger;
         }
 
-        public async Task<Response> Handle(SNSEvent snsRequest)
+        public async Task<Response> Handle(SNSEvent snsRequest, CancellationToken cancellationToken = default)
         {
             var request = requestFactory.CreateFromSnsEvent(snsRequest);
             logger.LogInformation($"Received transformed request: {JsonSerializer.Serialize(request)}");

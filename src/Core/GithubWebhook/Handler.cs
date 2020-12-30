@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Amazon.CloudFormation.Model;
@@ -63,7 +64,7 @@ namespace Cythral.CloudFormation.GithubWebhook
         /// <param name="context">The lambda context</param>
         /// <returns>A load balancer response object</returns>
 
-        public async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request)
+        public async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, CancellationToken cancellationToken = default)
         {
             GithubEvent payload = null;
 

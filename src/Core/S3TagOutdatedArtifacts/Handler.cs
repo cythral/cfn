@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.Core;
@@ -42,7 +43,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts
             this.getObject = getObject;
         }
 
-        public async Task<bool> Handle(Request request)
+        public async Task<bool> Handle(Request request, CancellationToken cancellationToken = default)
         {
             manifest = await getObject.GetZipEntryInObject<Manifest>(request.ManifestLocation, request.ManifestFilename);
 

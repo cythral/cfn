@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.Core;
@@ -49,7 +50,7 @@ namespace Cythral.CloudFormation.S3Deployment
             this.logger = logger;
         }
 
-        public async Task<object> Handle(Request request)
+        public async Task<object> Handle(Request request, CancellationToken cancellationToken = default)
         {
             await githubStatusNotifier.NotifyPending(
                 bucketName: request.DestinationBucket,
