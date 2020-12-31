@@ -1,19 +1,30 @@
+using System.Threading;
 using System.Threading.Tasks;
-using static System.Text.Json.JsonSerializer;
 
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
 
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
+using Lambdajection.Attributes;
+
+using static System.Text.Json.JsonSerializer;
+
 namespace Cythral.CloudFormation.ExtractFileFromZip
 {
-    public class Handler
+    [Lambda(typeof(Startup))]
+    public partial class Handler
     {
-        private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
+        private readonly S3GetObjectFacade s3GetObjectFacade;
 
-        [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
-        public static async Task<object> Handle(Request request, ILambdaContext context = null)
+        public Handler(
+            S3GetObjectFacade s3GetObjectFacade
+        )
+        {
+            this.s3GetObjectFacade = s3GetObjectFacade;
+        }
+
+        public async Task<object> Handle(Request request, CancellationToken cancellationToken = default)
         {
             var stringContent = await s3GetObjectFacade.GetZipEntryInObject(request.ZipLocation, request.Filename);
             return request.Filename.EndsWith(".json") ? Deserialize<object>(stringContent) : stringContent;
