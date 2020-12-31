@@ -4,9 +4,13 @@ using System.Threading.Tasks;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.ExtractFileFromZip;
 
+using FluentAssertions;
+
 using NSubstitute;
 
 using NUnit.Framework;
+
+using static NSubstitute.Arg;
 
 using Handler = Cythral.CloudFormation.ExtractFileFromZip.Handler;
 
@@ -25,14 +29,6 @@ namespace Cythral.CloudFormation.Tests.ExtractFileFromZip
         private const string filename = "filename";
         private const string contents = "contents";
 
-        [SetUp]
-        public void SetupS3GetObjectFacade()
-        {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "s3GetObjectFacade", s3GetObjectFacade);
-            s3GetObjectFacade.ClearReceivedCalls();
-            s3GetObjectFacade.GetZipEntryInObject(Arg.Any<string>(), Arg.Any<string>()).Returns(contents);
-        }
-
         private Request CreateRequest()
         {
             return new Request
@@ -46,9 +42,13 @@ namespace Cythral.CloudFormation.Tests.ExtractFileFromZip
         public async Task HandleReturnsContents()
         {
             var request = CreateRequest();
-            var result = await Handler.Handle(request);
+            var s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
+            var handler = new Handler(s3GetObjectFacade);
 
-            Assert.That(result, Is.EqualTo(contents));
+            s3GetObjectFacade.GetZipEntryInObject(Any<string>(), Any<string>()).Returns(contents);
+            var result = await handler.Handle(request);
+
+            result.Should().Be(contents);
             await s3GetObjectFacade.Received().GetZipEntryInObject(Arg.Is(zipLocation), Arg.Is(filename));
         }
 
@@ -59,11 +59,14 @@ namespace Cythral.CloudFormation.Tests.ExtractFileFromZip
             var request = CreateRequest();
             request.Filename = jsonFilename;
 
-            s3GetObjectFacade.GetZipEntryInObject(null, null).ReturnsForAnyArgs("{\"A\": \"B\"}");
-            var result = await Handler.Handle(request);
+            var s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
+            var handler = new Handler(s3GetObjectFacade);
 
-            Assert.That(((JsonElement)result).GetProperty("A").ToString(), Is.EqualTo("B"));
-            await s3GetObjectFacade.Received().GetZipEntryInObject(Arg.Is(zipLocation), Arg.Is(jsonFilename));
+            s3GetObjectFacade.GetZipEntryInObject(null, null).ReturnsForAnyArgs("{\"A\": \"B\"}");
+            var result = (JsonElement)(await handler.Handle(request));
+
+            result.GetProperty("A").ToString().Should().Be("B");
+            await s3GetObjectFacade.Received().GetZipEntryInObject(Is(zipLocation), Is(jsonFilename));
         }
     }
 }

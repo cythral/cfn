@@ -1375,8 +1375,7 @@
       "extractfilefromzip": {
         "type": "Project",
         "dependencies": {
-          "Amazon.Lambda.Core": "1.1.0",
-          "Amazon.Lambda.Serialization.SystemTextJson": "2.0.1",
+          "Lambdajection": "0.6.0-beta4",
           "SimpleStorageService": "1.0.0"
         }
       },
