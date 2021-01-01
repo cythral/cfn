@@ -5,6 +5,10 @@ Parameters:
     Type: String
     Description: Version of Lambdajection to use.
 
+  DotnetVersion:
+    Type: String
+    Description: Version of .NET to use.
+
 Resources:
   Lambdajection:
     Type: AWS::Serverless::Application
@@ -13,9 +17,22 @@ Resources:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:918601311641:applications/lambdajection-layer
         SemanticVersion: !Ref LambdajectionVersion
 
+  Dotnet:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location:
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:918601311641:applications/dotnet-lambda-layer
+        SemanticVersion: !Ref DotnetVersion
+
 Outputs:
   LambdajectionArn:
     Description: ARN of the Lambdajection Layer
     Value: !GetAtt Lambdajection.Outputs.LayerArn
     Export:
       Name: !Sub ${AWS::StackName}:LambdajectionArn
+
+  DotnetArn:
+    Description: ARN of the .NET Layer
+    Value: !GetAtt Dotnet.Outputs.LayerArn
+    Export:
+      Name: !Sub ${AWS::StackName}:DotnetArn

@@ -69,6 +69,10 @@ Parameters:
     Type: String
     Description: ARN of the Lambda Layer containing Lambdajection + its dependencies
   
+  DotnetLayerArn:
+    Type: String
+    Description: ARN of the Lambda Layer containing .NET
+
 Conditions:
   SetupDevAccount: !Not
     - !Equals
@@ -337,7 +341,7 @@ Resources:
       CodeUri: ../../bin/GithubWebhook/Release/net5.0/linux-x64/publish/
       MemorySize: 512
       Layers:
-        - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:net5:6
+        - !Ref DotnetLayerArn
         - !Ref LambdajectionLayerArn
       Policies:
         - AWSLambdaExecute
@@ -652,7 +656,7 @@ Resources:
       MemorySize: 256
       CodeUri: ../../bin/ApprovalNotification/Release/net5.0/linux-x64/publish/
       Layers:
-        - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:net5:6
+        - !Ref DotnetLayerArn
       Policies:
         - AWSLambdaExecute
         - !Ref ApprovalNotificationPolicy
@@ -770,7 +774,7 @@ Resources:
       MemorySize: 256
       CodeUri: ../../bin/S3Deployment/Release/net5.0/linux-x64/publish/
       Layers:
-        - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:net5:6
+        - !Ref DotnetLayerArn
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Environment:
         Variables:
