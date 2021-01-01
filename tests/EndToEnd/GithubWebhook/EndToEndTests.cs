@@ -259,7 +259,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
                     StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:cfn-test-repo-cicd-pipeline",
                 });
 
-                Assert.True(executionResponse.Executions.Any(execution => execution.Name == commit2.Sha));
+                Assert.True(executionResponse.Executions.Any(execution => execution.Name == $"refs/heads/master@{commit2.Sha}"));
             }
             #endregion
 
@@ -289,7 +289,7 @@ namespace Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook
                     StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:cfn-test-repo-cicd-pipeline",
                 });
 
-                Assert.False(executionResponse.Executions.Any(execution => execution.Name == commit3.Sha));
+                Assert.False(executionResponse.Executions.Any(execution => execution.Name == $"refs/heads/master@{commit3.Sha}"));
             }
             #endregion
         }
