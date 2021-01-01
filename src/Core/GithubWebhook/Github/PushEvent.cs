@@ -9,7 +9,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
     public class PushEvent : GithubEvent
     {
         [JsonPropertyName("ref")]
-        public string Ref { get; set; }
+        public override string Ref { get; set; }
 
         [JsonPropertyName("head")]
         public string Head { get; set; }
