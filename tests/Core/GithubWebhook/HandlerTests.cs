@@ -93,6 +93,34 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
         }
 
         [Test]
+        public async Task Handle_ShouldDeployPipeline_IfOnTag()
+        {
+            var requestValidator = Substitute.For<RequestValidator>();
+            var starter = Substitute.For<PipelineStarter>();
+            var deployer = Substitute.For<PipelineDeployer>();
+            var statusNotifier = Substitute.For<GithubStatusNotifier>();
+            var commitMessageFetcher = Substitute.For<GithubCommitMessageFetcher>();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestValidator, starter, deployer, statusNotifier, commitMessageFetcher, config, logger);
+
+            var message = "Release v0.1.0";
+            commitMessageFetcher.FetchCommitMessage(Any<GithubEvent>()).Returns(message);
+
+            var pushEvent = new PushEvent
+            {
+                Ref = "refs/tags/v0.1.0",
+                Repository = new Repository { Name = repoName, DefaultBranch = "master" },
+                HeadCommit = new Commit { Id = sha }
+            };
+
+            requestValidator.Validate(Any<ApplicationLoadBalancerRequest>()).Returns(pushEvent);
+
+            var response = await handler.Handle(new ApplicationLoadBalancerRequest { });
+            await deployer.Received().Deploy(Is(pushEvent));
+            await commitMessageFetcher.Received().FetchCommitMessage(Is(pushEvent));
+        }
+
+        [Test]
         public async Task Handle_ShouldNotDeployPipeline_IfOnDefaultBranch_AndCommitMessageContainsSkip()
         {
             var requestValidator = Substitute.For<RequestValidator>();

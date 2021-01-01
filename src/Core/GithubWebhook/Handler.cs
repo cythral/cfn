@@ -100,7 +100,7 @@ namespace Cythral.CloudFormation.GithubWebhook
 
         private IEnumerable<Task> GetPushEventTasks(PushEvent pushEvent)
         {
-            if (!pushEvent.OnDefaultBranch)
+            if (!pushEvent.OnDefaultBranch && !pushEvent.Ref.StartsWith("refs/tags/"))
             {
                 yield break;
             }
