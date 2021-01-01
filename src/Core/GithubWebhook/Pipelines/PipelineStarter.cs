@@ -39,13 +39,15 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
                 var prEventInput = payload is PullRequestEvent pullEvent ? Serialize(pullEvent) : null;
                 var input = pushEventInput ?? prEventInput;
 
-                var response = await stepFunctionsClient.StartExecutionAsync(new StartExecutionRequest
-                {
-                    StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:{payload.Repository.Name}-cicd-pipeline",
-                    Name = $"{payload.Ref}@{payload.HeadCommitId}",
-                    Input = input
-                });
+                var stateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:{payload.Repository.Name}-cicd-pipeline";
+                var request = new StartExecutionRequest { StateMachineArn = stateMachineArn, Input = input };
 
+                if (payload.Ref.StartsWith("refs/heads/"))
+                {
+                    request.Name = payload.HeadCommitId;
+                }
+
+                var response = await stepFunctionsClient.StartExecutionAsync(request);
                 logger.LogInformation($"Received start execution response: {Serialize(response)}");
             }
             catch (Exception e)

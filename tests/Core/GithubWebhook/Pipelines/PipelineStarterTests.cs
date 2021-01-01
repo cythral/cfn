@@ -33,7 +33,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
         {
             var repoName = "name";
             var sha = "sha";
-            var @ref = "ref";
+            var @ref = "refs/heads/master";
             var payload = new PushEvent
             {
                 Ref = @ref,
@@ -56,7 +56,40 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
             var StateMachineArn = $"arn:aws:states:us-east-1:5:stateMachine:{repoName}-cicd-pipeline";
             await stepFunctionsClient.Received().StartExecutionAsync(Arg.Is<StartExecutionRequest>(req =>
                 req.StateMachineArn == StateMachineArn &&
-                req.Name == $"{@ref}@{sha}" &&
+                req.Name == sha &&
+                req.Input == serializedPayload
+            ));
+        }
+
+        [Test]
+        public async Task StartExecutionIsCalled_ForTags()
+        {
+            var repoName = "name";
+            var sha = "sha";
+            var @ref = "refs/tags/v0.1.0";
+            var payload = new PushEvent
+            {
+                Ref = @ref,
+                HeadCommit = new Commit
+                {
+                    Id = sha,
+                },
+                Repository = new Repository
+                {
+                    Name = repoName
+                }
+            };
+            var serializedPayload = Serialize(payload);
+            var stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
+            var logger = Substitute.For<ILogger<PipelineStarter>>();
+            var pipelineStarter = new PipelineStarter(stepFunctionsClient, logger);
+
+            await pipelineStarter.StartPipelineIfExists(payload);
+
+            var StateMachineArn = $"arn:aws:states:us-east-1:5:stateMachine:{repoName}-cicd-pipeline";
+            await stepFunctionsClient.Received().StartExecutionAsync(Arg.Is<StartExecutionRequest>(req =>
+                req.StateMachineArn == StateMachineArn &&
+                req.Name == null &&
                 req.Input == serializedPayload
             ));
         }
@@ -93,7 +126,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
             var StateMachineArn = $"arn:aws:states:us-east-1:5:stateMachine:{repoName}-cicd-pipeline";
             await stepFunctionsClient.Received().StartExecutionAsync(Arg.Is<StartExecutionRequest>(req =>
                 req.StateMachineArn == StateMachineArn &&
-                req.Name == $"refs/heads/{@ref}@{sha}" &&
+                req.Name == sha &&
                 req.Input == serializedPayload
             ));
         }
