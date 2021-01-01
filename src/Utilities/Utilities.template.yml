@@ -427,6 +427,23 @@ Resources:
             Principal:
               Service: codebuild.amazonaws.com
 
+  ServerlessPublisherRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ServerlessPublisher
+      ManagedPolicyArns:
+        - !Ref ServerlessRepoPublisherAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              AWS: !If
+                - IsMasterAccount
+                - !GetAtt BuilderRole.Arn
+                - !Sub arn:aws:iam::${MasterAccountId}:role/Builder
+
   BrokerRole:
     Type: AWS::IAM::Role
     Properties:
@@ -455,6 +472,31 @@ Resources:
           - Effect: Allow
             Action: sts:AssumeRole
             Resource: "*"
+
+  ServerlessRepoPublisherAccess:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - serverlessrepo:ListApplications
+              - serverlessrepo:ListApplicationVersions
+              - serverlessrepo:CreateApplication
+              - serverlessrepo:GetApplication
+              - serverlessrepo:CreateCloudFormationTemplate
+              - serverlessrepo:CreateApplicationVersion
+              - serverlessrepo:GetApplicationPolicy
+              - serverlessrepo:SearchApplications
+              - serverlessrepo:GetCloudFormationTemplate
+              - serverlessrepo:UpdateApplication
+              - serverlessrepo:UnshareApplication
+              - serverlessrepo:ListApplicationDependencies
+              - serverlessrepo:CreateCloudFormationChangeSet
+              - serverlessrepo:PutApplicationPolicy
+            Resource: "*"
+
 
   # Security - Encryption
   # -------------------------------------------
@@ -643,6 +685,12 @@ Outputs:
     Value: !GetAtt AdminRole.Arn
     Export:
       Name: !Sub ${AWS::StackName}:AdminRoleArn
+
+  ServerlessPublisherRoleArn:
+    Description: ARN of the serverless publisher role
+    Value: !GetAtt ServerlessPublisherRole.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}:ServerlessPublisherRole
 
   BrokerRoleArn:
     Description: ARN of the broker role
