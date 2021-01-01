@@ -419,6 +419,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser
         - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+        - !Ref AssumeRoleAccess
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
