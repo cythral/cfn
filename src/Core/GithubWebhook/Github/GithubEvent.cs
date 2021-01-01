@@ -16,5 +16,8 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
 
         [JsonPropertyName("head_commit_id")]
         public abstract string HeadCommitId { get; }
+
+        [JsonPropertyName("ref")]
+        public abstract string Ref { get; set; }
     }
 }

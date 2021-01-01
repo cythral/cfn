@@ -33,8 +33,10 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
         {
             var repoName = "name";
             var sha = "sha";
+            var @ref = "ref";
             var payload = new PushEvent
             {
+                Ref = @ref,
                 HeadCommit = new Commit
                 {
                     Id = sha,
@@ -54,7 +56,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
             var StateMachineArn = $"arn:aws:states:us-east-1:5:stateMachine:{repoName}-cicd-pipeline";
             await stepFunctionsClient.Received().StartExecutionAsync(Arg.Is<StartExecutionRequest>(req =>
                 req.StateMachineArn == StateMachineArn &&
-                req.Name == sha &&
+                req.Name == $"{@ref}@{sha}" &&
                 req.Input == serializedPayload
             ));
         }
@@ -64,13 +66,15 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
         {
             var repoName = "name";
             var sha = "sha";
+            var @ref = "ref";
             var payload = new PullRequestEvent
             {
                 PullRequest = new PullRequest
                 {
                     Head = new PullRequestHead
                     {
-                        Sha = sha
+                        Sha = sha,
+                        Ref = @ref,
                     }
                 },
                 Repository = new Repository
@@ -89,7 +93,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines.Tests
             var StateMachineArn = $"arn:aws:states:us-east-1:5:stateMachine:{repoName}-cicd-pipeline";
             await stepFunctionsClient.Received().StartExecutionAsync(Arg.Is<StartExecutionRequest>(req =>
                 req.StateMachineArn == StateMachineArn &&
-                req.Name == sha &&
+                req.Name == $"refs/heads/{@ref}@{sha}" &&
                 req.Input == serializedPayload
             ));
         }

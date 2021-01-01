@@ -42,7 +42,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
                 var response = await stepFunctionsClient.StartExecutionAsync(new StartExecutionRequest
                 {
                     StateMachineArn = $"arn:aws:states:{region}:{accountId}:stateMachine:{payload.Repository.Name}-cicd-pipeline",
-                    Name = payload.HeadCommitId,
+                    Name = $"{payload.Ref}@{payload.HeadCommitId}",
                     Input = input
                 });
 
