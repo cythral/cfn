@@ -181,31 +181,75 @@
       "Next": "Deploy Layers"
     },
     "Deploy Layers": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+      "Type": "Parallel",
       "ResultPath": "$.LayerOutputs",
-      "Parameters": {
-        "QueueUrl": "${DeploymentQueue}",
-        "MessageGroupId": "${GithubRepo}",
-        "MessageBody": {
-          "StackName": "cfn-layers",
-          "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
-          "TemplateFileName": "Layers.template.yml",
-          "TemplateConfigurationFileName": "Layers.config.json",
-          "RoleArn": "${SharedRoleArn}",
-          "Token.$": "$$.Task.Token",
-          "Capabilities": [
-            "CAPABILITY_IAM",
-            "CAPABILITY_AUTO_EXPAND"
-          ],
-          "EnvironmentName": "shared",
-          "CommitInfo": {
-            "GithubOwner": "${GithubOwner}",
-            "GithubRepository": "${GithubRepo}",
-            "GithubRef.$": "$.head_commit.id"
+      "Branches": [
+        {
+          "StartAt": "Shared",
+          "States": {
+            "Shared": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+              "ResultPath": "$.LayerOutputs",
+              "Parameters": {
+                "QueueUrl": "${DeploymentQueue}",
+                "MessageGroupId": "${GithubRepo}",
+                "MessageBody": {
+                  "StackName": "cfn-layers",
+                  "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                  "TemplateFileName": "Layers.template.yml",
+                  "TemplateConfigurationFileName": "Layers.config.json",
+                  "RoleArn": "${SharedRoleArn}",
+                  "Token.$": "$$.Task.Token",
+                  "Capabilities": [
+                    "CAPABILITY_IAM",
+                    "CAPABILITY_AUTO_EXPAND"
+                  ],
+                  "EnvironmentName": "shared",
+                  "CommitInfo": {
+                    "GithubOwner": "${GithubOwner}",
+                    "GithubRepository": "${GithubRepo}",
+                    "GithubRef.$": "$.head_commit.id"
+                  }
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Oss",
+          "States": {
+            "Oss": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+              "Parameters": {
+                "QueueUrl": "${DeploymentQueue}",
+                "MessageGroupId": "${GithubRepo}",
+                "MessageBody": {
+                  "StackName": "cfn-layers",
+                  "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                  "TemplateFileName": "Layers.template.yml",
+                  "TemplateConfigurationFileName": "Layers.config.json",
+                  "RoleArn": "${OssRoleArn}",
+                  "Token.$": "$$.Task.Token",
+                  "Capabilities": [
+                    "CAPABILITY_IAM",
+                    "CAPABILITY_AUTO_EXPAND"
+                  ],
+                  "EnvironmentName": "oss",
+                  "CommitInfo": {
+                    "GithubOwner": "${GithubOwner}",
+                    "GithubRepository": "${GithubRepo}",
+                    "GithubRef.$": "$.head_commit.id"
+                  }
+                }
+              },
+              "End": true
+            }
           }
         }
-      },
+      ],
       "Next": "Deploy DNS"
     },
     "Deploy DNS": {
@@ -279,8 +323,8 @@
             "ProdLoadBalancerDnsName.$": "$.ProdUtilityOutputs.LoadBalancerDnsName",
             "Version.$": "$.head_commit.id",
             "RunEndToEndTests": "no",
-            "LambdajectionLayerArn.$": "$.LayerOutputs.LambdajectionArn",
-            "DotnetLayerArn.$": "$.LayerOutputs.DotnetArn"
+            "LambdajectionLayerArn.$": "$.LayerOutputs[0].LambdajectionArn",
+            "DotnetLayerArn.$": "$.LayerOutputs[0].DotnetArn"
           },
           "Capabilities": ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"],
           "EnvironmentName": "shared",
