@@ -190,7 +190,6 @@
             "Shared": {
               "Type": "Task",
               "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
-              "ResultPath": "$.LayerOutputs",
               "Parameters": {
                 "QueueUrl": "${DeploymentQueue}",
                 "MessageGroupId": "${GithubRepo}",
