@@ -68,7 +68,7 @@ Parameters:
   LambdajectionLayerArn:
     Type: String
     Description: ARN of the Lambda Layer containing Lambdajection + its dependencies
-  
+
   DotnetLayerArn:
     Type: String
     Description: ARN of the Lambda Layer containing .NET
@@ -127,7 +127,7 @@ Resources:
       DestinationCidrBlock: 10.2.0.0/16
       RouteTableId: !ImportValue cfn-utilities:RouteTableId
       VpcPeeringConnectionId: !Ref DevPeeringConnection
-  
+
   InternalDevListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Condition: SetupDevAccount
@@ -705,7 +705,7 @@ Resources:
   DeploymentSupersessionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: DeploymentSupersession::Cythral.CloudFormation.DeploymentSupersession.Handler::Handle
+      Handler: DeploymentSupersession::Cythral.CloudFormation.DeploymentSupersession.Handler::Run
       Runtime: dotnetcore3.1
       Timeout: 30
       MemorySize: 256
@@ -715,7 +715,7 @@ Resources:
         - !Ref DeploymentSupersessionPolicy
       Environment:
         Variables:
-          STATE_STORE: !Ref StateStore
+          Lambda__StateStore: !Ref StateStore
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   DeploymentSupersessionPolicy:

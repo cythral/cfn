@@ -7,9 +7,14 @@ using Amazon.S3.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
+using AutoFixture.AutoNSubstitute;
+using AutoFixture.NUnit3;
+
 using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 using Cythral.CloudFormation.DeploymentSupersession;
+
+using Microsoft.Extensions.Options;
 
 using NSubstitute;
 using NSubstitute.ClearExtensions;
@@ -17,130 +22,104 @@ using NSubstitute.ClearExtensions;
 using NUnit.Framework;
 
 using static System.Text.Json.JsonSerializer;
+using static NSubstitute.Arg;
 
 namespace Cythral.CloudFormation.Tests.DeploymentSupersession
 {
     public class HandlerTests
     {
-        private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
-        private static RequestFactory requestFactory = Substitute.For<RequestFactory>();
-        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = Substitute.For<AmazonClientFactory<IAmazonStepFunctions>>();
-        private static IAmazonStepFunctions stepFunctionsClient = Substitute.For<IAmazonStepFunctions>();
-        private static AmazonClientFactory<IAmazonS3> s3Factory = Substitute.For<AmazonClientFactory<IAmazonS3>>();
-        private static IAmazonS3 s3Client = Substitute.For<IAmazonS3>();
 
-        private static string pipeline = "pipeline";
-        private static string bucket = "bucket";
-        private static string token = "token";
-        private static DateTime commitTimestamp = DateTime.Now - TimeSpan.FromHours(1);
-
-        [SetUp]
-        public void SetupRequestFactory()
+        [Test, Auto]
+        public async Task ShouldCreateRequestFromSqsEvent(
+            Request request,
+            [Substitute] SQSEvent sqsEvent,
+            [Frozen, Options] IOptions<Config> options,
+            [Frozen, Substitute] RequestFactory requestFactory,
+            [Target] Handler handler
+        )
         {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "requestFactory", requestFactory);
-            requestFactory.ClearSubstitute();
+            requestFactory.CreateFromSqsEvent(Any<SQSEvent>()).Returns(request);
+
+            await handler.Handle(sqsEvent);
+
+            requestFactory.Received().CreateFromSqsEvent(Is(sqsEvent));
         }
 
-        [SetUp]
-        public void SetupS3()
+        [Test, Auto]
+        public async Task ShouldRetrieveStateFile(
+            string bucket,
+            string pipeline,
+            Request request,
+            [Substitute] SQSEvent sqsEvent,
+            [Frozen, Options] IOptions<Config> options,
+            [Frozen, Substitute] RequestFactory requestFactory,
+            [Frozen, Substitute] S3GetObjectFacade s3GetObjectFacade,
+            [Target] Handler handler
+        )
         {
-            Environment.SetEnvironmentVariable("STATE_STORE", bucket);
-            TestUtils.SetPrivateStaticField(typeof(Handler), "s3GetObjectFacade", s3GetObjectFacade);
-            TestUtils.SetPrivateStaticField(typeof(Handler), "s3Factory", s3Factory);
-
-            s3Factory.Create().Returns(s3Client);
-        }
-
-        [SetUp]
-        public void SetupStepFunctions()
-        {
-            TestUtils.SetPrivateStaticField(typeof(Handler), "stepFunctionsClientFactory", stepFunctionsClientFactory);
-            stepFunctionsClientFactory.ClearSubstitute();
-            stepFunctionsClientFactory.Create().Returns(stepFunctionsClient);
-        }
-
-        private Request CreateRequest()
-        {
-            var request = new Request
-            {
-                Pipeline = pipeline,
-                Token = token,
-                CommitTimestamp = commitTimestamp
-            };
-
+            options.Value.StateStore = bucket;
+            request.Pipeline = pipeline;
             requestFactory.CreateFromSqsEvent(Arg.Any<SQSEvent>()).Returns(request);
-            return request;
+
+            await handler.Handle(sqsEvent);
+
+            await s3GetObjectFacade.Received().TryGetObject<StateInfo>(Is(bucket), Is($"{pipeline}/state.json"));
         }
 
-        [Test]
-        public async Task ShouldCreateRequestFromSqsEvent()
+        [Test, Auto]
+        public async Task ShouldSendTaskSuccessWithSupersededTrueIfNewerCommitExists(
+            string token,
+            Request request,
+            [Substitute] SQSEvent sqsEvent,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctionsClient,
+            [Frozen, Options] IOptions<Config> options,
+            [Frozen, Substitute] RequestFactory requestFactory,
+            [Frozen, Substitute] S3GetObjectFacade s3GetObjectFacade,
+            [Target] Handler handler
+        )
         {
-            var request = CreateRequest();
-            var sqsEvent = Substitute.For<SQSEvent>();
-
-            await Handler.Handle(sqsEvent);
-
-            requestFactory.Received().CreateFromSqsEvent(Arg.Is(sqsEvent));
-        }
-
-        [Test]
-        public async Task ShouldRetrieveStateFile()
-        {
-            var request = CreateRequest();
-            var sqsEvent = Substitute.For<SQSEvent>();
-
-            await Handler.Handle(sqsEvent);
-
-            await s3GetObjectFacade.Received().TryGetObject<StateInfo>(Arg.Is(bucket), Arg.Is($"{pipeline}/state.json"));
-        }
-
-        [Test]
-        public async Task ShouldCreateStepFunctionsClient()
-        {
-            var request = CreateRequest();
-            var sqsEvent = Substitute.For<SQSEvent>();
-
-            await Handler.Handle(sqsEvent);
-
-            await stepFunctionsClientFactory.Received().Create();
-        }
-
-        [Test]
-        public async Task ShouldSendTaskSuccessWithSupersededTrueIfNewerCommitExists()
-        {
-            var request = CreateRequest();
-            var sqsEvent = Substitute.For<SQSEvent>();
-
-            s3GetObjectFacade.TryGetObject<StateInfo>(Arg.Any<string>(), Arg.Any<string>()).Returns(new StateInfo
+            request.Token = token;
+            request.CommitTimestamp = DateTime.Now - TimeSpan.FromHours(1);
+            requestFactory.CreateFromSqsEvent(Any<SQSEvent>()).Returns(request);
+            s3GetObjectFacade.TryGetObject<StateInfo>(null, null).ReturnsForAnyArgs(new StateInfo
             {
                 LastCommitTimestamp = DateTime.Now
             });
 
-            await Handler.Handle(sqsEvent);
+            await handler.Handle(sqsEvent);
 
             var expectedOutput = Serialize(new
             {
                 Superseded = true
             });
 
-            await stepFunctionsClient.Received().SendTaskSuccessAsync(Arg.Is<SendTaskSuccessRequest>(req =>
+            await stepFunctionsClient.Received().SendTaskSuccessAsync(Is<SendTaskSuccessRequest>(req =>
                 req.TaskToken == token &&
                 req.Output == expectedOutput
             ));
         }
 
-        [Test]
-        public async Task ShouldSendTaskSuccessWithSupersededFalseIfNewerCommitDoesntExist()
+        [Test, Auto]
+        public async Task ShouldSendTaskSuccessWithSupersededFalseIfNewerCommitDoesntExist(
+            string token,
+            Request request,
+            [Substitute] SQSEvent sqsEvent,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctionsClient,
+            [Frozen, Options] IOptions<Config> options,
+            [Frozen, Substitute] RequestFactory requestFactory,
+            [Frozen, Substitute] S3GetObjectFacade s3GetObjectFacade,
+            [Target] Handler handler
+        )
         {
-            var request = CreateRequest();
-            var sqsEvent = Substitute.For<SQSEvent>();
-
+            request.Token = token;
+            request.CommitTimestamp = DateTime.Now - TimeSpan.FromHours(1);
+            requestFactory.CreateFromSqsEvent(Any<SQSEvent>()).Returns(request);
             s3GetObjectFacade.TryGetObject<StateInfo>(Arg.Any<string>(), Arg.Any<string>()).Returns(new StateInfo
             {
                 LastCommitTimestamp = DateTime.Now - TimeSpan.FromHours(2)
             });
 
-            await Handler.Handle(sqsEvent);
+            await handler.Handle(sqsEvent);
 
             var expectedOutput = Serialize(new
             {
@@ -153,18 +132,32 @@ namespace Cythral.CloudFormation.Tests.DeploymentSupersession
             ));
         }
 
-        [Test]
-        public async Task ShouldPutUpdatedStateInfoIfNewerCommitDoesntExist()
+        [Test, Auto]
+        public async Task ShouldPutUpdatedStateInfoIfNewerCommitDoesntExist(
+            string bucket,
+            string pipeline,
+            string token,
+            Request request,
+            [Substitute] SQSEvent sqsEvent,
+            [Frozen, Substitute] IAmazonS3 s3Client,
+            [Frozen, Options] IOptions<Config> options,
+            [Frozen, Substitute] RequestFactory requestFactory,
+            [Frozen, Substitute] S3GetObjectFacade s3GetObjectFacade,
+            [Target] Handler handler
+        )
         {
-            var request = CreateRequest();
-            var sqsEvent = Substitute.For<SQSEvent>();
+            options.Value.StateStore = bucket;
+            request.Pipeline = pipeline;
+            request.Token = token;
+            request.CommitTimestamp = DateTime.Now - TimeSpan.FromHours(1);
 
+            requestFactory.CreateFromSqsEvent(Any<SQSEvent>()).Returns(request);
             s3GetObjectFacade.TryGetObject<StateInfo>(Arg.Any<string>(), Arg.Any<string>()).Returns(new StateInfo
             {
                 LastCommitTimestamp = DateTime.Now - TimeSpan.FromHours(2)
             });
 
-            await Handler.Handle(sqsEvent);
+            await handler.Handle(sqsEvent);
 
             var expectedBody = Serialize(new StateInfo
             {

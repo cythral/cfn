@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.Core;
@@ -12,45 +13,69 @@ using Amazon.StepFunctions.Model;
 using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+using Lambdajection.Attributes;
+using Lambdajection.Core;
+
 using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.DeploymentSupersession
 {
-    public class Handler
+    [Lambda(typeof(Startup))]
+    public partial class Handler
     {
-        private static RequestFactory requestFactory = new RequestFactory();
-        private static S3GetObjectFacade s3GetObjectFacade = new S3GetObjectFacade();
-        private static AmazonClientFactory<IAmazonStepFunctions> stepFunctionsClientFactory = new AmazonClientFactory<IAmazonStepFunctions>();
-        private static AmazonClientFactory<IAmazonS3> s3Factory = new AmazonClientFactory<IAmazonS3>();
+        private readonly RequestFactory requestFactory;
+        private readonly S3GetObjectFacade s3GetObjectFacade;
+        private readonly IAmazonStepFunctions stepFunctionsClient;
+        private readonly IAmazonS3 s3Client;
+        private readonly Config config;
+        private readonly ILogger<Handler> logger;
 
-        [LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
-        public static async Task<Response> Handle(SQSEvent sqsEvent, ILambdaContext context = null)
+        public Handler(
+            RequestFactory requestFactory,
+            S3GetObjectFacade s3GetObjectFacade,
+            IAmazonStepFunctions stepFunctionsClient,
+            IAmazonS3 s3Client,
+            IOptions<Config> options,
+            ILogger<Handler> logger
+        )
+        {
+            this.requestFactory = requestFactory;
+            this.s3GetObjectFacade = s3GetObjectFacade;
+            this.stepFunctionsClient = stepFunctionsClient;
+            this.s3Client = s3Client;
+            this.config = options.Value;
+            this.logger = logger;
+        }
+
+        public async Task<Response> Handle(SQSEvent sqsEvent, CancellationToken cancellationToken = default)
         {
             var request = requestFactory.CreateFromSqsEvent(sqsEvent);
-            var stepFunctionsClient = await stepFunctionsClientFactory.Create();
-            var bucket = Environment.GetEnvironmentVariable("STATE_STORE");
+            var bucket = config.StateStore;
             var getObjResponse = await s3GetObjectFacade.TryGetObject<StateInfo>(bucket, $"{request.Pipeline}/state.json");
-            var s3Client = await s3Factory.Create();
             var stateInfo = getObjResponse ?? new StateInfo
             {
                 LastCommitTimestamp = DateTime.MinValue
             };
 
             var superseded = request.CommitTimestamp < stateInfo.LastCommitTimestamp;
-            var sendTaskResponse = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
+            var sendTaskRequest = new SendTaskSuccessRequest
             {
                 TaskToken = request.Token,
                 Output = Serialize(new
                 {
                     Superseded = superseded
                 })
-            });
+            };
 
-            Console.WriteLine($"Got send task response: {Serialize(sendTaskResponse)}");
+            var sendTaskResponse = await stepFunctionsClient.SendTaskSuccessAsync(sendTaskRequest, cancellationToken);
+            logger.LogInformation($"Got send task response: {Serialize(sendTaskResponse)}");
 
             if (!superseded)
             {
-                var putObjectResponse = await s3Client.PutObjectAsync(new PutObjectRequest
+                var putObjectRequest = new PutObjectRequest
                 {
                     BucketName = bucket,
                     Key = $"{request.Pipeline}/state.json",
@@ -58,9 +83,10 @@ namespace Cythral.CloudFormation.DeploymentSupersession
                     {
                         LastCommitTimestamp = request.CommitTimestamp
                     })
-                });
+                };
 
-                Console.WriteLine($"Got put object response: {Serialize(putObjectResponse)}");
+                var putObjectResponse = await s3Client.PutObjectAsync(putObjectRequest, cancellationToken);
+                logger.LogInformation($"Got put object response: {Serialize(putObjectResponse)}");
             }
 
             return new Response
