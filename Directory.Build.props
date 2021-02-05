@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <LambdajectionVersion>0.6.0</LambdajectionVersion>
+        <LambdajectionVersion>0.7.0-beta1</LambdajectionVersion>
     </PropertyGroup>
 
     <PropertyGroup>

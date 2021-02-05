@@ -1,6 +1,6 @@
 {
     "Parameters": {
-        "LambdajectionVersion": "0.6.0",
+        "LambdajectionVersion": "0.7.0-beta1",
         "DotnetVersion": "5.0.102"
     }
 }
