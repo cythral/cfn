@@ -5,7 +5,7 @@
 
     <PropertyGroup>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-        <RestoreLockedMode>true</RestoreLockedMode>
+        <RestoreLockedMode Condition="$(NUKEEPER) != 'true'">true</RestoreLockedMode>
         <OutputPath>$(MSBuildThisFileDirectory)bin/$(MSBuildProjectName)/$(Configuration)</OutputPath>
         <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj/$(MSBuildProjectName)</BaseIntermediateOutputPath>
         <PackageOutputPath>$(MSBuildThisFileDirectory)bin/Packages/$(Configuration)</PackageOutputPath>
