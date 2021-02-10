@@ -79,9 +79,9 @@
       },
       "RichardSzalay.MockHttp": {
         "type": "Direct",
-        "requested": "[5.0.0, )",
-        "resolved": "5.0.0",
-        "contentHash": "RSM2A54eBAOL7xt2fAPddGkiizgTl+6SBmnISvK+iNIj90PSuD/tZ3bRyIzzLrTP3zVStoO/d9U2aIqUC7uBRQ=="
+        "requested": "[6.0.0, )",
+        "resolved": "6.0.0",
+        "contentHash": "bStGNqIX/MGYtML7K3EzdsE/k5HGVAcg7XgN23TQXGXqxNC9fvYFR94fA0sGM5hAT36R+BBGet6ZDQxXL/IPxg=="
       },
       "Amazon.Lambda.ApplicationLoadBalancerEvents": {
         "type": "Transitive",
