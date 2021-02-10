@@ -4,9 +4,9 @@
     ".NETCoreApp,Version=v3.1": {
       "Amazon.Lambda.SQSEvents": {
         "type": "Direct",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "AD6rELASxItdSSR1Vj7X7pEE8OeGIADJkYer9dvHtXP+2NhpgFheBKj9mNt7fOEBuZLHo058TY416E9fnHRd6Q=="
+        "requested": "[1.2.0, )",
+        "resolved": "1.2.0",
+        "contentHash": "24C5UjjGyuyOHfocw5d31YjsS+uS6I2Mrw2fuLCJx4stu2DgUFdEPTbL9FimAwPAcRdBpndKee6dYEinQMIiCw=="
       },
       "AWSSDK.S3": {
         "type": "Direct",
@@ -52,8 +52,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "bC5slbW3f1QgYlJK/I/zDUlixHq8YzktTwreJHwoOCpnRFB/IHV4EIgdEGwQnWOneJwRfwq4ZB0OhlrM3aT2pw=="
+        "resolved": "3.5.2.9",
+        "contentHash": "J0AZ/fDJpT+WArFaJ/E3wLmyideSVowZSrlp7ljpc4sRWSbxjzd/dDlC1NX16PwYWL9VXESYXymsitdJuyXbZg=="
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
@@ -221,7 +221,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.0",
+          "AWSSDK.Core": "3.5.2.9",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },

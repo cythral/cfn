@@ -24,9 +24,9 @@
       },
       "FluentAssertions": {
         "type": "Direct",
-        "requested": "[5.9.0, )",
-        "resolved": "5.9.0",
-        "contentHash": "JZxb5DuspmuH4A5p9bfj060evQnwIUkxxfFMG9F/pa7gl1Ry2r2nuQbu5G4UWGQQTtpTxPpVowqNDdBkA0G2Mw==",
+        "requested": "[5.10.3, )",
+        "resolved": "5.10.3",
+        "contentHash": "gVPEVp1hLVqcv+7Q2wiDf7kqCNn7+bQcQ0jbJ2mcRT6CeRoZl1tNkqvzSIhvekyldDptk77j1b03MXTTRIqqpg==",
         "dependencies": {
           "System.Configuration.ConfigurationManager": "4.4.0"
         }
@@ -43,9 +43,9 @@
       },
       "NSubstitute": {
         "type": "Direct",
-        "requested": "[4.2.1, )",
-        "resolved": "4.2.1",
-        "contentHash": "CqQuOU06ftAKrTV7Op/s0hdSII4RP6SNjP/XT1+2oEC6EqwYLXOfek/p+SEuHgaH8WNwEHWIYjsrUV9oSOIOXw==",
+        "requested": "[4.2.2, )",
+        "resolved": "4.2.2",
+        "contentHash": "s+H1fUo+WSymYxNdZlwhekdNDLv4w0ZvmwYheMEe4tWACcMDNoqfcDpeL66RyWfurNvvIYQJNP3VUwX2aAC1gw==",
         "dependencies": {
           "Castle.Core": "4.4.0",
           "System.Threading.Tasks.Extensions": "4.3.0"
@@ -79,9 +79,9 @@
       },
       "RichardSzalay.MockHttp": {
         "type": "Direct",
-        "requested": "[5.0.0, )",
-        "resolved": "5.0.0",
-        "contentHash": "RSM2A54eBAOL7xt2fAPddGkiizgTl+6SBmnISvK+iNIj90PSuD/tZ3bRyIzzLrTP3zVStoO/d9U2aIqUC7uBRQ=="
+        "requested": "[6.0.0, )",
+        "resolved": "6.0.0",
+        "contentHash": "bStGNqIX/MGYtML7K3EzdsE/k5HGVAcg7XgN23TQXGXqxNC9fvYFR94fA0sGM5hAT36R+BBGet6ZDQxXL/IPxg=="
       },
       "Amazon.Lambda.ApplicationLoadBalancerEvents": {
         "type": "Transitive",
@@ -113,13 +113,13 @@
       },
       "Amazon.Lambda.SNSEvents": {
         "type": "Transitive",
-        "resolved": "1.1.0",
-        "contentHash": "2bDTVmU8fzjjols+9keJtzQJHq5XAAfI28chvrLtBaOwEMzMfNV606ciEERndg5+cmhrO2DQVJmSK5yJ4PAT4w=="
+        "resolved": "1.2.0",
+        "contentHash": "RL/0zJ+/t1vXzmaorU9GclCTEY0qbn+4sN2wG79tscSvV1Uc4GYtZKz8J4Ofow/EXFHrqufJeGbKRf5qpRhZEg=="
       },
       "Amazon.Lambda.SQSEvents": {
         "type": "Transitive",
-        "resolved": "1.1.0",
-        "contentHash": "AD6rELASxItdSSR1Vj7X7pEE8OeGIADJkYer9dvHtXP+2NhpgFheBKj9mNt7fOEBuZLHo058TY416E9fnHRd6Q=="
+        "resolved": "1.2.0",
+        "contentHash": "24C5UjjGyuyOHfocw5d31YjsS+uS6I2Mrw2fuLCJx4stu2DgUFdEPTbL9FimAwPAcRdBpndKee6dYEinQMIiCw=="
       },
       "AutoFixture": {
         "type": "Transitive",
@@ -140,8 +140,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.1.57",
-        "contentHash": "ejhDvIToxqfxaNAVGiSJUtXemmoDzNZ9mVa8e9ogtqhyWrGXVY+dAOmAYwPYqxDzsdQXsuPgVwA3Y8DmhkXufA=="
+        "resolved": "3.5.2.9",
+        "contentHash": "J0AZ/fDJpT+WArFaJ/E3wLmyideSVowZSrlp7ljpc4sRWSbxjzd/dDlC1NX16PwYWL9VXESYXymsitdJuyXbZg=="
       },
       "AWSSDK.ElasticLoadBalancingV2": {
         "type": "Transitive",
@@ -161,10 +161,10 @@
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "3.5.4",
-        "contentHash": "IHaHZE5T/JQsM4+l+eHBdqPRuCfq36QpkqFn+ftLAmt1oKmdKQVOcEiE3rkMhVJiB3poqLCVncaul+YtfO94Kw==",
+        "resolved": "3.5.8.4",
+        "contentHash": "e8cjh8i5M1/ch939MvLg/7OMh73Jb/WIWblvCFoM1ymOZ7LUWc1Ojtod8YCUpuRlmyJAmHxd8Z9X2FNHIyNcdQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.1.34, 3.6.0)"
+          "AWSSDK.Core": "[3.5.2.9, 3.6.0)"
         }
       },
       "AWSSDK.SecurityToken": {
@@ -1381,7 +1381,7 @@
       "approvalnotification": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.5.4",
+          "AWSSDK.S3": "3.5.8.4",
           "AWSSDK.SimpleNotificationService": "3.5.1.6",
           "AWSSDK.StepFunctions": "3.5.2.23",
           "Brighid.Identity.Client": "0.1.24",
@@ -1405,7 +1405,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.0",
+          "AWSSDK.Core": "3.5.2.9",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },
@@ -1422,7 +1422,7 @@
         "dependencies": {
           "AWSSDK.S3": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
-          "Amazon.Lambda.SQSEvents": "1.1.0",
+          "Amazon.Lambda.SQSEvents": "1.2.0",
           "Lambdajection": "0.7.0-beta1",
           "SimpleStorageService": "1.0.0"
         }
@@ -1445,7 +1445,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.CloudFormation": "3.5.0.36",
-          "AWSSDK.S3": "3.5.4",
+          "AWSSDK.S3": "3.5.8.4",
           "AWSSDK.SecurityToken": "3.5.1.16",
           "AWSSDK.StepFunctions": "3.5.2.23",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
@@ -1500,7 +1500,7 @@
           "AWSSDK.S3": "3.5.0",
           "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
-          "Amazon.Lambda.SQSEvents": "1.1.0",
+          "Amazon.Lambda.SQSEvents": "1.2.0",
           "Lambdajection": "0.7.0-beta1",
           "Lambdajection.Encryption": "0.7.0-beta1",
           "System.Net.Http.Json": "3.2.1"
@@ -1514,7 +1514,7 @@
           "AWSSDK.SQS": "3.5.0",
           "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
-          "Amazon.Lambda.SNSEvents": "1.1.0",
+          "Amazon.Lambda.SNSEvents": "1.2.0",
           "Lambdajection": "0.7.0-beta1",
           "Lambdajection.Encryption": "0.7.0-beta1",
           "System.Net.Http.Json": "3.2.1"
@@ -1524,7 +1524,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.ElasticLoadBalancingV2": "3.5.0",
-          "Amazon.Lambda.SNSEvents": "1.1.0",
+          "Amazon.Lambda.SNSEvents": "1.2.0",
           "Lambdajection": "0.7.0-beta1"
         }
       }

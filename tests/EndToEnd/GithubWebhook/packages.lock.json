@@ -22,14 +22,14 @@
       },
       "Cythral.CloudFormation.CustomResource": {
         "type": "Direct",
-        "requested": "[0.2.24-alpha, )",
-        "resolved": "0.2.24-alpha",
-        "contentHash": "P0W53+uMy6BmnzanAOP5XRYhJPWxE56IK/o9MZyynThO2NetdjZpFicmY/zW/O3ZM340bRnaMxdFvNvLzhjxoA==",
+        "requested": "[0.2.27-alpha, )",
+        "resolved": "0.2.27-alpha",
+        "contentHash": "G4ZdPsqep/5LljvMLw38dit3TvnSfYI52V+EVYSRZoEFRu87wWDcr7Mdw/8tGcNL40/sEuro9N1iscqCvmklpQ==",
         "dependencies": {
-          "Cythral.CloudFormation.CustomResource.Attributes": "0.2.24-alpha",
-          "Cythral.CloudFormation.CustomResource.Core": "0.2.24-alpha",
-          "Cythral.CloudFormation.CustomResource.Generator": "0.2.24-alpha",
-          "Cythral.CodeGeneration.Roslyn.Tool": "0.8.12-alpha-g888d1d7801"
+          "Cythral.CloudFormation.CustomResource.Attributes": "0.2.27-alpha",
+          "Cythral.CloudFormation.CustomResource.Core": "0.2.27-alpha",
+          "Cythral.CloudFormation.CustomResource.Generator": "0.2.27-alpha",
+          "Cythral.CodeGeneration.Roslyn.Tool": "0.8.17-alpha-g40a87e6792"
         }
       },
       "NUnitLite": {
@@ -55,8 +55,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "bC5slbW3f1QgYlJK/I/zDUlixHq8YzktTwreJHwoOCpnRFB/IHV4EIgdEGwQnWOneJwRfwq4ZB0OhlrM3aT2pw=="
+        "resolved": "3.5.2.9",
+        "contentHash": "J0AZ/fDJpT+WArFaJ/E3wLmyideSVowZSrlp7ljpc4sRWSbxjzd/dDlC1NX16PwYWL9VXESYXymsitdJuyXbZg=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
@@ -76,40 +76,40 @@
       },
       "Cythral.CloudFormation.CustomResource.Attributes": {
         "type": "Transitive",
-        "resolved": "0.2.24-alpha",
-        "contentHash": "b7ZtrrHw0qxBSD1qm/KgMedykwiaGPO/RKT54hLbsXpDULxy7G0NXQN/05Kl3I+URmuXTK2XVsUbQYfoUgI+zg==",
+        "resolved": "0.2.27-alpha",
+        "contentHash": "4zsvzDc0LsDol9S6zDzj6cFf4d1Vy9UIcgc/rodG+kP9F5g44h5Q5qG5x2tnzWp6lrCOwG9P4+L4AETH5qyWhQ==",
         "dependencies": {
-          "Cythral.CodeGeneration.Roslyn.Attributes": "0.8.12-alpha-g888d1d7801"
+          "Cythral.CodeGeneration.Roslyn.Attributes": "0.8.17-alpha-g40a87e6792"
         }
       },
       "Cythral.CloudFormation.CustomResource.Core": {
         "type": "Transitive",
-        "resolved": "0.2.24-alpha",
-        "contentHash": "cwhOvbrYr/O/WsFTEnA6CI6FvEN+dNEm3dD76391mbA+a/MIbG09BS3HXSJ3HXEi2dcnK3cKD3DbZ43QH8By0A==",
+        "resolved": "0.2.27-alpha",
+        "contentHash": "TZ0HzPxqS77XTbDJ69W8atC6jQzw6EHWZEbfiuM4zGqYA6abzdtg29//usGqIujgWLTH3BZjhEXrST8ooGMbbA==",
         "dependencies": {
           "AWSSDK.Core": "3.3.106.4",
           "Amazon.Lambda.Core": "1.1.0",
-          "Cythral.CloudFormation.CustomResource.Attributes": "0.2.24-alpha",
+          "Cythral.CloudFormation.CustomResource.Attributes": "0.2.27-alpha",
           "System.Text.Json": "4.7.1"
         }
       },
       "Cythral.CloudFormation.CustomResource.Generator": {
         "type": "Transitive",
-        "resolved": "0.2.24-alpha",
-        "contentHash": "QRxgRV3ydO0INHs+ZxwFnQkrPQ0H4lyYktZy0i3VhN6nFNlBg0HnBQ09XHRf69bZmjdAYEqPZk2ortCo3os7mA=="
+        "resolved": "0.2.27-alpha",
+        "contentHash": "3YMX9IzuxU8QiSgo8vivV4UXsF3ftXMl+lgPB7jNlyVS+XFhohur2iReoL1+7BilzFcldIes7yBkXQW5hKFF+A=="
       },
       "Cythral.CodeGeneration.Roslyn.Attributes": {
         "type": "Transitive",
-        "resolved": "0.8.12-alpha-g888d1d7801",
-        "contentHash": "wFdxzyHv3cSRn3nhx3qROlEQ2hMHn1bzJ2E5bWbXLbkznBHI8bZ6qMmKj2gXLDN1rCVo535P4IY33cCD5QWk5w==",
+        "resolved": "0.8.17-alpha-g40a87e6792",
+        "contentHash": "Vo2ZYNAYWSfGMpcaJCiSaRf+Lf1BJsde9lMCLjePJDMRUuA+ObjizzxZKCCAk8OwGnnNxEuXC68HtISKr0VGww==",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
       },
       "Cythral.CodeGeneration.Roslyn.Tool": {
         "type": "Transitive",
-        "resolved": "0.8.12-alpha-g888d1d7801",
-        "contentHash": "laQs6DOKs5aacX6UhjKuadQlK3D3V39OaaJPbOEoLOZPPlWkZ1Zh+x+8VEIdycMNAsA9FkxtOWVW887L5MJldA=="
+        "resolved": "0.8.17-alpha-g40a87e6792",
+        "contentHash": "gD8ZXGSGvGZike8FB4TB6ELhi20i8zzbMwQTCO+ejAbY7yH4E+0xLACXcQClJysQFvVo2AHUHqgsqkNH/6TvCQ=="
       },
       "Microsoft.NETCore.Platforms": {
         "type": "Transitive",
@@ -140,7 +140,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.0",
+          "AWSSDK.Core": "3.5.2.9",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },
