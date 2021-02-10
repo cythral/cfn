@@ -4,9 +4,9 @@
     ".NETCoreApp,Version=v3.1": {
       "Octokit": {
         "type": "Direct",
-        "requested": "[0.47.0, )",
-        "resolved": "0.47.0",
-        "contentHash": "q1TWsMEjxG7Eb7YFrXm3MWgSPsMvPKxrIF//tuUPd9i/SS/fG7PerKr088E8AOoAFcHqMqouSrW0iAg2WgskDA=="
+        "requested": "[0.48.0, )",
+        "resolved": "0.48.0",
+        "contentHash": "WitpE+15EL9+vwxPg92O3uTfMJsAdN+wTZfU3dgr7KPItAfoWgsoLudzfEisHHKAROTJsPi/9mV9yGTA34hYAQ=="
       },
       "AWSSDK.Core": {
         "type": "Transitive",

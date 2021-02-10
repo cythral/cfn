@@ -573,8 +573,8 @@
       },
       "Octokit": {
         "type": "Transitive",
-        "resolved": "0.47.0",
-        "contentHash": "q1TWsMEjxG7Eb7YFrXm3MWgSPsMvPKxrIF//tuUPd9i/SS/fG7PerKr088E8AOoAFcHqMqouSrW0iAg2WgskDA=="
+        "resolved": "0.48.0",
+        "contentHash": "WitpE+15EL9+vwxPg92O3uTfMJsAdN+wTZfU3dgr7KPItAfoWgsoLudzfEisHHKAROTJsPi/9mV9yGTA34hYAQ=="
       },
       "runtime.native.System": {
         "type": "Transitive",
@@ -1438,7 +1438,7 @@
         "type": "Project",
         "dependencies": {
           "KeyManagementService": "1.0.0",
-          "Octokit": "0.47.0"
+          "Octokit": "0.48.0"
         }
       },
       "githubwebhook": {
@@ -1474,7 +1474,6 @@
           "Lambdajection": "0.7.0-beta1",
           "Lambdajection.Encryption": "0.7.0-beta1",
           "Lambdajection.Runtime": "0.7.0-beta1",
-          "Octokit": "0.47.0",
           "SimpleStorageService": "1.0.0"
         }
       },
