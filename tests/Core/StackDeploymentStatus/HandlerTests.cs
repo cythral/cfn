@@ -148,6 +148,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             return new StackDeploymentStatusRequest
             {
                 StackId = stackId,
+                PhysicalResourceId = stackId,
                 StackName = stackName,
                 ClientRequestToken = token,
                 ResourceStatus = status,
@@ -157,11 +158,9 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         }
 
         [Test]
-        [TestCase("AWS::S3::Bucket", "token")]
-        [TestCase("AWS::CloudFormation::Stack", "")]
-        public async Task ShouldDoNothing(string resourceType, string clientRequestToken)
+        public async Task ShouldDoNothingIfClientRequestTokenIsEmpty()
         {
-            var request = CreateRequest(stackId, clientRequestToken, null, resourceType);
+            var request = CreateRequest(stackId, "", null, "AWS::CloudFormation::Stack");
             var requestFactory = CreateRequestFactory(request);
             var stepFunctions = CreateStepFunctions();
             var sqs = CreateSQS();
@@ -173,6 +172,30 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             var config = CreateConfig();
             var logger = Substitute.For<ILogger<Handler>>();
             var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
+
+            await handler.Handle(snsEvent);
+
+            await stepFunctions.DidNotReceiveWithAnyArgs().SendTaskFailureAsync(Arg.Any<SendTaskFailureRequest>());
+            await stepFunctions.DidNotReceiveWithAnyArgs().SendTaskSuccessAsync(Arg.Any<SendTaskSuccessRequest>());
+        }
+
+        [Test]
+        public async Task ShouldDoNothingIfStackIdAndPhysicalResourceIdDontMatch()
+        {
+            var request = CreateRequest(stackId, "", "clientRequestToken", "AWS::CloudFormation::Stack");
+            var requestFactory = CreateRequestFactory(request);
+            var stepFunctions = CreateStepFunctions();
+            var sqs = CreateSQS();
+            var cloudformationClient = CreateCloudFormation();
+            var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
+            var statusNotifier = CreateStatusNotifier();
+            var tokenInfoRepository = CreateTokenInfoRepository();
+            var snsEvent = Substitute.For<SNSEvent>();
+            var config = CreateConfig();
+            var logger = Substitute.For<ILogger<Handler>>();
+            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
+
+            request.PhysicalResourceId = Guid.NewGuid().ToString();
 
             await handler.Handle(snsEvent);
 

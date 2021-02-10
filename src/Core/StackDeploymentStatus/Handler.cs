@@ -65,7 +65,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             var request = requestFactory.CreateFromSnsEvent(snsRequest);
             var status = request.ResourceStatus;
 
-            if (request.ResourceType == "AWS::CloudFormation::Stack" && request.ClientRequestToken.Length > 0)
+            if (request.ClientRequestToken.Length > 0 && request.StackId == request.PhysicalResourceId)
             {
                 if (status == "DELETE_COMPLETE" || status.EndsWith("ROLLBACK_COMPLETE") || status.EndsWith("FAILED"))
                 {
