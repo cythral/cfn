@@ -19,11 +19,11 @@
       },
       "AWSSDK.S3": {
         "type": "Direct",
-        "requested": "[3.5.4, )",
-        "resolved": "3.5.4",
-        "contentHash": "IHaHZE5T/JQsM4+l+eHBdqPRuCfq36QpkqFn+ftLAmt1oKmdKQVOcEiE3rkMhVJiB3poqLCVncaul+YtfO94Kw==",
+        "requested": "[3.5.8.4, )",
+        "resolved": "3.5.8.4",
+        "contentHash": "e8cjh8i5M1/ch939MvLg/7OMh73Jb/WIWblvCFoM1ymOZ7LUWc1Ojtod8YCUpuRlmyJAmHxd8Z9X2FNHIyNcdQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.1.34, 3.6.0)"
+          "AWSSDK.Core": "[3.5.2.9, 3.6.0)"
         }
       },
       "AWSSDK.SecurityToken": {
@@ -355,7 +355,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.0",
+          "AWSSDK.Core": "3.5.2.9",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },
