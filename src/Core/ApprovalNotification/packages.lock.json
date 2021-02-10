@@ -22,11 +22,11 @@
       },
       "AWSSDK.StepFunctions": {
         "type": "Direct",
-        "requested": "[3.5.2.23, )",
-        "resolved": "3.5.2.23",
-        "contentHash": "v84TzkcvbP/fMk9Py2otEkN7wPb6Dz+7Qn4oHFVlX8bYvVvu7/xiXkoUuPmwFI/1mZ/r87LGKzgKofpC9qSr/Q==",
+        "requested": "[3.5.3.27, )",
+        "resolved": "3.5.3.27",
+        "contentHash": "sV5YgLQrO0+8juM6jgKHZd24SgVX6QCaWQLjcOGTt+FlL01DjftLMSEK1KrrEao/NFzmIsfly0zJSJ4dWN8qyw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.1.34, 3.6.0)"
+          "AWSSDK.Core": "[3.5.2.9, 3.6.0)"
         }
       },
       "Brighid.Identity.Client": {
