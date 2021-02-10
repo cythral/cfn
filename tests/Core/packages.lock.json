@@ -113,8 +113,8 @@
       },
       "Amazon.Lambda.SNSEvents": {
         "type": "Transitive",
-        "resolved": "1.1.0",
-        "contentHash": "2bDTVmU8fzjjols+9keJtzQJHq5XAAfI28chvrLtBaOwEMzMfNV606ciEERndg5+cmhrO2DQVJmSK5yJ4PAT4w=="
+        "resolved": "1.2.0",
+        "contentHash": "RL/0zJ+/t1vXzmaorU9GclCTEY0qbn+4sN2wG79tscSvV1Uc4GYtZKz8J4Ofow/EXFHrqufJeGbKRf5qpRhZEg=="
       },
       "Amazon.Lambda.SQSEvents": {
         "type": "Transitive",
@@ -1514,7 +1514,7 @@
           "AWSSDK.SQS": "3.5.0",
           "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
-          "Amazon.Lambda.SNSEvents": "1.1.0",
+          "Amazon.Lambda.SNSEvents": "1.2.0",
           "Lambdajection": "0.7.0-beta1",
           "Lambdajection.Encryption": "0.7.0-beta1",
           "System.Net.Http.Json": "3.2.1"
@@ -1524,7 +1524,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.ElasticLoadBalancingV2": "3.5.0",
-          "Amazon.Lambda.SNSEvents": "1.1.0",
+          "Amazon.Lambda.SNSEvents": "1.2.0",
           "Lambdajection": "0.7.0-beta1"
         }
       }
