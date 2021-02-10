@@ -118,8 +118,8 @@
       },
       "Amazon.Lambda.SQSEvents": {
         "type": "Transitive",
-        "resolved": "1.1.0",
-        "contentHash": "AD6rELASxItdSSR1Vj7X7pEE8OeGIADJkYer9dvHtXP+2NhpgFheBKj9mNt7fOEBuZLHo058TY416E9fnHRd6Q=="
+        "resolved": "1.2.0",
+        "contentHash": "24C5UjjGyuyOHfocw5d31YjsS+uS6I2Mrw2fuLCJx4stu2DgUFdEPTbL9FimAwPAcRdBpndKee6dYEinQMIiCw=="
       },
       "AutoFixture": {
         "type": "Transitive",
@@ -1422,7 +1422,7 @@
         "dependencies": {
           "AWSSDK.S3": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
-          "Amazon.Lambda.SQSEvents": "1.1.0",
+          "Amazon.Lambda.SQSEvents": "1.2.0",
           "Lambdajection": "0.7.0-beta1",
           "SimpleStorageService": "1.0.0"
         }
@@ -1500,7 +1500,7 @@
           "AWSSDK.S3": "3.5.0",
           "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
-          "Amazon.Lambda.SQSEvents": "1.1.0",
+          "Amazon.Lambda.SQSEvents": "1.2.0",
           "Lambdajection": "0.7.0-beta1",
           "Lambdajection.Encryption": "0.7.0-beta1",
           "System.Net.Http.Json": "3.2.1"
