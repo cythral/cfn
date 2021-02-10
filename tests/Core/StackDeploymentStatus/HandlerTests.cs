@@ -170,10 +170,9 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             var statusNotifier = CreateStatusNotifier();
             var tokenInfoRepository = CreateTokenInfoRepository();
             var snsEvent = Substitute.For<SNSEvent>();
-            var wait = Substitute.For<Wait>();
             var config = CreateConfig();
             var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, wait, config, logger);
+            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
 
             await handler.Handle(snsEvent);
 
@@ -198,9 +197,8 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             var tokenInfoRepository = CreateTokenInfoRepository();
             var snsEvent = Substitute.For<SNSEvent>();
             var config = CreateConfig();
-            var wait = Substitute.For<Wait>();
             var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, wait, config, logger);
+            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
 
             await handler.Handle(snsEvent);
 
@@ -237,10 +235,9 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             var statusNotifier = CreateStatusNotifier();
             var tokenInfoRepository = CreateTokenInfoRepository();
             var snsEvent = Substitute.For<SNSEvent>();
-            var wait = Substitute.For<Wait>();
             var config = CreateConfig();
             var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, wait, config, logger);
+            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
 
             request.SourceTopic = githubTopicArn;
 
@@ -277,10 +274,9 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             var statusNotifier = CreateStatusNotifier();
             var tokenInfoRepository = CreateTokenInfoRepository();
             var snsEvent = Substitute.For<SNSEvent>();
-            var wait = Substitute.For<Wait>();
             var config = CreateConfig();
             var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, wait, config, logger);
+            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
 
             await handler.Handle(snsEvent);
 
@@ -323,10 +319,9 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             var statusNotifier = CreateStatusNotifier();
             var tokenInfoRepository = CreateTokenInfoRepository();
             var snsEvent = Substitute.For<SNSEvent>();
-            var wait = Substitute.For<Wait>();
             var config = CreateConfig();
             var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, wait, config, logger);
+            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
 
             request.SourceTopic = githubTopicArn;
 

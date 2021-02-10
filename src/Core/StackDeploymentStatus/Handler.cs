@@ -25,8 +25,6 @@ using Microsoft.Extensions.Options;
 
 namespace Cythral.CloudFormation.StackDeploymentStatus
 {
-    public delegate Task Wait(int ms);
-
     [Lambda(typeof(Startup))]
     public partial class Handler
     {
@@ -36,7 +34,6 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
         private readonly IAwsFactory<IAmazonCloudFormation> cloudformationFactory;
         private readonly GithubStatusNotifier githubStatusNotifier;
         private readonly TokenInfoRepository tokenInfoRepository;
-        private readonly Wait wait;
         private readonly Config config;
         private readonly ILogger<Handler> logger;
 
@@ -47,7 +44,6 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             IAwsFactory<IAmazonCloudFormation> cloudformationFactory,
             GithubStatusNotifier githubStatusNotifier,
             TokenInfoRepository tokenInfoRepository,
-            Wait wait,
             IOptions<Config> config,
             ILogger<Handler> logger
         )
@@ -58,7 +54,6 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             this.cloudformationFactory = cloudformationFactory;
             this.tokenInfoRepository = tokenInfoRepository;
             this.githubStatusNotifier = githubStatusNotifier;
-            this.wait = wait;
             this.config = config.Value;
             this.logger = logger;
         }
@@ -140,8 +135,6 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
         private async Task<Dictionary<string, string>> GetStackOutputs(string stackId, string roleArn)
         {
             var client = await cloudformationFactory.Create(roleArn);
-            await wait(1000);
-
             var response = await client.DescribeStacksAsync(new DescribeStacksRequest
             {
                 StackName = stackId
