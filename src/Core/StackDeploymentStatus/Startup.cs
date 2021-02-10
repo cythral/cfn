@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 using Amazon.CloudFormation;
 using Amazon.S3;
 using Amazon.SQS;
@@ -26,6 +28,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             services.AddSingleton<GithubStatusNotifier>();
             services.AddSingleton<TokenInfoRepository>();
             services.AddSingleton<StackDeploymentStatusRequestFactory>();
+            services.AddSingleton<Wait>(Task.Delay);
         }
     }
 }
