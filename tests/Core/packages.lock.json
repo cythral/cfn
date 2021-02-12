@@ -177,10 +177,10 @@
       },
       "AWSSDK.SimpleNotificationService": {
         "type": "Transitive",
-        "resolved": "3.5.1.6",
-        "contentHash": "ppSonX+jJo9q24eYpWyB/MsRl/Tdqi9uHZl1wABLQ8nu2Ok2NJpP6i7nKPVpwcT2zZf7mcYMm475rU2MxFhbgw==",
+        "resolved": "3.5.1.41",
+        "contentHash": "aHDY4CCMGYjSSA4UYoaoGLyHGB0LfzQBYufWnUPrTTxeh7wtwmUGiDg1HkhJMGrr/d/KuvxABdkL5GesUt/h7Q==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.1.34, 3.6.0)"
+          "AWSSDK.Core": "[3.5.2.9, 3.6.0)"
         }
       },
       "AWSSDK.SQS": {
@@ -1239,7 +1239,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.S3": "3.5.8.4",
-          "AWSSDK.SimpleNotificationService": "3.5.1.6",
+          "AWSSDK.SimpleNotificationService": "3.5.1.41",
           "AWSSDK.StepFunctions": "3.5.3.27",
           "Brighid.Identity.Client": "0.1.86",
           "Lambdajection": "0.7.0-beta1",
