@@ -22,11 +22,11 @@
       },
       "AWSSDK.StepFunctions": {
         "type": "Direct",
-        "requested": "[3.5.3.27, )",
-        "resolved": "3.5.3.27",
-        "contentHash": "sV5YgLQrO0+8juM6jgKHZd24SgVX6QCaWQLjcOGTt+FlL01DjftLMSEK1KrrEao/NFzmIsfly0zJSJ4dWN8qyw==",
+        "requested": "[3.5.3.28, )",
+        "resolved": "3.5.3.28",
+        "contentHash": "Q1vMN+RjQAPWRaqoYNkgPsePNTRkmt7Y/iRwvjShZCXTrllwTB8NF54fkxcD1hw4qmZrXu4DhBumHQGA2P8kwg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.2.9, 3.6.0)"
+          "AWSSDK.Core": "[3.5.2.10, 3.6.0)"
         }
       },
       "Brighid.Identity.Client": {
@@ -360,7 +360,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.2.9",
+          "AWSSDK.Core": "3.5.2.10",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },

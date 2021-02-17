@@ -13,11 +13,11 @@
       },
       "AWSSDK.SecurityToken": {
         "type": "Direct",
-        "requested": "[3.5.1.49, )",
-        "resolved": "3.5.1.49",
-        "contentHash": "MOdncpWGe1riDcnRNnLSzd73KddYOirsj5ImyVusfL5v2hMBFvUE5Y+LPhtff+llsXYzSkjWJyneXQMnZsoeLA==",
+        "requested": "[3.5.1.50, )",
+        "resolved": "3.5.1.50",
+        "contentHash": "xClfjje3YQ5ntx2pXKsWYhEJcF8hATm1g3I4ZnK58u32Di3EK9sceD6niLKJ2e5crj6zfmqMEaCDHLCeW6AnYQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.2.9, 3.6.0)"
+          "AWSSDK.Core": "[3.5.2.10, 3.6.0)"
         }
       },
       "Lambdajection": {
@@ -74,15 +74,15 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.2.9",
-        "contentHash": "J0AZ/fDJpT+WArFaJ/E3wLmyideSVowZSrlp7ljpc4sRWSbxjzd/dDlC1NX16PwYWL9VXESYXymsitdJuyXbZg=="
+        "resolved": "3.5.2.10",
+        "contentHash": "alPw//uyS2kagVu1+oUb0U0ffhVi9VonEBfM2BRERjm2HgnhKPoT22NU0CuGsCfY73pj4mzhPbVJdqYWruv7Ng=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.5.2.10",
-        "contentHash": "1ikpdsnTRIodINxAh1fFqgUPXLU9BAZmyVgghfV/Q9UvfpUCYyYF1qmfP4btIaOGwnw7PJCuXpQ7scKvSmlllA==",
+        "resolved": "3.5.2.11",
+        "contentHash": "1RsM5BPsicLzzmiuxvgvykw08L7sgtd2PSOiOrzVCFQmWxZMVK0JWVF5oUHkVgq5QUQadEeta+Dpz4euMzAIkA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.2.9, 3.6.0)"
+          "AWSSDK.Core": "[3.5.2.10, 3.6.0)"
         }
       },
       "Lambdajection.Attributes": {
@@ -245,8 +245,8 @@
       },
       "Octokit": {
         "type": "Transitive",
-        "resolved": "0.48.0",
-        "contentHash": "WitpE+15EL9+vwxPg92O3uTfMJsAdN+wTZfU3dgr7KPItAfoWgsoLudzfEisHHKAROTJsPi/9mV9yGTA34hYAQ=="
+        "resolved": "0.49.0",
+        "contentHash": "VKsLHOZ19BsT2viRF72zHJHa+zJX+fNJENgR3Q+Ii76ZpXHyO0CGskigW0XUHHmZMkX0hheAq0n+Evv3X3y/5g=="
       },
       "System.IO": {
         "type": "Transitive",
@@ -324,7 +324,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.2.9",
+          "AWSSDK.Core": "3.5.2.10",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },
@@ -332,13 +332,13 @@
         "type": "Project",
         "dependencies": {
           "KeyManagementService": "1.0.0",
-          "Octokit": "0.48.0"
+          "Octokit": "0.49.0"
         }
       },
       "keymanagementservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.5.2.10",
+          "AWSSDK.KeyManagementService": "3.5.2.11",
           "AwsUtils.Common": "1.0.0"
         }
       },
