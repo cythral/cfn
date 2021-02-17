@@ -132,10 +132,10 @@
       },
       "AWSSDK.CloudFormation": {
         "type": "Transitive",
-        "resolved": "3.5.2.27",
-        "contentHash": "Wl6AhGuztIvTDL71OareVA9FEZtvreLklsV/xTKyst8WJLEU+P8lh3pggrfcYdC4JlWZyZWnNQYKpGp/+S1haA==",
+        "resolved": "3.5.2.28",
+        "contentHash": "M0oLAYq9SobNRmNQPJ5szllxVGMplmHV5WOstju95bf5w354VWA/2SVxcn++kggG/fHBWKnFmjIBAFePohWpfg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.2.9, 3.6.0)"
+          "AWSSDK.Core": "[3.5.2.10, 3.6.0)"
         }
       },
       "AWSSDK.Core": {
@@ -177,10 +177,10 @@
       },
       "AWSSDK.SimpleNotificationService": {
         "type": "Transitive",
-        "resolved": "3.5.1.6",
-        "contentHash": "ppSonX+jJo9q24eYpWyB/MsRl/Tdqi9uHZl1wABLQ8nu2Ok2NJpP6i7nKPVpwcT2zZf7mcYMm475rU2MxFhbgw==",
+        "resolved": "3.5.1.42",
+        "contentHash": "EBohRQD+WtBkLXkfF5jsCHnj7byXD82foTSazgQSe0Fs/xVR/Djarta3EKGIyJJ2r1EL79TiPieAHUQHVcfk8w==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.1.34, 3.6.0)"
+          "AWSSDK.Core": "[3.5.2.10, 3.6.0)"
         }
       },
       "AWSSDK.SQS": {
@@ -1239,7 +1239,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.S3": "3.5.8.5",
-          "AWSSDK.SimpleNotificationService": "3.5.1.6",
+          "AWSSDK.SimpleNotificationService": "3.5.1.42",
           "AWSSDK.StepFunctions": "3.5.3.28",
           "Brighid.Identity.Client": "0.1.86",
           "Lambdajection": "0.7.0-beta1",
@@ -1301,8 +1301,8 @@
       "githubwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.5.2.27",
           "AWSSDK.S3": "3.5.8.5",
+          "AWSSDK.CloudFormation": "3.5.2.28",
           "AWSSDK.SecurityToken": "3.5.1.16",
           "AWSSDK.StepFunctions": "3.5.3.28",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
