@@ -355,7 +355,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.2.9",
+          "AWSSDK.Core": "3.5.2.10",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },
