@@ -161,10 +161,10 @@
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "3.5.8.4",
-        "contentHash": "e8cjh8i5M1/ch939MvLg/7OMh73Jb/WIWblvCFoM1ymOZ7LUWc1Ojtod8YCUpuRlmyJAmHxd8Z9X2FNHIyNcdQ==",
+        "resolved": "3.5.8.5",
+        "contentHash": "QRUb3C8IMUmoMFWty3GtzO3DAq9mcaUZZBMkRazL1PyGi72A2o71N20/4F+4OZSeK+eNZgO1xikG1TKRjFRyzA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.2.9, 3.6.0)"
+          "AWSSDK.Core": "[3.5.2.10, 3.6.0)"
         }
       },
       "AWSSDK.SecurityToken": {
@@ -1238,7 +1238,7 @@
       "approvalnotification": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.5.8.4",
+          "AWSSDK.S3": "3.5.8.5",
           "AWSSDK.SimpleNotificationService": "3.5.1.42",
           "AWSSDK.StepFunctions": "3.5.3.28",
           "Brighid.Identity.Client": "0.1.86",
@@ -1301,8 +1301,8 @@
       "githubwebhook": {
         "type": "Project",
         "dependencies": {
+          "AWSSDK.S3": "3.5.8.5",
           "AWSSDK.CloudFormation": "3.5.2.28",
-          "AWSSDK.S3": "3.5.8.4",
           "AWSSDK.SecurityToken": "3.5.1.16",
           "AWSSDK.StepFunctions": "3.5.3.28",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
