@@ -140,8 +140,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.2.10",
-        "contentHash": "alPw//uyS2kagVu1+oUb0U0ffhVi9VonEBfM2BRERjm2HgnhKPoT22NU0CuGsCfY73pj4mzhPbVJdqYWruv7Ng=="
+        "resolved": "3.5.3",
+        "contentHash": "nFCK9k1Av1UB6RD70Yjx2SuXcZd8y2V+S2lQjpjLfh6OqMssSdTHQS8CDVfV77e6gYty+PdI51KlEEuUAjpAOQ=="
       },
       "AWSSDK.ElasticLoadBalancingV2": {
         "type": "Transitive",
@@ -161,10 +161,10 @@
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "3.5.8.5",
-        "contentHash": "QRUb3C8IMUmoMFWty3GtzO3DAq9mcaUZZBMkRazL1PyGi72A2o71N20/4F+4OZSeK+eNZgO1xikG1TKRjFRyzA==",
+        "resolved": "3.5.8.6",
+        "contentHash": "16TOMwP/QovlfpqtTMRopRPg9aG5n//C7Cw/Ca4eK/HCYzIKeJBziLnkz+lZ72Nvbs44JTfHUidqCpXJTbIfsg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.2.10, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3, 3.6.0)"
         }
       },
       "AWSSDK.SecurityToken": {
@@ -1238,7 +1238,7 @@
       "approvalnotification": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.5.8.5",
+          "AWSSDK.S3": "3.5.8.6",
           "AWSSDK.SimpleNotificationService": "3.5.1.42",
           "AWSSDK.StepFunctions": "3.5.3.28",
           "Brighid.Identity.Client": "0.1.86",
@@ -1301,8 +1301,8 @@
       "githubwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.5.8.5",
           "AWSSDK.CloudFormation": "3.5.2.28",
+          "AWSSDK.S3": "3.5.8.6",
           "AWSSDK.SecurityToken": "3.5.1.16",
           "AWSSDK.StepFunctions": "3.5.3.28",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
