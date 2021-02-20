@@ -55,8 +55,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.2.10",
-        "contentHash": "alPw//uyS2kagVu1+oUb0U0ffhVi9VonEBfM2BRERjm2HgnhKPoT22NU0CuGsCfY73pj4mzhPbVJdqYWruv7Ng=="
+        "resolved": "3.5.3.1",
+        "contentHash": "Xjboie+bCfy2hCVDJF9f42issyEtD5QldQG0+m6cu28UVGiKVzxFckXmnglM/2Jyk/jKTooOfcdndWl5Rl/QGw=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
@@ -140,7 +140,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.2.10",
+          "AWSSDK.Core": "3.5.3.1",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },
