@@ -4,21 +4,21 @@
     ".NETCoreApp,Version=v3.1": {
       "Octokit": {
         "type": "Direct",
-        "requested": "[0.49.0, )",
-        "resolved": "0.49.0",
-        "contentHash": "VKsLHOZ19BsT2viRF72zHJHa+zJX+fNJENgR3Q+Ii76ZpXHyO0CGskigW0XUHHmZMkX0hheAq0n+Evv3X3y/5g=="
+        "requested": "[0.50.0, )",
+        "resolved": "0.50.0",
+        "contentHash": "J5vqespSvjxIAAtjG1Tc6ghBqyfRgDJtKnk/ifi4N0hD/f3JbPwyEDRT+Eelu/bS4C4M6mu5gt1WJqar+fByzg=="
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.2.10",
-        "contentHash": "alPw//uyS2kagVu1+oUb0U0ffhVi9VonEBfM2BRERjm2HgnhKPoT22NU0CuGsCfY73pj4mzhPbVJdqYWruv7Ng=="
+        "resolved": "3.5.3.1",
+        "contentHash": "Xjboie+bCfy2hCVDJF9f42issyEtD5QldQG0+m6cu28UVGiKVzxFckXmnglM/2Jyk/jKTooOfcdndWl5Rl/QGw=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.5.2.11",
-        "contentHash": "1RsM5BPsicLzzmiuxvgvykw08L7sgtd2PSOiOrzVCFQmWxZMVK0JWVF5oUHkVgq5QUQadEeta+Dpz4euMzAIkA==",
+        "resolved": "3.5.2.12",
+        "contentHash": "Ym3FK0rUxjqJwV4SbmUpEle6j/HhHRmXPR4/XAbVkehQTjXSBBTmUuoE7XIqOVvKjirNLdkuKUTeViEPnVtD0w==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.2.10, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.1, 3.6.0)"
         }
       },
       "AWSSDK.SecurityToken": {
@@ -32,14 +32,14 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.2.10",
+          "AWSSDK.Core": "3.5.3.1",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },
       "keymanagementservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.5.2.11",
+          "AWSSDK.KeyManagementService": "3.5.2.12",
           "AwsUtils.Common": "1.0.0"
         }
       }
