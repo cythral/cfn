@@ -4,13 +4,13 @@
     ".NETCoreApp,Version=v3.1": {
       "Lambdajection": {
         "type": "Direct",
-        "requested": "[0.7.0-beta1, )",
-        "resolved": "0.7.0-beta1",
-        "contentHash": "eoUMNs5qKsgyWw9EJCS9ti4hQAQA3H4j3G4+9UeSNu79qq5Rklmf4xBev/aEyQ12XENJ0g/1NUgb/Al2Q32yow==",
+        "requested": "[0.7.0-beta2, )",
+        "resolved": "0.7.0-beta2",
+        "contentHash": "Sgzv9O5aFx+FZdydbD+FIkVKJwnznwHucPUfT+JT9H4YV23C5SB9fSgUZr0hZnqKACw09zevic9y6A6KSoUGyg==",
         "dependencies": {
-          "Lambdajection.Attributes": "0.7.0-beta1",
-          "Lambdajection.Core": "0.7.0-beta1",
-          "Lambdajection.Generator": "0.7.0-beta1"
+          "Lambdajection.Attributes": "0.7.0-beta2",
+          "Lambdajection.Core": "0.7.0-beta2",
+          "Lambdajection.Generator": "0.7.0-beta2"
         }
       },
       "Amazon.Lambda.Core": {
@@ -49,17 +49,17 @@
       },
       "Lambdajection.Attributes": {
         "type": "Transitive",
-        "resolved": "0.7.0-beta1",
-        "contentHash": "uuUgElM2rAS1PFbLCMIeHNhtYFIVAxRilJjvij+tqTK26WoNANpo8/+QjfMCrRthFT2t7ZU4m1A/P8H80dcDNw=="
+        "resolved": "0.7.0-beta2",
+        "contentHash": "2oPEj2vKA1YvpKEv48e1K1XGJvX9M1xje1Y0Ww6OBF7fEkaRYvqWvjlFCKQhrpZ8jToBv5lZqnegBKJJ/t2XKQ=="
       },
       "Lambdajection.Core": {
         "type": "Transitive",
-        "resolved": "0.7.0-beta1",
-        "contentHash": "z8HJCF5+uHln2AXmLzL51uTeKZZHVR2rpUHgvrBLjzFu5f9TSwjrcNztFJxW6oM/b7BTPyDyBfCELAkuSzeWUg==",
+        "resolved": "0.7.0-beta2",
+        "contentHash": "oogE4o58w/i7clB2gCbmWT8fhsWXbazD5X2LSGGKD7valH9a9BXrpSkkAFjxfBnDGGNZAJWSC31vvY8UIWGXwA==",
         "dependencies": {
           "Amazon.Lambda.Core": "1.2.0",
           "Amazon.Lambda.Serialization.SystemTextJson": "2.1.0",
-          "Lambdajection.Attributes": "0.7.0-beta1",
+          "Lambdajection.Attributes": "0.7.0-beta2",
           "Microsoft.Extensions.Configuration": "5.0.0",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.1",
@@ -69,8 +69,8 @@
       },
       "Lambdajection.Generator": {
         "type": "Transitive",
-        "resolved": "0.7.0-beta1",
-        "contentHash": "J7CvsW08nGTRg9MFiZmsPC8LuJ2q3I88bpkoW/T6TqYdECb/v/X1Av/miQdeR/Ki/+R8+BtceUOsyPzQ1c/U0w=="
+        "resolved": "0.7.0-beta2",
+        "contentHash": "STZEew0el04ngbsUmo2xFr/0M1wOaCU0idKZKNtLSkmN8+oDe6XC1h5Mt+2/wGJ5wcoMLr9QgjifpmubA5ekJw=="
       },
       "Microsoft.Extensions.Configuration": {
         "type": "Transitive",
