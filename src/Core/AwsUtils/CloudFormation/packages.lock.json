@@ -13,13 +13,13 @@
       },
       "Lambdajection.Core": {
         "type": "Direct",
-        "requested": "[0.6.0, )",
-        "resolved": "0.6.0",
-        "contentHash": "56/vpygQYNQR8WOapRwOW1B9Dwxx48bQR379t7gcHV+RYQTD44tl3x+lVUi8+8uC2YH8kt6jPZWPMpPQJkqGpw==",
+        "requested": "[0.7.0-beta3, )",
+        "resolved": "0.7.0-beta3",
+        "contentHash": "Vjtat8dc8mL7qZhE5vkLfBo/4Fu3eJHEmc4fY/ne0s3xD0DQdRSjO7wxyF/9S5WKrlzA5A6f1IVU7ojvED8DHw==",
         "dependencies": {
           "Amazon.Lambda.Core": "1.2.0",
           "Amazon.Lambda.Serialization.SystemTextJson": "2.1.0",
-          "Lambdajection.Attributes": "0.6.0",
+          "Lambdajection.Attributes": "0.7.0-beta3",
           "Microsoft.Extensions.Configuration": "5.0.0",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.1",
@@ -42,8 +42,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.3.1",
-        "contentHash": "Xjboie+bCfy2hCVDJF9f42issyEtD5QldQG0+m6cu28UVGiKVzxFckXmnglM/2Jyk/jKTooOfcdndWl5Rl/QGw=="
+        "resolved": "3.5.3.2",
+        "contentHash": "NMg/UUxEkEh84MwK0NOR2x99FjkKbi+Sktb52101KKMGgNVsRw1u/K5pwAKoe2rm51O1OuU7vQDf46a6lXxk0A=="
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
@@ -55,8 +55,8 @@
       },
       "Lambdajection.Attributes": {
         "type": "Transitive",
-        "resolved": "0.6.0",
-        "contentHash": "ffvuVGvdNQz50HHZPz+ns+JCPU1fLLx1FazaTLOBN1RmBlTsohMjAaOj+7pVIkHEzky3JX6c27HjetJZCEQNjQ=="
+        "resolved": "0.7.0-beta3",
+        "contentHash": "TAaLTrOQOfuwEwM+8TFQkoTlrtX1Af9EmrGBimD0r5fVrhdjZhqLHgDWUhH8svJFh+lpURLIoiiItJGJGH9S2w=="
       },
       "Microsoft.Extensions.Configuration": {
         "type": "Transitive",
@@ -191,7 +191,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.3.1",
+          "AWSSDK.Core": "3.5.3.2",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       }
