@@ -13,11 +13,11 @@
       },
       "AWSSDK.SecurityToken": {
         "type": "Direct",
-        "requested": "[3.5.1.53, )",
-        "resolved": "3.5.1.53",
-        "contentHash": "re3LeW749S5AHcdBcgxcbHdG0zh1xqM8mSWXU0/+dQuiN/v/7ektpYN1NY0Q6zvU2uUA5x2nLPlKUBf8dRftuw==",
+        "requested": "[3.5.1.54, )",
+        "resolved": "3.5.1.54",
+        "contentHash": "OyXCqK/UbJhiafPDOe5OXlf8eBd53aUF9W2vokMPsCWn55G6+Rwads0iFNCL3NhiyEe0sZ+gSspRxbSx0kLptg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.2, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.3, 3.6.0)"
         }
       },
       "Lambdajection": {
@@ -74,15 +74,15 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.3.2",
-        "contentHash": "NMg/UUxEkEh84MwK0NOR2x99FjkKbi+Sktb52101KKMGgNVsRw1u/K5pwAKoe2rm51O1OuU7vQDf46a6lXxk0A=="
+        "resolved": "3.5.3.3",
+        "contentHash": "J5p51atBfFkUUS+fe9NQxqsrQeC1wX9TE+xf7YbNu6/I0YkSmotic57BbwFSuTyewge10JwAr7koaEPNn6o4aQ=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.5.2.13",
-        "contentHash": "D+Pb75B3nnrmi+eqsbnwPADIUZAAV654rccwf2RnQWg55AFNu8nQaEFMMy6PwPuTnJxeQgHJcF9yD2F//0arWg==",
+        "resolved": "3.5.2.14",
+        "contentHash": "jW1nmoN98B5X6qXvA5l5qHTZS0TAmzsAwfct3lhwVT8zLbis1r39iqJOQ1V1ltiigTGcTQr/j/gXtjuP046HiA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.2, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.3, 3.6.0)"
         }
       },
       "Lambdajection.Attributes": {
@@ -324,7 +324,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.3.2",
+          "AWSSDK.Core": "3.5.3.3",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },
@@ -338,7 +338,7 @@
       "keymanagementservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.5.2.13",
+          "AWSSDK.KeyManagementService": "3.5.2.14",
           "AwsUtils.Common": "1.0.0"
         }
       },
