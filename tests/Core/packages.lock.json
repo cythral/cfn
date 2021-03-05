@@ -201,8 +201,8 @@
       },
       "Brighid.Identity.Client": {
         "type": "Transitive",
-        "resolved": "0.1.88",
-        "contentHash": "+LeRs8BpNZOdN/wQoobsnFUh5dotkjHPNCa2/o+2mpUN0FA43G/fEpFZYqYU7EljUwCvmCO0VgT3UYAC35Vk6Q==",
+        "resolved": "0.1.90",
+        "contentHash": "c9THhPLDDjULAGFagssgK22xJrFIx5XMR8G4+ZB+lszBa/kYNI/HnG6GysD5OLjXTbls+6b3Piu2QebU/PscsQ==",
         "dependencies": {
           "Microsoft.Extensions.Configuration": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.0",
@@ -1253,7 +1253,7 @@
           "AWSSDK.S3": "3.5.9.1",
           "AWSSDK.SimpleNotificationService": "3.5.1.46",
           "AWSSDK.StepFunctions": "3.5.3.31",
-          "Brighid.Identity.Client": "0.1.88",
+          "Brighid.Identity.Client": "0.1.90",
           "Lambdajection": "0.7.0-beta4",
           "Lambdajection.Encryption": "0.7.0-beta4",
           "Lambdajection.Runtime": "0.7.0-beta4",
