@@ -13,11 +13,11 @@
       },
       "AWSSDK.SimpleNotificationService": {
         "type": "Direct",
-        "requested": "[3.5.1.45, )",
-        "resolved": "3.5.1.45",
-        "contentHash": "4zttHXy0QDCrAj+wV9/EiJegtWLfvYjFERlTfT2U5Ua64RwGdVeRFq3Tj/SJtfQdmiM/uFcu04oHAYO0swhJKA==",
+        "requested": "[3.5.1.46, )",
+        "resolved": "3.5.1.46",
+        "contentHash": "o4hWPPvkhX8tgUkBhWjMNjeB77C/GsyBJ8O5uXDu+xvF2tzFLiAGq2kak1lvhP88DIMqcgRcAmROXyOXutQzhw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.3, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.4, 3.6.0)"
         }
       },
       "AWSSDK.StepFunctions": {
@@ -31,9 +31,9 @@
       },
       "Brighid.Identity.Client": {
         "type": "Direct",
-        "requested": "[0.1.88, )",
-        "resolved": "0.1.88",
-        "contentHash": "+LeRs8BpNZOdN/wQoobsnFUh5dotkjHPNCa2/o+2mpUN0FA43G/fEpFZYqYU7EljUwCvmCO0VgT3UYAC35Vk6Q==",
+        "requested": "[0.1.90, )",
+        "resolved": "0.1.90",
+        "contentHash": "c9THhPLDDjULAGFagssgK22xJrFIx5XMR8G4+ZB+lszBa/kYNI/HnG6GysD5OLjXTbls+6b3Piu2QebU/PscsQ==",
         "dependencies": {
           "Microsoft.Extensions.Configuration": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.0",
