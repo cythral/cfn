@@ -10,20 +10,20 @@
       },
       "AWSSDK.CloudFormation": {
         "type": "Direct",
-        "requested": "[3.5.3.3, )",
-        "resolved": "3.5.3.3",
-        "contentHash": "B+6jy3BOFMBny+XZRxhQB48hiW4XHK2NbxM+8wwngjLbkrgGlLEg6P8Xmmkn3JCIYE1TIHgxiAXW/qpOPEd1dw==",
+        "requested": "[3.5.3.4, )",
+        "resolved": "3.5.3.4",
+        "contentHash": "VmbNLAMb0R9bOrVMSh6JMY2/+fQLGiUp5SGtZpIHLYCn8Q2eRzPZd7jPHsLelErAuoJwbiWqYc0WCVaXn8MGDw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.3, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.4, 3.6.0)"
         }
       },
       "AWSSDK.S3": {
         "type": "Direct",
-        "requested": "[3.5.9.1, )",
-        "resolved": "3.5.9.1",
-        "contentHash": "+WNpVcgYYys2/8Ye2cyc/un+Uz56fJcRb5sRmM6VL+WZFHikHzVp8VrAgeLfR96c64XhaTP/f1keh2DatxkT6Q==",
+        "requested": "[3.5.9.2, )",
+        "resolved": "3.5.9.2",
+        "contentHash": "CyXu8r+L+QDb9AwpCi8qINUSPLuoRhlacYf1aJVIMvUGjdC765cQtQKgrJ9Yfz0uFG+igfZetih9a82rBT26gA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.3, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.4, 3.6.0)"
         }
       },
       "AWSSDK.SecurityToken": {
@@ -368,7 +368,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.3.3",
+          "AWSSDK.Core": "3.5.3.4",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },
