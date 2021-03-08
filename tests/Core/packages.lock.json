@@ -140,8 +140,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.3.4",
-        "contentHash": "ivZ014GFHNXygHyssgHbyTN9mjGRsYYfSjqfICRfvwO6w02SGhIdm703epC5agdaKuFQG6GgCuthx/IZW9xWGw=="
+        "resolved": "3.5.3.5",
+        "contentHash": "xCmbEm0A+Tr94MrOHJoSJE5WRGcKOYjGMyXqHkSAbtUvfmSknUSk9tF/wXwP4QZ5L9KVP8UdBazoRxfSFCAWUA=="
       },
       "AWSSDK.ElasticLoadBalancingV2": {
         "type": "Transitive",
@@ -153,10 +153,10 @@
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.5.2.15",
-        "contentHash": "u7Tw/pSV/mngVgxL93y99YSx6O9h0uLx1munQicwjlagNQfNeZHRx9+AI1MzBsMyT+Vhd4jlF4wm7UPizLXPFg==",
+        "resolved": "3.5.2.16",
+        "contentHash": "a1jCnK9NSELFKr5yEGRXsn94w0DZ6CDTfmFQCtdLvIjLoQLegkBZpuk/nK5pDx3g7V/YFs7qHPfFsyFVlgOofA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.4, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.5, 3.6.0)"
         }
       },
       "AWSSDK.S3": {
@@ -1250,9 +1250,9 @@
       "approvalnotification": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.StepFunctions": "3.5.3.32",
           "AWSSDK.S3": "3.5.9.2",
           "AWSSDK.SimpleNotificationService": "3.5.1.46",
+          "AWSSDK.StepFunctions": "3.5.3.32",
           "Brighid.Identity.Client": "0.1.90",
           "Lambdajection": "0.7.0-beta4",
           "Lambdajection.Encryption": "0.7.0-beta4",
@@ -1313,8 +1313,8 @@
       "githubwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.5.9.2",
           "AWSSDK.CloudFormation": "3.5.3.4",
+          "AWSSDK.S3": "3.5.9.2",
           "AWSSDK.SecurityToken": "3.5.1.16",
           "AWSSDK.StepFunctions": "3.5.3.32",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
@@ -1329,7 +1329,7 @@
       "keymanagementservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.5.2.15",
+          "AWSSDK.KeyManagementService": "3.5.2.16",
           "AwsUtils.Common": "1.0.0"
         }
       },
