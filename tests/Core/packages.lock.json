@@ -145,18 +145,18 @@
       },
       "AWSSDK.ElasticLoadBalancingV2": {
         "type": "Transitive",
-        "resolved": "3.5.5.37",
-        "contentHash": "e2mM0JkR9G96Q3EyupheS0Mp9xwTQ7ESS+Kahc/TkDDHR+ktM+9dKtuf5f3xGgPI58Fl/NTqkmDujYJa+oRdug==",
+        "resolved": "3.5.5.38",
+        "contentHash": "kBlpO+xczV/MHvLjfwtqsSIz67Rlt8ngAGiFaX9PMEQtLA4CgJixcb+jDZeY/RZI9bnFKWYzE9pTTRlZw5Te4w==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.4, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.5, 3.6.0)"
         }
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.5.2.15",
-        "contentHash": "u7Tw/pSV/mngVgxL93y99YSx6O9h0uLx1munQicwjlagNQfNeZHRx9+AI1MzBsMyT+Vhd4jlF4wm7UPizLXPFg==",
+        "resolved": "3.5.2.16",
+        "contentHash": "a1jCnK9NSELFKr5yEGRXsn94w0DZ6CDTfmFQCtdLvIjLoQLegkBZpuk/nK5pDx3g7V/YFs7qHPfFsyFVlgOofA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.4, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.5, 3.6.0)"
         }
       },
       "AWSSDK.S3": {
@@ -1329,7 +1329,7 @@
       "keymanagementservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.5.2.15",
+          "AWSSDK.KeyManagementService": "3.5.2.16",
           "AwsUtils.Common": "1.0.0"
         }
       },
@@ -1392,7 +1392,7 @@
       "updatetargets": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.ElasticLoadBalancingV2": "3.5.5.37",
+          "AWSSDK.ElasticLoadBalancingV2": "3.5.5.38",
           "Amazon.Lambda.SNSEvents": "1.2.0",
           "Lambdajection": "0.7.0-beta4"
         }
