@@ -13,11 +13,11 @@
       },
       "AWSSDK.SimpleNotificationService": {
         "type": "Direct",
-        "requested": "[3.5.1.47, )",
-        "resolved": "3.5.1.47",
-        "contentHash": "I9JqWsG6ck5roLgpOx/br3IGiEnHc5nPHyc5mU5BJ8XdrqU3BS9E8IYIZVFH4o8e4gkiMPQI0fQOBxiinRIoSQ==",
+        "requested": "[3.5.1.48, )",
+        "resolved": "3.5.1.48",
+        "contentHash": "V3joI3ba5jKnXhVLXHXKAOmdLSLjSSS2vvpTWD7gMHdZzVyw42TEq/fH43BdQsaR0SDLNZfrKmrn4dqP1AbP0A==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.5, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.6, 3.6.0)"
         }
       },
       "AWSSDK.StepFunctions": {
@@ -98,8 +98,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.3.5",
-        "contentHash": "xCmbEm0A+Tr94MrOHJoSJE5WRGcKOYjGMyXqHkSAbtUvfmSknUSk9tF/wXwP4QZ5L9KVP8UdBazoRxfSFCAWUA=="
+        "resolved": "3.5.3.6",
+        "contentHash": "Eg8ka5UdybyAfVxWC4uLMeU7NWtUK8WaMKXUFOC9Ofijx912vyMOxxUCNsDnn9pPxSr93zxy5v0b6ipxr6VQqg=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
