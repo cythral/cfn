@@ -43,8 +43,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.3.6",
-        "contentHash": "Eg8ka5UdybyAfVxWC4uLMeU7NWtUK8WaMKXUFOC9Ofijx912vyMOxxUCNsDnn9pPxSr93zxy5v0b6ipxr6VQqg=="
+        "resolved": "3.5.3.7",
+        "contentHash": "KTlPskLG+9jYYbXXiS08v/mCCDXBRfOl18p7Z02PVclB2tmBsoMJMmdnjXFPRFCj9O5ceOK9mAZrasM/zSk+CQ=="
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
@@ -197,7 +197,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.3.6",
+          "AWSSDK.Core": "3.5.3.7",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       }
