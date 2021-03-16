@@ -11,7 +11,7 @@
     <PackageReference Include="AWSSDK.S3" Version="3.5.9.6" />
     <PackageReference Include="AWSSDK.StepFunctions" Version="3.5.3.34" />
     <PackageReference Include="Brighid.Identity.Client" Version="0.1.92" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.5.1.48" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.5.1.49" />
     <PackageReference Include="Lambdajection" Version="$(LambdajectionVersion)" />
     <PackageReference Include="Lambdajection.Encryption" Version="$(LambdajectionVersion)" />
     <PackageReference Include="Lambdajection.Runtime" Version="$(LambdajectionVersion)" />
