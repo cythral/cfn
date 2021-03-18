@@ -140,8 +140,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.3.7",
-        "contentHash": "KTlPskLG+9jYYbXXiS08v/mCCDXBRfOl18p7Z02PVclB2tmBsoMJMmdnjXFPRFCj9O5ceOK9mAZrasM/zSk+CQ=="
+        "resolved": "3.5.3.8",
+        "contentHash": "qF5cq1RuE2GD6EQu0Bef1I06yzVTwSlW0FBxMXT1bGd+dF0Rcoa0grH7P6KbRp9HyIzWPOEdlMIx0yX1puTFCA=="
       },
       "AWSSDK.ElasticLoadBalancingV2": {
         "type": "Transitive",
@@ -185,10 +185,10 @@
       },
       "AWSSDK.SQS": {
         "type": "Transitive",
-        "resolved": "3.5.1.26",
-        "contentHash": "01wbUgKcNKS0yDj5yCa8GVsbkjhGsbzbpRguEHV8pG0ZVMAcM58O6pzWdIGStopPbUnkD2ln319+TLQJ7t3rYQ==",
+        "resolved": "3.5.1.27",
+        "contentHash": "IbZsb0tX2qw/0UR9KlCKp4aHYaDWdZkrxqiKEEpOuc8T406dgSdltGOoCuae/h7q/fU5B8PD4+9+lMdz7Fa52g==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.7, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.8, 3.6.0)"
         }
       },
       "AWSSDK.StepFunctions": {
@@ -1251,8 +1251,8 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.S3": "3.5.9.7",
-          "AWSSDK.StepFunctions": "3.5.3.35",
           "AWSSDK.SimpleNotificationService": "3.5.1.49",
+          "AWSSDK.StepFunctions": "3.5.3.35",
           "Brighid.Identity.Client": "0.1.92",
           "Lambdajection": "0.7.0",
           "Lambdajection.Encryption": "0.7.0",
@@ -1313,8 +1313,8 @@
       "githubwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.5.9.7",
           "AWSSDK.CloudFormation": "3.5.3.7",
+          "AWSSDK.S3": "3.5.9.7",
           "AWSSDK.SecurityToken": "3.5.1.16",
           "AWSSDK.StepFunctions": "3.5.3.35",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
@@ -1380,7 +1380,7 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.5.0",
           "AWSSDK.S3": "3.5.0",
-          "AWSSDK.SQS": "3.5.1.26",
+          "AWSSDK.SQS": "3.5.1.27",
           "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
           "Amazon.Lambda.SNSEvents": "1.2.0",
