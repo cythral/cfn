@@ -169,10 +169,10 @@
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.5.1.58",
-        "contentHash": "bCtxOgnPDOAZC/Pkyv2NcXmMcuB9hSwGQyRxamuN+YtdVTlv5CwAzWsUcLOyYSIOwLUXUrOkUbRERMSNZ+bxLg==",
+        "resolved": "3.5.1.59",
+        "contentHash": "CendjOt4S5TxBsHbBz6sXPktfWP/Sop2xDpilfBYYN47gBioesxNEMsRcjBxXUzusfNzfKLXeorBnnFGYoRkBg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.7, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.8, 3.6.0)"
         }
       },
       "AWSSDK.SimpleNotificationService": {
@@ -1337,7 +1337,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.S3": "3.5.0",
-          "AWSSDK.SecurityToken": "3.5.1.58",
+          "AWSSDK.SecurityToken": "3.5.1.59",
           "AwsUtils.Common": "1.0.0",
           "GithubUtils": "1.0.0",
           "Lambdajection": "0.7.0",
