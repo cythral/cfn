@@ -4,20 +4,20 @@
     ".NETCoreApp,Version=v5.0": {
       "AWSSDK.S3": {
         "type": "Direct",
-        "requested": "[3.5.9.7, )",
-        "resolved": "3.5.9.7",
-        "contentHash": "nUbYc32PcXTwb/wjQzhFiVZjbu7592OM9JxeVoRV0LXYQpoi6xICc62DQ510JIcCdK1SmYsWBBlGcDY7bddxOQ==",
+        "requested": "[3.5.10, )",
+        "resolved": "3.5.10",
+        "contentHash": "+GEomAJD1oUiSJvYDX56JFbDHsGGKzqXG4zKNWbrSQ2+ac/qh/NnAtkYl4QfcfMGJFp9vItYrVnga6o2aQ/IBA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.7, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.8, 3.6.0)"
         }
       },
       "AWSSDK.SimpleNotificationService": {
         "type": "Direct",
-        "requested": "[3.5.1.49, )",
-        "resolved": "3.5.1.49",
-        "contentHash": "CeRinoN+85w6YOsHHBcEZQ1jIgW7Bcldw0gtKLDJv6Y5CAoRoga43e4wjs5//wm8VIAtI6j7VxRgCE8KFQ8xdA==",
+        "requested": "[3.5.1.50, )",
+        "resolved": "3.5.1.50",
+        "contentHash": "NZ362SJaO35Z18utRgqV/+Y7ypDvaAXJIX/RvpinIgK906XNZUK3Jo991fZsS08og4RBCNU39wq0CifiDhkGhg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.7, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.8, 3.6.0)"
         }
       },
       "AWSSDK.StepFunctions": {
@@ -373,7 +373,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.3.7",
+          "AWSSDK.Core": "3.5.3.8",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },
