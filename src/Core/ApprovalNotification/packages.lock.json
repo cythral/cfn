@@ -13,11 +13,11 @@
       },
       "AWSSDK.SimpleNotificationService": {
         "type": "Direct",
-        "requested": "[3.5.1.50, )",
-        "resolved": "3.5.1.50",
-        "contentHash": "NZ362SJaO35Z18utRgqV/+Y7ypDvaAXJIX/RvpinIgK906XNZUK3Jo991fZsS08og4RBCNU39wq0CifiDhkGhg==",
+        "requested": "[3.5.1.51, )",
+        "resolved": "3.5.1.51",
+        "contentHash": "mCRIu3gD9JbWNAxr1NtxbaAZsEgAN9SIHn3CgSJZwhaKDIZJQ3AvKHcrrhADfF+C/VqmBSTnU8gw50WsJGCMHw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.8, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.9, 3.6.0)"
         }
       },
       "AWSSDK.StepFunctions": {
