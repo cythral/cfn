@@ -13,20 +13,20 @@
       },
       "AWSSDK.SimpleNotificationService": {
         "type": "Direct",
-        "requested": "[3.5.1.50, )",
-        "resolved": "3.5.1.50",
-        "contentHash": "NZ362SJaO35Z18utRgqV/+Y7ypDvaAXJIX/RvpinIgK906XNZUK3Jo991fZsS08og4RBCNU39wq0CifiDhkGhg==",
+        "requested": "[3.5.1.51, )",
+        "resolved": "3.5.1.51",
+        "contentHash": "mCRIu3gD9JbWNAxr1NtxbaAZsEgAN9SIHn3CgSJZwhaKDIZJQ3AvKHcrrhADfF+C/VqmBSTnU8gw50WsJGCMHw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.8, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.9, 3.6.0)"
         }
       },
       "AWSSDK.StepFunctions": {
         "type": "Direct",
-        "requested": "[3.5.3.36, )",
-        "resolved": "3.5.3.36",
-        "contentHash": "E7DXlcsa90ArIFZeUKly1iEqsxEXMgGQ2m5kRcwHK4+zmA/fbXlVfsXvxglIn88GP/+sZNSv+e3oM6kJXBQUpg==",
+        "requested": "[3.5.3.37, )",
+        "resolved": "3.5.3.37",
+        "contentHash": "Zs/aweZJ5DOum+O1WpbbekFmTogR87dQeMgixNsBHMEXxaIUY2rMATOgvF7xRev5RBju+vLldtbGLHxurS4dyw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.8, 3.6.0)"
+          "AWSSDK.Core": "[3.5.3.9, 3.6.0)"
         }
       },
       "Brighid.Identity.Client": {
@@ -373,7 +373,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.3.8",
+          "AWSSDK.Core": "3.5.3.9",
           "AWSSDK.SecurityToken": "3.5.0"
         }
       },
