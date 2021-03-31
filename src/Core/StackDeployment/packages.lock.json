@@ -4,9 +4,9 @@
     ".NETCoreApp,Version=v3.1": {
       "Amazon.Lambda.SQSEvents": {
         "type": "Direct",
-        "requested": "[1.2.0, )",
-        "resolved": "1.2.0",
-        "contentHash": "24C5UjjGyuyOHfocw5d31YjsS+uS6I2Mrw2fuLCJx4stu2DgUFdEPTbL9FimAwPAcRdBpndKee6dYEinQMIiCw=="
+        "requested": "[2.0.0, )",
+        "resolved": "2.0.0",
+        "contentHash": "hL9l47f5/xSjmoavILhmS5qjoeDXxRPl0wWKc7muxXKH/DGeFmU+iCz0lx9a/lNjHXqZt/IVlVe4y1pswM7JDA=="
       },
       "AWSSDK.CloudFormation": {
         "type": "Direct",
