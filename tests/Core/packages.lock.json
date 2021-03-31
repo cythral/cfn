@@ -113,8 +113,8 @@
       },
       "Amazon.Lambda.SNSEvents": {
         "type": "Transitive",
-        "resolved": "1.2.0",
-        "contentHash": "RL/0zJ+/t1vXzmaorU9GclCTEY0qbn+4sN2wG79tscSvV1Uc4GYtZKz8J4Ofow/EXFHrqufJeGbKRf5qpRhZEg=="
+        "resolved": "2.0.0",
+        "contentHash": "NzEV+hsQygpukxwuyN4gyOINYhFGOilc6uSuHIeTRiOncz+dvtw100UbeBxObCMuAbofL9U4yidKV/rObnpInQ=="
       },
       "Amazon.Lambda.SQSEvents": {
         "type": "Transitive",
@@ -1251,8 +1251,8 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.S3": "3.5.10.2",
-          "AWSSDK.StepFunctions": "3.5.3.37",
           "AWSSDK.SimpleNotificationService": "3.5.1.51",
+          "AWSSDK.StepFunctions": "3.5.3.37",
           "Brighid.Identity.Client": "0.1.92",
           "Lambdajection": "0.7.0",
           "Lambdajection.Encryption": "0.7.0",
@@ -1313,8 +1313,8 @@
       "githubwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.5.10.2",
           "AWSSDK.CloudFormation": "3.5.3.9",
+          "AWSSDK.S3": "3.5.10.2",
           "AWSSDK.SecurityToken": "3.5.1.16",
           "AWSSDK.StepFunctions": "3.5.3.37",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
@@ -1383,7 +1383,7 @@
           "AWSSDK.SQS": "3.5.1.28",
           "AWSSDK.SecurityToken": "3.5.0",
           "AWSSDK.StepFunctions": "3.5.0",
-          "Amazon.Lambda.SNSEvents": "1.2.0",
+          "Amazon.Lambda.SNSEvents": "2.0.0",
           "Lambdajection": "0.7.0",
           "Lambdajection.Encryption": "0.7.0",
           "System.Net.Http.Json": "3.2.1"
@@ -1393,7 +1393,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.ElasticLoadBalancingV2": "3.5.5.42",
-          "Amazon.Lambda.SNSEvents": "1.2.0",
+          "Amazon.Lambda.SNSEvents": "2.0.0",
           "Lambdajection": "0.7.0"
         }
       }
