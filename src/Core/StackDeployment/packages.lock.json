@@ -4,66 +4,66 @@
     ".NETCoreApp,Version=v3.1": {
       "Amazon.Lambda.SQSEvents": {
         "type": "Direct",
-        "requested": "[1.2.0, )",
-        "resolved": "1.2.0",
-        "contentHash": "24C5UjjGyuyOHfocw5d31YjsS+uS6I2Mrw2fuLCJx4stu2DgUFdEPTbL9FimAwPAcRdBpndKee6dYEinQMIiCw=="
+        "requested": "[2.0.0, )",
+        "resolved": "2.0.0",
+        "contentHash": "hL9l47f5/xSjmoavILhmS5qjoeDXxRPl0wWKc7muxXKH/DGeFmU+iCz0lx9a/lNjHXqZt/IVlVe4y1pswM7JDA=="
       },
       "AWSSDK.CloudFormation": {
         "type": "Direct",
-        "requested": "[3.5.0, )",
-        "resolved": "3.5.0",
-        "contentHash": "AS9lPQ+znYz20fos5wf0APTcEHpa7Csko9W1rORm1R0LX5N8Jv7tnjqDWN4E0waN2tAcjw/d8r2qmoXZUeVxng==",
+        "requested": "[3.7.0, )",
+        "resolved": "3.7.0",
+        "contentHash": "B34e8a9FPFbgNj1NRlmcwmtV1ypQ84twTZgEqHDxcf741ZIcJEti4Y0EjQWQp/Ey6M/1MgDD/0bxS26IgpJMlQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.7.0, 3.8.0)"
         }
       },
       "AWSSDK.S3": {
         "type": "Direct",
-        "requested": "[3.5.0, )",
-        "resolved": "3.5.0",
-        "contentHash": "CLlXO0FGY8CnzBJGyVrLAi4rTDYaNUzbitEZ6B7qvnVRUOG8HnWS3KU7nk/wm6fJVTpa+CSHoittUzHfZbY2+g==",
+        "requested": "[3.7.0, )",
+        "resolved": "3.7.0",
+        "contentHash": "UnpBl+aF2xBjtPPBZl/SUTs5YmyWhqGAhyR55fiNIYl/JWUJpJUhirVY/jzvjWZ3oqjnAVM27cj0oKvIwj6U/w==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.7.0, 3.8.0)"
         }
       },
       "AWSSDK.SecurityToken": {
         "type": "Direct",
-        "requested": "[3.5.0, )",
-        "resolved": "3.5.0",
-        "contentHash": "rrhQYdiSynCneAUlTFZivo7eo6+Sm+FKSWGvfLRN0FmERb53yOB28O5w/o0dmr3B7rZ1kReCU0O0De/WGzA4vw==",
+        "requested": "[3.7.0, )",
+        "resolved": "3.7.0",
+        "contentHash": "W/lN9OGpy5DRIItoD/wBIy8cZDE39dlfjT0YNkueTBpnEswu3wjI3iw5P69xVzPaLjXvNwK9vdBPbqkCr/k8dg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.7.0, 3.8.0)"
         }
       },
       "AWSSDK.StepFunctions": {
         "type": "Direct",
-        "requested": "[3.5.0, )",
-        "resolved": "3.5.0",
-        "contentHash": "qYYacB39ZTHjrOD/oqnZW/rL6IDfMP+YRC8z3q1zNRbDhl9eYWwzhGfyEpK3q628yDFyRmPmIntRsTvETFfYEA==",
+        "requested": "[3.7.0.5, )",
+        "resolved": "3.7.0.5",
+        "contentHash": "ZXIav6tzmTGBGIkYOhC2jO3PuP7ZmtkVe7pZkpNNwo1X/VRwC6LvmXed1yJ0NOovREW4/EJwqllNnPAoS2p+bQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.7.0.6, 3.8.0)"
         }
       },
       "Lambdajection": {
         "type": "Direct",
-        "requested": "[0.7.0, )",
-        "resolved": "0.7.0",
-        "contentHash": "hS/HeHCMmZ3xycN+LbXdWBF4/cUN1YxTQB4mlJeOAngmmVyRG3Ha17e8y+KOJSmfgFfB0Pg40t6axMOESswA3A==",
+        "requested": "[0.8.0-beta2, )",
+        "resolved": "0.8.0-beta2",
+        "contentHash": "3TbOxsFOjNwp8CEOFjsuySLGPpNYaWZM8To1opPbvENJWX75DgOCaLUN8a5T/P0sL63lgmiesCZ4ZuknckW1UA==",
         "dependencies": {
-          "Lambdajection.Attributes": "0.7.0",
-          "Lambdajection.Core": "0.7.0",
-          "Lambdajection.Framework": "0.7.0",
-          "Lambdajection.Framework.BuildTime": "0.7.0",
-          "Lambdajection.Generator": "0.7.0"
+          "Lambdajection.Attributes": "0.8.0-beta2",
+          "Lambdajection.Core": "0.8.0-beta2",
+          "Lambdajection.Framework": "0.8.0-beta2",
+          "Lambdajection.Framework.BuildTime": "0.8.0-beta2",
+          "Lambdajection.Generator": "0.8.0-beta2"
         }
       },
       "Lambdajection.Encryption": {
         "type": "Direct",
-        "requested": "[0.7.0, )",
-        "resolved": "0.7.0",
-        "contentHash": "/iVuRU9swm9TGgg91Ip8DthhIR5QXyGsGXj19JdNiuWM8CG5MhHy8RyAb7nIoN1Og+iFbC/nCQWNStz9nA708w==",
+        "requested": "[0.8.0-beta2, )",
+        "resolved": "0.8.0-beta2",
+        "contentHash": "z2+wzqjs2n1DS1ZJUw4eqk8fLIO/0NM/bBsNej4fk4ZjFHE5V7hDbrIOvNz14HPmikLFCxd8A1u3TTAtTWacTA==",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.5.2.16"
+          "AWSSDK.KeyManagementService": "3.7.0.5"
         }
       },
       "System.Net.Http.Json": {
@@ -77,8 +77,8 @@
       },
       "Amazon.Lambda.Core": {
         "type": "Transitive",
-        "resolved": "1.2.0",
-        "contentHash": "goaq1LaH1UJB18BNG/Apxmn0P7dAlLWFbxU2nKxK+M4lH2KJaZDbtlP2gFEAJ+aENOMBHthaLPEtk3944J2OOg=="
+        "resolved": "2.0.0",
+        "contentHash": "V4fw3pYuP1LyUJThpbrbLwy2b4TH3CPYh5oId/CgJvGkX7lSAVyOEmkdGvDhpjegxnS4rgw6tP7faftVBO9jwQ=="
       },
       "Amazon.Lambda.Serialization.SystemTextJson": {
         "type": "Transitive",
@@ -90,31 +90,31 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.3.5",
-        "contentHash": "xCmbEm0A+Tr94MrOHJoSJE5WRGcKOYjGMyXqHkSAbtUvfmSknUSk9tF/wXwP4QZ5L9KVP8UdBazoRxfSFCAWUA=="
+        "resolved": "3.7.0.6",
+        "contentHash": "2oHC7TTLUjwVIvyS3CmCGvDPpgfrm/2FrjRwB/jUPEGreHpGkvTZHgcWbiD9QkLx1BLWJMpP+jww7CXbTuZZXQ=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.5.2.16",
-        "contentHash": "a1jCnK9NSELFKr5yEGRXsn94w0DZ6CDTfmFQCtdLvIjLoQLegkBZpuk/nK5pDx3g7V/YFs7qHPfFsyFVlgOofA==",
+        "resolved": "3.7.0.5",
+        "contentHash": "icITqik6vsDogOaoCnv0TT1X1Ed6s0Gy9CpQvvDqPopEkAFxUKmgw62hCm5LycJAt0+5zJXoMk9PivnHppI6yw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.5, 3.6.0)"
+          "AWSSDK.Core": "[3.7.0.6, 3.8.0)"
         }
       },
       "Lambdajection.Attributes": {
         "type": "Transitive",
-        "resolved": "0.7.0",
-        "contentHash": "Pc0yrQNQ0zcmT0jtZzoIFmPxZ9rnBz4Kt3tLqLnEYw2A9/dHk68r83M3AgO5EZhkgmkBTN1fou4wuhOkCapsug=="
+        "resolved": "0.8.0-beta2",
+        "contentHash": "gWFZGQGPxyFhvb1boVbivcCqYa27ZJ5OJlFQindMobAcJyxskY5DdHN36wc5EiOEr5cBD9lL07j5QbfXI42/8Q=="
       },
       "Lambdajection.Core": {
         "type": "Transitive",
-        "resolved": "0.7.0",
-        "contentHash": "gFL7bbFnIGXVcJUy0rJp7B5MrtpRsFrRKKWPWsQAjkwOF0m8UVR0aQPury6Q45FGZ40xjnqmEJfM0ziRC+4qNA==",
+        "resolved": "0.8.0-beta2",
+        "contentHash": "cXq9XTzbGk72y8LqUGTzUQxUKaecqNScJE5VLqWjiYVYq2xRojiT68havAAGmTywAXXiFVnlJAcGmudKx0lFjg==",
         "dependencies": {
-          "Amazon.Lambda.Core": "1.2.0",
+          "Amazon.Lambda.Core": "2.0.0",
           "Amazon.Lambda.Serialization.SystemTextJson": "2.1.0",
-          "Lambdajection.Attributes": "0.7.0",
-          "Lambdajection.Framework": "0.7.0",
+          "Lambdajection.Attributes": "0.8.0-beta2",
+          "Lambdajection.Framework": "0.8.0-beta2",
           "Microsoft.Extensions.Configuration": "5.0.0",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.1",
@@ -124,18 +124,18 @@
       },
       "Lambdajection.Framework": {
         "type": "Transitive",
-        "resolved": "0.7.0",
-        "contentHash": "WyQjDFyBVMrLe1B0Nq3vKEeTJ4W+oOBH6vKMQrRjwb70kZvBvFqCRJ+Qz+p8EXzpIm3utFgGA/1L3Nh1+LcADQ=="
+        "resolved": "0.8.0-beta2",
+        "contentHash": "gavWrv8N0sCTeK7tL7gmAunHjFUpcyTunbSpa1Xbn8uE0uJ1IojSokdIVFx7KBKH3Mqd2eYHovCr2hGZkcmaZA=="
       },
       "Lambdajection.Framework.BuildTime": {
         "type": "Transitive",
-        "resolved": "0.7.0",
-        "contentHash": "n+5XKj8do9YY9SzJAgW4seoB2jUM0kD4mxsRTh3BGN6RQlyQRuVk63rYvU3WoJw7s5mMVTPvSOEcEv9NyQRa0g=="
+        "resolved": "0.8.0-beta2",
+        "contentHash": "NMSLXCYDALUi/vX1OWBWkbLR0kerHBMOcsqZ79uzfYvTYJg+BuJ8sraMGv+/ZlyYxUqEIEyiQM78pQQ+JasfaQ=="
       },
       "Lambdajection.Generator": {
         "type": "Transitive",
-        "resolved": "0.7.0",
-        "contentHash": "3c/RxbcwJpXCU+qvvW2G7Zw5Op8Ne0aJzvcOweD7UtqIhoywBDfT/UouPSIJTwgN2TNmKSPIiKHO6t0wdvL+Kg=="
+        "resolved": "0.8.0-beta2",
+        "contentHash": "rySwOZdDRu7Se9rdfD1U+24EpkiZFj6q2AothJHKy1NzJ1IJLNuOAdxmfBRoHU38V1+XJELWvVFDAbkiYmu54Q=="
       },
       "Microsoft.Extensions.Configuration": {
         "type": "Transitive",

@@ -4,20 +4,20 @@
     ".NETCoreApp,Version=v3.1": {
       "AWSSDK.CloudFormation": {
         "type": "Direct",
-        "requested": "[3.5.0, )",
-        "resolved": "3.5.0",
-        "contentHash": "AS9lPQ+znYz20fos5wf0APTcEHpa7Csko9W1rORm1R0LX5N8Jv7tnjqDWN4E0waN2tAcjw/d8r2qmoXZUeVxng==",
+        "requested": "[3.7.0, )",
+        "resolved": "3.7.0",
+        "contentHash": "B34e8a9FPFbgNj1NRlmcwmtV1ypQ84twTZgEqHDxcf741ZIcJEti4Y0EjQWQp/Ey6M/1MgDD/0bxS26IgpJMlQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.7.0, 3.8.0)"
         }
       },
       "AWSSDK.StepFunctions": {
         "type": "Direct",
-        "requested": "[3.5.0, )",
-        "resolved": "3.5.0",
-        "contentHash": "qYYacB39ZTHjrOD/oqnZW/rL6IDfMP+YRC8z3q1zNRbDhl9eYWwzhGfyEpK3q628yDFyRmPmIntRsTvETFfYEA==",
+        "requested": "[3.7.0, )",
+        "resolved": "3.7.0",
+        "contentHash": "A/cWlFZ7dBhvoiaxrMGN3RRlq+HplMI5ar0jgeHw57tQzLg4ijiESs7POnorXrDcEcEca+FUuQ+xfz/TywQ1BA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.7.0, 3.8.0)"
         }
       },
       "Cythral.CloudFormation.CustomResource": {
@@ -55,23 +55,23 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.3.9",
-        "contentHash": "mQpClYN6Rxb+RADnYOcKzNIN7Q/BULEGiDWtNc8KS3MBLtoYWnZVnHoALSW4UcL6cjTn3ACGH3dqXSkQmflukA=="
+        "resolved": "3.7.0.6",
+        "contentHash": "2oHC7TTLUjwVIvyS3CmCGvDPpgfrm/2FrjRwB/jUPEGreHpGkvTZHgcWbiD9QkLx1BLWJMpP+jww7CXbTuZZXQ=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.5.2.20",
-        "contentHash": "l3IhoM9aqM30NqZ/eAAJxTF0+xHXVsomTY4JAjNAP2IjExD9X/qFO+YAqoLlTyC6DSjZZ1o8rxcWaguTyZd2Ow==",
+        "resolved": "3.7.0.5",
+        "contentHash": "icITqik6vsDogOaoCnv0TT1X1Ed6s0Gy9CpQvvDqPopEkAFxUKmgw62hCm5LycJAt0+5zJXoMk9PivnHppI6yw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.3.9, 3.6.0)"
+          "AWSSDK.Core": "[3.7.0.6, 3.8.0)"
         }
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "rrhQYdiSynCneAUlTFZivo7eo6+Sm+FKSWGvfLRN0FmERb53yOB28O5w/o0dmr3B7rZ1kReCU0O0De/WGzA4vw==",
+        "resolved": "3.7.0.5",
+        "contentHash": "vuUa48puKOWa2qP07o0pjHardK9yRlo6rbiOCyL5q3jiH5N57wy6vztokE4EscZrKriXTTxrlBwXjhEFNdptZw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.7.0.6, 3.8.0)"
         }
       },
       "Cythral.CloudFormation.CustomResource.Attributes": {
@@ -140,14 +140,14 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.3.9",
-          "AWSSDK.SecurityToken": "3.5.0"
+          "AWSSDK.Core": "3.7.0.6",
+          "AWSSDK.SecurityToken": "3.7.0.5"
         }
       },
       "keymanagementservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.5.2.20",
+          "AWSSDK.KeyManagementService": "3.7.0.5",
           "AwsUtils.Common": "1.0.0"
         }
       }
