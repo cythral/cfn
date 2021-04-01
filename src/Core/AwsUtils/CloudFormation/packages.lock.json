@@ -4,23 +4,23 @@
     ".NETCoreApp,Version=v3.1": {
       "AWSSDK.CloudFormation": {
         "type": "Direct",
-        "requested": "[3.5.0, )",
-        "resolved": "3.5.0",
-        "contentHash": "AS9lPQ+znYz20fos5wf0APTcEHpa7Csko9W1rORm1R0LX5N8Jv7tnjqDWN4E0waN2tAcjw/d8r2qmoXZUeVxng==",
+        "requested": "[3.7.1.1, )",
+        "resolved": "3.7.1.1",
+        "contentHash": "gqYxZklKeSG/ev7l1SbJGPrC1q6wgDYFDzdr4IvF1TMw45vPQm5il/KNgqVZV+8ivypHMxk7/ZzvNfh3WyY/tA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.7.0.6, 3.8.0)"
         }
       },
       "Lambdajection.Core": {
         "type": "Direct",
-        "requested": "[0.7.0, )",
-        "resolved": "0.7.0",
-        "contentHash": "gFL7bbFnIGXVcJUy0rJp7B5MrtpRsFrRKKWPWsQAjkwOF0m8UVR0aQPury6Q45FGZ40xjnqmEJfM0ziRC+4qNA==",
+        "requested": "[0.8.0-beta3, )",
+        "resolved": "0.8.0-beta3",
+        "contentHash": "HpFcZUBkeLzUoVpNZWG4+IZLlAuo+xVidZA1Hi7ZhtqLCpig7h/Rrg/GQqnT4xBNci1H3h21zsBgKy7C9DzxXg==",
         "dependencies": {
-          "Amazon.Lambda.Core": "1.2.0",
+          "Amazon.Lambda.Core": "2.0.0",
           "Amazon.Lambda.Serialization.SystemTextJson": "2.1.0",
-          "Lambdajection.Attributes": "0.7.0",
-          "Lambdajection.Framework": "0.7.0",
+          "Lambdajection.Attributes": "0.8.0-beta3",
+          "Lambdajection.Framework": "0.8.0-beta3",
           "Microsoft.Extensions.Configuration": "5.0.0",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.1",
@@ -30,8 +30,8 @@
       },
       "Amazon.Lambda.Core": {
         "type": "Transitive",
-        "resolved": "1.2.0",
-        "contentHash": "goaq1LaH1UJB18BNG/Apxmn0P7dAlLWFbxU2nKxK+M4lH2KJaZDbtlP2gFEAJ+aENOMBHthaLPEtk3944J2OOg=="
+        "resolved": "2.0.0",
+        "contentHash": "V4fw3pYuP1LyUJThpbrbLwy2b4TH3CPYh5oId/CgJvGkX7lSAVyOEmkdGvDhpjegxnS4rgw6tP7faftVBO9jwQ=="
       },
       "Amazon.Lambda.Serialization.SystemTextJson": {
         "type": "Transitive",
@@ -43,26 +43,26 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.5.3.9",
-        "contentHash": "mQpClYN6Rxb+RADnYOcKzNIN7Q/BULEGiDWtNc8KS3MBLtoYWnZVnHoALSW4UcL6cjTn3ACGH3dqXSkQmflukA=="
+        "resolved": "3.7.0.6",
+        "contentHash": "2oHC7TTLUjwVIvyS3CmCGvDPpgfrm/2FrjRwB/jUPEGreHpGkvTZHgcWbiD9QkLx1BLWJMpP+jww7CXbTuZZXQ=="
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "rrhQYdiSynCneAUlTFZivo7eo6+Sm+FKSWGvfLRN0FmERb53yOB28O5w/o0dmr3B7rZ1kReCU0O0De/WGzA4vw==",
+        "resolved": "3.7.0.5",
+        "contentHash": "vuUa48puKOWa2qP07o0pjHardK9yRlo6rbiOCyL5q3jiH5N57wy6vztokE4EscZrKriXTTxrlBwXjhEFNdptZw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.5.0, 3.6.0)"
+          "AWSSDK.Core": "[3.7.0.6, 3.8.0)"
         }
       },
       "Lambdajection.Attributes": {
         "type": "Transitive",
-        "resolved": "0.7.0",
-        "contentHash": "Pc0yrQNQ0zcmT0jtZzoIFmPxZ9rnBz4Kt3tLqLnEYw2A9/dHk68r83M3AgO5EZhkgmkBTN1fou4wuhOkCapsug=="
+        "resolved": "0.8.0-beta3",
+        "contentHash": "xtRL4lTU4v8Ruvx8oA7v0CgStOKXj9DRyoC0sYQWGxS/i1PtBtYqz8NI3MmohSxYmDLh82+4ik2NB78hBAUONg=="
       },
       "Lambdajection.Framework": {
         "type": "Transitive",
-        "resolved": "0.7.0",
-        "contentHash": "WyQjDFyBVMrLe1B0Nq3vKEeTJ4W+oOBH6vKMQrRjwb70kZvBvFqCRJ+Qz+p8EXzpIm3utFgGA/1L3Nh1+LcADQ=="
+        "resolved": "0.8.0-beta3",
+        "contentHash": "nFY2NtA9Z4KqCQZe2tLD2IpNTctO0LTKspcIRUSlCB3LRaXYUP1gq7jsb9Dm8WT3Ul2DWaq660OCqtqd704VsQ=="
       },
       "Microsoft.Extensions.Configuration": {
         "type": "Transitive",
@@ -197,8 +197,8 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Core": "3.5.3.9",
-          "AWSSDK.SecurityToken": "3.5.0"
+          "AWSSDK.Core": "3.7.0.6",
+          "AWSSDK.SecurityToken": "3.7.0.5"
         }
       }
     }
