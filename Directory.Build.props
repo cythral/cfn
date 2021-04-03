@@ -1,9 +1,5 @@
 <Project>
     <PropertyGroup>
-        <LambdajectionVersion>0.7.0</LambdajectionVersion>
-    </PropertyGroup>
-
-    <PropertyGroup>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <RestoreLockedMode Condition="$(NUKEEPER) != 'true'">true</RestoreLockedMode>
         <OutputPath>$(MSBuildThisFileDirectory)bin/$(MSBuildProjectName)/$(Configuration)</OutputPath>

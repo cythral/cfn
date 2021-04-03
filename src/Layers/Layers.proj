@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Overrides Include="LambdajectionVersion=$(LambdajectionVersion)" />
+    <Overrides Include="LambdajectionVersion=0.8.0-beta3" />
   </ItemGroup>
 
   <ItemGroup>
