@@ -1655,9 +1655,9 @@
       "deploymentsupersession": {
         "type": "Project",
         "dependencies": {
+          "Amazon.Lambda.SQSEvents": "2.0.0",
           "AWSSDK.S3": "3.7.0.6",
           "AWSSDK.StepFunctions": "3.7.0",
-          "Amazon.Lambda.SQSEvents": "1.2.0",
           "Lambdajection": "0.8.0-beta3",
           "SimpleStorageService": "1.0.0"
         }
@@ -1731,11 +1731,11 @@
       "stackdeployment": {
         "type": "Project",
         "dependencies": {
+          "Amazon.Lambda.SQSEvents": "2.0.0",
           "AWSSDK.CloudFormation": "3.7.0",
           "AWSSDK.S3": "3.7.0",
           "AWSSDK.SecurityToken": "3.7.0",
           "AWSSDK.StepFunctions": "3.7.0.5",
-          "Amazon.Lambda.SQSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta3",
           "Lambdajection.Encryption": "0.8.0-beta3",
           "System.Net.Http.Json": "3.2.1"
