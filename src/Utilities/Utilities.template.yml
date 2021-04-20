@@ -778,6 +778,13 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:LoadBalancerDnsName
 
+  LoadBalancerCanonicalHostedZoneId:
+    Description: ID of the canonical hosted zone for the primary load balancer
+    Condition: SetupLoadBalancing
+    Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
+    Export:
+      Name: !Sub ${AWS::StackName}:LoadBalancerCanonicalHostedZoneId
+
   HttpListenerArn:
     Description: ARN of the http listener for the internal load balancer
     Condition: SetupLoadBalancing
