@@ -632,6 +632,13 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:VpcId
 
+  VPCHostedZoneId:
+    Description: ID of the private hosted zone
+    Condition: CreatePrivateHostedZone
+    Value: !Ref VPCHostedZone
+    Export:
+      Name: !Sub ${AWS::StackName}:VPCHostedZoneId
+
   SubnetIds:
     Description: Comma-delimited list of Subnet Ids
     Value: !Join
