@@ -44,16 +44,6 @@ Resources:
       HostedZoneConfig:
         Comment: The hosted zone for brigh.id
 
-  PrivateHostedZone:
-    Type: AWS::Route53::HostedZone
-    Properties:
-      Name: !Ref DomainName
-      HostedZoneConfig:
-        Comment: !Sub Private hosted zone for ${DomainName}
-      VPCs:
-        - VPCId: !ImportValue cfn-utilities:VpcId
-          VPCRegion: !Ref AWS::Region
-
   MoragRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
     Properties:
