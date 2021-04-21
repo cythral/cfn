@@ -29,19 +29,6 @@ Parameters:
     AllowedValues:
       - "true"
       - "false"
-  
-  CreatePrivateHostedZone:
-    Type: "String"
-    Description: Whether or not to create a private hosted zone and associate it with the VPC.
-    Default: "false"
-    AllowedValues:
-      - "true"
-      - "false"
-
-  DomainName:
-    Type: String
-    Description: Domain name to use for the private Hosted Zone.
-    Default: "brigh.id"
 
 Conditions:
   # Master/Shared account - one that has control of "agent" accounts like (dev/staging/prod)
@@ -71,10 +58,6 @@ Conditions:
       - !Ref SkipLoadBalancer
       - "false"
 
-  CreatePrivateHostedZone: !Equals 
-    - !Ref CreatePrivateHostedZone
-    - "true"
-
 Resources:
   # Storage
   # -------------------------------------------
@@ -95,15 +78,6 @@ Resources:
       CidrBlock: !Ref NetworkCidr
       EnableDnsSupport: true
       EnableDnsHostnames: true
-
-  VPCHostedZone:
-    Type: AWS::Route53::HostedZone
-    Condition: CreatePrivateHostedZone
-    Properties:
-      Name: !Ref DomainName
-      VPCs:
-        - VPCId: !Ref VPC
-          VPCRegion: !Ref AWS::Region
 
   VPCFlowLogGroup:
     Type: AWS::Logs::LogGroup
@@ -631,13 +605,6 @@ Outputs:
     Value: !Ref VPC
     Export:
       Name: !Sub ${AWS::StackName}:VpcId
-
-  VPCHostedZoneId:
-    Description: ID of the private hosted zone
-    Condition: CreatePrivateHostedZone
-    Value: !Ref VPCHostedZone
-    Export:
-      Name: !Sub ${AWS::StackName}:VPCHostedZoneId
 
   SubnetIds:
     Description: Comma-delimited list of Subnet Ids
