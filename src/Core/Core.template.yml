@@ -149,6 +149,29 @@ Resources:
             Values:
               - 10.0.0.0/8
 
+  SnsDevListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Condition: SetupDevAccount
+    Properties:
+      ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
+      Priority: 3
+      Actions:
+        - Type: forward
+          TargetGroupArn: !ImportValue cfn-gateway:DevTargetGroupArn
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - "dev.*"
+              - "*.dev.*"
+        - Field: http-header
+          HttpHeaderConfig:
+            HttpHeaderName: x-amz-sns-topic-arn
+            Values:
+              - !Sub
+                - arn:aws:sns:${AWS::Region}:${AccountId}:*
+                - AccountId: !ImportValue cfn-metadata:DevAccountId
+
   DevListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Condition: SetupDevAccount
