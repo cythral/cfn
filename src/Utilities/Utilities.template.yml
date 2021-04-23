@@ -791,3 +791,9 @@ Outputs:
     Value: !Ref HttpListener
     Export:
       Name: !Sub ${AWS::StackName}:HttpListenerArn
+
+  Ipv4NetworkCidr:
+    Description: Ipv4 CIDR Range for the VPC
+    Value: !Ref NetworkCidr
+    Export:
+      Name: !Sub ${AWS::StackName}:Ipv4NetworkCidr
