@@ -17,15 +17,6 @@
           "AWSSDK.Core": "[3.7.0, 3.8.0)"
         }
       },
-      "AWSSDK.S3": {
-        "type": "Direct",
-        "requested": "[3.7.0, )",
-        "resolved": "3.7.0",
-        "contentHash": "UnpBl+aF2xBjtPPBZl/SUTs5YmyWhqGAhyR55fiNIYl/JWUJpJUhirVY/jzvjWZ3oqjnAVM27cj0oKvIwj6U/w==",
-        "dependencies": {
-          "AWSSDK.Core": "[3.7.0, 3.8.0)"
-        }
-      },
       "AWSSDK.SecurityToken": {
         "type": "Direct",
         "requested": "[3.7.0, )",

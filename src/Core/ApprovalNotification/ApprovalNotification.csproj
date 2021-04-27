@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.7.0.6" />
     <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0" />
     <PackageReference Include="Brighid.Identity.Client" Version="0.1.92" />
     <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.0.6" />

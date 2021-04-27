@@ -8,15 +8,6 @@
         "resolved": "2.0.0",
         "contentHash": "hL9l47f5/xSjmoavILhmS5qjoeDXxRPl0wWKc7muxXKH/DGeFmU+iCz0lx9a/lNjHXqZt/IVlVe4y1pswM7JDA=="
       },
-      "AWSSDK.S3": {
-        "type": "Direct",
-        "requested": "[3.7.0.6, )",
-        "resolved": "3.7.0.6",
-        "contentHash": "iutzITgN449koghoKikX+wK0qoq9J4J2Q/5YwZVo0MNrWrsl8qU4flX9pYkLrg688bW980p1ynJYT4bjrU7fGw==",
-        "dependencies": {
-          "AWSSDK.Core": "[3.7.0.6, 3.8.0)"
-        }
-      },
       "AWSSDK.StepFunctions": {
         "type": "Direct",
         "requested": "[3.7.0, )",
@@ -54,8 +45,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.14",
-        "contentHash": "n9V+mwRStMzXl/GnD+J0uwnySMUB/Ug+yJ0G2B4XBQZYIegWWfqeQT2KqaP4hI08L49vY6JDIWIKEW4sNidNEg=="
+        "resolved": "3.7.0.15",
+        "contentHash": "8slVElCpnQQ+RhNjfZnZ3pdb90hQLcMhY37+yXEmn2F+fdLCFCK0EajM6jzv/3EZ7u8/+DoUQMF+OAjh+Qenjg=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
@@ -63,6 +54,14 @@
         "contentHash": "icITqik6vsDogOaoCnv0TT1X1Ed6s0Gy9CpQvvDqPopEkAFxUKmgw62hCm5LycJAt0+5zJXoMk9PivnHppI6yw==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.0.6, 3.8.0)"
+        }
+      },
+      "AWSSDK.S3": {
+        "type": "Transitive",
+        "resolved": "3.7.0.16",
+        "contentHash": "A3l4yAAYMH65mlk+FRoxsRLynUGUFS9mnykEE73kt2cgDz7UL8Oi+8e61cjN8FSiRREAHpyERG1T6SZrxoKxzw==",
+        "dependencies": {
+          "AWSSDK.Core": "[3.7.0.15, 3.8.0)"
         }
       },
       "AWSSDK.SecurityToken": {
@@ -1561,7 +1560,7 @@
       "simplestorageservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.0.6",
+          "AWSSDK.S3": "3.7.0.16",
           "AwsUtils.Common": "1.0.0"
         }
       }
