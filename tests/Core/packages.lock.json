@@ -132,10 +132,10 @@
       },
       "AWSSDK.CloudFormation": {
         "type": "Transitive",
-        "resolved": "3.7.1.1",
-        "contentHash": "gqYxZklKeSG/ev7l1SbJGPrC1q6wgDYFDzdr4IvF1TMw45vPQm5il/KNgqVZV+8ivypHMxk7/ZzvNfh3WyY/tA==",
+        "resolved": "3.7.1.11",
+        "contentHash": "I+Zu1pn4ZGgozaNdoFRklSrZU0Vg35e4z6bbLwudwT4js8FakQZe66NW2NAm1L3ImJBIPyMl4pwFr4mBtGaEAA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.6, 3.8.0)"
+          "AWSSDK.Core": "[3.7.0.15, 3.8.0)"
         }
       },
       "AWSSDK.Core": {
@@ -1645,7 +1645,7 @@
       "cloudformation": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.1.1",
+          "AWSSDK.CloudFormation": "3.7.1.11",
           "AwsUtils.Common": "1.0.0",
           "Lambdajection.Core": "0.8.0-beta3"
         }
@@ -1676,7 +1676,6 @@
       "githubwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.1.1",
           "AWSSDK.S3": "3.7.0.16",
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
@@ -1723,7 +1722,7 @@
       "stackdeployment": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.0",
+          "AWSSDK.CloudFormation": "3.7.1.11",
           "AWSSDK.S3": "3.7.0.16",
           "AWSSDK.SecurityToken": "3.7.1.3",
           "AWSSDK.StepFunctions": "3.7.0.5",
@@ -1736,7 +1735,7 @@
       "stackdeploymentstatus": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.0",
+          "AWSSDK.CloudFormation": "3.7.1.11",
           "AWSSDK.S3": "3.7.0.16",
           "AWSSDK.SQS": "3.7.0.6",
           "AWSSDK.SecurityToken": "3.7.1.3",

@@ -8,15 +8,6 @@
         "resolved": "2.1.0",
         "contentHash": "lxOKr4kuooqQV84YsNjgrJp7c4lcYDe+RPIMcdvpLEM6XlLzar38OoG4DeCdzsgnxy0aFQ25nzaDUnrqjIFC/A=="
       },
-      "AWSSDK.CloudFormation": {
-        "type": "Direct",
-        "requested": "[3.7.1.1, )",
-        "resolved": "3.7.1.1",
-        "contentHash": "gqYxZklKeSG/ev7l1SbJGPrC1q6wgDYFDzdr4IvF1TMw45vPQm5il/KNgqVZV+8ivypHMxk7/ZzvNfh3WyY/tA==",
-        "dependencies": {
-          "AWSSDK.Core": "[3.7.0.6, 3.8.0)"
-        }
-      },
       "AWSSDK.S3": {
         "type": "Direct",
         "requested": "[3.7.0.16, )",
@@ -99,6 +90,14 @@
         "contentHash": "q2R4I77NrrAHDpcaWby9VA/XhE1tjG/2kpredwucRq7k4dTPCqqB7OFmbiFdlfuErrp2/9+X1l62c4unwVicpw==",
         "dependencies": {
           "Amazon.Lambda.Core": "1.2.0"
+        }
+      },
+      "AWSSDK.CloudFormation": {
+        "type": "Transitive",
+        "resolved": "3.7.1.11",
+        "contentHash": "I+Zu1pn4ZGgozaNdoFRklSrZU0Vg35e4z6bbLwudwT4js8FakQZe66NW2NAm1L3ImJBIPyMl4pwFr4mBtGaEAA==",
+        "dependencies": {
+          "AWSSDK.Core": "[3.7.0.15, 3.8.0)"
         }
       },
       "AWSSDK.Core": {
@@ -1603,7 +1602,7 @@
       "cloudformation": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.1.1",
+          "AWSSDK.CloudFormation": "3.7.1.11",
           "AwsUtils.Common": "1.0.0",
           "Lambdajection.Core": "0.8.0-beta3"
         }
