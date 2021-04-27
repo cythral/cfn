@@ -10,11 +10,11 @@
       },
       "AWSSDK.CloudFormation": {
         "type": "Direct",
-        "requested": "[3.7.0, )",
-        "resolved": "3.7.0",
-        "contentHash": "B34e8a9FPFbgNj1NRlmcwmtV1ypQ84twTZgEqHDxcf741ZIcJEti4Y0EjQWQp/Ey6M/1MgDD/0bxS26IgpJMlQ==",
+        "requested": "[3.7.1.11, )",
+        "resolved": "3.7.1.11",
+        "contentHash": "I+Zu1pn4ZGgozaNdoFRklSrZU0Vg35e4z6bbLwudwT4js8FakQZe66NW2NAm1L3ImJBIPyMl4pwFr4mBtGaEAA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0, 3.8.0)"
+          "AWSSDK.Core": "[3.7.0.15, 3.8.0)"
         }
       },
       "AWSSDK.S3": {
