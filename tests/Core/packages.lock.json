@@ -185,10 +185,10 @@
       },
       "AWSSDK.SQS": {
         "type": "Transitive",
-        "resolved": "3.7.0.6",
-        "contentHash": "EaqyRQz+CPxy9/705mQ3SoMK7uDd926KKPVBL85gGxCCCUn7QaqczBZGntPxFl5Rud765yVHz1umrRhBhr4dxw==",
+        "resolved": "3.7.0.15",
+        "contentHash": "DP6GYdySNBO+kNt/3YeA6G9AvbY4W6CGx0vMpseCTgXNV1VCjm1TUYTdixpmLj/4HHHFfIIpWDjYoE+o0cWosw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.6, 3.8.0)"
+          "AWSSDK.Core": "[3.7.0.15, 3.8.0)"
         }
       },
       "AWSSDK.StepFunctions": {
@@ -1737,7 +1737,7 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.1.11",
           "AWSSDK.S3": "3.7.0.16",
-          "AWSSDK.SQS": "3.7.0.6",
+          "AWSSDK.SQS": "3.7.0.15",
           "AWSSDK.SecurityToken": "3.7.1.3",
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SNSEvents": "2.0.0",
