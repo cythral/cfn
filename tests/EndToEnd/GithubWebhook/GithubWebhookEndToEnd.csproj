@@ -9,7 +9,7 @@
     <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.0" />
     <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0" />
     <PackageReference Include="Cythral.CloudFormation.CustomResource" Version="0.2.27-alpha" />
-    <PackageReference Include="NUnitLite" Version="3.13.1" />
+    <PackageReference Include="NUnitLite" Version="3.13.2" />
     <PackageReference Include="Octokit" Version="0.47.0" />
   </ItemGroup>
 
