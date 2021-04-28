@@ -1721,10 +1721,9 @@
       "stackdeployment": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.0.17",
           "AWSSDK.CloudFormation": "3.7.1.12",
-          "AWSSDK.SecurityToken": "3.7.1.3",
-          "AWSSDK.S3": "3.7.0.16",
+          "AWSSDK.S3": "3.7.0.17",
+          "AWSSDK.SecurityToken": "3.7.1.4",
           "AWSSDK.StepFunctions": "3.7.0.14",
           "Amazon.Lambda.SQSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta3",
@@ -1735,8 +1734,8 @@
       "stackdeploymentstatus": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.0.17",
           "AWSSDK.CloudFormation": "3.7.1.12",
+          "AWSSDK.S3": "3.7.0.17",
           "AWSSDK.SQS": "3.7.0.15",
           "AWSSDK.SecurityToken": "3.7.1.4",
           "AWSSDK.StepFunctions": "3.7.0",
