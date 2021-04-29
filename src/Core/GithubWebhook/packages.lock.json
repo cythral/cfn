@@ -94,8 +94,8 @@
       },
       "AWSSDK.CloudFormation": {
         "type": "Transitive",
-        "resolved": "3.7.1.12",
-        "contentHash": "s/fTbzArzKOtQCS/5jeYci/yNXkqRa0760KxMMxftLeQxzfsYtaQrdY+CNm6ok5VBALpqXDwdjFJXa9lGqYx9Q==",
+        "resolved": "3.7.2",
+        "contentHash": "Fqs8hv7XDYx6NcNAiPlYJUzkBsLrdfMP0/V011A3f5A7BUqsGE5IdUVsxHRBg9kxSiZ7C8MpiFc2vVLEuSfl8g==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.0.16, 3.8.0)"
         }
@@ -1601,7 +1601,7 @@
       "cloudformation": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.1.12",
+          "AWSSDK.CloudFormation": "3.7.2",
           "AwsUtils.Common": "1.0.0",
           "Lambdajection.Core": "0.8.0-beta3"
         }
