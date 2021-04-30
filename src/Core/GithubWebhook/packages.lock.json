@@ -131,18 +131,18 @@
       },
       "Lambdajection.Attributes": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta3",
-        "contentHash": "xtRL4lTU4v8Ruvx8oA7v0CgStOKXj9DRyoC0sYQWGxS/i1PtBtYqz8NI3MmohSxYmDLh82+4ik2NB78hBAUONg=="
+        "resolved": "0.8.0-beta4",
+        "contentHash": "urOHWSp4mHSVSOGvfrXr44PdsddXw21lVCVYg9rRiFdch9qAshIXq0cMqiSZGKKDGSVMgWqz2VGV0/7w96SoUw=="
       },
       "Lambdajection.Core": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta3",
-        "contentHash": "HpFcZUBkeLzUoVpNZWG4+IZLlAuo+xVidZA1Hi7ZhtqLCpig7h/Rrg/GQqnT4xBNci1H3h21zsBgKy7C9DzxXg==",
+        "resolved": "0.8.0-beta4",
+        "contentHash": "VjXmBDaBW0+L1jb/5fYjexpLoyADHqy7iOhukTQ5cR8jK/w990BwQQCG+LGqqb4Ajl0O4mHE+ph/wSLQ/P6GoA==",
         "dependencies": {
           "Amazon.Lambda.Core": "2.0.0",
           "Amazon.Lambda.Serialization.SystemTextJson": "2.1.0",
-          "Lambdajection.Attributes": "0.8.0-beta3",
-          "Lambdajection.Framework": "0.8.0-beta3",
+          "Lambdajection.Attributes": "0.8.0-beta4",
+          "Lambdajection.Framework": "0.8.0-beta4",
           "Microsoft.Extensions.Configuration": "5.0.0",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.1",
@@ -152,8 +152,8 @@
       },
       "Lambdajection.Framework": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta3",
-        "contentHash": "nFY2NtA9Z4KqCQZe2tLD2IpNTctO0LTKspcIRUSlCB3LRaXYUP1gq7jsb9Dm8WT3Ul2DWaq660OCqtqd704VsQ=="
+        "resolved": "0.8.0-beta4",
+        "contentHash": "v1nHtONE0l+6TdpN3YnsmI+1MePJ7dXumcAh4Q3lKqQ1fk/Xq4Wd/TWvfiX+9wp2dJWezPxhK75tnk4GvB5B0Q=="
       },
       "Lambdajection.Framework.BuildTime": {
         "type": "Transitive",
@@ -1603,7 +1603,7 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.2",
           "AwsUtils.Common": "1.0.0",
-          "Lambdajection.Core": "0.8.0-beta3"
+          "Lambdajection.Core": "0.8.0-beta4"
         }
       }
     },
