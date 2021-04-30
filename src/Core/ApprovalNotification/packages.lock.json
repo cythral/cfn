@@ -58,9 +58,9 @@
       },
       "Lambdajection.Runtime": {
         "type": "Direct",
-        "requested": "[0.8.0-beta3, )",
-        "resolved": "0.8.0-beta3",
-        "contentHash": "ATXHVWcp5nq6huiZbKPhn4SY8yFGP3ZqeNE9UjV9GyKyMB9U4J9MGgpADsY/+/nTxkNu4tqm5AWe5pqi3RX0XQ==",
+        "requested": "[0.8.0-beta4, )",
+        "resolved": "0.8.0-beta4",
+        "contentHash": "YYWtxZTYQNfkJwK8yCq4KFpfDt5WofMNZbK6MyPo70RoSp2nFa0YNK6UgEPSdbUijNZ+6tWL6or5w14mZV2sBg==",
         "dependencies": {
           "Amazon.Lambda.RuntimeSupport": "1.3.0"
         }
