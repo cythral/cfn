@@ -68,11 +68,12 @@
       },
       "Lambdajection.Encryption": {
         "type": "Direct",
-        "requested": "[0.8.0-beta3, )",
-        "resolved": "0.8.0-beta3",
-        "contentHash": "e2Oig3GKvNbqtaI2ZWAh0qacGMa9pC3zcibklP7jwP7ztzyG5DXWtsdHKcDTCQ3mSnqK0plwdQl9b261lfq7Fw==",
+        "requested": "[0.8.0-beta4, )",
+        "resolved": "0.8.0-beta4",
+        "contentHash": "9R+WeQRq6kQKydnLu+6xwB9+KKvL0xOySBaScZGnQ9UnnorZMKTGSMtYExRNBMxR+yGMa865HQ92y5MobcdNKg==",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.7.0.5"
+          "AWSSDK.KeyManagementService": "3.7.0.15",
+          "Lambdajection.Framework": "0.8.0-beta4"
         }
       },
       "System.Net.Http.Json": {
@@ -104,10 +105,10 @@
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.7.0.5",
-        "contentHash": "icITqik6vsDogOaoCnv0TT1X1Ed6s0Gy9CpQvvDqPopEkAFxUKmgw62hCm5LycJAt0+5zJXoMk9PivnHppI6yw==",
+        "resolved": "3.7.0.15",
+        "contentHash": "aDWrQ398eJf48IgxrZl7Nlyb9Gi9HLj4qRvYL97EJfK+BZnytbuGTeIaJS+aFW0jVHpNJhyqR3/RS54VJ437nw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.6, 3.8.0)"
+          "AWSSDK.Core": "[3.7.0.16, 3.8.0)"
         }
       },
       "Humanizer.Core": {
@@ -141,8 +142,8 @@
       },
       "Lambdajection.Framework": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta3",
-        "contentHash": "nFY2NtA9Z4KqCQZe2tLD2IpNTctO0LTKspcIRUSlCB3LRaXYUP1gq7jsb9Dm8WT3Ul2DWaq660OCqtqd704VsQ=="
+        "resolved": "0.8.0-beta4",
+        "contentHash": "v1nHtONE0l+6TdpN3YnsmI+1MePJ7dXumcAh4Q3lKqQ1fk/Xq4Wd/TWvfiX+9wp2dJWezPxhK75tnk4GvB5B0Q=="
       },
       "Lambdajection.Framework.BuildTime": {
         "type": "Transitive",
