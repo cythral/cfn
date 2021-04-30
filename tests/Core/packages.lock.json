@@ -1644,7 +1644,7 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.2",
           "AwsUtils.Common": "1.0.0",
-          "Lambdajection.Core": "0.8.0-beta3"
+          "Lambdajection.Core": "0.8.0-beta4"
         }
       },
       "deploymentsupersession": {
