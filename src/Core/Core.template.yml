@@ -826,6 +826,24 @@ Resources:
       ServerType: GITHUB
       AuthType: PERSONAL_ACCESS_TOKEN
 
+  CodeStarConnection:
+    Type: AWS::CodeStarConnections::Connection
+    Properties:
+      ConnectionName: GitHub
+      ProviderType: GitHub
+
+  CodeStarConnectionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Roles:
+        - Builder
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: codestar-connections:UseConnection
+            Resource: !Ref CodeStarConnection
+
 Outputs:
   DevPeeringConnectionId:
     Value: !Ref DevPeeringConnection
@@ -883,3 +901,9 @@ Outputs:
     Description: ARN of the S3 Tag Outdated Artifacts function for use in step function pipelines
     Export:
       Name: !Sub ${AWS::StackName}:S3TagOutdatedArtifactsFunctionArn
+  
+  CodeStarConnectionArn:
+    Value: !Ref CodeStarConnection
+    Description: ARN of the Code Star Connection.
+    Export:
+      Name: !Sub ${AWS::StackName}:CodeStarConnectionArn

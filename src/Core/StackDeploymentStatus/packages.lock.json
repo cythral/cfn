@@ -37,11 +37,11 @@
       },
       "AWSSDK.SQS": {
         "type": "Direct",
-        "requested": "[3.7.0.16, )",
-        "resolved": "3.7.0.16",
-        "contentHash": "nrWcUVFi4vVbVD0/a8k2W52U0gQFWAMb6lz90HgG1RQu0zDEOOnHG4kXsORJvdAjB6reelKqtqEYqpb8RKmv0w==",
+        "requested": "[3.7.0.17, )",
+        "resolved": "3.7.0.17",
+        "contentHash": "VO8G1XdzjJ7eZ+c54kn5VMCeXDKVvdj0XpnHX5BhfqGABYbU42Gg/T8HbNw0/zCuMByBYFstY5QZQmQ2FB5KKw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.16, 3.8.0)"
+          "AWSSDK.Core": "[3.7.0.17, 4.0.0)"
         }
       },
       "AWSSDK.StepFunctions": {
