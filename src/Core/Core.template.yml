@@ -832,6 +832,18 @@ Resources:
       ConnectionName: GitHub
       ProviderType: GitHub
 
+  CodeStarConnectionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Roles:
+        - Builder
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: codestar-connections:UseConnection
+            Resource: !Ref CodeStarConnection
+
 Outputs:
   DevPeeringConnectionId:
     Value: !Ref DevPeeringConnection
