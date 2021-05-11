@@ -140,8 +140,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.18",
-        "contentHash": "5nzrJ9UvHCMEIFxsbwjW7tJklm1wNVgGXoo1wVYD+54ikY+tDK5hputUkS2kmgrwkqJbtWJEsyo+B6jE+O7IEg=="
+        "resolved": "3.7.0.20",
+        "contentHash": "/XLFqX6JiE/9L24bDjmbnjm8fVHx4VRuxogA/1z+pXMAy+UU+aamVlWAIS2W68Lo+qAiM5IR2xNNTFQnJN/CyA=="
       },
       "AWSSDK.ElasticLoadBalancingV2": {
         "type": "Transitive",
@@ -169,10 +169,10 @@
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.7.1.5",
-        "contentHash": "k92hRtuj3SbTDlG1TXJAFD/oHIiVRQRq878wh6KpwhtXx/U6XpuR0JR/9NoD0pXe+NvAe/jYevD8CPTmZW6vDw==",
+        "resolved": "3.7.1.8",
+        "contentHash": "LXjRNX8lXAZOplGcA/fTp287AB77rwK2IXO4gA3IyUM91P6QtqDL+xK+Y8KLneQB4l9vtRb9NWwBO7BYwRRmtQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.17, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.20, 4.0.0)"
         }
       },
       "AWSSDK.SimpleNotificationService": {
@@ -1637,7 +1637,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "3.7.1.5"
+          "AWSSDK.SecurityToken": "3.7.1.8"
         }
       },
       "cloudformation": {
@@ -1722,7 +1722,7 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.2.2",
           "AWSSDK.S3": "3.7.0.17",
-          "AWSSDK.SecurityToken": "3.7.1.5",
+          "AWSSDK.SecurityToken": "3.7.1.8",
           "AWSSDK.StepFunctions": "3.7.0.16",
           "Amazon.Lambda.SQSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta4",
@@ -1735,8 +1735,8 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.2.2",
           "AWSSDK.S3": "3.7.0.17",
-          "AWSSDK.SecurityToken": "3.7.1.5",
           "AWSSDK.SQS": "3.7.0.17",
+          "AWSSDK.SecurityToken": "3.7.1.8",
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SNSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta4",
