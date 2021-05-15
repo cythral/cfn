@@ -140,8 +140,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.18",
-        "contentHash": "5nzrJ9UvHCMEIFxsbwjW7tJklm1wNVgGXoo1wVYD+54ikY+tDK5hputUkS2kmgrwkqJbtWJEsyo+B6jE+O7IEg=="
+        "resolved": "3.7.0.22",
+        "contentHash": "oDF5+G81jJRUaV55KcSPPSGfHJv/KGu8lodCfxmHcoZcG3j7QbHkiEfd5NUWe9vcrH3ycZBXvaenenLN0VZhDQ=="
       },
       "AWSSDK.ElasticLoadBalancingV2": {
         "type": "Transitive",
@@ -153,10 +153,10 @@
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.7.0.17",
-        "contentHash": "gLJ4ifmxIn5yJHDmmdW5h649140pngTIgFFnwLP9O8vmOHZYypEzVzwcZzhyP4gnCUNyqtBw83dP1yNCrC8e+A==",
+        "resolved": "3.7.0.21",
+        "contentHash": "e7ZSoaQi/iyORyK4wg8NP7SxDdAWby57aw9feaZSc2HStYOTryEBI7VpQ27sLLNTJ9yOB3YzJwztVmp5If2wEw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.18, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.22, 4.0.0)"
         }
       },
       "AWSSDK.S3": {
@@ -1688,7 +1688,7 @@
       "keymanagementservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.7.0.17",
+          "AWSSDK.KeyManagementService": "3.7.0.21",
           "AwsUtils.Common": "1.0.0"
         }
       },
@@ -1735,8 +1735,8 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.2.2",
           "AWSSDK.S3": "3.7.0.17",
-          "AWSSDK.SecurityToken": "3.7.1.5",
           "AWSSDK.SQS": "3.7.0.17",
+          "AWSSDK.SecurityToken": "3.7.1.5",
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SNSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta4",
