@@ -72,7 +72,7 @@
       "ResultPath": "$.UtilityOutputs.Shared",
       "Parameters": {
         "QueueUrl": "${DeploymentQueue}",
-        "MessageGroupId": "${GithubRepo}",
+        "MessageGroupId": "${GithubRepo}-utilities-shared",
         "MessageBody": {
           "StackName": "cfn-utilities",
           "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
@@ -374,7 +374,7 @@
       "ResultPath": null,
       "Parameters": {
         "QueueUrl": "${DeploymentQueue}",
-        "MessageGroupId": "${GithubRepo}",
+        "MessageGroupId": "${GithubRepo}-core",
         "MessageBody": {
           "StackName": "cfn-core",
           "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
