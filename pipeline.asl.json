@@ -196,7 +196,7 @@
               "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
               "Parameters": {
                 "QueueUrl": "${DeploymentQueue}",
-                "MessageGroupId": "${GithubRepo}",
+                "MessageGroupId": "${GithubRepo}-layers-shared",
                 "MessageBody": {
                   "StackName": "cfn-layers",
                   "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
@@ -221,6 +221,70 @@
           }
         },
         {
+          "StartAt": "Dev",
+          "States": {
+            "Dev": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+              "Parameters": {
+                "QueueUrl": "${DeploymentQueue}",
+                "MessageGroupId": "${GithubRepo}-layers-dev",
+                "MessageBody": {
+                  "StackName": "cfn-layers",
+                  "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                  "TemplateFileName": "Layers.template.yml",
+                  "TemplateConfigurationFileName": "Layers.config.json",
+                  "RoleArn": "${DevRoleArn}",
+                  "Token.$": "$$.Task.Token",
+                  "Capabilities": [
+                    "CAPABILITY_IAM",
+                    "CAPABILITY_AUTO_EXPAND"
+                  ],
+                  "EnvironmentName": "dev",
+                  "CommitInfo": {
+                    "GithubOwner": "${GithubOwner}",
+                    "GithubRepository": "${GithubRepo}",
+                    "GithubRef.$": "$.head_commit.id"
+                  }
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Prod",
+          "States": {
+            "Prod": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+              "Parameters": {
+                "QueueUrl": "${DeploymentQueue}",
+                "MessageGroupId": "${GithubRepo}-layers-prod",
+                "MessageBody": {
+                  "StackName": "cfn-layers",
+                  "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                  "TemplateFileName": "Layers.template.yml",
+                  "TemplateConfigurationFileName": "Layers.config.json",
+                  "RoleArn": "${ProdRoleArn}",
+                  "Token.$": "$$.Task.Token",
+                  "Capabilities": [
+                    "CAPABILITY_IAM",
+                    "CAPABILITY_AUTO_EXPAND"
+                  ],
+                  "EnvironmentName": "prod",
+                  "CommitInfo": {
+                    "GithubOwner": "${GithubOwner}",
+                    "GithubRepository": "${GithubRepo}",
+                    "GithubRef.$": "$.head_commit.id"
+                  }
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
           "StartAt": "Oss",
           "States": {
             "Oss": {
@@ -228,7 +292,7 @@
               "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
               "Parameters": {
                 "QueueUrl": "${DeploymentQueue}",
-                "MessageGroupId": "${GithubRepo}",
+                "MessageGroupId": "${GithubRepo}-layers-oss",
                 "MessageBody": {
                   "StackName": "cfn-layers",
                   "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
@@ -261,7 +325,7 @@
       "ResultPath": null,
       "Parameters": {
         "QueueUrl": "${DeploymentQueue}",
-        "MessageGroupId": "${GithubRepo}",
+        "MessageGroupId": "${GithubRepo}-dns",
         "MessageBody": {
           "StackName": "cfn-dns",
           "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
@@ -286,7 +350,7 @@
       "ResultPath": null,
       "Parameters": {
         "QueueUrl": "${DeploymentQueue}",
-        "MessageGroupId": "${GithubRepo}",
+        "MessageGroupId": "${GithubRepo}-gateway",
         "MessageBody": {
           "StackName": "cfn-gateway",
           "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
