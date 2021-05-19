@@ -10,11 +10,11 @@
       },
       "AWSSDK.CloudFormation": {
         "type": "Direct",
-        "requested": "[3.7.2.2, )",
-        "resolved": "3.7.2.2",
-        "contentHash": "3bTxj4GQJjATZdmo6RMyaLRSMXDgh98p/nvDPVK3+hBaBR2SI4+JDjRIxymA1Ci4KFeqkjBDW95PqS5HNXNn2w==",
+        "requested": "[3.7.2.7, )",
+        "resolved": "3.7.2.7",
+        "contentHash": "nOWF47IrTAUA7rKzoiVnOAqXt7bFd5t1uo8drCNTtnbTB8X+lr7pTV1IgYc3snvAgReLGVOwG6imQcixqwOnIQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.18, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.23, 4.0.0)"
         }
       },
       "AWSSDK.S3": {
@@ -91,8 +91,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.18",
-        "contentHash": "5nzrJ9UvHCMEIFxsbwjW7tJklm1wNVgGXoo1wVYD+54ikY+tDK5hputUkS2kmgrwkqJbtWJEsyo+B6jE+O7IEg=="
+        "resolved": "3.7.0.23",
+        "contentHash": "RFbszK1tb3JnfRWj2jYLA121NvOmeCjzVbWVLnvQDmI9JHA76lJai9Qv96WkZwtq7Cc9lIwsZ+R8ErbwyjkkXw=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
