@@ -37,11 +37,11 @@
       },
       "AWSSDK.StepFunctions": {
         "type": "Direct",
-        "requested": "[3.7.0.16, )",
-        "resolved": "3.7.0.16",
-        "contentHash": "jdEC5GRlrNYY99MpAqW9BdVzl7GwskFRRRaySIniALAKnqEIfzNaA2Xe/B5Y9gL4m1bl48o5pPe2vQ3UqesEdA==",
+        "requested": "[3.7.0.24, )",
+        "resolved": "3.7.0.24",
+        "contentHash": "DHlb3IcSIqqABb/nSso9IPDaMBKFCNEDhrEcuTLTy7VfP4KIFWcuv3AW7SsyoDQRVY0ABOmzer+e0Xdwxs1UyQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.17, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.25, 4.0.0)"
         }
       },
       "Lambdajection": {
@@ -91,8 +91,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.18",
-        "contentHash": "5nzrJ9UvHCMEIFxsbwjW7tJklm1wNVgGXoo1wVYD+54ikY+tDK5hputUkS2kmgrwkqJbtWJEsyo+B6jE+O7IEg=="
+        "resolved": "3.7.0.25",
+        "contentHash": "lAmeDwnGaFWi5GnXC+kgTJyHTlJFyaegYOXtsEaX3rvXn01OPdtSqk1D9wSMUz8Bp5aUrioKqXCPDua0v62SJA=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",

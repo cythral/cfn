@@ -140,8 +140,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.18",
-        "contentHash": "5nzrJ9UvHCMEIFxsbwjW7tJklm1wNVgGXoo1wVYD+54ikY+tDK5hputUkS2kmgrwkqJbtWJEsyo+B6jE+O7IEg=="
+        "resolved": "3.7.0.25",
+        "contentHash": "lAmeDwnGaFWi5GnXC+kgTJyHTlJFyaegYOXtsEaX3rvXn01OPdtSqk1D9wSMUz8Bp5aUrioKqXCPDua0v62SJA=="
       },
       "AWSSDK.ElasticLoadBalancingV2": {
         "type": "Transitive",
@@ -193,10 +193,10 @@
       },
       "AWSSDK.StepFunctions": {
         "type": "Transitive",
-        "resolved": "3.7.0.16",
-        "contentHash": "jdEC5GRlrNYY99MpAqW9BdVzl7GwskFRRRaySIniALAKnqEIfzNaA2Xe/B5Y9gL4m1bl48o5pPe2vQ3UqesEdA==",
+        "resolved": "3.7.0.24",
+        "contentHash": "DHlb3IcSIqqABb/nSso9IPDaMBKFCNEDhrEcuTLTy7VfP4KIFWcuv3AW7SsyoDQRVY0ABOmzer+e0Xdwxs1UyQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.17, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.25, 4.0.0)"
         }
       },
       "Brighid.Identity.Client": {
@@ -1723,7 +1723,7 @@
           "AWSSDK.CloudFormation": "3.7.2.2",
           "AWSSDK.S3": "3.7.0.17",
           "AWSSDK.SecurityToken": "3.7.1.5",
-          "AWSSDK.StepFunctions": "3.7.0.16",
+          "AWSSDK.StepFunctions": "3.7.0.24",
           "Amazon.Lambda.SQSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta4",
           "Lambdajection.Encryption": "0.8.0-beta4",
@@ -1735,8 +1735,8 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.2.2",
           "AWSSDK.S3": "3.7.0.17",
-          "AWSSDK.SecurityToken": "3.7.1.5",
           "AWSSDK.SQS": "3.7.0.17",
+          "AWSSDK.SecurityToken": "3.7.1.5",
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SNSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta4",
