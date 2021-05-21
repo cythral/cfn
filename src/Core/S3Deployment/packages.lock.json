@@ -64,18 +64,18 @@
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.7.0.17",
-        "contentHash": "gLJ4ifmxIn5yJHDmmdW5h649140pngTIgFFnwLP9O8vmOHZYypEzVzwcZzhyP4gnCUNyqtBw83dP1yNCrC8e+A==",
+        "resolved": "3.7.0.24",
+        "contentHash": "4/Q1IMc2Da+qPGiNiY1zcyxJujaNGr6MHyau+bDemf8yuVuxwCIpYVETBGiUvHEIbpGldYs7o3OAx2JRi4Y62A==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.18, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.25, 4.0.0)"
         }
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "3.7.0.17",
-        "contentHash": "pwaYCUbr2R2z7pB8OD+GFHYICYMJZcUHxnig0gbAYltuJqAasmf11Y/EeO/7OceIb+XCbhWuI0Tx//y5d/cezQ==",
+        "resolved": "3.7.0.26",
+        "contentHash": "H4qbw6TZVNgVKQ12sSGKie822RKMxuUE4NMjldacBMlvxQPVJLvUMKY2HD2OEGseLt1aIKyN9kunVtjotNOYLw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.16, 3.8.0)"
+          "AWSSDK.Core": "[3.7.0.25, 4.0.0)"
         }
       },
       "AWSSDK.SecurityToken": {
@@ -1576,14 +1576,14 @@
       "keymanagementservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.7.0.17",
+          "AWSSDK.KeyManagementService": "3.7.0.24",
           "AwsUtils.Common": "1.0.0"
         }
       },
       "simplestorageservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.0.17",
+          "AWSSDK.S3": "3.7.0.26",
           "AwsUtils.Common": "1.0.0"
         }
       }
