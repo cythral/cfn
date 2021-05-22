@@ -4,17 +4,17 @@
     ".NETCoreApp,Version=v3.1": {
       "AWSSDK.KeyManagementService": {
         "type": "Direct",
-        "requested": "[3.7.0.24, )",
-        "resolved": "3.7.0.24",
-        "contentHash": "4/Q1IMc2Da+qPGiNiY1zcyxJujaNGr6MHyau+bDemf8yuVuxwCIpYVETBGiUvHEIbpGldYs7o3OAx2JRi4Y62A==",
+        "requested": "[3.7.0.25, )",
+        "resolved": "3.7.0.25",
+        "contentHash": "wtfpXG5bc7PnwlXg2MveMSFDnwIZX/KdcJEILZyRVWqnL5ca+XlB0uHl62LbQX7gYrpoZ795qIwDlg9jebmaGA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.25, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.26, 4.0.0)"
         }
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.25",
-        "contentHash": "lAmeDwnGaFWi5GnXC+kgTJyHTlJFyaegYOXtsEaX3rvXn01OPdtSqk1D9wSMUz8Bp5aUrioKqXCPDua0v62SJA=="
+        "resolved": "3.7.0.26",
+        "contentHash": "Zr0Tf1wkzQqJH0sevplHW9fn8I+8aoVL/dbOlsZqtgTxw2SytSSkIZUP6gQYsNdyEr3VJPcQ9LT6umU3YI9uFA=="
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
