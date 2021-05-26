@@ -106,7 +106,9 @@
           "ParameterOverrides": {
             "MasterAccountId": "${AccountId}",
             "NetworkCidr": "10.2.0.0/16",
-            "PeeringConnectionId.$": "$.NetworkingConfig.DevPeeringConnectionId"
+            "PeeringConnectionId.$": "$.NetworkingConfig.DevPeeringConnectionId",
+            "CreatePrivateHostedZone": "true",
+            "DomainName": "dev.brigh.id"
           },
           "Capabilities": ["CAPABILITY_NAMED_IAM"],
           "EnvironmentName": "dev",
@@ -135,7 +137,9 @@
           "ParameterOverrides": {
             "MasterAccountId": "${AccountId}",
             "NetworkCidr": "10.3.0.0/16",
-            "PeeringConnectionId.$": "$.NetworkingConfig.ProdPeeringConnectionId"
+            "PeeringConnectionId.$": "$.NetworkingConfig.ProdPeeringConnectionId",
+            "CreatePrivateHostedZone": "true",
+            "DomainName": "brigh.id"
           },
           "Capabilities": ["CAPABILITY_NAMED_IAM"],
           "EnvironmentName": "prod",
