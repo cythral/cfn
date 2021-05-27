@@ -1735,8 +1735,8 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.2.11",
           "AWSSDK.S3": "3.7.0.26",
-          "AWSSDK.SecurityToken": "3.7.1.15",
           "AWSSDK.SQS": "3.7.0.27",
+          "AWSSDK.SecurityToken": "3.7.1.15",
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SNSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta4",
