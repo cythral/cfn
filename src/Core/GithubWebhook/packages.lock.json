@@ -95,16 +95,16 @@
       },
       "AWSSDK.CloudFormation": {
         "type": "Transitive",
-        "resolved": "3.7.2.11",
-        "contentHash": "RaIXXJSYGB1kH2Rvd8Bq0nyq8tPQkiYdIEmsQJNq+9r7wy+wtuEOwIsCfS1vV/1130W1aw73WigTUhlYL1DtNg==",
+        "resolved": "3.7.2.12",
+        "contentHash": "yF2Cpl0lRR+28ot2YG0IPLjMPnOzzVzyMojDQnqLvA/wGKxEMibCy2sTPjs7tSloMG+kV20ecsKMrVjpp6M4aQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.27, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.28, 4.0.0)"
         }
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.27",
-        "contentHash": "IYfqUYQIjwWo9gTMXdhYWuUm3txd+O4xwX8z7utsVpwdQCzBm/dNK0uXJFJqlmj5vY14wXBCKWY2WFhol+LrUA=="
+        "resolved": "3.7.0.28",
+        "contentHash": "mSHKz7EPtfEeg2DYgqnLPE/Ra4c48q3eLxglfQQ5GGqaw4MdufQLN0sdLmoxIqvwKN8FZ8JoTXcxwYG3MUsumA=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
@@ -1600,7 +1600,7 @@
       "cloudformation": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.2.11",
+          "AWSSDK.CloudFormation": "3.7.2.12",
           "AwsUtils.Common": "1.0.0",
           "Lambdajection.Core": "0.8.0-beta4"
         }
