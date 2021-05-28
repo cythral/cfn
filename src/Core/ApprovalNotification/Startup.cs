@@ -32,10 +32,9 @@ namespace Cythral.CloudFormation.ApprovalNotification
             services.AddSingleton<ApprovalCanceler>();
 
             services.AddSingleton<ILinkService, DefaultLinkService>();
-            services.UseBrighidIdentity<ILinkService, DefaultLinkService>(options => options
-                .WithBaseAddress("https://cythr.al/")
-                .WithCredentials<Config>("Lambda")
-            );
+
+            services.ConfigureBrighidIdentity("Lambda");
+            services.UseBrighidIdentity<ILinkService, DefaultLinkService>();
         }
     }
 }
