@@ -1,3 +1,5 @@
+using System;
+
 using Amazon.S3;
 using Amazon.SimpleNotificationService;
 using Amazon.StepFunctions;
@@ -34,7 +36,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
             services.AddSingleton<ILinkService, DefaultLinkService>();
 
             services.ConfigureBrighidIdentity("Lambda");
-            services.UseBrighidIdentity<ILinkService, DefaultLinkService>("https://cythr.al");
+            services.UseBrighidIdentity<ILinkService, DefaultLinkService>(new Uri("https://cythr.al"));
         }
     }
 }
