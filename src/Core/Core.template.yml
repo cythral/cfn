@@ -688,6 +688,7 @@ Resources:
           Lambda__StateStore: !Ref StateStore
           Lambda__ClientId: !GetAtt ApprovalNotificationClient.Id
           Lambda__ClientSecret: !GetAtt ApprovalNotificationClient.EncryptedSecret
+          Lambda__IdentityServerUri: https://identity.brigh.id
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
 
   ApprovalNotificationPolicy:
