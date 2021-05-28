@@ -1,12 +1,10 @@
-using Brighid.Identity.Client;
-
 using Lambdajection.Attributes;
 using Lambdajection.Encryption;
 
 namespace Cythral.CloudFormation.ApprovalNotification
 {
     [LambdaOptions(typeof(Handler), "Lambda")]
-    public class Config : IClientCredentials
+    public class Config
     {
         public string BaseUrl { get; set; }
 
