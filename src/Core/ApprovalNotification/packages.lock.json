@@ -4,11 +4,11 @@
     ".NETCoreApp,Version=v5.0": {
       "AWSSDK.SimpleNotificationService": {
         "type": "Direct",
-        "requested": "[3.7.1.13, )",
-        "resolved": "3.7.1.13",
-        "contentHash": "mdJ/atvqVjkKR81vqfcDDkBZ4ImI7RAWClpCLkiKZf+gt4x/devqxF2Z08RyePzxdSseEDNo6G/frkg5YphzMQ==",
+        "requested": "[3.7.1.14, )",
+        "resolved": "3.7.1.14",
+        "contentHash": "mc16UYjr9RiCaMwSmfj4JfuOAyNObqLIns+GWVKzNQRjp/Pt7jt0obAQDbtuWykAXk32g7wUow1jLJInAqFxwg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.28, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.29, 4.0.0)"
         }
       },
       "AWSSDK.StepFunctions": {
@@ -90,8 +90,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.28",
-        "contentHash": "mSHKz7EPtfEeg2DYgqnLPE/Ra4c48q3eLxglfQQ5GGqaw4MdufQLN0sdLmoxIqvwKN8FZ8JoTXcxwYG3MUsumA=="
+        "resolved": "3.7.0.29",
+        "contentHash": "RXeNNVehUDF/hTdeOfbHjjMyt9UciPifhtcrOScKHN+04sENBGdahZjvQHb+uw7XNJuzeFWdGgvibNNRfXYyDA=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
