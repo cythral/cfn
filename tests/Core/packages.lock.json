@@ -169,10 +169,10 @@
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.7.1.16",
-        "contentHash": "o4Oi0sd8g9ByOj1wyZ+hh9IBJnYqabazUQDt1cEvf7PvE/kZ/h5BD2Su7YVtZdJvaDvsb9d6ZKmHsMHstywXVg==",
+        "resolved": "3.7.1.17",
+        "contentHash": "1/FOHDTt7DhjhH+UAQiw4HrKEcp82WD4yHEPFriPJv+daoYPvuw86pVBVebxRnaDmWiGsShyxCR8ySvS3KISdQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.28, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.29, 4.0.0)"
         }
       },
       "AWSSDK.SimpleNotificationService": {
@@ -1637,7 +1637,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "3.7.1.16"
+          "AWSSDK.SecurityToken": "3.7.1.17"
         }
       },
       "cloudformation": {
@@ -1722,7 +1722,7 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.2.13",
           "AWSSDK.S3": "3.7.0.29",
-          "AWSSDK.SecurityToken": "3.7.1.16",
+          "AWSSDK.SecurityToken": "3.7.1.17",
           "AWSSDK.StepFunctions": "3.7.0.28",
           "Amazon.Lambda.SQSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta4",
@@ -1736,7 +1736,7 @@
           "AWSSDK.CloudFormation": "3.7.2.13",
           "AWSSDK.S3": "3.7.0.29",
           "AWSSDK.SQS": "3.7.0.29",
-          "AWSSDK.SecurityToken": "3.7.1.16",
+          "AWSSDK.SecurityToken": "3.7.1.17",
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SNSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta4",
