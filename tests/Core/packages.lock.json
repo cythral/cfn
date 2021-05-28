@@ -140,8 +140,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.28",
-        "contentHash": "mSHKz7EPtfEeg2DYgqnLPE/Ra4c48q3eLxglfQQ5GGqaw4MdufQLN0sdLmoxIqvwKN8FZ8JoTXcxwYG3MUsumA=="
+        "resolved": "3.7.0.29",
+        "contentHash": "RXeNNVehUDF/hTdeOfbHjjMyt9UciPifhtcrOScKHN+04sENBGdahZjvQHb+uw7XNJuzeFWdGgvibNNRfXYyDA=="
       },
       "AWSSDK.ElasticLoadBalancingV2": {
         "type": "Transitive",
@@ -177,10 +177,10 @@
       },
       "AWSSDK.SimpleNotificationService": {
         "type": "Transitive",
-        "resolved": "3.7.1.13",
-        "contentHash": "mdJ/atvqVjkKR81vqfcDDkBZ4ImI7RAWClpCLkiKZf+gt4x/devqxF2Z08RyePzxdSseEDNo6G/frkg5YphzMQ==",
+        "resolved": "3.7.1.14",
+        "contentHash": "mc16UYjr9RiCaMwSmfj4JfuOAyNObqLIns+GWVKzNQRjp/Pt7jt0obAQDbtuWykAXk32g7wUow1jLJInAqFxwg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.28, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.29, 4.0.0)"
         }
       },
       "AWSSDK.SQS": {
@@ -1615,7 +1615,7 @@
       "approvalnotification": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SimpleNotificationService": "3.7.1.13",
+          "AWSSDK.SimpleNotificationService": "3.7.1.14",
           "AWSSDK.StepFunctions": "3.7.0",
           "Brighid.Identity.Client": "0.1.104",
           "Lambdajection": "0.8.0-beta4",
@@ -1720,8 +1720,8 @@
       "stackdeployment": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.0.29",
           "AWSSDK.CloudFormation": "3.7.2.12",
+          "AWSSDK.S3": "3.7.0.29",
           "AWSSDK.SecurityToken": "3.7.1.16",
           "AWSSDK.StepFunctions": "3.7.0.27",
           "Amazon.Lambda.SQSEvents": "2.0.0",
@@ -1733,8 +1733,8 @@
       "stackdeploymentstatus": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.0.29",
           "AWSSDK.CloudFormation": "3.7.2.12",
+          "AWSSDK.S3": "3.7.0.29",
           "AWSSDK.SQS": "3.7.0.28",
           "AWSSDK.SecurityToken": "3.7.1.16",
           "AWSSDK.StepFunctions": "3.7.0",
