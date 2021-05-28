@@ -140,8 +140,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.28",
-        "contentHash": "mSHKz7EPtfEeg2DYgqnLPE/Ra4c48q3eLxglfQQ5GGqaw4MdufQLN0sdLmoxIqvwKN8FZ8JoTXcxwYG3MUsumA=="
+        "resolved": "3.7.0.30",
+        "contentHash": "VCJaptmJScS1wfo+g8ZR1Uh3+zgtavjhr9rY6vboyAzlIIe7UKiQv659cSKdSFSCHCttCTvQr+xUJo6vj1hAhw=="
       },
       "AWSSDK.ElasticLoadBalancingV2": {
         "type": "Transitive",
@@ -161,10 +161,10 @@
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "3.7.0.29",
-        "contentHash": "dDhC8T4Pe4HW8mdk2il74r8cH8A21IFk6uIwxJgcrSRx3vAuXTpki82BrnAsxHk5BQwsgfU6CJwKKTZtpur7dA==",
+        "resolved": "3.7.0.31",
+        "contentHash": "u7QzgmhLsvJy9QBWYIuwy7U9unwrZFXq9QYvZNo8uc5cBJVZYYKsFWuXZC/brAB3aiIMXsE20daeSqNrT6K+KA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.28, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.30, 4.0.0)"
         }
       },
       "AWSSDK.SecurityToken": {
@@ -1674,7 +1674,7 @@
       "githubwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.0.29",
+          "AWSSDK.S3": "3.7.0.31",
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
           "CloudFormation": "1.0.0",
@@ -1713,15 +1713,15 @@
       "simplestorageservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.0.29",
+          "AWSSDK.S3": "3.7.0.31",
           "AwsUtils.Common": "1.0.0"
         }
       },
       "stackdeployment": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.0.29",
           "AWSSDK.CloudFormation": "3.7.2.12",
+          "AWSSDK.S3": "3.7.0.31",
           "AWSSDK.SecurityToken": "3.7.1.16",
           "AWSSDK.StepFunctions": "3.7.0.27",
           "Amazon.Lambda.SQSEvents": "2.0.0",
@@ -1733,8 +1733,8 @@
       "stackdeploymentstatus": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.0.29",
           "AWSSDK.CloudFormation": "3.7.2.12",
+          "AWSSDK.S3": "3.7.0.31",
           "AWSSDK.SQS": "3.7.0.28",
           "AWSSDK.SecurityToken": "3.7.1.16",
           "AWSSDK.StepFunctions": "3.7.0",
