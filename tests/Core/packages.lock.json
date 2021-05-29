@@ -132,16 +132,16 @@
       },
       "AWSSDK.CloudFormation": {
         "type": "Transitive",
-        "resolved": "3.7.2.13",
-        "contentHash": "y6dgZyQ/WcufBynC3jzzk+RXIfgXtonp+jRTe5Nu94w3Jo+7IkeSb4ft3AUvKsUPFE5eGcWU5cvJbjut2DPQEg==",
+        "resolved": "3.7.2.14",
+        "contentHash": "rktTfZmkwAuyNCX7NebMZ0FVqJ9xacy5hpVDAjNRsGxqkv+9fhXFYaexXnIfTjv0gwlayDSB80AwrSH4BbQnpg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.29, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.31, 4.0.0)"
         }
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.29",
-        "contentHash": "RXeNNVehUDF/hTdeOfbHjjMyt9UciPifhtcrOScKHN+04sENBGdahZjvQHb+uw7XNJuzeFWdGgvibNNRfXYyDA=="
+        "resolved": "3.7.0.31",
+        "contentHash": "C2vzPag+Rzb1hBiMUwRW+HQzIrsPxxKBk7EMX0AUxkApg36DOGXI1Aha4xpC0w5sWqRuQAJ3YW0Ihk1nPlBzKA=="
       },
       "AWSSDK.ElasticLoadBalancingV2": {
         "type": "Transitive",
@@ -1643,7 +1643,7 @@
       "cloudformation": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.2.13",
+          "AWSSDK.CloudFormation": "3.7.2.14",
           "AwsUtils.Common": "1.0.0",
           "Lambdajection.Core": "0.8.0-beta4"
         }
@@ -1720,7 +1720,7 @@
       "stackdeployment": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.2.13",
+          "AWSSDK.CloudFormation": "3.7.2.14",
           "AWSSDK.S3": "3.7.0.29",
           "AWSSDK.SecurityToken": "3.7.1.17",
           "AWSSDK.StepFunctions": "3.7.0.28",
@@ -1733,7 +1733,7 @@
       "stackdeploymentstatus": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.2.13",
+          "AWSSDK.CloudFormation": "3.7.2.14",
           "AWSSDK.S3": "3.7.0.29",
           "AWSSDK.SQS": "3.7.0.29",
           "AWSSDK.SecurityToken": "3.7.1.17",
