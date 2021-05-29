@@ -279,11 +279,11 @@
       },
       "Lambdajection.Encryption": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta4",
-        "contentHash": "9R+WeQRq6kQKydnLu+6xwB9+KKvL0xOySBaScZGnQ9UnnorZMKTGSMtYExRNBMxR+yGMa865HQ92y5MobcdNKg==",
+        "resolved": "0.8.0-beta5",
+        "contentHash": "ZphZ5VoEdfcCBfc1p0kvkmh5SVAy40LMjWIlmPjXLsag7I/Ak/fwGteNzx/8k5H1NyhG4/8QtiG2lbNaZXVdzw==",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.7.0.15",
-          "Lambdajection.Framework": "0.8.0-beta4"
+          "AWSSDK.KeyManagementService": "3.7.0.28",
+          "Lambdajection.Framework": "0.8.0-beta5"
         }
       },
       "Lambdajection.Framework": {
@@ -1625,7 +1625,7 @@
           "AWSSDK.StepFunctions": "3.7.0",
           "Brighid.Identity.Client": "0.2.0",
           "Lambdajection": "0.8.0-beta5",
-          "Lambdajection.Encryption": "0.8.0-beta4",
+          "Lambdajection.Encryption": "0.8.0-beta5",
           "Lambdajection.Runtime": "0.8.0-beta5",
           "SimpleStorageService": "1.0.0"
         }
@@ -1685,7 +1685,7 @@
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
           "CloudFormation": "1.0.0",
           "Lambdajection": "0.8.0-beta5",
-          "Lambdajection.Encryption": "0.8.0-beta4",
+          "Lambdajection.Encryption": "0.8.0-beta5",
           "Lambdajection.Layer": "0.8.0-beta4",
           "Lambdajection.Runtime": "0.8.0-beta5",
           "System.Net.Http.Json": "5.0.0"
@@ -1704,7 +1704,7 @@
           "AwsUtils.Common": "1.0.0",
           "GithubUtils": "1.0.0",
           "Lambdajection": "0.8.0-beta5",
-          "Lambdajection.Encryption": "0.8.0-beta4",
+          "Lambdajection.Encryption": "0.8.0-beta5",
           "Lambdajection.Runtime": "0.8.0-beta5",
           "SimpleStorageService": "1.0.0"
         }
@@ -1732,7 +1732,7 @@
           "AWSSDK.StepFunctions": "3.7.0.28",
           "Amazon.Lambda.SQSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta5",
-          "Lambdajection.Encryption": "0.8.0-beta4",
+          "Lambdajection.Encryption": "0.8.0-beta5",
           "System.Net.Http.Json": "3.2.1"
         }
       },
@@ -1746,7 +1746,7 @@
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SNSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta5",
-          "Lambdajection.Encryption": "0.8.0-beta4",
+          "Lambdajection.Encryption": "0.8.0-beta5",
           "System.Net.Http.Json": "5.0.0"
         }
       },
