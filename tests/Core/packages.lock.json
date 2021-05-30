@@ -315,8 +315,8 @@
       },
       "Lambdajection.Layer": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta4",
-        "contentHash": "bao0mISP/8UQiOf3tibLSD/wpX3bwucPDjBEised0KJ5GI/vkAAeIJvRPCjLtUPO2AgurvRqUWIwLoBx6bL4Rg=="
+        "resolved": "0.8.0-beta5",
+        "contentHash": "mcV+ILyAgoTnh0faopr2FVdBrElP/B86InUod57fgJn86u3i5gxmvugMTZhWnWYE295m0VnF8hzJ3VdG1wJ9Zw=="
       },
       "Lambdajection.Runtime": {
         "type": "Transitive",
@@ -1686,7 +1686,7 @@
           "CloudFormation": "1.0.0",
           "Lambdajection": "0.8.0-beta5",
           "Lambdajection.Encryption": "0.8.0-beta5",
-          "Lambdajection.Layer": "0.8.0-beta4",
+          "Lambdajection.Layer": "0.8.0-beta5",
           "Lambdajection.Runtime": "0.8.0-beta5",
           "System.Net.Http.Json": "5.0.0"
         }
