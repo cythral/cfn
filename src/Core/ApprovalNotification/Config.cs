@@ -1,12 +1,10 @@
-using Brighid.Identity.Client;
-
 using Lambdajection.Attributes;
 using Lambdajection.Encryption;
 
 namespace Cythral.CloudFormation.ApprovalNotification
 {
     [LambdaOptions(typeof(Handler), "Lambda")]
-    public class Config : IdentityConfig
+    public class Config
     {
         public string BaseUrl { get; set; }
 
@@ -14,9 +12,9 @@ namespace Cythral.CloudFormation.ApprovalNotification
 
         public string TopicArn { get; set; }
 
-        public override string ClientId { get; set; }
+        public string ClientId { get; set; }
 
         [Encrypted]
-        public override string ClientSecret { get; set; }
+        public string ClientSecret { get; set; }
     }
 }
