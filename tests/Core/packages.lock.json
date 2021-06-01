@@ -1651,7 +1651,7 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.2.14",
           "AwsUtils.Common": "1.0.0",
-          "Lambdajection.Core": "0.8.0-beta4"
+          "Lambdajection.Core": "0.8.0-beta5"
         }
       },
       "deploymentsupersession": {
@@ -1731,8 +1731,8 @@
           "AWSSDK.SecurityToken": "3.7.1.18",
           "AWSSDK.StepFunctions": "3.7.0.29",
           "Amazon.Lambda.SQSEvents": "2.0.0",
-          "Lambdajection": "0.8.0-beta4",
-          "Lambdajection.Encryption": "0.8.0-beta4",
+          "Lambdajection": "0.8.0-beta5",
+          "Lambdajection.Encryption": "0.8.0-beta5",
           "System.Net.Http.Json": "3.2.1"
         }
       },
