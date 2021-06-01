@@ -35,10 +35,8 @@ namespace Cythral.CloudFormation.ApprovalNotification
 
             services.AddSingleton<ILinkService, DefaultLinkService>();
 
-            services.ConfigureBrighidIdentity<Config>("Lambda");
+            services.ConfigureBrighidIdentity<Config>(configuration.GetSection("Identity"));
             services.UseBrighidIdentity<ILinkService, DefaultLinkService>(new Uri("https://cythr.al"));
-
-            // use 
         }
     }
 }
