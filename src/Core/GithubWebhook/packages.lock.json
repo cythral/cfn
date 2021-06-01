@@ -51,9 +51,9 @@
       },
       "Lambdajection.Layer": {
         "type": "Direct",
-        "requested": "[0.8.0-beta4, )",
-        "resolved": "0.8.0-beta4",
-        "contentHash": "bao0mISP/8UQiOf3tibLSD/wpX3bwucPDjBEised0KJ5GI/vkAAeIJvRPCjLtUPO2AgurvRqUWIwLoBx6bL4Rg=="
+        "requested": "[0.8.0-beta5, )",
+        "resolved": "0.8.0-beta5",
+        "contentHash": "mcV+ILyAgoTnh0faopr2FVdBrElP/B86InUod57fgJn86u3i5gxmvugMTZhWnWYE295m0VnF8hzJ3VdG1wJ9Zw=="
       },
       "Lambdajection.Runtime": {
         "type": "Direct",
