@@ -1755,7 +1755,7 @@
         "dependencies": {
           "AWSSDK.ElasticLoadBalancingV2": "3.7.0.29",
           "Amazon.Lambda.SNSEvents": "1.2.0",
-          "Lambdajection": "0.8.0-beta4"
+          "Lambdajection": "0.8.0-beta5"
         }
       }
     }
