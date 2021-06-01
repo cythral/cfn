@@ -145,10 +145,10 @@
       },
       "AWSSDK.ElasticLoadBalancingV2": {
         "type": "Transitive",
-        "resolved": "3.7.0.28",
-        "contentHash": "mG4QlIESR5djNXYws/NgxV/tnqZYxj4iFSljMUXeiGH016Xo/VLkn/hGo6SrLobLX7wL/FTe25YRfjl6hKc2Zw==",
+        "resolved": "3.7.0.29",
+        "contentHash": "YE21wGPaBng275LGVy7NRn7GDNGKMdADZx1VTwyMVuZSplrdOkdF8/gphYWsV0PugZQuSbWl1EmGdZJ3wGWBsA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.29, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.31, 4.0.0)"
         }
       },
       "AWSSDK.KeyManagementService": {
@@ -1753,7 +1753,7 @@
       "updatetargets": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.ElasticLoadBalancingV2": "3.7.0.28",
+          "AWSSDK.ElasticLoadBalancingV2": "3.7.0.29",
           "Amazon.Lambda.SNSEvents": "1.2.0",
           "Lambdajection": "0.8.0-beta5"
         }
