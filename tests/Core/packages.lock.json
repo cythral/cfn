@@ -193,10 +193,10 @@
       },
       "AWSSDK.StepFunctions": {
         "type": "Transitive",
-        "resolved": "3.7.0.28",
-        "contentHash": "gBk3mfY3oZFoZ8zvai7QzI8VChwM5lHWpMBE3J7RnuiV6YYcriX+39pC8HHOZlw77zEesaeUDNf3IvnA+QTpQg==",
+        "resolved": "3.7.0.29",
+        "contentHash": "+jNUl5Me9NC9TVzq745GUJmDTObDKHkDzk0JSgioEFwWWj82CUvKccioTy4vExVz26+CyGQOErI3gyIsx+RI8A==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.29, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.31, 4.0.0)"
         }
       },
       "Brighid.Identity.Client": {
@@ -1622,7 +1622,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.SimpleNotificationService": "3.7.1.15",
-          "AWSSDK.StepFunctions": "3.7.0",
+          "AWSSDK.StepFunctions": "3.7.0.29",
           "Brighid.Identity.Client": "0.3.3",
           "Lambdajection": "0.8.0-beta5",
           "Lambdajection.Encryption": "0.8.0-beta5",
@@ -1636,7 +1636,7 @@
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.0.0",
           "AwsUtils.Common": "1.0.0",
-          "Lambdajection": "0.8.0-beta5",
+          "Lambdajection": "0.8.0-beta4",
           "SimpleStorageService": "1.0.0"
         }
       },
@@ -1659,14 +1659,14 @@
         "dependencies": {
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SQSEvents": "2.0.0",
-          "Lambdajection": "0.8.0-beta5",
+          "Lambdajection": "0.8.0-beta4",
           "SimpleStorageService": "1.0.0"
         }
       },
       "extractfilefromzip": {
         "type": "Project",
         "dependencies": {
-          "Lambdajection": "0.8.0-beta5",
+          "Lambdajection": "0.8.0-beta4",
           "SimpleStorageService": "1.0.0"
         }
       },
@@ -1681,7 +1681,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.S3": "3.7.0.32",
-          "AWSSDK.StepFunctions": "3.7.0",
+          "AWSSDK.StepFunctions": "3.7.0.29",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
           "CloudFormation": "1.0.0",
           "Lambdajection": "0.8.0-beta5",
@@ -1703,16 +1703,16 @@
         "dependencies": {
           "AwsUtils.Common": "1.0.0",
           "GithubUtils": "1.0.0",
-          "Lambdajection": "0.8.0-beta5",
-          "Lambdajection.Encryption": "0.8.0-beta5",
-          "Lambdajection.Runtime": "0.8.0-beta5",
+          "Lambdajection": "0.8.0-beta4",
+          "Lambdajection.Encryption": "0.8.0-beta4",
+          "Lambdajection.Runtime": "0.8.0-beta4",
           "SimpleStorageService": "1.0.0"
         }
       },
       "s3tagoutdatedartifacts": {
         "type": "Project",
         "dependencies": {
-          "Lambdajection": "0.8.0-beta5",
+          "Lambdajection": "0.8.0-beta4",
           "SimpleStorageService": "1.0.0"
         }
       },
@@ -1729,7 +1729,7 @@
           "AWSSDK.CloudFormation": "3.7.2.14",
           "AWSSDK.S3": "3.7.0.32",
           "AWSSDK.SecurityToken": "3.7.1.18",
-          "AWSSDK.StepFunctions": "3.7.0.28",
+          "AWSSDK.StepFunctions": "3.7.0.29",
           "Amazon.Lambda.SQSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta5",
           "Lambdajection.Encryption": "0.8.0-beta5",
@@ -1745,8 +1745,8 @@
           "AWSSDK.SecurityToken": "3.7.1.18",
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SNSEvents": "2.0.0",
-          "Lambdajection": "0.8.0-beta5",
-          "Lambdajection.Encryption": "0.8.0-beta5",
+          "Lambdajection": "0.8.0-beta4",
+          "Lambdajection.Encryption": "0.8.0-beta4",
           "System.Net.Http.Json": "5.0.0"
         }
       },

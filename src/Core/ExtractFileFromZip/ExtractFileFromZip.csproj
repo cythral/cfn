@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lambdajection" Version="0.8.0-beta5" />
+    <PackageReference Include="Lambdajection" Version="0.8.0-beta4" />
   </ItemGroup>
 
 </Project>
