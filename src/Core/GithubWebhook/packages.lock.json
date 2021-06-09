@@ -132,18 +132,18 @@
       },
       "Lambdajection.Attributes": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta5",
-        "contentHash": "QLzM958F7kjQBQUC6rEbty40Z97IqWly/Dg8ePiPmB318LfzbhkKVLHzh6gJEDdhR1IYsw7fbnm+QLSKyqLdzw=="
+        "resolved": "0.8.0",
+        "contentHash": "Adl0BBvGzP113Zf8LezfdkRY9vSa7Bv/uvrqPOmac85g32bxGVWy64H3Huu4NveD5DkNJK1dyKqFgiPE91QR7A=="
       },
       "Lambdajection.Core": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta5",
-        "contentHash": "hDI7UtiofGET4ZpOFvj1KmnRTDH4Crx16rZlFTi3AZnMyddtvC283QjEkDkDQGiwfVcE6S/tmC9mm3j0N9ESog==",
+        "resolved": "0.8.0",
+        "contentHash": "My9+f1xq6Lwgr5l81Jmp9hj+U1AVLxr8Hi5kacl13ccwY2aOREr4oxj9ryaaIqdkLpeaJDrt9yiv6YyubxsF0A==",
         "dependencies": {
           "Amazon.Lambda.Core": "2.0.0",
           "Amazon.Lambda.Serialization.SystemTextJson": "2.1.0",
-          "Lambdajection.Attributes": "0.8.0-beta5",
-          "Lambdajection.Framework": "0.8.0-beta5",
+          "Lambdajection.Attributes": "0.8.0",
+          "Lambdajection.Framework": "0.8.0",
           "Microsoft.Extensions.Configuration": "5.0.0",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.1",
@@ -153,8 +153,8 @@
       },
       "Lambdajection.Framework": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta5",
-        "contentHash": "lSp9oQPMuFWYiiZAoHz7D7TKBJXX3drb0AWiR479aieGFXWuGdhwLa6594RoWdpPvVvIpQmQHRuCD95BGbsvfQ=="
+        "resolved": "0.8.0",
+        "contentHash": "ERYSbXhWjNBYCpvGjhAoSQMZkXknzzyh/7ix+BNVMoEaG+XlAuhvVKktOKT/YIVTffC8qR727fe4h6BwLz5m4Q=="
       },
       "Lambdajection.Framework.BuildTime": {
         "type": "Transitive",
@@ -1608,7 +1608,7 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.2.14",
           "AwsUtils.Common": "1.0.0",
-          "Lambdajection.Core": "0.8.0-beta5"
+          "Lambdajection.Core": "0.8.0"
         }
       }
     },
