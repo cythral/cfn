@@ -12,7 +12,7 @@
     <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.29" />
     <PackageReference Include="Lambdajection.Runtime" Version="0.8.0-beta5" />
     <PackageReference Include="Lambdajection.Encryption" Version="0.8.0-beta5" />
-    <PackageReference Include="Lambdajection" Version="0.8.0-beta5" />
+    <PackageReference Include="Lambdajection" Version="0.8.0" />
     <PackageReference Include="Lambdajection.Layer" Version="0.8.0-beta5" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
   </ItemGroup>
