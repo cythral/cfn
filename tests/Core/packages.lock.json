@@ -279,17 +279,17 @@
       },
       "Lambdajection.Encryption": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta5",
-        "contentHash": "ZphZ5VoEdfcCBfc1p0kvkmh5SVAy40LMjWIlmPjXLsag7I/Ak/fwGteNzx/8k5H1NyhG4/8QtiG2lbNaZXVdzw==",
+        "resolved": "0.8.0",
+        "contentHash": "yz0lDvhqWo4ncha0eGa4BxxbxEmllaNdYMreonrcg6txqHaRIApEqGEf9dhGDeG80M7I77/HDfSckXMs9toqRA==",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.7.0.28",
-          "Lambdajection.Framework": "0.8.0-beta5"
+          "AWSSDK.KeyManagementService": "3.7.0.29",
+          "Lambdajection.Framework": "0.8.0"
         }
       },
       "Lambdajection.Framework": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta5",
-        "contentHash": "lSp9oQPMuFWYiiZAoHz7D7TKBJXX3drb0AWiR479aieGFXWuGdhwLa6594RoWdpPvVvIpQmQHRuCD95BGbsvfQ=="
+        "resolved": "0.8.0",
+        "contentHash": "ERYSbXhWjNBYCpvGjhAoSQMZkXknzzyh/7ix+BNVMoEaG+XlAuhvVKktOKT/YIVTffC8qR727fe4h6BwLz5m4Q=="
       },
       "Lambdajection.Framework.BuildTime": {
         "type": "Transitive",
@@ -1625,7 +1625,7 @@
           "AWSSDK.StepFunctions": "3.7.0.29",
           "Brighid.Identity.Client": "0.3.3",
           "Lambdajection": "0.8.0-beta5",
-          "Lambdajection.Encryption": "0.8.0-beta5",
+          "Lambdajection.Encryption": "0.8.0",
           "Lambdajection.Runtime": "0.8.0-beta5",
           "SimpleStorageService": "1.0.0"
         }
@@ -1685,7 +1685,7 @@
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
           "CloudFormation": "1.0.0",
           "Lambdajection": "0.8.0-beta5",
-          "Lambdajection.Encryption": "0.8.0-beta5",
+          "Lambdajection.Encryption": "0.8.0",
           "Lambdajection.Layer": "0.8.0-beta5",
           "Lambdajection.Runtime": "0.8.0-beta5",
           "System.Net.Http.Json": "5.0.0"
@@ -1732,7 +1732,7 @@
           "AWSSDK.StepFunctions": "3.7.0.29",
           "Amazon.Lambda.SQSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta5",
-          "Lambdajection.Encryption": "0.8.0-beta5",
+          "Lambdajection.Encryption": "0.8.0",
           "System.Net.Http.Json": "3.2.1"
         }
       },
