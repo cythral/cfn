@@ -139,6 +139,18 @@ Resources:
             HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
             DNSName: !Sub dualstack.${LoadBalancer.DNSName}
 
+  AppMesh:
+    Type: AWS::AppMesh::Mesh
+    Properties:
+      MeshName: brighid-mesh
+  
+  ResourceShare:
+    Type: AWS::RAM::ResourceShare
+    Properties:
+      Name: brighid-mesh-share
+      ResourceArns:
+        - !Ref AppMesh
+
 Outputs:
   LoadBalancerCanonicalHostedZoneId:
     Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
