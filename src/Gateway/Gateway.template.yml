@@ -148,6 +148,7 @@ Resources:
     Type: AWS::RAM::ResourceShare
     Properties:
       Name: brighid-mesh-share
+      AllowExternalPrincipals: false
       Principals:
         - !ImportValue cfn-metadata:OrganizationId
       ResourceArns:
