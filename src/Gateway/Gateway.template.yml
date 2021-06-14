@@ -149,7 +149,7 @@ Resources:
     Properties:
       Name: brighid-mesh-share
       Principals:
-        - !ImportValue cfn-metadata:OrganizationArn
+        - !ImportValue cfn-metadata:OrganizationId
       ResourceArns:
         - !Ref AppMesh
 
