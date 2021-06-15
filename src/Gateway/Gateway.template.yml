@@ -150,7 +150,7 @@ Resources:
       Name: brighid-mesh-share
       AllowExternalPrincipals: false
       Principals:
-        - !ImportValue cfn-metadata:OrganizationId
+        - !ImportValue cfn-metadata:OrganizationArn
       ResourceArns:
         - !Ref AppMesh
 
