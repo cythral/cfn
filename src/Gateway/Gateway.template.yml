@@ -184,8 +184,9 @@ Resources:
             - !ImportValue cfn-utilities:SubnetIds
           SecurityGroups:
             - !ImportValue cfn-utilities:WebSecurityGroupId
+            - !GetAtt EnvoySecurityGroup.GroupId
           AssignPublicIp: ENABLED
-      TaskDefinition: !Ref TaskDefinition
+      TaskDefinition: !Ref EnvoyTaskDefinition
       LoadBalancers:
         - ContainerName: envoy
           ContainerPort: 80
@@ -198,7 +199,17 @@ Resources:
           Enable: true
           Rollback: true
 
-  TaskDefinition:
+  EnvoySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allows Envoy Health Check Traffic
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 9901
+          ToPort: 9901
+          CidrIp: !ImportValue cfn-utilities:Ipv4NetworkCidr
+
+  EnvoyTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Cpu: "256"
@@ -215,6 +226,7 @@ Resources:
           Image: !Sub 840364872350.dkr.ecr.${AWS::Region}.amazonaws.com/aws-appmesh-envoy:v1.17.2.0-prod
           PortMappings:
             - ContainerPort: 80
+            - ContainerPort: 9901
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -250,9 +262,10 @@ Resources:
     Properties:
       TargetType: ip
       VpcId: !ImportValue cfn-utilities:VpcId
+      HealthCheckPath: /ready
+      HealthCheckPort: 9901
       Protocol: HTTP
       Port: 80
-      HealthCheckPath: /healthcheck
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: "30"
