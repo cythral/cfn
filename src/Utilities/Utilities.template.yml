@@ -341,6 +341,17 @@ Resources:
             FromPort: 15000
             ToPort: 15000
             CidrIp: 10.1.0.0/16
+        - IpProtocol: tcp
+          FromPort: 15001
+          ToPort: 15001
+          CidrIp: !Ref NetworkCidr
+        - !If
+          - IsMasterAccount
+          - !Ref AWS::NoValue
+          - IpProtocol: tcp
+            FromPort: 15001
+            ToPort: 15001
+            CidrIp: 10.1.0.0/16
 
   DatabaseSecurityGroup:
     Type: AWS::EC2::SecurityGroup
