@@ -236,7 +236,7 @@ Resources:
               awslogs-stream-prefix: brighid
           Environment:
             - Name: APPMESH_RESOURCE_ARN
-              Value: !Sub mesh/${AppMesh}/virtualGateway/${AppMeshGateway.VirtualGatewayName}
+              Value: !Sub mesh/${AppMesh.MeshName}/virtualGateway/${AppMeshGateway.VirtualGatewayName}
 
   TaskRole:
     Type: AWS::IAM::Role
