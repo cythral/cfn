@@ -203,6 +203,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allows Envoy Health Check Traffic
+      VpcId: !ImportValue cfn-utilities:VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 9901
