@@ -313,6 +313,35 @@ Resources:
           CidrIpv6: ::/0
       VpcId: !Ref VPC
 
+  EnvoySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for envoy
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 9901
+          ToPort: 9901
+          CidrIp: !Ref NetworkCidr
+        - !If
+          - IsMasterAccount
+          - !Ref AWS::NoValue
+          - IpProtocol: tcp
+            FromPort: 9901
+            ToPort: 9901
+            CidrIp: 10.1.0.0/16
+        - IpProtocol: tcp
+          FromPort: 15000
+          ToPort: 15000
+          CidrIp: !Ref NetworkCidr
+        - !If
+          - IsMasterAccount
+          - !Ref AWS::NoValue
+          - IpProtocol: tcp
+            FromPort: 15000
+            ToPort: 15000
+            CidrIp: 10.1.0.0/16
+
   DatabaseSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -635,6 +664,12 @@ Outputs:
     Value: !GetAtt WebSecurityGroup.GroupId
     Export:
       Name: !Sub ${AWS::StackName}:WebSecurityGroupId
+
+  EnvoySecurityGroupId:
+    Description: Group ID for the envoy security group
+    Value: !GetAtt EnvoySecurityGroup.GroupId
+    Export:
+      Name: !Sub ${AWS::StackName}:EnvoySecurityGroupId
 
   DatabaseSecurityGroupId:
     Description: ID of the mysql/aurora security group
