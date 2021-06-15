@@ -159,6 +159,45 @@ Resources:
               Port: 80
               Protocol: http
 
+  AppMeshHttpService:
+    Type: AWS::AppMesh::VirtualService
+    Properties:
+      MeshName: !GetAtt AppMesh.MeshName
+      MeshOwner: !Ref AWS::AccountId
+      VirtualServiceName: http
+      Spec:
+        Provider:
+          VirtualRouter:
+            VirtualRouterName: !GetAtt AppMeshHttpRouter.VirtualRouterName
+
+  AppMeshHttpRouter:
+    Type: AWS::AppMesh::VirtualRouter
+    Properties:
+      MeshName: !GetAtt AppMesh.MeshName
+      MeshOwner: !Ref AWS::AccountId
+      VirtualRouterName: http
+      Spec:
+        Listeners:
+          - PortMapping:
+              Port: 80
+              Protocol: http
+
+  AppMeshHttpGatewayRoute:
+    Type: AWS::AppMesh::GatewayRoute
+    Properties:
+      MeshName: !GetAtt AppMesh.MeshName
+      MeshOwner: !Ref AWS::AccountId
+      VirtualGatewayName: internet
+      GatewayRouteName: http
+      Spec:
+        HttpRoute:
+          Action: 
+            Target:
+              VirtualService:
+                VirtualServiceName: !GetAtt AppMeshHttpService.VirtualServiceName
+          Match:
+            Prefix: /
+
   ResourceShare:
     Type: AWS::RAM::ResourceShare
     Properties:
