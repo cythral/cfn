@@ -129,75 +129,75 @@ Resources:
       RouteTableId: !ImportValue cfn-utilities:RouteTableId
       VpcPeeringConnectionId: !Ref DevPeeringConnection
 
-  InternalDevListenerRule:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Condition: SetupDevAccount
-    Properties:
-      ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
-      Priority: 50
-      Actions:
-        - Type: forward
-          TargetGroupArn: !ImportValue cfn-gateway:MeshTargetGroupArn
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-              - "dev.*"
-              - "*.dev.*"
-        - Field: source-ip
-          SourceIpConfig:
-            Values:
-              - 10.0.0.0/8
+  # InternalDevListenerRule:
+  #   Type: AWS::ElasticLoadBalancingV2::ListenerRule
+  #   Condition: SetupDevAccount
+  #   Properties:
+  #     ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
+  #     Priority: 50
+  #     Actions:
+  #       - Type: forward
+  #         TargetGroupArn: !ImportValue cfn-gateway:MeshTargetGroupArn
+  #     Conditions:
+  #       - Field: host-header
+  #         HostHeaderConfig:
+  #           Values:
+  #             - "dev.*"
+  #             - "*.dev.*"
+  #       - Field: source-ip
+  #         SourceIpConfig:
+  #           Values:
+  #             - 10.0.0.0/8
 
-  SnsDevListenerRule:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Condition: SetupDevAccount
-    Properties:
-      ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
-      Priority: 51
-      Actions:
-        - Type: forward
-          TargetGroupArn: !ImportValue cfn-gateway:MeshTargetGroupArn
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-              - "dev.*"
-              - "*.dev.*"
-        - Field: http-header
-          HttpHeaderConfig:
-            HttpHeaderName: x-amz-sns-topic-arn
-            Values:
-              - !Sub
-                - arn:aws:sns:${AWS::Region}:${AccountId}:*
-                - AccountId: !ImportValue cfn-metadata:DevAccountId
+  # SnsDevListenerRule:
+  #   Type: AWS::ElasticLoadBalancingV2::ListenerRule
+  #   Condition: SetupDevAccount
+  #   Properties:
+  #     ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
+  #     Priority: 51
+  #     Actions:
+  #       - Type: forward
+  #         TargetGroupArn: !ImportValue cfn-gateway:MeshTargetGroupArn
+  #     Conditions:
+  #       - Field: host-header
+  #         HostHeaderConfig:
+  #           Values:
+  #             - "dev.*"
+  #             - "*.dev.*"
+  #       - Field: http-header
+  #         HttpHeaderConfig:
+  #           HttpHeaderName: x-amz-sns-topic-arn
+  #           Values:
+  #             - !Sub
+  #               - arn:aws:sns:${AWS::Region}:${AccountId}:*
+  #               - AccountId: !ImportValue cfn-metadata:DevAccountId
 
-  DevListenerRule:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Condition: SetupDevAccount
-    Properties:
-      ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
-      Priority: 52
-      Actions:
-        - Type: authenticate-oidc
-          Order: 1
-          AuthenticateOidcConfig:
-            Issuer: https://accounts.google.com
-            AuthorizationEndpoint: https://accounts.google.com/o/oauth2/v2/auth
-            TokenEndpoint: https://oauth2.googleapis.com/token
-            UserInfoEndpoint: https://openidconnect.googleapis.com/v1/userinfo
-            ClientId: !ImportValue sso-aws-registry:DevGoogleClientId
-            ClientSecret: !GetAtt DecryptedDevClientSecret.Plaintext
-            SessionTimeout: 86400
-        - Type: forward
-          Order: 2
-          TargetGroupArn: !ImportValue cfn-gateway:MeshTargetGroupArn
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-              - "dev.*"
-              - "*.dev.*"
+  # DevListenerRule:
+  #   Type: AWS::ElasticLoadBalancingV2::ListenerRule
+  #   Condition: SetupDevAccount
+  #   Properties:
+  #     ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
+  #     Priority: 52
+  #     Actions:
+  #       - Type: authenticate-oidc
+  #         Order: 1
+  #         AuthenticateOidcConfig:
+  #           Issuer: https://accounts.google.com
+  #           AuthorizationEndpoint: https://accounts.google.com/o/oauth2/v2/auth
+  #           TokenEndpoint: https://oauth2.googleapis.com/token
+  #           UserInfoEndpoint: https://openidconnect.googleapis.com/v1/userinfo
+  #           ClientId: !ImportValue sso-aws-registry:DevGoogleClientId
+  #           ClientSecret: !GetAtt DecryptedDevClientSecret.Plaintext
+  #           SessionTimeout: 86400
+  #       - Type: forward
+  #         Order: 2
+  #         TargetGroupArn: !ImportValue cfn-gateway:MeshTargetGroupArn
+  #     Conditions:
+  #       - Field: host-header
+  #         HostHeaderConfig:
+  #           Values:
+  #             - "dev.*"
+  #             - "*.dev.*"
 
   DecryptedDevClientSecret:
     Type: Custom::Secret
