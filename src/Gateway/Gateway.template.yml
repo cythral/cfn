@@ -241,6 +241,16 @@ Resources:
             - Name: APPMESH_RESOURCE_ARN
               Value: !Sub mesh/${AppMesh.MeshName}/virtualGateway/${AppMeshGateway.VirtualGatewayName}
 
+  EnvoyServiceScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MinCapacity: 1
+      MaxCapacity: 5
+      ResourceId: !Sub service/${Cluster}/${EnvoyService.Name}
+      ScalableDimension: ecs:service:DesiredCount
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/AWSServiceRoleForApplicationAutoScaling_ECSService
+      ServiceNamespace: ecs
+
   EnvoyServiceScalingPolicy:
     Type: AWS::ApplicationAutoScaling::ScalingPolicy
     Properties:
