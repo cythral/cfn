@@ -137,7 +137,7 @@ Resources:
       Priority: 50
       Actions:
         - Type: forward
-          TargetGroupArn: !ImportValue cfn-gateway:DevTargetGroupArn
+          TargetGroupArn: !ImportValue cfn-gateway:MeshTargetGroupArn
       Conditions:
         - Field: host-header
           HostHeaderConfig:
@@ -157,7 +157,7 @@ Resources:
       Priority: 51
       Actions:
         - Type: forward
-          TargetGroupArn: !ImportValue cfn-gateway:DevTargetGroupArn
+          TargetGroupArn: !ImportValue cfn-gateway:MeshTargetGroupArn
       Conditions:
         - Field: host-header
           HostHeaderConfig:
@@ -191,7 +191,7 @@ Resources:
             SessionTimeout: 86400
         - Type: forward
           Order: 2
-          TargetGroupArn: !ImportValue cfn-gateway:DevTargetGroupArn
+          TargetGroupArn: !ImportValue cfn-gateway:MeshTargetGroupArn
       Conditions:
         - Field: host-header
           HostHeaderConfig:
@@ -204,61 +204,6 @@ Resources:
     Properties:
       ServiceToken: !ImportValue cfn-secret-resource:SecretLambdaArn
       Ciphertext: !ImportValue sso-aws-registry:DevGoogleClientSecret
-
-  DevTargetGroupAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Condition: SetupDevAccount
-    Properties:
-      AlarmDescription: Dev load balancer target health
-      AlarmActions:
-        - !Ref UpdateTargetsTopic
-      Threshold: 0.0
-      TreatMissingData: breaching
-      EvaluationPeriods: 1
-      ComparisonOperator: GreaterThanThreshold
-      Metrics:
-        - Id: healthyfactor
-          Expression: healthy == 0 OR unhealthy > 0
-          ReturnData: true
-        - Id: unhealthy
-          MetricStat:
-            Metric:
-              Namespace: AWS/ApplicationELB
-              MetricName: UnHealthyHostCount
-              Dimensions:
-                - Name: LoadBalancer
-                  Value: !ImportValue cfn-gateway:LoadBalancerFullName
-                - Name: TargetGroup
-                  Value: !ImportValue cfn-gateway:DevTargetGroupFullName
-            Stat: Maximum
-            Period: 60
-          ReturnData: false
-        - Id: healthy
-          MetricStat:
-            Metric:
-              Namespace: AWS/ApplicationELB
-              MetricName: HealthyHostCount
-              Dimensions:
-                - Name: LoadBalancer
-                  Value: !ImportValue cfn-gateway:LoadBalancerFullName
-                - Name: TargetGroup
-                  Value: !ImportValue cfn-gateway:DevTargetGroupFullName
-            Stat: Maximum
-            Period: 60
-          ReturnData: false
-        - Id: customdata
-          MetricStat:
-            Metric:
-              Namespace: CustomData
-              MetricName: CustomData
-              Dimensions:
-                - Name: TargetGroupArn
-                  Value: !ImportValue cfn-gateway:DevTargetGroupArn
-                - Name: TargetDnsName
-                  Value: !Ref DevLoadBalancerDnsName
-            Stat: Maximum
-            Period: 60
-          ReturnData: false
 
   ProdPeeringConnection:
     Type: AWS::EC2::VPCPeeringConnection
@@ -276,61 +221,6 @@ Resources:
       DestinationCidrBlock: 10.3.0.0/16
       RouteTableId: !ImportValue cfn-utilities:RouteTableId
       VpcPeeringConnectionId: !Ref ProdPeeringConnection
-
-  ProdTargetGroupAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Condition: SetupProdAccount
-    Properties:
-      AlarmDescription: Prod load balancer target health
-      AlarmActions:
-        - !Ref UpdateTargetsTopic
-      Threshold: 0.0
-      EvaluationPeriods: 1
-      TreatMissingData: breaching
-      ComparisonOperator: GreaterThanThreshold
-      Metrics:
-        - Id: healthyfactor
-          Expression: healthy == 0 OR unhealthy > 0
-          ReturnData: true
-        - Id: unhealthy
-          MetricStat:
-            Metric:
-              Namespace: AWS/ApplicationELB
-              MetricName: UnHealthyHostCount
-              Dimensions:
-                - Name: LoadBalancer
-                  Value: !ImportValue cfn-gateway:LoadBalancerFullName
-                - Name: TargetGroup
-                  Value: !ImportValue cfn-gateway:ProdTargetGroupFullName
-            Stat: Maximum
-            Period: 60
-          ReturnData: false
-        - Id: healthy
-          MetricStat:
-            Metric:
-              Namespace: AWS/ApplicationELB
-              MetricName: HealthyHostCount
-              Dimensions:
-                - Name: LoadBalancer
-                  Value: !ImportValue cfn-gateway:LoadBalancerFullName
-                - Name: TargetGroup
-                  Value: !ImportValue cfn-gateway:ProdTargetGroupFullName
-            Stat: Maximum
-            Period: 60
-          ReturnData: false
-        - Id: customdata
-          MetricStat:
-            Metric:
-              Namespace: CustomData
-              MetricName: CustomData
-              Dimensions:
-                - Name: TargetGroupArn
-                  Value: !ImportValue cfn-gateway:ProdTargetGroupArn
-                - Name: TargetDnsName
-                  Value: !Ref ProdLoadBalancerDnsName
-            Stat: Maximum
-            Period: 60
-          ReturnData: false
 
   GithubWebhookArtifactStore:
     Type: AWS::S3::Bucket
