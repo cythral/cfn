@@ -320,6 +320,12 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:HttpsListenerArn
 
+  MeshTargetGroupArn:
+    Value: !Ref TargetGroup
+    Description: ARN of the mesh target group
+    Export:
+      Name: !Sub ${AWS::StackName}:MeshTargetGroupArn
+
   DevTargetGroupArn:
     Value: !Ref DevTargetGroup
     Description: ARN of the dev target group
