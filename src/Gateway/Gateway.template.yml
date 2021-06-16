@@ -158,6 +158,9 @@ Resources:
           - PortMapping:
               Port: 80
               Protocol: http
+          - PortMapping:
+              Port: 8080
+              Protocol: http2
 
   ResourceShare:
     Type: AWS::RAM::ResourceShare
@@ -194,6 +197,9 @@ Resources:
         - ContainerName: envoy
           ContainerPort: 80
           TargetGroupArn: !Ref TargetGroup
+        - ContainerName: envoy
+          ContainerPort: 8080
+          TargetGroupArn: !Ref Http2TargetGroup
       DesiredCount: 1
       DeploymentConfiguration:
         MinimumHealthyPercent: 1
@@ -211,6 +217,10 @@ Resources:
         - IpProtocol: tcp
           FromPort: 9901
           ToPort: 9901
+          CidrIp: !ImportValue cfn-utilities:Ipv4NetworkCidr
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
           CidrIp: !ImportValue cfn-utilities:Ipv4NetworkCidr
 
   EnvoyTaskDefinition:
@@ -230,6 +240,7 @@ Resources:
           Image: !Sub 840364872350.dkr.ecr.${AWS::Region}.amazonaws.com/aws-appmesh-envoy:v1.17.2.0-prod
           PortMappings:
             - ContainerPort: 80
+            - ContainerPort: 8080
             - ContainerPort: 9901
           LogConfiguration:
             LogDriver: awslogs
@@ -298,6 +309,20 @@ Resources:
         - Key: deregistration_delay.timeout_seconds
           Value: "30"
 
+  Http2TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      TargetType: ip
+      VpcId: !ImportValue cfn-utilities:VpcId
+      HealthCheckPath: /ready
+      HealthCheckPort: 9901
+      Protocol: HTTP
+      ProtocolVersion: HTTP2
+      Port: 8080
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "30"
+
 Outputs:
   LoadBalancerCanonicalHostedZoneId:
     Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
@@ -334,6 +359,12 @@ Outputs:
     Description: ARN of the mesh target group
     Export:
       Name: !Sub ${AWS::StackName}:MeshTargetGroupArn
+
+  MeshHttp2TargetGroupArn:
+    Value: !Ref Http2TargetGroup
+    Description: ARN of the mesh's http2 target group
+    Export:
+      Name: !Sub ${AWS::StackName}:MeshHttp2TargetGroupArn
 
   DevTargetGroupArn:
     Value: !Ref DevTargetGroup
