@@ -177,7 +177,7 @@ Resources:
     Condition: SetupDevAccount
     Properties:
       ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
-      Priority: 4
+      Priority: 52
       Actions:
         - Type: authenticate-oidc
           Order: 1
