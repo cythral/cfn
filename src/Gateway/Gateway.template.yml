@@ -177,7 +177,6 @@ Resources:
   EnvoyService:
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: envoy
       Cluster: !Ref Cluster
       LaunchType: FARGATE
       NetworkConfiguration:
