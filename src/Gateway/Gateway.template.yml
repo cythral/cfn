@@ -254,6 +254,8 @@ Resources:
 
   EnvoyServiceScalingPolicy:
     Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    DependsOn:
+      - EnvoyServiceScalingTarget
     Properties:
       PolicyName: EnvoyServiceAutoScaling
       PolicyType: TargetTrackingScaling
