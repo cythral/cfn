@@ -157,7 +157,7 @@ Resources:
         Listeners:
           - PortMapping:
               Port: 80
-              Protocol: http
+              Protocol: http2
 
   ResourceShare:
     Type: AWS::RAM::ResourceShare
@@ -293,6 +293,7 @@ Resources:
       HealthCheckPath: /ready
       HealthCheckPort: 9901
       Protocol: HTTP
+      ProtocolVersion: HTTP2
       Port: 80
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
