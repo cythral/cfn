@@ -154,7 +154,7 @@ Resources:
     Condition: SetupDevAccount
     Properties:
       ListenerArn: !ImportValue cfn-gateway:HttpsListenerArn
-      Priority: 3
+      Priority: 51
       Actions:
         - Type: forward
           TargetGroupArn: !ImportValue cfn-gateway:DevTargetGroupArn
