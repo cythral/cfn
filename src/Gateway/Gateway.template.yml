@@ -82,7 +82,7 @@ Resources:
     Properties:
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref ProdTargetGroup
+          TargetGroupArn: !Ref MeshTargetGroup
       LoadBalancerArn: !Ref LoadBalancer
       Port: 443
       Protocol: HTTPS
@@ -176,6 +176,8 @@ Resources:
 
   EnvoyService:
     Type: AWS::ECS::Service
+    DependsOn:
+      - HttpsListener
     Properties:
       Cluster: !Ref Cluster
       LaunchType: FARGATE
@@ -192,7 +194,7 @@ Resources:
       LoadBalancers:
         - ContainerName: envoy
           ContainerPort: 80
-          TargetGroupArn: !Ref TargetGroup
+          TargetGroupArn: !Ref MeshTargetGroup
       DesiredCount: 1
       DeploymentConfiguration:
         MinimumHealthyPercent: 1
@@ -284,7 +286,7 @@ Resources:
       LogGroupName: /brighid/envoy
       RetentionInDays: 14
 
-  TargetGroup:
+  MeshTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       TargetType: ip
@@ -330,7 +332,7 @@ Outputs:
       Name: !Sub ${AWS::StackName}:HttpsListenerArn
 
   MeshTargetGroupArn:
-    Value: !Ref TargetGroup
+    Value: !Ref MeshTargetGroup
     Description: ARN of the mesh target group
     Export:
       Name: !Sub ${AWS::StackName}:MeshTargetGroupArn
