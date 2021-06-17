@@ -199,6 +199,9 @@ Resources:
         - ContainerName: envoy
           ContainerPort: 80
           TargetGroupArn: !Ref MeshTargetGroup
+        - ContainerName: envoy
+          ContainerPort: 80
+          TargetGroupArn: !Ref MeshHttp2TargetGroup
       DesiredCount: 1
       DeploymentConfiguration:
         MinimumHealthyPercent: 1
@@ -302,6 +305,20 @@ Resources:
       HealthCheckPath: /ready
       HealthCheckPort: 9901
       Protocol: HTTP
+      Port: 80
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "30"
+
+  MeshHttp2TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      TargetType: ip
+      VpcId: !ImportValue cfn-utilities:VpcId
+      HealthCheckPath: /ready
+      HealthCheckPort: 9901
+      Protocol: HTTP
+      ProtocolVersion: HTTP2
       Port: 80
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
