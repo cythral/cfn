@@ -154,6 +154,10 @@ Resources:
       MeshOwner: !Ref AWS::AccountId
       VirtualGatewayName: internet
       Spec:
+        Logging:
+          AccessLog:
+            File:
+              Path: /dev/stdout
         Listeners:
           - PortMapping:
               Port: 80
