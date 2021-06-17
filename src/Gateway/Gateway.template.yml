@@ -241,6 +241,8 @@ Resources:
           Environment:
             - Name: APPMESH_RESOURCE_ARN
               Value: !Sub mesh/${AppMesh.MeshName}/virtualGateway/${AppMeshGateway.VirtualGatewayName}
+            - Name: ENVOY_LOG_LEVEL
+              Value: debug
 
   EnvoyServiceScalingTarget:
     Type: AWS::ApplicationAutoScaling::ScalableTarget
