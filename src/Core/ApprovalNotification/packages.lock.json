@@ -4,11 +4,11 @@
     ".NETCoreApp,Version=v5.0": {
       "AWSSDK.SimpleNotificationService": {
         "type": "Direct",
-        "requested": "[3.7.2.1, )",
-        "resolved": "3.7.2.1",
-        "contentHash": "zmENgF2SH15EsL8ifjZVH4hNVBRqmzlCsPz8Y3eZtBcnK+XKmTXkv/6ZGJ+FjrX5TBrznMBYW7vSOzTDAcytcQ==",
+        "requested": "[3.7.2.3, )",
+        "resolved": "3.7.2.3",
+        "contentHash": "VxlhVQbQb9bON6xlG1NCuzNktNbHbQO3+ohfrPqBuEVxX/OXbPj1RrPqobYds1rq/Z+dZa0LlOgGz7+BawjZvg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.32, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.34, 4.0.0)"
         }
       },
       "AWSSDK.StepFunctions": {
