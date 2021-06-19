@@ -164,7 +164,6 @@
           "ParameterOverrides": {
             "MasterAccountId": "${AccountId}",
             "NetworkCidr": "10.4.0.0/16",
-            "SkipLoadBalancer": "true",
             "PeeringConnectionId.$": "$.NetworkingConfig.OssPeeringConnectionId"
           },
           "Capabilities": [
