@@ -164,7 +164,6 @@
           "ParameterOverrides": {
             "MasterAccountId": "${AccountId}",
             "NetworkCidr": "10.4.0.0/16",
-            "SkipLoadBalancer": "true",
             "PeeringConnectionId.$": "$.NetworkingConfig.OssPeeringConnectionId"
           },
           "Capabilities": [
@@ -382,8 +381,6 @@
             "DevVpcId.$": "$.DevUtilityOutputs.VpcId",
             "ProdVpcId.$": "$.ProdUtilityOutputs.VpcId",
             "OssVpcId.$": "$.OssUtilityOutputs.VpcId",
-            "DevLoadBalancerDnsName.$": "$.DevUtilityOutputs.LoadBalancerDnsName",
-            "ProdLoadBalancerDnsName.$": "$.ProdUtilityOutputs.LoadBalancerDnsName",
             "Version.$": "$.head_commit.id",
             "RunEndToEndTests": "no",
             "LambdajectionLayerArn.$": "$.LayerOutputs[0].LambdajectionArn",
