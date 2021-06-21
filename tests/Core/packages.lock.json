@@ -182,10 +182,10 @@
       },
       "AWSSDK.StepFunctions": {
         "type": "Transitive",
-        "resolved": "3.7.0.31",
-        "contentHash": "2xysV5DeChKgOG951xnMKeVmjdXDlYVtbYlTbxbgdwl9BrfhmUcr06Yq2hBS68Zf6iZkNVaYwqUEzpzpFT9G+Q==",
+        "resolved": "3.7.0.32",
+        "contentHash": "OPalx9bOP0xNjrQOV688+KRpGWGTF6I1a9GXHBJEVFmOyMlKUHwGTiIi1a/ieAeu2CSJ0ejkw9U9PuVMXmacBg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.33, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.34, 4.0.0)"
         }
       },
       "Brighid.Identity.Client": {
@@ -1475,7 +1475,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.SimpleNotificationService": "3.7.2.3",
-          "AWSSDK.StepFunctions": "3.7.0.31",
+          "AWSSDK.StepFunctions": "3.7.0.32",
           "Brighid.Identity.Client": "0.4.0-beta3",
           "Lambdajection": "0.8.2",
           "Lambdajection.Encryption": "0.8.2",
@@ -1534,7 +1534,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.S3": "3.7.1.4",
-          "AWSSDK.StepFunctions": "3.7.0.31",
+          "AWSSDK.StepFunctions": "3.7.0.32",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
           "CloudFormation": "1.0.0",
           "Lambdajection": "0.8.2",
@@ -1582,7 +1582,7 @@
           "AWSSDK.CloudFormation": "3.7.2.17",
           "AWSSDK.S3": "3.7.1.4",
           "AWSSDK.SecurityToken": "3.7.1.19",
-          "AWSSDK.StepFunctions": "3.7.0.31",
+          "AWSSDK.StepFunctions": "3.7.0.32",
           "Amazon.Lambda.SQSEvents": "2.0.0",
           "Lambdajection": "0.8.2",
           "Lambdajection.Encryption": "0.8.2",
