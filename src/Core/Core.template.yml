@@ -42,16 +42,6 @@ Parameters:
     Default: ""
     Description: ID of the VPC to peer to in oss
 
-  DevLoadBalancerDnsName:
-    Type: String
-    Default: ""
-    Description: DNS name of the dev load balancer
-
-  ProdLoadBalancerDnsName:
-    Type: String
-    Default: ""
-    Description: DNS name of the prod load balancer
-
   Version:
     Type: String
     Default: "1"
