@@ -59,31 +59,31 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.34",
-        "contentHash": "5EGFEfIIiIF2iQfxcwSjbuL1gvs2ESVLwECAxgpD2BDzfXdjxsHwNRXQPT+7R7iS78hjBETF/ka1iTMuNqU4ww=="
+        "resolved": "3.7.0.35",
+        "contentHash": "bjPgNNSv8ZuT8MQ1EBQaEecAyAXbNh7Hp6WDDnU6/msdKtEGFyF0G3s6fvqqCMzBUWHFgobaD3zm487g3pJ4tg=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.7.1.1",
-        "contentHash": "/TcvjSqJsJStOkHDLFbLDV3AIVlqvHCtcHILIvJAQ/s17winpNmYMMmp4ZeA6a9f8ejKri2BwtfDU45awL9o+Q==",
+        "resolved": "3.7.1.2",
+        "contentHash": "bj72qCKkj/2nxaCQRfP30lo7L1GxKRvE6R6Jyex7/CXTLiXNL0QRfBLmJq17erOJsOucQ2T2gacz/Ek9qjGYWA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.34, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.35, 4.0.0)"
         }
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "3.7.1.4",
-        "contentHash": "F4s+IT3/Bq+L8BDBWToito9TTAU+vTP7aAjnExgA0dk3OX8xKH5+OTRjb1/nFmeCkq5RQwGs9xi9MxYrkDnVDw==",
+        "resolved": "3.7.1.5",
+        "contentHash": "u4c+Ch5jQzuOox9XilExlUXwRuLOzyDOXoTFSWIv8Vd0snLVxGrJlaJtwJqa4uRJFy0O/D3KvBWJb6hgyMODpg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.34, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.35, 4.0.0)"
         }
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.7.1.21",
-        "contentHash": "PeDm6Ac8Mo/qh2p573o9T5IM1zX2RnGg1akfPEKhCdBxBFiAPfi4BwdwJfdbyPGSp8kFstRQa4l7hAW/qSTvWw==",
+        "resolved": "3.7.1.22",
+        "contentHash": "tVwH39lXvxp6jpLhnkKPV2EH9XGjEN32jDylT7ZJfTTwRbsWPu4bH3h1pL8uSG451sWXrLHqZVAOg+625g8BgQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.34, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.35, 4.0.0)"
         }
       },
       "Humanizer.Core": {
@@ -1563,7 +1563,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "3.7.1.21"
+          "AWSSDK.SecurityToken": "3.7.1.22"
         }
       },
       "githubutils": {
@@ -1576,14 +1576,14 @@
       "keymanagementservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.7.1.1",
+          "AWSSDK.KeyManagementService": "3.7.1.2",
           "AwsUtils.Common": "1.0.0"
         }
       },
       "simplestorageservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.1.4",
+          "AWSSDK.S3": "3.7.1.5",
           "AwsUtils.Common": "1.0.0"
         }
       }
