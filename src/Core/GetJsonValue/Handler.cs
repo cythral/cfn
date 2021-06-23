@@ -8,7 +8,7 @@ using Lambdajection.CustomResource;
 namespace Cythral.CloudFormation.GetJsonValue
 {
     [CustomResourceProvider(typeof(Startup))]
-    public partial class GetJsonValue
+    public partial class Handler
     {
         public Task<OutputData> Create(CustomResourceRequest<Properties> request, CancellationToken cancellationToken = default)
         {
