@@ -28,8 +28,10 @@ namespace Cythral.CloudFormation.GetJsonValue
             cancellationToken.ThrowIfCancellationRequested();
             var props = request.ResourceProperties;
 
-            object? result = null;
             var json = JsonSerializer.Deserialize<Dictionary<string, object>>(props!.Json!);
+            logger.LogInformation("Deserialized JSON: {@json}", json);
+
+            object? result = null;
             json?.TryGetValue(props?.Key ?? string.Empty, out result);
             logger.LogInformation("Found value: {@value}", result);
             return Task.FromResult(new OutputData { Id = request.PhysicalResourceId ?? Guid.NewGuid().ToString(), Result = result });
