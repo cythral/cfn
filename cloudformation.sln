@@ -49,7 +49,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S3TagOutdatedArtifacts", "s
 EndProject
 Project("FAE04EC0-301F-11D3-BF4B-00C04F79EFBC") = "CoreProject", "src\Core\Core.proj", "{AD3091B1-F206-4026-B288-1B16FCD97653}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project", "src\Core\GetJsonValue\Project.csproj", "{C3E803BE-AF9B-43DF-8B8B-F7839F7B4FA2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetJsonValue", "src\Core\GetJsonValue\GetJsonValue.csproj", "{C3E803BE-AF9B-43DF-8B8B-F7839F7B4FA2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
