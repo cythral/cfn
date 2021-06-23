@@ -27,6 +27,7 @@ namespace Cythral.CloudFormation.GetJsonValue
         {
             cancellationToken.ThrowIfCancellationRequested();
             var props = request.ResourceProperties;
+            logger.LogInformation("Received properties: " + JsonSerializer.Serialize(props));
 
             var json = JsonSerializer.Deserialize<Dictionary<string, object>>(props!.Json!);
             logger.LogInformation("Deserialized JSON: {@json}", json);
