@@ -624,6 +624,17 @@ Resources:
       CodeUri: ../../bin/S3TagOutdatedArtifacts/Release/netcoreapp3.1/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
 
+  GetJsonValueFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: GetJsonValue::Cythral.CloudFormation.GetJsonValue.Handler::Run
+      Runtime: dotnetcore3.1
+      Timeout: 300
+      MemorySize: 256
+      CodeUri: ../../bin/GetJsonValue/Release/netcoreapp3.1/publish/
+      Policies:
+        - AWSLambdaExecute
+
   GithubTokenSecret:
     Type: Custom::Secret
     Properties:
@@ -713,6 +724,12 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:S3TagOutdatedArtifactsFunctionArn
   
+  GetJsonValueFunctionArn:
+    Value: !GetAtt GetJsonValueFunction.Arn
+    Description: ARN of the GetJsonValue function for use as a Custom Resource.
+    Export:
+      Name: !Sub ${AWS::StackName}:GetJsonValueFunctionArn
+
   CodeStarConnectionArn:
     Value: !Ref CodeStarConnection
     Description: ARN of the Code Star Connection.

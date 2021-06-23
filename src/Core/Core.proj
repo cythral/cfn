@@ -29,6 +29,7 @@
     <ProjectReference Include="ApprovalNotification\ApprovalNotification.csproj" />
     <ProjectReference Include="ApprovalWebhook\ApprovalWebhook.csproj" />
     <ProjectReference Include="S3TagOutdatedArtifacts\S3TagOutdatedArtifacts.csproj" />
+    <ProjectReference Include="GetJsonValue\GetJsonValue.csproj" />
   </ItemGroup>
 
   <!-- Sets up the configuraiton file -->
