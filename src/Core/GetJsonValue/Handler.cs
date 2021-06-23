@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,7 +29,8 @@ namespace Cythral.CloudFormation.GetJsonValue
             var props = request.ResourceProperties;
 
             object? result = null;
-            props?.Json?.TryGetValue(props?.Key ?? string.Empty, out result);
+            var json = JsonSerializer.Deserialize<Dictionary<string, object>>(props!.Json!);
+            json?.TryGetValue(props?.Key ?? string.Empty, out result);
             logger.LogInformation("Found value: {@value}", result);
             return Task.FromResult(new OutputData { Id = request.PhysicalResourceId ?? Guid.NewGuid().ToString(), Result = result });
         }
