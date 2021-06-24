@@ -5,8 +5,7 @@ namespace Cythral.CloudFormation.GetJsonValue
 {
     public class Properties
     {
-        [Required]
-        public string? Json { get; set; } = null;
+        public string? Json { get; set; }
 
         public string? Key { get; set; }
     }
