@@ -27,7 +27,7 @@ namespace Cythral.CloudFormation.GetJsonValue
         {
             cancellationToken.ThrowIfCancellationRequested();
             var props = request.ResourceProperties;
-            logger.LogInformation("Received properties: " + JsonSerializer.Serialize(props));
+            logger.LogInformation("Received properties: {@props}", props);
 
             var json = JsonSerializer.Deserialize<Dictionary<string, object>>(props!.Json!);
             logger.LogInformation("Deserialized JSON: {@json}", json);
@@ -35,7 +35,9 @@ namespace Cythral.CloudFormation.GetJsonValue
             object? result = null;
             json?.TryGetValue(props?.Key ?? string.Empty, out result);
             logger.LogInformation("Found value: {@value}", result);
-            return Task.FromResult(new OutputData { Id = request.PhysicalResourceId ?? Guid.NewGuid().ToString(), Result = result });
+
+            var id = string.IsNullOrEmpty(request.PhysicalResourceId) ? Guid.NewGuid().ToString() : request.PhysicalResourceId;
+            return Task.FromResult(new OutputData { Id = id, Result = result });
         }
 
         public Task<OutputData> Update(CustomResourceRequest<Properties> request, CancellationToken cancellationToken = default)
