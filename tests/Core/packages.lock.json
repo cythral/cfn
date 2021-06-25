@@ -309,8 +309,8 @@
       },
       "Lambdajection.Runtime": {
         "type": "Transitive",
-        "resolved": "0.8.2",
-        "contentHash": "u9FoBOOTkh/xymzUpm5bVbPbTIFGNyV6nboV60OKa/mDDfU8+Taiuz5s7+5E1zAzxz7Mr02DPWsG4lib549dzw==",
+        "resolved": "0.8.3",
+        "contentHash": "dfRXGTY3o8RQTmVkfE6r1Z73Ja7bgi2jqWouv5uiUHo2La5kKW1uR1T9TBk5APBYH9920YtHBzV3NNCEga8tVQ==",
         "dependencies": {
           "Amazon.Lambda.RuntimeSupport": "1.3.0"
         }
@@ -1479,7 +1479,7 @@
           "Brighid.Identity.Client": "0.4.0-beta3",
           "Lambdajection": "0.8.2",
           "Lambdajection.Encryption": "0.8.2",
-          "Lambdajection.Runtime": "0.8.2",
+          "Lambdajection.Runtime": "0.8.3",
           "SimpleStorageService": "1.0.0"
         }
       },
@@ -1540,7 +1540,7 @@
           "Lambdajection": "0.8.2",
           "Lambdajection.Encryption": "0.8.2",
           "Lambdajection.Layer": "0.8.2",
-          "Lambdajection.Runtime": "0.8.2",
+          "Lambdajection.Runtime": "0.8.3",
           "System.Net.Http.Json": "5.0.0"
         }
       },
