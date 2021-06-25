@@ -279,42 +279,6 @@ Resources:
       ServiceToken: !GetAtt GithubWebhookEndToEndTests.Arn
       Serial: !Ref Version
 
-  UpdateTargetsFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: UpdateTargets::Cythral.CloudFormation.UpdateTargets.Handler::Run
-      Runtime: dotnetcore3.1
-      Timeout: 30
-      CodeUri: ../../bin/UpdateTargets/Release/netcoreapp3.1/publish/
-      Policies:
-        - AWSLambdaExecute
-        - !Ref UpdateTargetsPolicy
-      Environment:
-        Variables:
-          LAMBDA_NET_SERIALIZER_DEBUG: "true"
-      Events:
-        SNS:
-          Type: SNS
-          Properties:
-            Topic: !Ref UpdateTargetsTopic
-            Region: !Ref AWS::Region
-
-  UpdateTargetsTopic:
-    Type: AWS::SNS::Topic
-
-  UpdateTargetsPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action:
-              - elasticloadbalancing:DescribeTargetHealth
-              - elasticloadbalancing:RegisterTargets
-              - elasticloadbalancing:DeregisterTargets
-            Resource: "*"
-
   StackDeploymentFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -624,17 +588,6 @@ Resources:
       CodeUri: ../../bin/S3TagOutdatedArtifacts/Release/netcoreapp3.1/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
 
-  GetJsonValueFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: GetJsonValue::Cythral.CloudFormation.GetJsonValue.Handler::Run
-      Runtime: dotnetcore3.1
-      Timeout: 300
-      MemorySize: 256
-      CodeUri: ../../bin/GetJsonValue/Release/netcoreapp3.1/publish/
-      Policies:
-        - AWSLambdaExecute
-
   GithubTokenSecret:
     Type: Custom::Secret
     Properties:
@@ -723,12 +676,6 @@ Outputs:
     Description: ARN of the S3 Tag Outdated Artifacts function for use in step function pipelines
     Export:
       Name: !Sub ${AWS::StackName}:S3TagOutdatedArtifactsFunctionArn
-  
-  GetJsonValueFunctionArn:
-    Value: !GetAtt GetJsonValueFunction.Arn
-    Description: ARN of the GetJsonValue function for use as a Custom Resource.
-    Export:
-      Name: !Sub ${AWS::StackName}:GetJsonValueFunctionArn
 
   CodeStarConnectionArn:
     Value: !Ref CodeStarConnection

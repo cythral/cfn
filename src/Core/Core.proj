@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\tests\EndToEnd\GithubWebhook\GithubWebhookEndToEnd.csproj" Properties="Package=false" />
-    <ProjectReference Include="UpdateTargets\UpdateTargets.csproj" />
     <ProjectReference Include="StackDeploymentStatus\StackDeploymentStatus.csproj" />
     <ProjectReference Include="StackDeployment\StackDeployment.csproj" />
     <ProjectReference Include="S3Deployment\S3Deployment.csproj" />
@@ -29,7 +28,6 @@
     <ProjectReference Include="ApprovalNotification\ApprovalNotification.csproj" />
     <ProjectReference Include="ApprovalWebhook\ApprovalWebhook.csproj" />
     <ProjectReference Include="S3TagOutdatedArtifacts\S3TagOutdatedArtifacts.csproj" />
-    <ProjectReference Include="GetJsonValue\GetJsonValue.csproj" />
   </ItemGroup>
 
   <!-- Sets up the configuraiton file -->
