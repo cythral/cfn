@@ -129,23 +129,15 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.35",
-        "contentHash": "bjPgNNSv8ZuT8MQ1EBQaEecAyAXbNh7Hp6WDDnU6/msdKtEGFyF0G3s6fvqqCMzBUWHFgobaD3zm487g3pJ4tg=="
-      },
-      "AWSSDK.ElasticLoadBalancingV2": {
-        "type": "Transitive",
-        "resolved": "3.7.0.33",
-        "contentHash": "vrNhA1fUZhpmS5fFPWTB3l/DFnlqH5nLIhmue6mkNv0jQjBdJF09+VXL5pU30m6iopX8pM2i0BuQHgQ6Lk1Xww==",
-        "dependencies": {
-          "AWSSDK.Core": "[3.7.0.35, 4.0.0)"
-        }
+        "resolved": "3.7.0.37",
+        "contentHash": "urpl1vl9PnwOqc4WXWj+MmuB/fHmzxVPmsjuu5j7FW0h0964aUuFbCJhM++ahu55JI7JlmKHSXxlCjKiJGHeyg=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.7.1.2",
-        "contentHash": "bj72qCKkj/2nxaCQRfP30lo7L1GxKRvE6R6Jyex7/CXTLiXNL0QRfBLmJq17erOJsOucQ2T2gacz/Ek9qjGYWA==",
+        "resolved": "3.7.1.4",
+        "contentHash": "RmunJiB/ia1mtyRsbaGrdrscWpx50k7S1xgI82BOCS0zM/4ePStA9omZBZFBFwx3IZiSIq2W1Vz34kAc8BSQUA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.35, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.37, 4.0.0)"
         }
       },
       "AWSSDK.S3": {
@@ -1547,7 +1539,7 @@
       "keymanagementservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.7.1.2",
+          "AWSSDK.KeyManagementService": "3.7.1.4",
           "AwsUtils.Common": "1.0.0"
         }
       },
@@ -1601,14 +1593,6 @@
           "Lambdajection": "0.8.0-beta4",
           "Lambdajection.Encryption": "0.8.0-beta4",
           "System.Net.Http.Json": "5.0.0"
-        }
-      },
-      "updatetargets": {
-        "type": "Project",
-        "dependencies": {
-          "AWSSDK.ElasticLoadBalancingV2": "3.7.0.33",
-          "Amazon.Lambda.SNSEvents": "1.2.0",
-          "Lambdajection": "0.8.2"
         }
       }
     }
