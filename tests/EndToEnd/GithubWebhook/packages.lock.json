@@ -55,8 +55,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.35",
-        "contentHash": "bjPgNNSv8ZuT8MQ1EBQaEecAyAXbNh7Hp6WDDnU6/msdKtEGFyF0G3s6fvqqCMzBUWHFgobaD3zm487g3pJ4tg=="
+        "resolved": "3.7.0.37",
+        "contentHash": "urpl1vl9PnwOqc4WXWj+MmuB/fHmzxVPmsjuu5j7FW0h0964aUuFbCJhM++ahu55JI7JlmKHSXxlCjKiJGHeyg=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
@@ -68,10 +68,10 @@
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.7.1.22",
-        "contentHash": "tVwH39lXvxp6jpLhnkKPV2EH9XGjEN32jDylT7ZJfTTwRbsWPu4bH3h1pL8uSG451sWXrLHqZVAOg+625g8BgQ==",
+        "resolved": "3.7.1.24",
+        "contentHash": "iPmtnOPV6ZqyhlhjtDYVt/0MOmDP6AbdYAnGaZQ7TRqKSrLJpyvvQUR7aiPacpDxx8xM4KGa/q1s85rWIQIqBA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.35, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.37, 4.0.0)"
         }
       },
       "Cythral.CloudFormation.CustomResource.Attributes": {
@@ -140,7 +140,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "3.7.1.22"
+          "AWSSDK.SecurityToken": "3.7.1.24"
         }
       },
       "keymanagementservice": {

@@ -129,16 +129,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.35",
-        "contentHash": "bjPgNNSv8ZuT8MQ1EBQaEecAyAXbNh7Hp6WDDnU6/msdKtEGFyF0G3s6fvqqCMzBUWHFgobaD3zm487g3pJ4tg=="
-      },
-      "AWSSDK.ElasticLoadBalancingV2": {
-        "type": "Transitive",
-        "resolved": "3.7.0.33",
-        "contentHash": "vrNhA1fUZhpmS5fFPWTB3l/DFnlqH5nLIhmue6mkNv0jQjBdJF09+VXL5pU30m6iopX8pM2i0BuQHgQ6Lk1Xww==",
-        "dependencies": {
-          "AWSSDK.Core": "[3.7.0.35, 4.0.0)"
-        }
+        "resolved": "3.7.0.37",
+        "contentHash": "urpl1vl9PnwOqc4WXWj+MmuB/fHmzxVPmsjuu5j7FW0h0964aUuFbCJhM++ahu55JI7JlmKHSXxlCjKiJGHeyg=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
@@ -158,10 +150,10 @@
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.7.1.22",
-        "contentHash": "tVwH39lXvxp6jpLhnkKPV2EH9XGjEN32jDylT7ZJfTTwRbsWPu4bH3h1pL8uSG451sWXrLHqZVAOg+625g8BgQ==",
+        "resolved": "3.7.1.24",
+        "contentHash": "iPmtnOPV6ZqyhlhjtDYVt/0MOmDP6AbdYAnGaZQ7TRqKSrLJpyvvQUR7aiPacpDxx8xM4KGa/q1s85rWIQIqBA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.35, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.37, 4.0.0)"
         }
       },
       "AWSSDK.SimpleNotificationService": {
@@ -1496,7 +1488,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "3.7.1.22"
+          "AWSSDK.SecurityToken": "3.7.1.24"
         }
       },
       "cloudformation": {
@@ -1581,7 +1573,7 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.3",
           "AWSSDK.S3": "3.7.1.5",
-          "AWSSDK.SecurityToken": "3.7.1.22",
+          "AWSSDK.SecurityToken": "3.7.1.24",
           "AWSSDK.StepFunctions": "3.7.0.33",
           "Amazon.Lambda.SQSEvents": "2.0.0",
           "Lambdajection": "0.8.2",
@@ -1595,20 +1587,12 @@
           "AWSSDK.CloudFormation": "3.7.3",
           "AWSSDK.S3": "3.7.1.5",
           "AWSSDK.SQS": "3.7.0.34",
-          "AWSSDK.SecurityToken": "3.7.1.22",
+          "AWSSDK.SecurityToken": "3.7.1.24",
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SNSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta4",
           "Lambdajection.Encryption": "0.8.0-beta4",
           "System.Net.Http.Json": "5.0.0"
-        }
-      },
-      "updatetargets": {
-        "type": "Project",
-        "dependencies": {
-          "AWSSDK.ElasticLoadBalancingV2": "3.7.0.33",
-          "Amazon.Lambda.SNSEvents": "1.2.0",
-          "Lambdajection": "0.8.2"
         }
       }
     }
