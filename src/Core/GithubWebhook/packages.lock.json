@@ -41,12 +41,12 @@
       },
       "Lambdajection.Encryption": {
         "type": "Direct",
-        "requested": "[0.8.2, )",
-        "resolved": "0.8.2",
-        "contentHash": "Du6VIYYS96JGcAGXKpuhpcp32wp3rh9dxvhLkiGxqSvWZ5Odtevg2yPLKGs81+YXq7i33qJN+v0kdQoB+dm6Wg==",
+        "requested": "[0.8.3, )",
+        "resolved": "0.8.3",
+        "contentHash": "dUcaYvzOC8/ec0hoD6F7M3hshYh8Vy8KiUzIVJN9kMritny6Jr76BJVwhloiaC//S0Hwq5eAuhw5WUizMVzvvA==",
         "dependencies": {
           "AWSSDK.KeyManagementService": "3.7.0.29",
-          "Lambdajection.Framework": "0.8.2"
+          "Lambdajection.Framework": "0.8.3"
         }
       },
       "Lambdajection.Layer": {

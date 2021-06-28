@@ -268,11 +268,11 @@
       },
       "Lambdajection.Encryption": {
         "type": "Transitive",
-        "resolved": "0.8.2",
-        "contentHash": "Du6VIYYS96JGcAGXKpuhpcp32wp3rh9dxvhLkiGxqSvWZ5Odtevg2yPLKGs81+YXq7i33qJN+v0kdQoB+dm6Wg==",
+        "resolved": "0.8.3",
+        "contentHash": "dUcaYvzOC8/ec0hoD6F7M3hshYh8Vy8KiUzIVJN9kMritny6Jr76BJVwhloiaC//S0Hwq5eAuhw5WUizMVzvvA==",
         "dependencies": {
           "AWSSDK.KeyManagementService": "3.7.0.29",
-          "Lambdajection.Framework": "0.8.2"
+          "Lambdajection.Framework": "0.8.3"
         }
       },
       "Lambdajection.Framework": {
@@ -1477,7 +1477,7 @@
           "AWSSDK.StepFunctions": "3.7.0.33",
           "Brighid.Identity.Client": "0.4.0-beta3",
           "Lambdajection": "0.8.3",
-          "Lambdajection.Encryption": "0.8.2",
+          "Lambdajection.Encryption": "0.8.3",
           "Lambdajection.Runtime": "0.8.2",
           "SimpleStorageService": "1.0.0"
         }
@@ -1537,7 +1537,7 @@
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
           "CloudFormation": "1.0.0",
           "Lambdajection": "0.8.3",
-          "Lambdajection.Encryption": "0.8.2",
+          "Lambdajection.Encryption": "0.8.3",
           "Lambdajection.Layer": "0.8.2",
           "Lambdajection.Runtime": "0.8.2",
           "System.Net.Http.Json": "5.0.0"
@@ -1584,7 +1584,7 @@
           "AWSSDK.StepFunctions": "3.7.0.33",
           "Amazon.Lambda.SQSEvents": "2.0.0",
           "Lambdajection": "0.8.3",
-          "Lambdajection.Encryption": "0.8.2",
+          "Lambdajection.Encryption": "0.8.3",
           "System.Net.Http.Json": "3.2.1"
         }
       },
