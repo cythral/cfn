@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.3" />
+    <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.3.2" />
     <PackageReference Include="Lambdajection.Core" Version="0.8.3" />
   </ItemGroup>
 
