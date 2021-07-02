@@ -13,21 +13,21 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.37",
-        "contentHash": "urpl1vl9PnwOqc4WXWj+MmuB/fHmzxVPmsjuu5j7FW0h0964aUuFbCJhM++ahu55JI7JlmKHSXxlCjKiJGHeyg=="
+        "resolved": "3.7.0.38",
+        "contentHash": "Tk+WfhQkZB6tXMioWy1faZk7Ld2sSkIJTn9E7KyCKs3WHRLjz7BS/MwMITf8AZt1QbdGv0+m45OMlTN9hkEIIg=="
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.7.1.22",
-        "contentHash": "tVwH39lXvxp6jpLhnkKPV2EH9XGjEN32jDylT7ZJfTTwRbsWPu4bH3h1pL8uSG451sWXrLHqZVAOg+625g8BgQ==",
+        "resolved": "3.7.1.25",
+        "contentHash": "FqwRO6sg8Y5jM3iRyWQqZstcDz2XIrO0c1PrVOatjaKPYbXADK6/29OA9LWoB6B8yyaK3bz240aa0VjT6xm9+A==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.35, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.38, 4.0.0)"
         }
       },
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "3.7.1.22"
+          "AWSSDK.SecurityToken": "3.7.1.25"
         }
       }
     }
