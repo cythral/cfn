@@ -4,11 +4,11 @@
     ".NETCoreApp,Version=v5.0": {
       "AWSSDK.SimpleNotificationService": {
         "type": "Direct",
-        "requested": "[3.7.2.4, )",
-        "resolved": "3.7.2.4",
-        "contentHash": "BsyVsK6Gg7GrTXCDzPADFBY4tmWyi+EUDuiN4bbkNjXivqb/xSc3vvCnxtNek1Nc4G+ZsVTmCEMLHfT8pV6iLw==",
+        "requested": "[3.7.2.8, )",
+        "resolved": "3.7.2.8",
+        "contentHash": "CTqmrR9teimKeQEpbpy+6QLqLCFZrdNzTXigWXUUuC574TfIoFLT5KfcZZ0O5ONVvVa6Mrv5fGzzLT1LVaKM1w==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.35, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.39, 4.0.0)"
         }
       },
       "AWSSDK.StepFunctions": {
@@ -22,9 +22,9 @@
       },
       "Brighid.Identity.Client": {
         "type": "Direct",
-        "requested": "[0.4.0-beta3, )",
-        "resolved": "0.4.0-beta3",
-        "contentHash": "ca6PdDvXm++jidkPHgl66h8lSFmEmNAJB2JORZe8hpUHec0ScHJnTmjdXY9eIOSgbnHpHw1IuqAeHwrOczYiSw==",
+        "requested": "[0.4.0, )",
+        "resolved": "0.4.0",
+        "contentHash": "19PKQd1Db3WOEjHGXhOvPLEUxz1qxW8LUpfZ20g0aeRmKeAqWxCfixxBDDjgmmyN9W/h8y+5C+kLq6fJVTFwGQ==",
         "dependencies": {
           "Microsoft.Extensions.Configuration": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.1",
@@ -103,10 +103,10 @@
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "3.7.1.7",
-        "contentHash": "E16Nhb9l+udVajJwz1+IMog3dUhIM49qGUd8mqoPKr0RAYiAmsFcUdJRwrjNLzCrh99rQEFj7Fa7BifCTL+vnw==",
+        "resolved": "3.7.1.9",
+        "contentHash": "/By+6cP5F0NJVLLqMbExw4HRBLORt4mQbKJpmJWoR+dKMI+h+6//Ax7P48xT+VHIbgNV9l9SR9XavLsItDgFMw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.37, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.39, 4.0.0)"
         }
       },
       "AWSSDK.SecurityToken": {
@@ -1611,7 +1611,7 @@
       "simplestorageservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.1.7",
+          "AWSSDK.S3": "3.7.1.9",
           "AwsUtils.Common": "1.0.0"
         }
       }
