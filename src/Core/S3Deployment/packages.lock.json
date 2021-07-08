@@ -59,15 +59,15 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.39",
-        "contentHash": "G8+hyyov3ju/4M9SdwaZhGEdYhUdp+KptrKXy9Jmjzj44MZ+wqbmxbTYc5szOTXbmx5N/b+IJM18dUUciDEnkw=="
+        "resolved": "3.7.0.40",
+        "contentHash": "gHUYpUHwqNojTyOX7gifKy9u8SEBTe0LNqGoP5aWvTl6TGune3NNZp9SwIJhuYIk5yv7dBbGaJ0XHnHSL+qv7g=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.7.1.6",
-        "contentHash": "tdHX3GaUDX1NWKQYr1ooNtBfxHVEg4mvt50lLalKmgReB+0OM54Nl2rR4E+qSrc405zG68MfhGVnmNmoL2oT/w==",
+        "resolved": "3.7.1.7",
+        "contentHash": "Kk9JIfRP8udnAknBN3aewML4EYWEtIIhG9Oq5QAPx2dnHOtOXFOteumkcZjVbw7YCuFA8MKudIuzII9qzS6L4g==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.40, 4.0.0)"
         }
       },
       "AWSSDK.S3": {
@@ -1576,7 +1576,7 @@
       "keymanagementservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.7.1.6",
+          "AWSSDK.KeyManagementService": "3.7.1.7",
           "AwsUtils.Common": "1.0.0"
         }
       },
