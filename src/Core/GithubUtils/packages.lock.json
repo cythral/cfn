@@ -10,8 +10,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.39",
-        "contentHash": "G8+hyyov3ju/4M9SdwaZhGEdYhUdp+KptrKXy9Jmjzj44MZ+wqbmxbTYc5szOTXbmx5N/b+IJM18dUUciDEnkw=="
+        "resolved": "3.7.0.40",
+        "contentHash": "gHUYpUHwqNojTyOX7gifKy9u8SEBTe0LNqGoP5aWvTl6TGune3NNZp9SwIJhuYIk5yv7dBbGaJ0XHnHSL+qv7g=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
@@ -23,16 +23,16 @@
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.7.1.26",
-        "contentHash": "4aTTjzLZYbfA79OViYwJBi4RmQSflJ4BQ4uP4ZbOCNmxPGdCtPQ12aYxDVqMAwkDz7W/s7jgApmdABHGuXIGsA==",
+        "resolved": "3.7.1.28",
+        "contentHash": "XeRdT5OMeTMvdzQp3G5E+5PfgRQASvBWTjJ05xo75B1Vu5j7IR2n3bhX5MPqmb5sNuMv8SODctyfun9ggHqVvg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.40, 4.0.0)"
         }
       },
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "3.7.1.26"
+          "AWSSDK.SecurityToken": "3.7.1.28"
         }
       },
       "keymanagementservice": {
