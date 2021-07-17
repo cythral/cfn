@@ -13,11 +13,11 @@
       },
       "AWSSDK.StepFunctions": {
         "type": "Direct",
-        "requested": "[3.7.0.37, )",
-        "resolved": "3.7.0.37",
-        "contentHash": "Jlk4noCTJcY1ARkCWRxgWJVibVUKgCAn7PbdUFy+iskHMG8kAjaVmJb7aBUtOkYvD8sETuALYBemWWo1CBYRCw==",
+        "requested": "[3.7.0.43, )",
+        "resolved": "3.7.0.43",
+        "contentHash": "G5do/KDU+bXhkAwWq0zDtYYzwGaE+ecUs3rjeWKaftMVxmV1pASqFipK795Jj/8vGFc0l+F+Fag114HBjEhNSw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.0.45, 4.0.0)"
         }
       },
       "Brighid.Identity.Client": {
@@ -90,8 +90,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.0.39",
-        "contentHash": "G8+hyyov3ju/4M9SdwaZhGEdYhUdp+KptrKXy9Jmjzj44MZ+wqbmxbTYc5szOTXbmx5N/b+IJM18dUUciDEnkw=="
+        "resolved": "3.7.0.45",
+        "contentHash": "bNcOtusZ/BFwsCr4sO9sbWZ4uXycnvpOfwx/1cNMfk92tWUOxP87B125sKL79HNdUTbhmVMp5AUISHddV3FxYA=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
