@@ -6,8 +6,13 @@ Parameters:
 
   NetworkCidr:
     Type: String
-    Description: Cidr to use for the VPC
+    Description: Cidr to use for the VPC.
     Default: 10.1.0.0/16
+
+  PrivateNetworkCidr:
+    Type: String
+    Description: Cidr to use for private networking within the VPC.
+    Default: 192.168.1.0/24
 
   # DO NOT SET THIS MANUALLY
   # This value should only be controlled by CI/CD CodePipeline.
@@ -52,7 +57,6 @@ Resources:
 
   # Networking
   # -------------------------------------------
-  # Use this VPC for quick development and/or tools that do not require extremely high availability
 
   VPC:
     Type: AWS::EC2::VPC
@@ -60,7 +64,7 @@ Resources:
       CidrBlock: !Ref NetworkCidr
       EnableDnsSupport: true
       EnableDnsHostnames: true
-
+  
   VPCFlowLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -306,6 +310,76 @@ Resources:
             ToPort: 3306
             CidrIp: 10.1.0.0/16
       VpcId: !Ref VPC
+
+  # Private Networking
+  # -------------------------------------------
+
+  PrivateVpcCidr:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      CidrBlock: !Ref PrivateNetworkCidr
+      VpcId: !Ref VPC
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    DependsOn: PrivateVpcCidr
+    Properties:
+      CidrBlock: !Select [0, !Cidr [!Ref PrivateNetworkCidr, 4, 6]]
+      AvailabilityZone: !Select [0, !GetAZs us-east-1]
+      VpcId: !Ref VPC
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet1
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    DependsOn: PrivateVpcCidr
+    Properties:
+      CidrBlock: !Select [1, !Cidr [!Ref PrivateNetworkCidr, 4, 6]]
+      AvailabilityZone: !Select [1, !GetAZs us-east-1]
+      VpcId: !Ref VPC
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet2
+
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    DependsOn: PrivateVpcCidr
+    Properties:
+      CidrBlock: !Select [2, !Cidr [!Ref PrivateNetworkCidr, 4, 6]]
+      AvailabilityZone: !Select [2, !GetAZs us-east-1]
+      VpcId: !Ref VPC
+
+  PrivateSubnet3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet3
+
+  PrivateSubnet4:
+    Type: AWS::EC2::Subnet
+    DependsOn: PrivateVpcCidr
+    Properties:
+      CidrBlock: !Select [3, !Cidr [!Ref PrivateNetworkCidr, 4, 6]]
+      AvailabilityZone: !Select [3, !GetAZs us-east-1]
+      VpcId: !Ref VPC
+
+  PrivateSubnet4RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet4
 
   # Security - Roles & Policies
   # -------------------------------------------
