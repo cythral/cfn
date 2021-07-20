@@ -341,7 +341,6 @@ Resources:
       ImageId: ami-0087f029c88fa4619
       NetworkInterfaces:
         - DeviceIndex: '0'
-          AssociatePublicIpAddress: true
           NetworkInterfaceId: !Ref NatNetworkInterface
       Tags:
         - Key: Name
