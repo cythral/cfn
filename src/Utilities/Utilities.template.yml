@@ -713,6 +713,17 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:SubnetIds
 
+  PrivateSubnetIds:
+    Description: Comma-delimited list of Private Subnet Ids
+    Value: !Join
+      - ","
+      - - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+        - !Ref PrivateSubnet4
+    Export:
+      Name: !Sub ${AWS::StackName}:PrivateSubnetIds
+
   DBSubnetGroupName:
     Description: Name of the db subnet group for the primary VPC
     Value: !Ref DBSubnetGroup
