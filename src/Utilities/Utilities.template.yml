@@ -12,7 +12,7 @@ Parameters:
   PrivateNetworkCidr:
     Type: String
     Description: Cidr to use for private networking within the VPC.
-    Default: 192.168.1.0/24
+    Default: 10.127.0.0/16
 
   # DO NOT SET THIS MANUALLY
   # This value should only be controlled by CI/CD CodePipeline.
@@ -329,7 +329,7 @@ Resources:
     Type: AWS::EC2::Subnet
     DependsOn: PrivateVpcCidr
     Properties:
-      CidrBlock: !Select [0, !Cidr [!Ref PrivateNetworkCidr, 4, 6]]
+      CidrBlock: !Select [0, !Cidr [!Ref PrivateNetworkCidr, 4, 14]]
       AvailabilityZone: !Select [0, !GetAZs us-east-1]
       VpcId: !Ref VPC
 
@@ -343,7 +343,7 @@ Resources:
     Type: AWS::EC2::Subnet
     DependsOn: PrivateVpcCidr
     Properties:
-      CidrBlock: !Select [1, !Cidr [!Ref PrivateNetworkCidr, 4, 6]]
+      CidrBlock: !Select [1, !Cidr [!Ref PrivateNetworkCidr, 4, 14]]
       AvailabilityZone: !Select [1, !GetAZs us-east-1]
       VpcId: !Ref VPC
 
@@ -357,7 +357,7 @@ Resources:
     Type: AWS::EC2::Subnet
     DependsOn: PrivateVpcCidr
     Properties:
-      CidrBlock: !Select [2, !Cidr [!Ref PrivateNetworkCidr, 4, 6]]
+      CidrBlock: !Select [2, !Cidr [!Ref PrivateNetworkCidr, 4, 14]]
       AvailabilityZone: !Select [2, !GetAZs us-east-1]
       VpcId: !Ref VPC
 
@@ -371,7 +371,7 @@ Resources:
     Type: AWS::EC2::Subnet
     DependsOn: PrivateVpcCidr
     Properties:
-      CidrBlock: !Select [3, !Cidr [!Ref PrivateNetworkCidr, 4, 6]]
+      CidrBlock: !Select [3, !Cidr [!Ref PrivateNetworkCidr, 4, 14]]
       AvailabilityZone: !Select [3, !GetAZs us-east-1]
       VpcId: !Ref VPC
 
