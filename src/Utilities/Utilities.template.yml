@@ -313,7 +313,45 @@ Resources:
 
   # Private Networking
   # -------------------------------------------
+  
+  NatNetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      SourceDestCheck: false
+      SubnetId: !Ref Subnet1
+      GroupSet:
+        - !Ref NatSecurityGroup
 
+  NatSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group to allow traffic to the NAT instance.
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref PrivateNetworkCidr
+
+  NatInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t4g.nano
+      SourceDestCheck: false
+      ImageId: ami-0087f029c88fa4619
+      NetworkInterfaces:
+        - DeviceIndex: '0'
+          AssociatePublicIpAddress: true
+          NetworkInterfaceId: !Ref NatNetworkInterface
+      Tags:
+        - Key: Name
+          Value: nat-instance
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash -xe
+          sysctl -w net.ipv4.ip_forward=1
+          /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+  
   PrivateVpcCidr:
     Type: AWS::EC2::VPCCidrBlock
     Properties:
@@ -324,6 +362,14 @@ Resources:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
+
+  PrivateNatRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NetworkInterfaceId: !Ref NatNetworkInterface
 
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
