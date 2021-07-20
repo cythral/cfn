@@ -338,7 +338,7 @@ Resources:
     Properties:
       InstanceType: t4g.nano
       SourceDestCheck: false
-      ImageId: ami-0aa78712d96adbf29
+      ImageId: ami-008a8487adc2b32ec
       NetworkInterfaces:
         - DeviceIndex: '0'
           NetworkInterfaceId: !Ref NatNetworkInterface
