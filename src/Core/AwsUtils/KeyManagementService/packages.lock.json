@@ -4,11 +4,11 @@
     ".NETCoreApp,Version=v3.1": {
       "AWSSDK.KeyManagementService": {
         "type": "Direct",
-        "requested": "[3.7.1.6, )",
-        "resolved": "3.7.1.6",
-        "contentHash": "tdHX3GaUDX1NWKQYr1ooNtBfxHVEg4mvt50lLalKmgReB+0OM54Nl2rR4E+qSrc405zG68MfhGVnmNmoL2oT/w==",
+        "requested": "[3.7.1.13, )",
+        "resolved": "3.7.1.13",
+        "contentHash": "tbhzXcffZTlkpqafUYbFT6o7sJjQ7IXHVo0mt17fQmhiez9nf4CSFHoLqm4jtoeUsPfYqO/qN6q80gqp2Jl/pw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.0.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.1, 4.0.0)"
         }
       },
       "AWSSDK.Core": {
