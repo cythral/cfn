@@ -4,9 +4,9 @@
     ".NETCoreApp,Version=v3.1": {
       "Amazon.Lambda.ApplicationLoadBalancerEvents": {
         "type": "Direct",
-        "requested": "[2.0.0, )",
-        "resolved": "2.0.0",
-        "contentHash": "faB8e3dvWhNsI5hABtiDvKJ5RjeQXlE3cIM3u4pMs0MtQiGbxbuzjiibEd58ojRzz0ijYImy36mxPSGWm1nVtQ=="
+        "requested": "[2.1.0, )",
+        "resolved": "2.1.0",
+        "contentHash": "lxOKr4kuooqQV84YsNjgrJp7c4lcYDe+RPIMcdvpLEM6XlLzar38OoG4DeCdzsgnxy0aFQ25nzaDUnrqjIFC/A=="
       },
       "AWSSDK.StepFunctions": {
         "type": "Direct",
