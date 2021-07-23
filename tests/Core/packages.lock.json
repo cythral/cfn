@@ -1480,7 +1480,7 @@
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.0.0",
           "AwsUtils.Common": "1.0.0",
-          "Lambdajection": "0.8.0-beta4",
+          "Lambdajection": "0.8.4",
           "SimpleStorageService": "1.0.0"
         }
       },
@@ -1503,14 +1503,14 @@
         "dependencies": {
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SQSEvents": "2.0.0",
-          "Lambdajection": "0.8.0-beta4",
+          "Lambdajection": "0.8.4",
           "SimpleStorageService": "1.0.0"
         }
       },
       "extractfilefromzip": {
         "type": "Project",
         "dependencies": {
-          "Lambdajection": "0.8.0-beta4",
+          "Lambdajection": "0.8.4",
           "SimpleStorageService": "1.0.0"
         }
       },
@@ -1547,7 +1547,7 @@
         "dependencies": {
           "AwsUtils.Common": "1.0.0",
           "GithubUtils": "1.0.0",
-          "Lambdajection": "0.8.0-beta4",
+          "Lambdajection": "0.8.4",
           "Lambdajection.Encryption": "0.8.0-beta4",
           "Lambdajection.Runtime": "0.8.0-beta4",
           "SimpleStorageService": "1.0.0"
@@ -1556,7 +1556,7 @@
       "s3tagoutdatedartifacts": {
         "type": "Project",
         "dependencies": {
-          "Lambdajection": "0.8.0-beta4",
+          "Lambdajection": "0.8.4",
           "SimpleStorageService": "1.0.0"
         }
       },
@@ -1589,7 +1589,7 @@
           "AWSSDK.SecurityToken": "3.7.1.26",
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SNSEvents": "2.0.0",
-          "Lambdajection": "0.8.0-beta4",
+          "Lambdajection": "0.8.4",
           "Lambdajection.Encryption": "0.8.0-beta4",
           "System.Net.Http.Json": "5.0.0"
         }

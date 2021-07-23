@@ -19,15 +19,15 @@
       },
       "Lambdajection": {
         "type": "Direct",
-        "requested": "[0.8.0-beta4, )",
-        "resolved": "0.8.0-beta4",
-        "contentHash": "sw3UoORYHGDnzfGAsozHdbHMjT//A+J4mF4z5NspgCXWY9yutvMODepENAxtB1UUa5te+CtJ+nrk8BL3ugQzIw==",
+        "requested": "[0.8.4, )",
+        "resolved": "0.8.4",
+        "contentHash": "vEiPnKiDv6tVynueC6s1s57gqln6Me2KGqWN9BzXvYGyjKn3Fr7kNBNKUciuloKpJVIjNvNQfRWyC1LKPjzAyA==",
         "dependencies": {
-          "Lambdajection.Attributes": "0.8.0-beta4",
-          "Lambdajection.Core": "0.8.0-beta4",
-          "Lambdajection.Framework": "0.8.0-beta4",
-          "Lambdajection.Framework.BuildTime": "0.8.0-beta4",
-          "Lambdajection.Generator": "0.8.0-beta4"
+          "Lambdajection.Attributes": "0.8.4",
+          "Lambdajection.Core": "0.8.4",
+          "Lambdajection.Framework": "0.8.4",
+          "Lambdajection.Framework.BuildTime": "0.8.4",
+          "Lambdajection.Generator": "0.8.4"
         }
       },
       "Amazon.Lambda.Core": {
@@ -74,18 +74,18 @@
       },
       "Lambdajection.Attributes": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta4",
-        "contentHash": "urOHWSp4mHSVSOGvfrXr44PdsddXw21lVCVYg9rRiFdch9qAshIXq0cMqiSZGKKDGSVMgWqz2VGV0/7w96SoUw=="
+        "resolved": "0.8.4",
+        "contentHash": "torc8iV0uCt2VSD/CfXvbBPgjBmco2SwRWgM2G26/KCJjkFZ7JGOiaVJBwQLRmywLRkWE81kEESQfjqOjL2zvg=="
       },
       "Lambdajection.Core": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta4",
-        "contentHash": "VjXmBDaBW0+L1jb/5fYjexpLoyADHqy7iOhukTQ5cR8jK/w990BwQQCG+LGqqb4Ajl0O4mHE+ph/wSLQ/P6GoA==",
+        "resolved": "0.8.4",
+        "contentHash": "Y6cX6YxF/KMVLJoSNqADcU13hpLsfER6qKV2BKhETghe/kCBXfD4CwwvE+BDpsIYgKl2GbZKR2wEGrw2SvQs+w==",
         "dependencies": {
           "Amazon.Lambda.Core": "2.0.0",
           "Amazon.Lambda.Serialization.SystemTextJson": "2.1.0",
-          "Lambdajection.Attributes": "0.8.0-beta4",
-          "Lambdajection.Framework": "0.8.0-beta4",
+          "Lambdajection.Attributes": "0.8.4",
+          "Lambdajection.Framework": "0.8.4",
           "Microsoft.Extensions.Configuration": "5.0.0",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "5.0.1",
@@ -95,28 +95,28 @@
       },
       "Lambdajection.Framework": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta4",
-        "contentHash": "v1nHtONE0l+6TdpN3YnsmI+1MePJ7dXumcAh4Q3lKqQ1fk/Xq4Wd/TWvfiX+9wp2dJWezPxhK75tnk4GvB5B0Q=="
+        "resolved": "0.8.4",
+        "contentHash": "gjPycNx1KUEhbM9Ms9pJB6g1rWXU7d1/8CmhyvDdt5wi2TCscHVSCU6s24z6kCgKY8sLImtfeZeYTT9kgl5WPw=="
       },
       "Lambdajection.Framework.BuildTime": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta4",
-        "contentHash": "Aaxo4DRGpGH2ya2zQBijpo5rJ+YJQ55CMFl9HCRrHlnSgQ/XrgyXeQK2X5tqou/AQi6fKv8b2606vN1BYL/iPg=="
+        "resolved": "0.8.4",
+        "contentHash": "uhcsE3cO27FXTjXyYk/noE8PyvtXEybYvnhJMqpMW0IK3r4Ewuseh8+EmTVQn5JCSimubb96J3bswY9tW9pzcg=="
       },
       "Lambdajection.Generator": {
         "type": "Transitive",
-        "resolved": "0.8.0-beta4",
-        "contentHash": "3/AENEamYFpJ2YCDiM2rvqsiO0ULNvIf5DSNe3kLvyHsZ9HKp4g9RZJlV/fJLCRS8OR5wRdX9PKmHXr03vErvw==",
+        "resolved": "0.8.4",
+        "contentHash": "7rvwbw71UBj+jsAOYi4rx8D7W8/VeJJPNkxHg2YawnWL6Z2KtXwqHOPnllu3rVCHyM/RVlE/vcm18Q/VTqlmWg==",
         "dependencies": {
-          "Lambdajection.Attributes": "0.8.0-beta4",
-          "Lambdajection.Core": "0.8.0-beta4",
-          "Lambdajection.Framework": "0.8.0-beta4",
-          "Lambdajection.Framework.BuildTime": "0.8.0-beta4",
+          "Lambdajection.Attributes": "0.8.4",
+          "Lambdajection.Framework": "0.8.4",
+          "Lambdajection.Framework.BuildTime": "0.8.4",
           "Microsoft.CodeAnalysis": "3.9.0",
           "Microsoft.CodeAnalysis.CSharp.Workspaces": "3.9.0",
           "Microsoft.Extensions.Hosting": "5.0.0",
           "System.ComponentModel.Annotations": "5.0.0",
-          "System.Runtime.Loader": "4.3.0"
+          "System.Runtime.Loader": "4.3.0",
+          "YamlDotNet": "11.1.1"
         }
       },
       "Microsoft.Bcl.AsyncInterfaces": {
@@ -1531,6 +1531,11 @@
           "System.Threading": "4.3.0",
           "System.Xml.ReaderWriter": "4.3.0"
         }
+      },
+      "YamlDotNet": {
+        "type": "Transitive",
+        "resolved": "11.1.1",
+        "contentHash": "FWSee6b+CnrimzZijOF+Bcym9Hf9qWQ/dyhk1f0KGeZ4Eh++6kymVZGWKOYIqcaEh5/IUx7b2lnq+JeeSn7E3Q=="
       },
       "awsutils.common": {
         "type": "Project",

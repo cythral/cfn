@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Lambdajection.Encryption" Version="0.8.0-beta4" />
-    <PackageReference Include="Lambdajection" Version="0.8.0-beta4" />
+    <PackageReference Include="Lambdajection" Version="0.8.4" />
     <PackageReference Include="Lambdajection.Runtime" Version="0.8.0-beta4" />
   </ItemGroup>
 
