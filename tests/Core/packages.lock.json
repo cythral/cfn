@@ -1478,7 +1478,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.StepFunctions": "3.7.0",
-          "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.0.0",
+          "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
           "AwsUtils.Common": "1.0.0",
           "Lambdajection": "0.8.0-beta4",
           "SimpleStorageService": "1.0.0"
