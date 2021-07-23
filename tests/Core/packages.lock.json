@@ -1549,7 +1549,7 @@
           "GithubUtils": "1.0.0",
           "Lambdajection": "0.8.0-beta4",
           "Lambdajection.Encryption": "0.8.0-beta4",
-          "Lambdajection.Runtime": "0.8.0-beta4",
+          "Lambdajection.Runtime": "0.8.4",
           "SimpleStorageService": "1.0.0"
         }
       },
