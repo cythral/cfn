@@ -1577,7 +1577,7 @@
           "Amazon.Lambda.SQSEvents": "2.0.0",
           "Lambdajection": "0.8.4",
           "Lambdajection.Encryption": "0.8.4",
-          "System.Net.Http.Json": "3.2.1"
+          "System.Net.Http.Json": "5.0.0"
         }
       },
       "stackdeploymentstatus": {
