@@ -1548,7 +1548,7 @@
           "AwsUtils.Common": "1.0.0",
           "GithubUtils": "1.0.0",
           "Lambdajection": "0.8.0-beta4",
-          "Lambdajection.Encryption": "0.8.0-beta4",
+          "Lambdajection.Encryption": "0.8.4",
           "Lambdajection.Runtime": "0.8.0-beta4",
           "SimpleStorageService": "1.0.0"
         }
@@ -1590,7 +1590,7 @@
           "AWSSDK.StepFunctions": "3.7.0",
           "Amazon.Lambda.SNSEvents": "2.0.0",
           "Lambdajection": "0.8.0-beta4",
-          "Lambdajection.Encryption": "0.8.0-beta4",
+          "Lambdajection.Encryption": "0.8.4",
           "System.Net.Http.Json": "5.0.0"
         }
       }
