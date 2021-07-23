@@ -175,8 +175,8 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
         private string ComputeSignature(string value)
         {
             var key = config.GithubSigningSecret;
-            var valueBytes = Encoding.ASCII.GetBytes(value ?? "");
-            var keyBytes = Encoding.ASCII.GetBytes(key ?? "");
+            var valueBytes = Encoding.UTF8.GetBytes(value ?? "");
+            var keyBytes = Encoding.UTF8.GetBytes(key ?? "");
 
             using var hasher = new HMACSHA1(keyBytes);
             var hashArray = hasher.ComputeHash(valueBytes);
