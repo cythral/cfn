@@ -29,5 +29,6 @@
     <ProjectReference Include="..\..\src\Core\ApprovalNotification\ApprovalNotification.csproj" />
     <ProjectReference Include="..\..\src\Core\ApprovalWebhook\ApprovalWebhook.csproj" />
     <ProjectReference Include="..\..\src\Core\S3TagOutdatedArtifacts\S3TagOutdatedArtifacts.csproj" />
+    <ProjectReference Include="..\..\src\Core\EcsDeployment\EcsDeployment.csproj" />
   </ItemGroup>
 </Project>

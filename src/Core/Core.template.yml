@@ -588,6 +588,16 @@ Resources:
       CodeUri: ../../bin/S3TagOutdatedArtifacts/Release/netcoreapp3.1/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
 
+  EcsDeploymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: EcsDeployment::Cythral.CloudFormation.EcsDeployment.Handler::Run
+      Runtime: dotnetcore3.1
+      Timeout: 900
+      MemorySize: 256
+      CodeUri: ../../bin/EcsDeployment/Release/netcoreapp3.1/publish/
+      Role: !ImportValue cfn-utilities:MasterRoleArn
+
   GithubTokenSecret:
     Type: Custom::Secret
     Properties:
@@ -676,6 +686,12 @@ Outputs:
     Description: ARN of the S3 Tag Outdated Artifacts function for use in step function pipelines
     Export:
       Name: !Sub ${AWS::StackName}:S3TagOutdatedArtifactsFunctionArn
+
+  EcsDeploymentFunctionArn:
+    Value: !GetAtt EcsDeploymentFunction.Arn
+    Description: ARN of the ECS Deployment function for use in step function pipelines
+    Export:
+      Name: !Sub ${AWS::StackName}:EcsDeploymentFunctionArn
 
   CodeStarConnectionArn:
     Value: !Ref CodeStarConnection
