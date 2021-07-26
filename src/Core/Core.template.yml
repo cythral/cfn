@@ -687,6 +687,12 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}:S3TagOutdatedArtifactsFunctionArn
 
+  EcsDeploymentFunctionArn:
+    Value: !GetAtt EcsDeploymentFunction.Arn
+    Description: ARN of the ECS Deployment function for use in step function pipelines
+    Export:
+      Name: !Sub ${AWS::StackName}:EcsDeploymentFunctionArn
+
   CodeStarConnectionArn:
     Value: !Ref CodeStarConnection
     Description: ARN of the Code Star Connection.
