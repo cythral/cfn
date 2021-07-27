@@ -232,7 +232,7 @@ Resources:
       ContainerDefinitions:
         - Name: envoy
           Essential: true
-          Image: !Sub 840364872350.dkr.ecr.${AWS::Region}.amazonaws.com/aws-appmesh-envoy:v1.17.2.0-prod
+          Image: !Sub 840364872350.dkr.ecr.${AWS::Region}.amazonaws.com/aws-appmesh-envoy:v1.18.3.0-prod
           PortMappings:
             - ContainerPort: 80
             - ContainerPort: 9901
