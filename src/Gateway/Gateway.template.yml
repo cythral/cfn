@@ -51,7 +51,7 @@ Resources:
     Properties:
       IpAddressType: dualstack
       SecurityGroups:
-        - !ImportValue cfn-utilities:WebSecurityGroupId
+        - !GetAtt PublicWebSecurityGroup.GroupId
       Subnets: !Split
         - ","
         - !ImportValue cfn-utilities:SubnetIds
@@ -60,6 +60,31 @@ Resources:
           Value: "true"
         - Key: access_logs.s3.bucket
           Value: !Ref LoadBalancerLogsBucket
+
+  PublicWebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allows HTTP and HTTPS traffic from the public internet.
+      VpcId: !ImportValue cfn-utilities:VpcId
+      SecurityGroupIngress:
+         # Port 80 - HTTP
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIpv6: ::/0
+        # Port 443 - HTTPS
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIpv6: ::/0
 
   HttpListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
