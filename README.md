@@ -46,8 +46,6 @@ An effort to automate most of these steps will be made at some point in the futu
     ```
 
 ## Infra Design Decisions
-- Avoid use of API Gateway wherever possible, use ALBs instead.  Once the free tier of API Gateway is up, things become very expensive very fast.
 - Use reusable delegation sets to setup vanity nameservers.  That way, I can give a client a set of nameservers to point their domain to, before even creating a hosted zone for it.  This also means they don't have to update their nameservers if the hosted zone accidentally gets deleted (plus no ^48 hour wait time for those changes to take effect).  
-- Only 3 load balancers will be used.  One for each account. This is approximately $50/mo for the load balancers themselves ($0.0225 * 24 * 30).  Additional charge based on LCU metrics will occur based on traffic.
   - Shared account has a VPC with a CIDR of 10.1.0.0/16. DNS records will get pointed to an internet facing load balancer in this account, which peers with VPCs in the dev and prod accounts.  Routing is chosen based on whether the host header contains a dev subdomain.
-  - Dev has a VPC with a CIDR of 10.2.0.0/16 and Prod's is 10.3.0.0/16.  Load balancers in these accounts are internal.  These typically route to targets based on the full host-header. 
+  - Dev has a VPC with a CIDR of 10.2.0.0/16 and Prod's is 10.3.0.0/16.  Traffic from the load balancer to ECS Services is routed via AppMesh.
