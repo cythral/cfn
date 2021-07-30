@@ -46,6 +46,22 @@ Conditions:
       - ""
 
 Resources:
+  # Config
+  # -------------------------------------------
+  # Utilities for AWS Config
+  
+  ConfigServiceLinkedRole:
+    Type: AWS::IAM::ServiceLinkedRole
+    Properties:
+      AWSServiceName: config.amazonaws.com
+      Description: Service-linked role for AWS Config.
+
+  ConfigRecorder:
+    Type: AWS::Config::ConfigurationRecorder
+    Properties:
+      Name: default
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig
+  
   # Storage
   # -------------------------------------------
   # Store whatever you want in here, but it'll mostly be used for deployment templates and artifacts
