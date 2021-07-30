@@ -46,45 +46,6 @@ Conditions:
       - ""
 
 Resources:
-  # Config
-  # -------------------------------------------
-  # Utilities for AWS Config
-
-  ConfigServiceLinkedRole:
-    Type: AWS::IAM::ServiceLinkedRole
-    Properties:
-      AWSServiceName: config.amazonaws.com
-      Description: Service-linked role for AWS Config.
-
-  ConfigRecorder:
-    Type: AWS::Config::ConfigurationRecorder
-    DependsOn: ConfigServiceLinkedRole
-    Properties:
-      Name: default
-      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig
-
-  ConfigBucket:
-    Type: AWS::S3::Bucket
-
-  ConfigTopic:
-    Type: AWS::SNS::Topic
-    Properties:
-      DisplayName: AWS Config Notification Topic
-
-  ConfigSubscription:
-    Type: AWS::SNS::Subscription
-    Properties:
-      TopicArn: !Ref ConfigTopic
-      Protocol: email
-      Endpoint: talen.fisher@cythral.com
-
-  ConfigDeliveryPolicy:
-    Type: AWS::Config::DeliveryChannel
-    Properties:
-      S3BucketName: !Ref ConfigBucket
-      SnsTopicARN: !Ref ConfigTopic
-
-  
   # Storage
   # -------------------------------------------
   # Store whatever you want in here, but it'll mostly be used for deployment templates and artifacts
