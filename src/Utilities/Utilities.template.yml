@@ -80,7 +80,6 @@ Resources:
 
   ConfigDeliveryPolicy:
     Type: AWS::Config::DeliveryChannel
-    DependsOn: ConfigRecorder
     Properties:
       S3BucketName: !Ref ConfigBucket
       SnsTopicARN: !Ref ConfigTopic
