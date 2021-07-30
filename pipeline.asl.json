@@ -315,6 +315,137 @@
           }
         }
       ],
+      "Next": "Deploy Config"
+    },
+    "Deploy Config": {
+      "Type": "Parallel",
+      "ResultPath": "$.ConfigOutputs",
+      "Branches": [
+        {
+          "StartAt": "Shared",
+          "States": {
+            "Shared": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+              "Parameters": {
+                "QueueUrl": "${DeploymentQueue}",
+                "MessageGroupId": "${GithubRepo}-config-shared",
+                "MessageBody": {
+                  "StackName": "cfn-config",
+                  "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                  "TemplateFileName": "Config.template.yml",
+                  "RoleArn": "${SharedRoleArn}",
+                  "Token.$": "$$.Task.Token",
+                  "Capabilities": [
+                    "CAPABILITY_IAM",
+                    "CAPABILITY_AUTO_EXPAND"
+                  ],
+                  "EnvironmentName": "shared",
+                  "CommitInfo": {
+                    "GithubOwner": "${GithubOwner}",
+                    "GithubRepository": "${GithubRepo}",
+                    "GithubRef.$": "$.head_commit.id"
+                  }
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Dev",
+          "States": {
+            "Dev": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+              "Parameters": {
+                "QueueUrl": "${DeploymentQueue}",
+                "MessageGroupId": "${GithubRepo}-config-dev",
+                "MessageBody": {
+                  "StackName": "cfn-config",
+                  "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                  "TemplateFileName": "Config.template.yml",
+                  "RoleArn": "${DevRoleArn}",
+                  "Token.$": "$$.Task.Token",
+                  "Capabilities": [
+                    "CAPABILITY_IAM",
+                    "CAPABILITY_AUTO_EXPAND"
+                  ],
+                  "EnvironmentName": "dev",
+                  "CommitInfo": {
+                    "GithubOwner": "${GithubOwner}",
+                    "GithubRepository": "${GithubRepo}",
+                    "GithubRef.$": "$.head_commit.id"
+                  }
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Prod",
+          "States": {
+            "Prod": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+              "Parameters": {
+                "QueueUrl": "${DeploymentQueue}",
+                "MessageGroupId": "${GithubRepo}-config-prod",
+                "MessageBody": {
+                  "StackName": "cfn-config",
+                  "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                  "TemplateFileName": "Config.template.yml",
+                  "RoleArn": "${ProdRoleArn}",
+                  "Token.$": "$$.Task.Token",
+                  "Capabilities": [
+                    "CAPABILITY_IAM",
+                    "CAPABILITY_AUTO_EXPAND"
+                  ],
+                  "EnvironmentName": "prod",
+                  "CommitInfo": {
+                    "GithubOwner": "${GithubOwner}",
+                    "GithubRepository": "${GithubRepo}",
+                    "GithubRef.$": "$.head_commit.id"
+                  }
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Oss",
+          "States": {
+            "Oss": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+              "Parameters": {
+                "QueueUrl": "${DeploymentQueue}",
+                "MessageGroupId": "${GithubRepo}-config-oss",
+                "MessageBody": {
+                  "StackName": "cfn-config",
+                  "ZipLocation.$": "$.BuildOutput.Build.Artifacts.Location",
+                  "TemplateFileName": "Config.template.yml",
+                  "RoleArn": "${OssRoleArn}",
+                  "Token.$": "$$.Task.Token",
+                  "Capabilities": [
+                    "CAPABILITY_IAM",
+                    "CAPABILITY_AUTO_EXPAND"
+                  ],
+                  "EnvironmentName": "oss",
+                  "CommitInfo": {
+                    "GithubOwner": "${GithubOwner}",
+                    "GithubRepository": "${GithubRepo}",
+                    "GithubRef.$": "$.head_commit.id"
+                  }
+                }
+              },
+              "End": true
+            }
+          }
+        }
+      ],
       "Next": "Deploy DNS"
     },
     "Deploy DNS": {
