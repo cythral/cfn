@@ -322,9 +322,9 @@
       "ResultPath": "$.ConfigOutputs",
       "Branches": [
         {
-          "StartAt": "Shared",
+          "StartAt": "Config Shared",
           "States": {
-            "Shared": {
+            "Config Shared": {
               "Type": "Task",
               "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
               "Parameters": {
@@ -353,9 +353,9 @@
           }
         },
         {
-          "StartAt": "Dev",
+          "StartAt": "Config Dev",
           "States": {
-            "Dev": {
+            "Config Dev": {
               "Type": "Task",
               "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
               "Parameters": {
@@ -384,9 +384,9 @@
           }
         },
         {
-          "StartAt": "Prod",
+          "StartAt": "Config Prod",
           "States": {
-            "Prod": {
+            "Config Prod": {
               "Type": "Task",
               "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
               "Parameters": {
@@ -415,9 +415,9 @@
           }
         },
         {
-          "StartAt": "Oss",
+          "StartAt": "Config Oss",
           "States": {
-            "Oss": {
+            "Config Oss": {
               "Type": "Task",
               "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
               "Parameters": {
