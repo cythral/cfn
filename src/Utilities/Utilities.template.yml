@@ -49,7 +49,7 @@ Resources:
   # Config
   # -------------------------------------------
   # Utilities for AWS Config
-  
+
   ConfigServiceLinkedRole:
     Type: AWS::IAM::ServiceLinkedRole
     Properties:
@@ -61,6 +61,28 @@ Resources:
     Properties:
       Name: default
       RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig
+
+  ConfigBucket:
+    Type: AWS::S3::Bucket
+
+  ConfigTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: AWS Config Notification Topic
+
+  ConfigSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref ConfigTopic
+      Protocol: email
+      Endpoint: talen.fisher@cythral.com
+
+  ConfigDeliveryPolicy:
+    Type: AWS::Config::DeliveryChannel
+    Properties:
+      S3BucketName: !Ref ConfigBucket
+      SnsTopicARN: !Ref ConfigTopic
+
   
   # Storage
   # -------------------------------------------
