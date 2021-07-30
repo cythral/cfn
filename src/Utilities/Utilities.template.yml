@@ -237,21 +237,41 @@ Resources:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref NetworkCidr
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIpv6: ::/0
+          CidrIpv6: !Select [0, !GetAtt VPC.Ipv6CidrBlocks]
         # Port 443 - HTTPS
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref NetworkCidr
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIpv6: ::/0
+          CidrIpv6: !Select [0, !GetAtt VPC.Ipv6CidrBlocks]
       VpcId: !Ref VPC
+
+  WebSecurityGroupMasterPort80Ingress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: IsAgentAccount
+    Properties:
+      GroupId: !GetAtt WebSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      CidrIp: 10.1.0.0/16
+
+  WebSecurityGroupMasterPort443Ingress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: IsAgentAccount
+    Properties:
+      GroupId: !GetAtt WebSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      CidrIp: 10.1.0.0/16
 
   EnvoySecurityGroup:
     Type: AWS::EC2::SecurityGroup
