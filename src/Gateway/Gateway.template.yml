@@ -314,28 +314,6 @@ Resources:
       ServiceToken: !ImportValue cfn-secret-resource:SecretLambdaArn
       Ciphertext: !ImportValue sso-aws-registry:DevGoogleClientSecret
 
-  SnsDevListenerRule:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      ListenerArn: !Ref HttpsListener
-      Priority: 60
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref MeshTargetGroup
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-              - "dev.*"
-              - "*.dev.*"
-        - Field: http-header
-          HttpHeaderConfig:
-            HttpHeaderName: x-amz-sns-topic-arn
-            Values:
-              - !Sub
-                - arn:aws:sns:${AWS::Region}:${AccountId}:*
-                - AccountId: !ImportValue cfn-metadata:DevAccountId
-
   DevListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Properties:
