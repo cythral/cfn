@@ -241,12 +241,20 @@ Resources:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
+          CidrIp: !Ref PrivateNetworkCidr
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
           CidrIpv6: !Select [0, !GetAtt VPC.Ipv6CidrBlocks]
         # Port 443 - HTTPS
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
           CidrIp: !Ref NetworkCidr
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Ref PrivateNetworkCidr
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
