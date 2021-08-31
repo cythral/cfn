@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.ApplicationLoadBalancerEvents" Version="2.1.0" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.1.28" />
-    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.56" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.1.29" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.57" />
     <PackageReference Include="Lambdajection.Runtime" Version="0.8.4" />
     <PackageReference Include="Lambdajection.Encryption" Version="0.8.4" />
     <PackageReference Include="Lambdajection" Version="0.8.4" />
