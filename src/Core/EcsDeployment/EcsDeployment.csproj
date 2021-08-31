@@ -6,8 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AWSSDK.ECS" Version="3.7.2.32" />
-        <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.46" />
+        <PackageReference Include="AWSSDK.ECS" Version="3.7.2.33" />
+        <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.47" />
         <PackageReference Include="Lambdajection" Version="0.8.4" />
     </ItemGroup>
 
