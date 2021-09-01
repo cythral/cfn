@@ -8,11 +8,11 @@
     <PackageReference Include="Lambdajection.Encryption" Version="0.8.4" />
     <PackageReference Include="Lambdajection" Version="0.8.4" />
     <PackageReference Include="Amazon.Lambda.SNSEvents" Version="2.0.0" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.1.29" />
-    <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.5.1" />
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.47" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.7.1" />
-    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.57" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.1.30" />
+    <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.5.2" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.48" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.1.1" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.58" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
   </ItemGroup>
 </Project>
