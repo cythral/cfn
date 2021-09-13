@@ -4,20 +4,20 @@
     ".NETCoreApp,Version=v3.1": {
       "AWSSDK.ECS": {
         "type": "Direct",
-        "requested": "[3.7.2.40, )",
-        "resolved": "3.7.2.40",
-        "contentHash": "/mus9oXhvPBV24qjCoFSQA9+bfHR6CzzuvE3qkZrjVg6PsJGCEWZXAwsexf1njdCyWumwuCi56L0Cdmsw23Q8Q==",
+        "requested": "[3.7.2.41, )",
+        "resolved": "3.7.2.41",
+        "contentHash": "+t3JJnKg0CYLBI0mChtOcmuJ4UlIBKiy8dnidbz4gQpAGxcwbaue4bDvwQxZ839gmXRXNJcALkF4D4j8Om+BMA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.3.4, 4.0.0)"
+          "AWSSDK.Core": "[3.7.3.5, 4.0.0)"
         }
       },
       "AWSSDK.SecurityToken": {
         "type": "Direct",
-        "requested": "[3.7.1.54, )",
-        "resolved": "3.7.1.54",
-        "contentHash": "YpZlEzIEUuxGa7xqlHMrfugDzW220+norTkvhXnRBQVHNJQ+1OCIXrMu/QSeocc529QjUMWfhAOjgc8jayo1ZQ==",
+        "requested": "[3.7.1.55, )",
+        "resolved": "3.7.1.55",
+        "contentHash": "c6gviPipu2AILb49FFhB89R5fLB87bgQj23UwCYT2EXzwPwJcGE/BAxI8xGEjniqYL0x6+5esQc2PCxjqXTQGg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.3.4, 4.0.0)"
+          "AWSSDK.Core": "[3.7.3.5, 4.0.0)"
         }
       },
       "Lambdajection": {
@@ -48,8 +48,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.3.4",
-        "contentHash": "vnaua1196PDtfTGOeFXCD7ozJ7CLYUjbDyyLJ/a5XgMyJcqTADlnZkVF8tadbbht2qxEMj+o/ggthK4gtW9dFg=="
+        "resolved": "3.7.3.5",
+        "contentHash": "wu6s4geFWpSKuqg/UOx6DAdTnnTzoWQRsKOVCYae2ggzpadFJxwMIB7CSvw0r8CaIQNDKYr6Al3eKU+EA8jqbg=="
       },
       "Humanizer.Core": {
         "type": "Transitive",
