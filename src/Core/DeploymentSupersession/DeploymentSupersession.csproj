@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.SQSEvents" Version="2.0.0" />
-    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.71" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.72" />
     <PackageReference Include="Lambdajection" Version="0.8.4" />
   </ItemGroup>
 
