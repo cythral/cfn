@@ -4,17 +4,17 @@
     ".NETCoreApp,Version=v3.1": {
       "AWSSDK.SecurityToken": {
         "type": "Direct",
-        "requested": "[3.7.1.67, )",
-        "resolved": "3.7.1.67",
-        "contentHash": "4eNjoNmOyct+AL/C+hVqao+lpEbEdo4rT++ubyzNAcoMMNw22lbywPyTtAdNF2bI+bODS2UmlUgleLS9tEEk2g==",
+        "requested": "[3.7.1.68, )",
+        "resolved": "3.7.1.68",
+        "contentHash": "Fm01GAvXf+4IAPRuIaZkTY01jBpU24IiTzlyWHBFHqAaxt6kL2NaJvxT8wibw8k2kNu1YCdU8jgpanIinHHDGw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.3.17, 4.0.0)"
+          "AWSSDK.Core": "[3.7.3.18, 4.0.0)"
         }
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.3.17",
-        "contentHash": "f/F4HlZ9NjhxtbK0bSfDbnCntMt8z4iRhigQNawe/BUfmYqGHujywdC6cPtGTVvvF4DlnY73fQCk0TNQfuf4Fg=="
+        "resolved": "3.7.3.18",
+        "contentHash": "4LtTi6b2OgDgICXY0mwwgJxq88DnH2D576nwI544zviO/MjyEhnDj4zS5MHmBhw26At9o+QQVcz/ElUOKoyVRw=="
       }
     }
   }
