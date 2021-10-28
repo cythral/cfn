@@ -4,9 +4,9 @@
     ".NETCoreApp,Version=v3.1": {
       "AWSSDK.ECS": {
         "type": "Direct",
-        "requested": "[3.7.2.63, )",
-        "resolved": "3.7.2.63",
-        "contentHash": "HDaVxTx2GEEITKTdJ8NxcLdJyci3fgRVGtZxbex250mC1SMdM5sx3PMi2yMm/4EO3iaPdSBJmfxsX8AeYCXS4A==",
+        "requested": "[3.7.3, )",
+        "resolved": "3.7.3",
+        "contentHash": "rcIFBiXFZMHoLQMyv64RDnsFNPWsglh01k+D/u7krYL950/zXHpaRVVadPugJaGTwZEysCo9gHT+1a+v7AY3gw==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.3.27, 4.0.0)"
         }
