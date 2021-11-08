@@ -13,6 +13,6 @@
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.83" />
     <PackageReference Include="AWSSDK.SQS" Version="3.7.1.36" />
     <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.93" />
-    <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
   </ItemGroup>
 </Project>
