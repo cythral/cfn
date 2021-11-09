@@ -516,7 +516,6 @@
             "ProdVpcId.$": "$.ProdUtilityOutputs.VpcId",
             "OssVpcId.$": "$.OssUtilityOutputs.VpcId",
             "Version.$": "$.head_commit.id",
-            "RunEndToEndTests": "no",
             "LambdajectionLayerArn.$": "$.LayerOutputs[0].LambdajectionArn",
             "DotnetLayerArn.$": "$.LayerOutputs[0].DotnetArn"
           },
