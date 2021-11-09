@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
     <RootNamespace>Cythral.CloudFormation.ApprovalWebhook</RootNamespace>
   </PropertyGroup>
 
@@ -9,6 +9,8 @@
     <PackageReference Include="Amazon.Lambda.ApplicationLoadBalancerEvents" Version="2.1.0" />
     <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.93" />
     <PackageReference Include="Lambdajection" Version="0.8.4" />
+    <PackageReference Include="Lambdajection.Runtime" Version="0.8.4" />
+    <PackageReference Include="Lambdajection.Layer" Version="0.8.4" />
   </ItemGroup>
 
   <ItemGroup>

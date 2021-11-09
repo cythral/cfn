@@ -2,13 +2,15 @@
 
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="AWSSDK.ECS" Version="3.7.3.6" />
         <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.83" />
         <PackageReference Include="Lambdajection" Version="0.8.4" />
+        <PackageReference Include="Lambdajection.Runtime" Version="0.8.4" />
+        <PackageReference Include="Lambdajection.Layer" Version="0.8.4" />
     </ItemGroup>
 
 </Project>

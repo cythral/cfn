@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +9,8 @@
     <PackageReference Include="AWSSDK.S3" Version="3.7.4" />
     <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.5.37" />
     <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.93" />
+    <PackageReference Include="Lambdajection.Layer" Version="0.8.4" />
+    <PackageReference Include="Lambdajection.Runtime" Version="0.8.4" />
     <PackageReference Include="Lambdajection.Encryption" Version="0.8.4" />
     <PackageReference Include="Lambdajection" Version="0.8.4" />
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />

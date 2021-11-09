@@ -18,7 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\tests\EndToEnd\GithubWebhook\GithubWebhookEndToEnd.csproj" Properties="Package=false" />
     <ProjectReference Include="StackDeploymentStatus\StackDeploymentStatus.csproj" />
     <ProjectReference Include="StackDeployment\StackDeployment.csproj" />
     <ProjectReference Include="S3Deployment\S3Deployment.csproj" />

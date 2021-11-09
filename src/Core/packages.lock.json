@@ -1,26 +1,12 @@
 {
   "version": 1,
   "dependencies": {
-    ".NETFramework,Version=v4.5": {
+    "net6.0": {
       "Cythral.CloudFormation.BuildTasks": {
         "type": "Direct",
         "requested": "[0.2.3, )",
         "resolved": "0.2.3",
         "contentHash": "vJJBdT7ZbOBG2e+YNNM8E8yN7aribZFX+UkcWIWVmA2Ly0POqAzAS31B9vCwpB8ilo+PTg0r6vGt/c7ARfC8dw=="
-      },
-      "Microsoft.NETFramework.ReferenceAssemblies": {
-        "type": "Direct",
-        "requested": "[1.0.0, )",
-        "resolved": "1.0.0",
-        "contentHash": "7D2TMufjGiowmt0E941kVoTIS+GTNzaPopuzM1/1LSaJAdJdBrVP0SkZW7AgDd0a2U1DjsIeaKG1wxGVBNLDMw==",
-        "dependencies": {
-          "Microsoft.NETFramework.ReferenceAssemblies.net45": "1.0.0"
-        }
-      },
-      "Microsoft.NETFramework.ReferenceAssemblies.net45": {
-        "type": "Transitive",
-        "resolved": "1.0.0",
-        "contentHash": "f7XMQsZFaoc3w8Vg3VQ3FHuU2C9vf0Ng5EAV4gzdNWDerPM/OmrzccLj15eI1wCLLXj4jk8+lKsbonzJeyXgQQ=="
       }
     }
   }

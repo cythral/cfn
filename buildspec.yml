@@ -2,7 +2,8 @@ version: 0.2
 env:
   variables:
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: "true"
-    DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+    DOTNET_SYSTEM_GLOBALIZATION_PREDEFINED_CULTURES_ONLY: "false"
+    DOTNET_NOLOGO: "true"
 
 phases:
   install:

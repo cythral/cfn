@@ -1,8 +1,0 @@
-{
-    "StartAt": "Success",
-    "States": {
-        "Success": {
-            "Type": "Succeed"
-        }
-    }
-}
