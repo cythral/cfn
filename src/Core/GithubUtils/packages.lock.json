@@ -42,6 +42,7 @@
           "AwsUtils.Common": "1.0.0"
         }
       }
-    }
+    },
+    "net6.0/linux-x64": {}
   }
 }
