@@ -11,6 +11,8 @@ using Amazon.ECS.Model;
 using Lambdajection.Attributes;
 using Lambdajection.Core;
 
+using Task = System.Threading.Tasks.Task;
+
 namespace Cythral.CloudFormation.EcsDeployment
 {
     [Lambda(typeof(Startup))]

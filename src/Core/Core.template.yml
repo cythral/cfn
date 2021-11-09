@@ -47,14 +47,6 @@ Parameters:
     Default: "1"
     Description: Version of the stack being deployed
 
-  RunEndToEndTests:
-    Type: String
-    Default: "no"
-    Description: Whether or not to run end to end tests
-    AllowedValues:
-      - "yes"
-      - "no"
-
   LambdajectionLayerArn:
     Type: String
     Description: ARN of the Lambda Layer containing Lambdajection + its dependencies
@@ -78,10 +70,6 @@ Conditions:
     - !Equals
       - !Ref OssVpcId
       - ""
-
-  RunEndToEndTests: !Equals
-    - !Ref RunEndToEndTests
-    - "yes"
 
 Resources:
   OssPeeringConnection:
@@ -169,7 +157,7 @@ Resources:
       Handler: GithubWebhook::Cythral.CloudFormation.GithubWebhook.Handler::Run
       Runtime: provided.al2
       Timeout: 30
-      CodeUri: ../../bin/GithubWebhook/Release/net5.0/linux-x64/publish/
+      CodeUri: ../../bin/GithubWebhook/Release/net6.0/linux-x64/publish/
       MemorySize: 512
       Layers:
         - !Ref DotnetLayerArn
@@ -192,7 +180,6 @@ Resources:
           GithubWebhook__ArtifactStore: !Ref GithubWebhookArtifactStore
           AWS_ACCOUNT_ID: !Ref AWS::AccountId
           LAMBDA_NET_SERIALIZER_DEBUG: "true"
-          DOTNET_SHARED_STORE: /opt/
 
   GithubWebhookPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -253,39 +240,16 @@ Resources:
             Values:
               - /webhooks/github
 
-  GithubWebhookEndToEndTests:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: GithubWebhookEndToEnd::Cythral.CloudFormation.Tests.EndToEnd.GithubWebhook.Runner::Handle
-      Runtime: dotnetcore3.1
-      Timeout: 900
-      MemorySize: 512
-      CodeUri: ../../bin/GithubWebhookEndToEnd/Release/netcoreapp3.1/publish/
-      Policies:
-        - AdministratorAccess
-      Environment:
-        Variables:
-          GITHUB_TOKEN: !Ref GithubToken
-          GITHUB_SIGNING_SECRET: !Ref GithubSigningSecret
-          AWS_ACCOUNT_ID: !Ref AWS::AccountId
-
-  GithubWebhoookEndToEndTestRunner:
-    Type: Custom::TestRunner
-    Condition: RunEndToEndTests
-    DependsOn: GithubWebhookAliasGithubWebhook
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
-    Properties:
-      ServiceToken: !GetAtt GithubWebhookEndToEndTests.Arn
-      Serial: !Ref Version
-
   StackDeploymentFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: StackDeployment::Cythral.CloudFormation.StackDeployment.Handler::Run
-      Runtime: dotnetcore3.1
+      Runtime: provided.al2
       Timeout: 300
-      CodeUri: ../../bin/StackDeployment/Release/netcoreapp3.1/publish/
+      CodeUri: ../../bin/StackDeployment/Release/net6.0/linux-x64/publish/
+      Layers:
+        - !Ref DotnetLayerArn
+        - !Ref LambdajectionLayerArn
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Environment:
         Variables:
@@ -304,10 +268,13 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: StackDeploymentStatus::Cythral.CloudFormation.StackDeploymentStatus.Handler::Run
-      Runtime: dotnetcore3.1
+      Runtime: provided.al2
       Timeout: 30
-      CodeUri: ../../bin/StackDeploymentStatus/Release/netcoreapp3.1/publish/
+      CodeUri: ../../bin/StackDeploymentStatus/Release/net6.0/linux-x64/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
+      Layers:
+        - !Ref DotnetLayerArn
+        - !Ref LambdajectionLayerArn
       Events:
         GithubWebhookStatus:
           Type: SNS
@@ -354,10 +321,13 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: ApprovalWebhook::Cythral.CloudFormation.ApprovalWebhook.Handler::Run
-      Runtime: dotnetcore3.1
+      Runtime: provided.al2
       Timeout: 30
-      CodeUri: ../../bin/ApprovalWebhook/Release/netcoreapp3.1/publish/
+      CodeUri: ../../bin/ApprovalWebhook/Release/net6.0/linux-x64/publish/
       MemorySize: 512
+      Layers:
+        - !Ref DotnetLayerArn
+        - !Ref LambdajectionLayerArn
       Policies:
         - AWSLambdaExecute
         - !Ref ApprovalWebhookPolicy
@@ -449,9 +419,10 @@ Resources:
       Runtime: provided.al2
       Timeout: 30
       MemorySize: 256
-      CodeUri: ../../bin/ApprovalNotification/Release/net5.0/linux-x64/publish/
+      CodeUri: ../../bin/ApprovalNotification/Release/net6.0/linux-x64/publish/
       Layers:
         - !Ref DotnetLayerArn
+        - !Ref LambdajectionLayerArn
       Policies:
         - AWSLambdaExecute
         - !Ref ApprovalNotificationPolicy
@@ -502,10 +473,13 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: DeploymentSupersession::Cythral.CloudFormation.DeploymentSupersession.Handler::Run
-      Runtime: dotnetcore3.1
+      Runtime: provided.al2
       Timeout: 30
       MemorySize: 256
-      CodeUri: ../../bin/DeploymentSupersession/Release/netcoreapp3.1/publish/
+      CodeUri: ../../bin/DeploymentSupersession/Release/net6.0/linux-x64/publish/
+      Layers:
+        - !Ref DotnetLayerArn
+        - !Ref LambdajectionLayerArn
       Policies:
         - AWSLambdaExecute
         - !Ref DeploymentSupersessionPolicy
@@ -538,10 +512,13 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: ExtractFileFromZip::Cythral.CloudFormation.ExtractFileFromZip.Handler::Run
-      Runtime: dotnetcore3.1
+      Runtime: provided.al2
       Timeout: 30
       MemorySize: 256
-      CodeUri: ../../bin/ExtractFileFromZip/Release/netcoreapp3.1/publish/
+      CodeUri: ../../bin/ExtractFileFromZip/Release/net6.0/linux-x64/publish/
+      Layers:
+        - !Ref DotnetLayerArn
+        - !Ref LambdajectionLayerArn
       Policies:
         - AWSLambdaExecute
         - !Ref ExtractFileFromZipPolicy
@@ -568,9 +545,10 @@ Resources:
       Runtime: provided.al2
       Timeout: 300
       MemorySize: 256
-      CodeUri: ../../bin/S3Deployment/Release/net5.0/linux-x64/publish/
+      CodeUri: ../../bin/S3Deployment/Release/net6.0/linux-x64/publish/
       Layers:
         - !Ref DotnetLayerArn
+        - !Ref LambdajectionLayerArn
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Environment:
         Variables:
@@ -582,21 +560,27 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: S3TagOutdatedArtifacts::Cythral.CloudFormation.S3TagOutdatedArtifacts.Handler::Run
-      Runtime: dotnetcore3.1
+      Runtime: provided.al2
       Timeout: 300
       MemorySize: 256
-      CodeUri: ../../bin/S3TagOutdatedArtifacts/Release/netcoreapp3.1/publish/
+      CodeUri: ../../bin/S3TagOutdatedArtifacts/Release/net6.0/linux-x64/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
+      Layers:
+        - !Ref DotnetLayerArn
+        - !Ref LambdajectionLayerArn
 
   EcsDeploymentFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: EcsDeployment::Cythral.CloudFormation.EcsDeployment.Handler::Run
-      Runtime: dotnetcore3.1
+      Runtime: provided.al2
       Timeout: 900
       MemorySize: 256
-      CodeUri: ../../bin/EcsDeployment/Release/netcoreapp3.1/publish/
+      CodeUri: ../../bin/EcsDeployment/Release/net6.0/linux-x64/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
+      Layers:
+        - !Ref DotnetLayerArn
+        - !Ref LambdajectionLayerArn
 
   GithubTokenSecret:
     Type: Custom::Secret
