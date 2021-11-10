@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 using Amazon.CloudFormation;
 using Amazon.S3;
 using Amazon.StepFunctions;
@@ -29,6 +31,10 @@ namespace Cythral.CloudFormation.GithubWebhook
             services.UseAwsService<IAmazonS3>();
             services.UseAwsService<IAmazonStepFunctions>();
             services.UseAwsService<IAmazonCloudFormation>();
+            services.AddSingleton(new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            });
         }
     }
 }
