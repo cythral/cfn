@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 using Amazon.S3;
@@ -22,6 +23,10 @@ namespace Cythral.CloudFormation.DeploymentSupersession
             services.UseAwsService<IAmazonStepFunctions>();
             services.AddSingleton<RequestFactory>();
             services.AddSingleton<S3GetObjectFacade>();
+            services.AddSingleton(new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+            });
         }
     }
 }
