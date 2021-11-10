@@ -87,7 +87,9 @@ namespace Cythral.CloudFormation.AwsUtils.CloudFormation
                     }
                     else
                     {
+#pragma warning disable CA2200
                         throw e;
+#pragma warning restore CA2200
                     }
                 }
             }

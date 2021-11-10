@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.Core;
-using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.Lambda.SQSEvents;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -13,11 +12,11 @@ using Amazon.StepFunctions.Model;
 using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-
 using Lambdajection.Attributes;
 using Lambdajection.Core;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using static System.Text.Json.JsonSerializer;
 

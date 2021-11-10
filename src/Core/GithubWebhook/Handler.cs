@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Amazon.CloudFormation.Model;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.Lambda.Core;
-using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.S3;
 using Amazon.S3.Model;
 
@@ -27,7 +26,7 @@ using Microsoft.Extensions.Options;
 
 namespace Cythral.CloudFormation.GithubWebhook
 {
-    [Lambda(typeof(Startup), Serializer = typeof(CamelCaseLambdaJsonSerializer))]
+    [Lambda(typeof(Startup))]
     public partial class Handler
     {
         private readonly RequestValidator requestValidator;

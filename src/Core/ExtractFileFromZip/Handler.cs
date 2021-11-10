@@ -2,7 +2,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.Core;
-using Amazon.Lambda.Serialization.SystemTextJson;
 
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
 

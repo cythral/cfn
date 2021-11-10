@@ -5,8 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
-using Amazon.Lambda.Core;
-using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.S3;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
@@ -26,7 +24,7 @@ using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.ApprovalWebhook
 {
-    [Lambda(typeof(Startup), Serializer = typeof(CamelCaseLambdaJsonSerializer))]
+    [Lambda(typeof(Startup))]
     public partial class Handler
     {
         private readonly IAmazonStepFunctions stepFunctionsClient;
