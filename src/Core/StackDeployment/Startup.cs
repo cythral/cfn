@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 using Amazon.CloudFormation;
 using Amazon.S3;
 using Amazon.StepFunctions;
@@ -26,6 +28,10 @@ namespace Cythral.CloudFormation.StackDeployment
             services.UseAwsService<IAmazonStepFunctions>();
             services.UseAwsService<IAmazonCloudFormation>();
             services.UseAwsService<IAmazonS3>();
+            services.AddSingleton(new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+            });
         }
     }
 }
