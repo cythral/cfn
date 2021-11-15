@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.7.4.4" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.4.5" />
   </ItemGroup>
 
   <ItemGroup>
