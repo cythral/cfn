@@ -22,8 +22,6 @@
 
         <MSBuild Condition="$(SkipLayers) != 'true'" Projects="$(SourceDirectory)/Layers/Layers.proj" Targets="Copy" Properties="Configuration=$(Configuration);Dest=$(Destination)" />
 
-        <MSBuild Condition="$(SkipConfig) != 'true'" Projects="$(SourceDirectory)/Config/Config.proj" Targets="Copy" Properties="Configuration=$(Configuration);Dest=$(Destination)" />
-
         <MSBuild Condition="$(SkipDns) != 'true'" Projects="$(SourceDirectory)/Dns/Dns.proj" Targets="Copy" Properties="Configuration=$(Configuration);Dest=$(Destination)" />
 
         <MSBuild Condition="$(SkipGateway) != 'true'" Projects="$(SourceDirectory)/Gateway/Gateway.proj" Targets="Copy" Properties="Configuration=$(Configuration);Dest=$(Destination)" />

@@ -32,7 +32,6 @@ artifacts:
     - "Dns.config.json"
     - "Gateway.template.yml"
     - "Networking.config.json"
-    - "Config.template.yml"
     - "package-manifest.json"
 
 reports:
