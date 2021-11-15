@@ -4,14 +4,7 @@ Resources:
     Properties:
       AWSServiceName: config.amazonaws.com
       Description: Service-linked role for AWS Config.
-
-  ConfigRecorder:
-    Type: AWS::Config::ConfigurationRecorder
-    DependsOn: ConfigServiceLinkedRole
-    Properties:
-      Name: default
-      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig
-
+      
   ConfigBucket:
     Type: AWS::S3::Bucket
 
