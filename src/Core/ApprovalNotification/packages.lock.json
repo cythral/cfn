@@ -36,38 +36,38 @@
       },
       "Lambdajection": {
         "type": "Direct",
-        "requested": "[0.9.0-beta2, )",
-        "resolved": "0.9.0-beta2",
-        "contentHash": "daBXvvZuAFah+L0IVclzF6uisAl1Ie9OKW0W9KQq2mJl/PKb/9doTfWSonDM7SXS+/1YZRAcuXE9QfP7znQWng==",
+        "requested": "[0.9.0-beta3, )",
+        "resolved": "0.9.0-beta3",
+        "contentHash": "qHJqIjrxVFl/WJe6+dA/Xo+QRzxPwIVWWdVotMVtFApSqNkqeeoEft688jzTSYI89rcTGOvKfTz/tuERcwTOkQ==",
         "dependencies": {
-          "Lambdajection.Attributes": "0.9.0-beta2",
-          "Lambdajection.Core": "0.9.0-beta2",
-          "Lambdajection.Framework": "0.9.0-beta2",
-          "Lambdajection.Framework.BuildTime": "0.9.0-beta2",
-          "Lambdajection.Generator": "0.9.0-beta2"
+          "Lambdajection.Attributes": "0.9.0-beta3",
+          "Lambdajection.Core": "0.9.0-beta3",
+          "Lambdajection.Framework": "0.9.0-beta3",
+          "Lambdajection.Framework.BuildTime": "0.9.0-beta3",
+          "Lambdajection.Generator": "0.9.0-beta3"
         }
       },
       "Lambdajection.Encryption": {
         "type": "Direct",
-        "requested": "[0.9.0-beta2, )",
-        "resolved": "0.9.0-beta2",
-        "contentHash": "KZIgeWsdJ9uLhx/ocDM81gZPcOpVoVcByZs913i/yhYE68izwy/EFB9FePuwneiC4HRhnLUch3j/8hkCl4WQVQ==",
+        "requested": "[0.9.0-beta3, )",
+        "resolved": "0.9.0-beta3",
+        "contentHash": "mEg5sSan9h0EFWDbrosXflskr7dZlpR/F6VC+MxmYKGBAfDYeDEaPM9I6DM3oox0zoly5OkxKTeg/b/zc8TzmA==",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.7.2.39",
-          "Lambdajection.Framework": "0.9.0-beta2"
+          "AWSSDK.KeyManagementService": "3.7.2.44",
+          "Lambdajection.Framework": "0.9.0-beta3"
         }
       },
       "Lambdajection.Layer": {
         "type": "Direct",
-        "requested": "[0.9.0-beta2, )",
-        "resolved": "0.9.0-beta2",
-        "contentHash": "aFa1sAFf5wjnnmVlp9w5ynhB/3JMkEQ5P2Xlo932WYqX7gBM+0qfchTn6rJw+SBUK9TqyT+gLZqBOUgyNHRgLw=="
+        "requested": "[0.9.0-beta3, )",
+        "resolved": "0.9.0-beta3",
+        "contentHash": "MIzno2wycgX3OBgKiJ1tU+HpVWdx9ouh+vFVPsICrvM4V5itKIWo+/Y9Si6oFfuTxHuo8FRh0qOuoA8dUbDfUA=="
       },
       "Lambdajection.Runtime": {
         "type": "Direct",
-        "requested": "[0.9.0-beta2, )",
-        "resolved": "0.9.0-beta2",
-        "contentHash": "+73iUIhhhouY+EnkhMB1wlZS4g5UDiAU5hIIz/q7y33J7FiIcAeDpm75Axzdj8PucYaxp8REgUI+TwSE34D/dw==",
+        "requested": "[0.9.0-beta3, )",
+        "resolved": "0.9.0-beta3",
+        "contentHash": "k2ImYhB90Wvodo8c9lA3zQ8JHzNlnEoe5B/5ClEYoYcryhPatuh1EUgQ1urdN2OIZq9m7a0mzriVdqAoIpfhvw==",
         "dependencies": {
           "Amazon.Lambda.RuntimeSupport": "1.4.0"
         }
@@ -94,10 +94,10 @@
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.7.2.39",
-        "contentHash": "GjjvPICbvX2IMZ6SxmMXXH95kS/kWZzvVfFu4Kpj5I0azmdtnAUxFclq7qiReE+9JWVsYV7XrvFjFXW2NCi4Eg==",
+        "resolved": "3.7.2.44",
+        "contentHash": "fhNh+OjGfdYWsXLZ3usSVZwBc4Ptqe0BLmK+D2d//ciR5WstI2ulNY+ejJ62PzC033LmeTAWh89OghsY4R6YSQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.3.34, 4.0.0)"
+          "AWSSDK.Core": "[3.7.4.4, 4.0.0)"
         }
       },
       "AWSSDK.S3": {
@@ -126,17 +126,17 @@
       },
       "Lambdajection.Attributes": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta2",
-        "contentHash": "Ey8OpdHhY1+HlFSYG4SSFjSxhyJBnyabq17XCurCbRt+tB9MjawfXzcQPRvuDAtbcxH3lEwVNJa1QzXs0y37lg=="
+        "resolved": "0.9.0-beta3",
+        "contentHash": "Yrl+XqaPlgY2RALRDNatydZOAIg6XxzO/msUreuYgt7C5sddkDJwo+if58DTPZd+xOa72R3JofS87pz3hVpsUg=="
       },
       "Lambdajection.Core": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta2",
-        "contentHash": "6LalJ2HCJDUvaDmTztjDeEDrJFiBRPC1fhXt4JNJNv0AvIlPInj9ar/VggvfkE2rKKvJMA4NMh4zy8+gX3K8Xg==",
+        "resolved": "0.9.0-beta3",
+        "contentHash": "V8SYNGy8MqXadb64mpsi+xsK4k2Zjb7Vu5Z8g9M6KliQHTg0mIj2gN8CPFQw5rPjCpOXZ32UYAisnDMtmO0YTg==",
         "dependencies": {
           "Amazon.Lambda.Core": "2.1.0",
-          "Lambdajection.Attributes": "0.9.0-beta2",
-          "Lambdajection.Framework": "0.9.0-beta2",
+          "Lambdajection.Attributes": "0.9.0-beta3",
+          "Lambdajection.Framework": "0.9.0-beta3",
           "Microsoft.Extensions.Configuration": "6.0.0",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "6.0.0",
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
@@ -146,22 +146,22 @@
       },
       "Lambdajection.Framework": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta2",
-        "contentHash": "YbR8R2Sy2C0+li8WaqcAEL4pdTCVk8y6WApSDdK5lW98nNycOs4CeyTOiOBU6UHFohccAEGce7vN8bAHkstCDQ=="
+        "resolved": "0.9.0-beta3",
+        "contentHash": "X9W93+c8PWZE3PWnQdos8QeSjacbpnnpUIjwdMdT6hf0KD8tqll4Q45jqnk/FsyXmlbTAbR2AfcmDUS9KmJptA=="
       },
       "Lambdajection.Framework.BuildTime": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta2",
-        "contentHash": "mOPRlztL+dfvVdHb2I8XrhE4emjCYWGsJ7fJuZaiwel76E6JepaziWrXJqfMXAhFAdtmoffEPHLMxUebvmSBfQ=="
+        "resolved": "0.9.0-beta3",
+        "contentHash": "qBy6Pv3HSx1tCV3j1gwO/5HD19PzegbBY1ZR8cno8tXl6tmkTleKU+p7dfrcbi194vrJPg4oUCvXSukMQLuqVg=="
       },
       "Lambdajection.Generator": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta2",
-        "contentHash": "7g4uAbgcOCQLn5BFFx+Ydm2rwxD+Jg1MM3kNAwmbFGA1x4ImCn8gDu1slZ9IKZph93IdIkKWOeb/7Wr+eOS9mw==",
+        "resolved": "0.9.0-beta3",
+        "contentHash": "3rz6cnhIK1BOsFNpslu3PgvnJsOdYelL77K+uMZIj63dxsEdJV9MRgSqLFH1dvsJfwgdXD23iAXG+EW/r5gz+w==",
         "dependencies": {
-          "Lambdajection.Attributes": "0.9.0-beta2",
-          "Lambdajection.Framework": "0.9.0-beta2",
-          "Lambdajection.Framework.BuildTime": "0.9.0-beta2",
+          "Lambdajection.Attributes": "0.9.0-beta3",
+          "Lambdajection.Framework": "0.9.0-beta3",
+          "Lambdajection.Framework.BuildTime": "0.9.0-beta3",
           "Microsoft.CodeAnalysis": "4.0.1",
           "Microsoft.CodeAnalysis.CSharp.Workspaces": "4.0.1",
           "Microsoft.Extensions.Hosting": "6.0.0",
