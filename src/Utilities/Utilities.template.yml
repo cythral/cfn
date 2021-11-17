@@ -531,6 +531,24 @@ Resources:
                   ]
                 - !GetAtt BrokerRole.Arn
 
+  ContactTesterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ContractTester
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - arn:aws:iam::aws:policy/AWSLambda_ReadOnlyAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              AWS: !If
+                - IsMasterAccount
+                - !Sub arn:aws:iam::${AWS::AccountId}:root
+                - !Sub arn:aws:iam::${MasterAccountId}:root
+
   BuilderRole:
     Type: AWS::IAM::Role
     Condition: IsMasterAccount
