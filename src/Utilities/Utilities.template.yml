@@ -523,13 +523,13 @@ Resources:
           - Effect: Allow
             Action: sts:AssumeRole
             Principal:
-              AWS:
-                - !If [
-                    IsMasterAccount,
-                    !GetAtt MasterRole.Arn,
-                    !GetAtt AgentRole.Arn,
-                  ]
-                - !GetAtt BrokerRole.Arn
+              AWS: !If
+                - IsMasterAccount
+                - - !GetAtt MasterRole.Arn
+                  - !GetAtt BrokerRole.Arn
+                - - !GetAtt AgentRole.Arn
+                  - !GetAtt BrokerRole.Arn
+                  - !Sub arn:aws:iam::${MasterAccountId}:root
 
   BuilderRole:
     Type: AWS::IAM::Role
