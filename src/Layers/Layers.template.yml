@@ -17,6 +17,13 @@ Resources:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:918601311641:applications/lambdajection-layer
         SemanticVersion: !Ref LambdajectionVersion
 
+  LambdajectionSsmParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /lambdajection/${LambdajectionVersion}/layer-arn
+      Type: String
+      Value: !GetAtt Lambdajection.Outputs.LayerArn
+
   Dotnet:
     Type: AWS::Serverless::Application
     Properties:
