@@ -4,9 +4,9 @@
     "net6.0": {
       "Cythral.CloudFormation.BuildTasks": {
         "type": "Direct",
-        "requested": "[0.2.3, )",
-        "resolved": "0.2.3",
-        "contentHash": "vJJBdT7ZbOBG2e+YNNM8E8yN7aribZFX+UkcWIWVmA2Ly0POqAzAS31B9vCwpB8ilo+PTg0r6vGt/c7ARfC8dw=="
+        "requested": "[0.5.2, )",
+        "resolved": "0.5.2",
+        "contentHash": "XgwEwpltoXeoiOQHVbSQCRNU0v80zMV3RMPlyE3ERlCzkVvgZUBCyrs3QpCOarozvwbruGf1Hc6gbVFIVL/hWQ=="
       }
     }
   }
