@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.Build.Traversal" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <DefaultProjectTypeGuid>FAE04EC0-301F-11D3-BF4B-00C04F79EFBC</DefaultProjectTypeGuid>
     <TemplateName>Layers.template.yml</TemplateName>
     <ConfigName>Layers.config.json</ConfigName>
     <Template>$(MSBuildThisFileDirectory)$(TemplateName)</Template>
@@ -9,27 +10,30 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Overrides Include="LambdajectionVersion=0.8.0-beta3" />
+    <ProjectReference Include="../Core/Core.proj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Flags Include="--template-file $(Template)" />
-    <Flags Include="--stack-name $(StackName)" />
-    <Flags Include="--no-fail-on-empty-changeset" />
-
-    <Flags Include="--profile $(Profile)" Condition="$(Profile) != ''" />
+    <PackageReference Include="Lambdajection" Version="0.9.0-beta3" />
   </ItemGroup>
 
-  <Target Name="Build">
-    <PropertyGroup>
-      <ParameterOverrides>@(Overrides, ' ')</ParameterOverrides>
-    </PropertyGroup>
-
+  <Target Name="Configure" AfterTargets="Build">
     <ItemGroup>
-      <Flags Include="--parameter-overrides $(ParameterOverrides)" Condition="$(ParameterOverrides) != ''" />
+      <LambdajectionPackageReference Include="@(PackageReference)" Condition="%(Identity) == 'Lambdajection'" />
     </ItemGroup>
 
-    <Exec Command="aws cloudformation deploy @(Flags, ' ')" />
+    <PropertyGroup>
+      <ConfigLines>
+{
+    "Parameters": {
+        "LambdajectionVersion": "%(LambdajectionPackageReference.Version)",
+        "DotnetVersion": "$(NETCoreSdkVersion)"
+    }
+}
+        </ConfigLines>
+    </PropertyGroup>
+
+    <WriteLinesToFile File="$(ConfigFile)" Lines="$(ConfigLines)" Overwrite="true" />
   </Target>
 
   <Target Name="Copy" Condition="$(Dest) != ''">
