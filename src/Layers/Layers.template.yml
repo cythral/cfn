@@ -19,6 +19,8 @@ Resources:
 
   LambdajectionSsmParameter:
     Type: AWS::SSM::Parameter
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       Name: !Sub /lambdajection/${LambdajectionVersion}/layer-arn
       Type: String
@@ -33,6 +35,8 @@ Resources:
 
   DotnetSsmParameter:
     Type: AWS::SSM::Parameter
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       Name: !Sub /dotnet/${DotnetVersion}/layer-arn
       Type: String
