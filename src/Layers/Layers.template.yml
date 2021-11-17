@@ -31,6 +31,13 @@ Resources:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:918601311641:applications/dotnet-lambda-layer
         SemanticVersion: !Ref DotnetVersion
 
+  DotnetSsmParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /dotnet/${DotnetVersion}/layer-arn
+      Type: String
+      Value: !GetAtt Dotnet.Outputs.LayerArn
+
 Outputs:
   LambdajectionArn:
     Description: ARN of the Lambdajection Layer
