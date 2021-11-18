@@ -92,11 +92,6 @@
           "System.Runtime.Loader": "4.3.0"
         }
       },
-      "Amazon.Lambda.SNSEvents": {
-        "type": "Transitive",
-        "resolved": "2.0.0",
-        "contentHash": "NzEV+hsQygpukxwuyN4gyOINYhFGOilc6uSuHIeTRiOncz+dvtw100UbeBxObCMuAbofL9U4yidKV/rObnpInQ=="
-      },
       "Amazon.Lambda.SQSEvents": {
         "type": "Transitive",
         "resolved": "2.0.0",
@@ -304,6 +299,15 @@
         "contentHash": "/Z91csTKbKTouiH6TM/HzbJzaGwAOlpFT5Djo/7ceRoUFQAZ6wF6qOxdlYWytSS4s8PhKjXUSDF28K5zUrXoXQ==",
         "dependencies": {
           "Amazon.Lambda.RuntimeSupport": "1.4.0"
+        }
+      },
+      "Lambdajection.Sns": {
+        "type": "Transitive",
+        "resolved": "0.9.0-beta5",
+        "contentHash": "FA7PbspxctpB8PYWHU3J5+HlMSRoh9JsJK4Upuo2Ocieh5pVqtCttc6H50jTWdObRcWPlBeNGVBDzmxG4VITmQ==",
+        "dependencies": {
+          "Lambdajection.Core": "0.9.0-beta5",
+          "Lambdajection.Framework": "0.9.0-beta5"
         }
       },
       "Microsoft.Bcl.AsyncInterfaces": {
@@ -1618,11 +1622,11 @@
           "AWSSDK.SQS": "3.7.1.44",
           "AWSSDK.SecurityToken": "3.7.1.91",
           "AWSSDK.StepFunctions": "3.7.0.101",
-          "Amazon.Lambda.SNSEvents": "2.0.0",
           "Lambdajection": "0.9.0-beta5",
           "Lambdajection.Encryption": "0.9.0-beta5",
           "Lambdajection.Layer": "0.9.0-beta5",
           "Lambdajection.Runtime": "0.9.0-beta5",
+          "Lambdajection.Sns": "0.9.0-beta5",
           "System.Net.Http.Json": "6.0.0"
         }
       }
