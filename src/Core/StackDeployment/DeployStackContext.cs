@@ -13,9 +13,9 @@ namespace Cythral.CloudFormation.StackDeployment
 
         public string? RoleArn { get; set; }
 
-        public string PassRoleArn { get; set; } = string.Empty;
+        public string? PassRoleArn { get; set; }
 
-        public string NotificationArn { get; set; } = string.Empty;
+        public string? NotificationArn { get; set; }
 
         public string? StackPolicyBody { get; set; }
 
