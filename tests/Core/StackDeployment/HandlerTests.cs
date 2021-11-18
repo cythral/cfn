@@ -350,7 +350,7 @@ namespace Cythral.CloudFormation.StackDeployment.Tests
                     c.Template == template &&
                     c.RoleArn == roleArn &&
                     c.NotificationArn == notificationArn &&
-                    configuration.Parameters.All(entry => c.Parameters!.Any(param => param.ParameterKey == entry.ParameterKey && param.ParameterValue == entry.ParameterValue)) &&
+                    configuration.Parameters!.All(entry => c.Parameters!.Any(param => param.ParameterKey == entry.ParameterKey && param.ParameterValue == entry.ParameterValue)) &&
                     c.Tags == configuration.Tags &&
                     c.StackPolicyBody == configuration.StackPolicy!.ToString() &&
                     c.ClientRequestToken == createdToken &&
