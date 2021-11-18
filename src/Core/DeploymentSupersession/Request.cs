@@ -4,8 +4,8 @@ namespace Cythral.CloudFormation.DeploymentSupersession
 {
     public class Request
     {
-        public string Pipeline { get; set; }
-        public string Token { get; set; }
+        public string Pipeline { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty;
         public DateTime CommitTimestamp { get; set; }
     }
 }

@@ -13,8 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Core\AwsUtils\Common\AwsUtils.Common.csproj" />
     <ProjectReference Include="..\..\src\Core\AwsUtils\SimpleStorageService\SimpleStorageService.csproj" />
-    <ProjectReference Include="..\..\src\Core\AwsUtils\CloudFormation\CloudFormation.csproj" />
-    <ProjectReference Include="..\..\src\Core\GithubUtils\GithubUtils.csproj" />
     <ProjectReference Include="..\..\src\Core\StackDeploymentStatus\StackDeploymentStatus.csproj" />
     <ProjectReference Include="..\..\src\Core\StackDeployment\StackDeployment.csproj" />
     <ProjectReference Include="..\..\src\Core\S3Deployment\S3Deployment.csproj" />

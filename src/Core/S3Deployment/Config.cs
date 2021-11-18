@@ -14,8 +14,8 @@ namespace Cythral.CloudFormation.S3Deployment
     [LambdaOptions(typeof(Handler), "Lambda")]
     public class Config
     {
-        [Encrypted] public string GithubToken { get; set; }
+        [Encrypted] public string GithubToken { get; set; } = string.Empty;
 
-        public string GithubOwner { get; set; }
+        public string GithubOwner { get; set; } = string.Empty;
     }
 }

@@ -2,13 +2,13 @@ namespace Cythral.CloudFormation.StackDeployment
 {
     public class TokenInfo
     {
-        public string ClientRequestToken { get; set; }
-        public string QueueUrl { get; set; }
-        public string ReceiptHandle { get; set; }
-        public string RoleArn { get; set; }
-        public string GithubOwner { get; set; }
-        public string GithubRepo { get; set; }
-        public string GithubRef { get; set; }
-        public string EnvironmentName { get; set; }
+        public string ClientRequestToken { get; set; } = string.Empty;
+        public string QueueUrl { get; set; } = string.Empty;
+        public string ReceiptHandle { get; set; } = string.Empty;
+        public string RoleArn { get; set; } = string.Empty;
+        public string GithubOwner { get; set; } = string.Empty;
+        public string GithubRepo { get; set; } = string.Empty;
+        public string GithubRef { get; set; } = string.Empty;
+        public string EnvironmentName { get; set; } = string.Empty;
     }
 }

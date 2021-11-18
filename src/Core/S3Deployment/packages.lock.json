@@ -559,11 +559,6 @@
         "resolved": "12.0.4",
         "contentHash": "4Gqf64I2j3Y5UyxtdvPW4H8h8RgY2e6Cp6++T30/v0aXS9UhErPKg35GKz3nSKRUesjYQh7Duy3cPnDCDdGlMg=="
       },
-      "Octokit": {
-        "type": "Transitive",
-        "resolved": "0.50.0",
-        "contentHash": "J5vqespSvjxIAAtjG1Tc6ghBqyfRgDJtKnk/ifi4N0hD/f3JbPwyEDRT+Eelu/bS4C4M6mu5gt1WJqar+fByzg=="
-      },
       "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl": {
         "type": "Transitive",
         "resolved": "4.3.0",
@@ -1558,20 +1553,6 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.SecurityToken": "3.7.1.89"
-        }
-      },
-      "githubutils": {
-        "type": "Project",
-        "dependencies": {
-          "KeyManagementService": "1.0.0",
-          "Octokit": "0.50.0"
-        }
-      },
-      "keymanagementservice": {
-        "type": "Project",
-        "dependencies": {
-          "AWSSDK.KeyManagementService": "3.7.2.44",
-          "AwsUtils.Common": "1.0.0"
         }
       },
       "simplestorageservice": {

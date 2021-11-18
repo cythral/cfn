@@ -22,6 +22,8 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
         internal GithubCommitMessageFetcher()
         {
             // testing only
+            client = null!;
+            logger = null!;
         }
 
         public virtual async Task<string> FetchCommitMessage(GithubEvent @event)
@@ -46,7 +48,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
             var ownerName = pullRequestEvent.Repository.Owner.Login;
             var repoName = pullRequestEvent.Repository.Name;
             var commitSha = pullRequestEvent.PullRequest.Head.Sha;
-            var response = await client.GetAsync<RepoCommit>($"https://api.github.com/repos/{ownerName}/{repoName}/commits/{commitSha}");
+            var response = await client.GetAsync<RepoCommit>($"https://api.github.com/repos/{ownerName}/{repoName}/commits/{commitSha}") ?? throw new System.Exception("Could not fetch commit.");
 
             logger.LogInformation($"Received get commit response: {Serialize(response)}");
             return response.Commit.Message;

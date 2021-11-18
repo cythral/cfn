@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 using static System.Text.Json.JsonSerializer;
 using static Amazon.CloudFormation.OnFailure;
 
-namespace Cythral.CloudFormation.AwsUtils.CloudFormation
+namespace Cythral.CloudFormation.GithubWebhook.StackDeployment
 {
     public class DeployStackFacade
     {
@@ -29,6 +29,8 @@ namespace Cythral.CloudFormation.AwsUtils.CloudFormation
 
         internal DeployStackFacade()
         {
+            cloudformationFactory = null!;
+            logger = null!;
             // Used for testing
         }
 
@@ -37,9 +39,9 @@ namespace Cythral.CloudFormation.AwsUtils.CloudFormation
             var cloudformationClient = await cloudformationFactory.Create(context.RoleArn);
             var notificationArns = GetNotificationArns(context);
             var stackExists = await DoesStackExist(context, cloudformationClient);
-            var parameters = (List<Parameter>)context.Parameters ?? new List<Parameter> { };
-            var capabilities = (List<string>)context.Capabilities ?? new List<string> { };
-            var tags = (List<Tag>)context.Tags ?? new List<Tag> { };
+            var parameters = (List<Parameter>?)context.Parameters ?? new List<Parameter> { };
+            var capabilities = (List<string>?)context.Capabilities ?? new List<string> { };
+            var tags = (List<Tag>?)context.Tags ?? new List<Tag> { };
 
 
             if (!stackExists)

@@ -55,7 +55,7 @@ namespace Cythral.CloudFormation.ApprovalWebhook
             var tokenHash = request.QueryStringParameters["token"];
             var key = $"{pipeline}/approvals/{tokenHash}";
             var bucket = config.StateStore;
-            var approvalInfo = await s3GetObjectFacade.GetObject<ApprovalInfo>(bucket, key);
+            var approvalInfo = await s3GetObjectFacade.GetObject<ApprovalInfo>(bucket, key) ?? throw new Exception("Invalid approval info");
 
             var sendTaskResponse = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
             {

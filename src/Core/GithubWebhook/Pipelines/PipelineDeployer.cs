@@ -6,8 +6,8 @@ using Amazon.CloudFormation.Model;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-using Cythral.CloudFormation.AwsUtils.CloudFormation;
 using Cythral.CloudFormation.GithubWebhook.Github;
+using Cythral.CloudFormation.GithubWebhook.StackDeployment;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -48,6 +48,13 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
         internal PipelineDeployer()
         {
             // used for testing
+            this.s3Client = null!;
+            this.config = null!;
+            this.sumComputer = null!;
+            this.fileFetcher = null!;
+            this.statusNotifier = null!;
+            this.stackDeployer = null!;
+            this.logger = null!;
         }
 
         public virtual async Task Deploy(PushEvent payload)

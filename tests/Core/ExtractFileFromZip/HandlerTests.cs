@@ -20,7 +20,7 @@ namespace Cythral.CloudFormation.Tests.ExtractFileFromZip
     {
         public class ExampleObject
         {
-            public string A { get; set; }
+            public string A { get; set; } = string.Empty;
         }
 
         private static S3GetObjectFacade s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
@@ -62,10 +62,10 @@ namespace Cythral.CloudFormation.Tests.ExtractFileFromZip
             var s3GetObjectFacade = Substitute.For<S3GetObjectFacade>();
             var handler = new Handler(s3GetObjectFacade);
 
-            s3GetObjectFacade.GetZipEntryInObject(null, null).ReturnsForAnyArgs("{\"A\": \"B\"}");
-            var result = (JsonElement)(await handler.Handle(request));
+            s3GetObjectFacade.GetZipEntryInObject(string.Empty, string.Empty).ReturnsForAnyArgs("{\"A\": \"B\"}");
+            var result = (JsonElement?)await handler.Handle(request);
 
-            result.GetProperty("A").ToString().Should().Be("B");
+            result?.GetProperty("A").ToString().Should().Be("B");
             await s3GetObjectFacade.Received().GetZipEntryInObject(Is(zipLocation), Is(jsonFilename));
         }
     }

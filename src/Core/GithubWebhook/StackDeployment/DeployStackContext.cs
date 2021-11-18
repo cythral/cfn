@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Amazon.CloudFormation.Model;
 
-namespace Cythral.CloudFormation.StackDeployment
+namespace Cythral.CloudFormation.GithubWebhook.StackDeployment
 {
     public class DeployStackContext
     {
@@ -11,7 +11,7 @@ namespace Cythral.CloudFormation.StackDeployment
 
         public string Template { get; set; } = string.Empty;
 
-        public string? RoleArn { get; set; }
+        public string RoleArn { get; set; } = string.Empty;
 
         public string PassRoleArn { get; set; } = string.Empty;
 

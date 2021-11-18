@@ -21,8 +21,6 @@ using NSubstitute.ClearExtensions;
 
 using NUnit.Framework;
 
-using Octokit;
-
 using static System.Text.Json.JsonSerializer;
 using static NSubstitute.Arg;
 
@@ -302,7 +300,7 @@ namespace Cythral.CloudFormation.StackDeployment.Tests
 
             Assert.ThrowsAsync<Exception>(() => handler.Handle(sqs));
 
-            await s3GetObjectFacade.DidNotReceive().GetZipEntryInObject(Arg.Is(location), Arg.Is((string)null));
+            await s3GetObjectFacade.DidNotReceive().GetZipEntryInObject(Arg.Is(location), Arg.Is((string)null!));
         }
 
         [Test]
@@ -352,11 +350,11 @@ namespace Cythral.CloudFormation.StackDeployment.Tests
                     c.Template == template &&
                     c.RoleArn == roleArn &&
                     c.NotificationArn == notificationArn &&
-                    configuration.Parameters.All(entry => c.Parameters.Any(param => param.ParameterKey == entry.ParameterKey && param.ParameterValue == entry.ParameterValue)) &&
+                    configuration.Parameters.All(entry => c.Parameters!.Any(param => param.ParameterKey == entry.ParameterKey && param.ParameterValue == entry.ParameterValue)) &&
                     c.Tags == configuration.Tags &&
-                    c.StackPolicyBody == configuration.StackPolicy.ToString() &&
+                    c.StackPolicyBody == configuration.StackPolicy!.ToString() &&
                     c.ClientRequestToken == createdToken &&
-                    capabilities.All(c.Capabilities.Contains)
+                    capabilities.All(c.Capabilities!.Contains)
                 )
             );
         }
@@ -377,7 +375,7 @@ namespace Cythral.CloudFormation.StackDeployment.Tests
             var sqs = Substitute.For<SQSEvent>();
             var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, putCommitStatusFacade, config);
 
-            deployer.Deploy(null).ReturnsForAnyArgs(x => { throw new NoUpdatesException("no updates"); });
+            deployer.Deploy(new()).ReturnsForAnyArgs(x => { throw new NoUpdatesException("no updates"); });
 
             await handler.Handle(sqs);
 
@@ -410,7 +408,7 @@ namespace Cythral.CloudFormation.StackDeployment.Tests
             var sqs = Substitute.For<SQSEvent>();
             var handler = new Handler(deployer, s3GetObjectFacade, parseConfigFileFacade, tokenGenerator, requestFactory, stepFunctionsClient, cloudformationFactory, statusNotifier, config);
 
-            deployer.Deploy(null).ReturnsForAnyArgs(x => { throw new NoUpdatesException("no updates"); });
+            deployer.Deploy(new()).ReturnsForAnyArgs(x => { throw new NoUpdatesException("no updates"); });
             await handler.Handle(sqs);
 
             await statusNotifier.Received().NotifySuccess(Is(githubOwner), Is(githubRepo), Is(githubRef), Is(stackName), Is(environmentName));

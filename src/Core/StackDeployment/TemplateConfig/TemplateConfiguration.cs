@@ -6,8 +6,8 @@ namespace Cythral.CloudFormation.StackDeployment.TemplateConfig
 {
     public class TemplateConfiguration
     {
-        public List<Parameter> Parameters { get; set; }
-        public List<Tag> Tags { get; set; }
-        public StackPolicyBody StackPolicy { get; set; }
+        public IEnumerable<Parameter> Parameters { get; set; } = null!;
+        public List<Tag> Tags { get; set; } = null!;
+        public StackPolicyBody? StackPolicy { get; set; }
     }
 }

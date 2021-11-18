@@ -286,12 +286,13 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
                 {
                     Repository = new Repository
                     {
+                        Owner = new User { Name = "Codertocat" },
                         ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}"
                     }
                 })
             };
 
-            var options = Options.Create(new Config { GithubSigningSecret = "test_key" });
+            var options = Options.Create(new Config { GithubSigningSecret = "test_key", GithubOwner = "Codertocat" });
             var requestValidator = new RequestValidator(options);
 
             Assert.Throws(Is.InstanceOf<InvalidSignatureException>(), () => requestValidator.Validate(request));
@@ -312,12 +313,13 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Tests
                 {
                     Repository = new Repository
                     {
+                        Owner = new User { Name = "Codertocat" },
                         ContentsUrl = "https://api.github.com/repos/Codertocat/Hello-World/contents/{+path}"
                     }
                 })
             };
 
-            var options = Options.Create(new Config { GithubSigningSecret = "test_key" });
+            var options = Options.Create(new Config { GithubSigningSecret = "test_key", GithubOwner = "Codertocat" });
             var requestValidator = new RequestValidator(options);
 
             Assert.Throws(Is.InstanceOf<InvalidSignatureException>(), () => requestValidator.Validate(request));

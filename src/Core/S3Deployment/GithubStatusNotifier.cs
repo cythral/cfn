@@ -29,6 +29,9 @@ namespace Cythral.CloudFormation.S3Deployment
         internal GithubStatusNotifier()
         {
             // Used for testing
+            client = null!;
+            config = null!;
+            logger = null!;
         }
 
         private async Task Notify(

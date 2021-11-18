@@ -1,5 +1,6 @@
 using System;
-namespace Cythral.CloudFormation.AwsUtils.CloudFormation
+
+namespace Cythral.CloudFormation.GithubWebhook.StackDeployment
 {
     public class NoUpdatesException : Exception
     {

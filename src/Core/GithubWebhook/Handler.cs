@@ -7,13 +7,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Amazon.CloudFormation.Model;
 using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.Lambda.Core;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-using Cythral.CloudFormation.AwsUtils.CloudFormation;
 using Cythral.CloudFormation.GithubWebhook.Exceptions;
 using Cythral.CloudFormation.GithubWebhook.Github;
 using Cythral.CloudFormation.GithubWebhook.Pipelines;
@@ -65,7 +63,7 @@ namespace Cythral.CloudFormation.GithubWebhook
 
         public async Task<ApplicationLoadBalancerResponse> Handle(ApplicationLoadBalancerRequest request, CancellationToken cancellationToken = default)
         {
-            GithubEvent payload = null;
+            GithubEvent? payload = null;
 
             try
             {

@@ -84,7 +84,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
 
         private async Task SendFailure(StackDeploymentStatusRequest request)
         {
-            var tokenInfo = await tokenInfoRepository.FindByRequest(request);
+            var tokenInfo = await tokenInfoRepository.FindByRequest(request) ?? throw new Exception("Token info not found.");
 
             if (request.SourceTopic != config.GithubTopicArn)
             {
@@ -109,7 +109,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
 
         private async Task SendSuccess(StackDeploymentStatusRequest request)
         {
-            var tokenInfo = await tokenInfoRepository.FindByRequest(request);
+            var tokenInfo = await tokenInfoRepository.FindByRequest(request) ?? throw new Exception("Token Info not found.");
             if (request.SourceTopic != config.GithubTopicArn)
             {
                 var outputs = await GetStackOutputs(request.StackId, tokenInfo.RoleArn);

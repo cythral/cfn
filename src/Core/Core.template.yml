@@ -157,7 +157,7 @@ Resources:
       Handler: GithubWebhook::Cythral.CloudFormation.GithubWebhook.Handler::Run
       Runtime: provided.al2
       Timeout: 30
-      CodeUri: ../../bin/GithubWebhook/Release/net6.0/linux-x64/publish/
+      CodeUri: ../../bin/GithubWebhook/Release/linux-x64/publish/
       MemorySize: 512
       Layers:
         - !Ref DotnetLayerArn
@@ -246,7 +246,7 @@ Resources:
       Handler: StackDeployment::Cythral.CloudFormation.StackDeployment.Handler::Run
       Runtime: provided.al2
       Timeout: 300
-      CodeUri: ../../bin/StackDeployment/Release/net6.0/linux-x64/publish/
+      CodeUri: ../../bin/StackDeployment/Release/linux-x64/publish/
       Layers:
         - !Ref DotnetLayerArn
         - !Ref LambdajectionLayerArn
@@ -270,7 +270,7 @@ Resources:
       Handler: StackDeploymentStatus::Cythral.CloudFormation.StackDeploymentStatus.Handler::Run
       Runtime: provided.al2
       Timeout: 30
-      CodeUri: ../../bin/StackDeploymentStatus/Release/net6.0/linux-x64/publish/
+      CodeUri: ../../bin/StackDeploymentStatus/Release/linux-x64/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Layers:
         - !Ref DotnetLayerArn
@@ -323,7 +323,7 @@ Resources:
       Handler: ApprovalWebhook::Cythral.CloudFormation.ApprovalWebhook.Handler::Run
       Runtime: provided.al2
       Timeout: 30
-      CodeUri: ../../bin/ApprovalWebhook/Release/net6.0/linux-x64/publish/
+      CodeUri: ../../bin/ApprovalWebhook/Release/linux-x64/publish/
       MemorySize: 512
       Layers:
         - !Ref DotnetLayerArn
@@ -419,7 +419,7 @@ Resources:
       Runtime: provided.al2
       Timeout: 30
       MemorySize: 256
-      CodeUri: ../../bin/ApprovalNotification/Release/net6.0/linux-x64/publish/
+      CodeUri: ../../bin/ApprovalNotification/Release/linux-x64/publish/
       Layers:
         - !Ref DotnetLayerArn
         - !Ref LambdajectionLayerArn
@@ -476,7 +476,7 @@ Resources:
       Runtime: provided.al2
       Timeout: 30
       MemorySize: 256
-      CodeUri: ../../bin/DeploymentSupersession/Release/net6.0/linux-x64/publish/
+      CodeUri: ../../bin/DeploymentSupersession/Release/linux-x64/publish/
       Layers:
         - !Ref DotnetLayerArn
         - !Ref LambdajectionLayerArn
@@ -515,7 +515,7 @@ Resources:
       Runtime: provided.al2
       Timeout: 30
       MemorySize: 256
-      CodeUri: ../../bin/ExtractFileFromZip/Release/net6.0/linux-x64/publish/
+      CodeUri: ../../bin/ExtractFileFromZip/Release/linux-x64/publish/
       Layers:
         - !Ref DotnetLayerArn
         - !Ref LambdajectionLayerArn
@@ -545,7 +545,7 @@ Resources:
       Runtime: provided.al2
       Timeout: 300
       MemorySize: 256
-      CodeUri: ../../bin/S3Deployment/Release/net6.0/linux-x64/publish/
+      CodeUri: ../../bin/S3Deployment/Release/linux-x64/publish/
       Layers:
         - !Ref DotnetLayerArn
         - !Ref LambdajectionLayerArn
@@ -563,7 +563,7 @@ Resources:
       Runtime: provided.al2
       Timeout: 300
       MemorySize: 256
-      CodeUri: ../../bin/S3TagOutdatedArtifacts/Release/net6.0/linux-x64/publish/
+      CodeUri: ../../bin/S3TagOutdatedArtifacts/Release/linux-x64/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Layers:
         - !Ref DotnetLayerArn
@@ -576,7 +576,7 @@ Resources:
       Runtime: provided.al2
       Timeout: 900
       MemorySize: 256
-      CodeUri: ../../bin/EcsDeployment/Release/net6.0/linux-x64/publish/
+      CodeUri: ../../bin/EcsDeployment/Release/linux-x64/publish/
       Role: !ImportValue cfn-utilities:MasterRoleArn
       Layers:
         - !Ref DotnetLayerArn

@@ -18,7 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AwsUtils\SimpleStorageService\SimpleStorageService.csproj" />
     <ProjectReference Include="..\AwsUtils\Common\AwsUtils.Common.csproj" />
-    <ProjectReference Include="..\GithubUtils\GithubUtils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

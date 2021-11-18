@@ -23,7 +23,7 @@ namespace Cythral.CloudFormation.ExtractFileFromZip
             this.s3GetObjectFacade = s3GetObjectFacade;
         }
 
-        public async Task<object> Handle(Request request, CancellationToken cancellationToken = default)
+        public async Task<object?> Handle(Request request, CancellationToken cancellationToken = default)
         {
             var stringContent = await s3GetObjectFacade.GetZipEntryInObject(request.ZipLocation, request.Filename);
             return request.Filename.EndsWith(".json") ? Deserialize<object>(stringContent) : stringContent;

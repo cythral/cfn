@@ -10,7 +10,6 @@ using Amazon.S3.Model;
 
 using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
-using Cythral.CloudFormation.GithubUtils;
 using Cythral.CloudFormation.S3Deployment;
 
 using FluentAssertions;
@@ -23,8 +22,6 @@ using NSubstitute;
 using NSubstitute.ClearExtensions;
 
 using NUnit.Framework;
-
-using Octokit;
 
 using static NSubstitute.Arg;
 
@@ -175,7 +172,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
         [Test]
         public async Task ShouldUploadReadme()
         {
-            string streamContents = null;
+            string? streamContents = null;
 
             s3Client
             .PutObjectAsync(Arg.Is<PutObjectRequest>(req => req.Key == "README.txt"))
@@ -185,7 +182,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                 using var reader = new StreamReader(stream);
                 streamContents = reader.ReadToEnd();
 
-                return (PutObjectResponse)null;
+                return (PutObjectResponse?)null;
             });
 
             var handler = new Handler(s3Factory, statusNotifier, s3GetObjectFacade, logger);
@@ -205,7 +202,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
         [Test]
         public async Task ShouldUploadLicense()
         {
-            string streamContents = null;
+            string? streamContents = null;
 
             s3Client
             .PutObjectAsync(Arg.Is<PutObjectRequest>(req => req.Key == "LICENSE.txt"))
@@ -217,7 +214,7 @@ namespace Cythral.CloudFormation.Tests.S3Deployment
                     streamContents = reader.ReadToEnd();
                 }
 
-                return (PutObjectResponse)null;
+                return (PutObjectResponse?)null;
             });
 
             var handler = new Handler(s3Factory, statusNotifier, s3GetObjectFacade, logger);

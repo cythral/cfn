@@ -20,6 +20,7 @@ namespace Cythral.CloudFormation.StackDeployment
         internal S3Util()
         {
             // for testing only
+            s3Client = null!;
         }
 
         public virtual async Task<string> GetZipEntryInObject(string location, string entry)

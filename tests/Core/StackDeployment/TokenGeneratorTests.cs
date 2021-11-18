@@ -27,12 +27,12 @@ namespace Cythral.CloudFormation.StackDeployment.Tests
         private const string notificationArn = "notificationArn";
         private const string clientRequestToken = "clientRequestToken";
         private const string clientRequestTokenSum = "272A689245B6118F1AAB392CED48E3D07C3894CC2EF6A3500F298628CE87F88A";
-        private string sqsArn = "arn:sqs:aws:us-east-1:5:testQueue";
-        private string receiptHandle = "5";
-        private string sqsUrl = "https://sqs.us-east-1.amazonaws.com/5/testQueue";
-        private static List<string> Locations = new List<string> { $"s3://{bucket}/{key}", $"arn:s3:aws:::{bucket}/{key}" };
+        private const string sqsArn = "arn:sqs:aws:us-east-1:5:testQueue";
+        private const string receiptHandle = "5";
+        private const string sqsUrl = "https://sqs.us-east-1.amazonaws.com/5/testQueue";
+        private static readonly List<string> Locations = new List<string> { $"s3://{bucket}/{key}", $"arn:s3:aws:::{bucket}/{key}" };
 
-        private Request CreateRequest()
+        private static Request CreateRequest()
         {
             return new Request
             {
@@ -45,7 +45,7 @@ namespace Cythral.CloudFormation.StackDeployment.Tests
             };
         }
 
-        private SQSEvent CreateSQSEvent()
+        private static SQSEvent CreateSQSEvent()
         {
             return new SQSEvent
             {
@@ -59,7 +59,7 @@ namespace Cythral.CloudFormation.StackDeployment.Tests
         }
 
         [Test]
-        public async Task PutObjectIsCalled([ValueSource("Locations")] string location)
+        public async Task PutObjectIsCalled([ValueSource(nameof(Locations))] string location)
         {
             var request = CreateRequest();
             var sqsEvent = CreateSQSEvent();
