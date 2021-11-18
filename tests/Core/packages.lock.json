@@ -92,11 +92,6 @@
           "System.Runtime.Loader": "4.3.0"
         }
       },
-      "Amazon.Lambda.SNSEvents": {
-        "type": "Transitive",
-        "resolved": "2.0.0",
-        "contentHash": "NzEV+hsQygpukxwuyN4gyOINYhFGOilc6uSuHIeTRiOncz+dvtw100UbeBxObCMuAbofL9U4yidKV/rObnpInQ=="
-      },
       "Amazon.Lambda.SQSEvents": {
         "type": "Transitive",
         "resolved": "2.0.0",
@@ -1618,7 +1613,6 @@
           "AWSSDK.SQS": "3.7.1.43",
           "AWSSDK.SecurityToken": "3.7.1.90",
           "AWSSDK.StepFunctions": "3.7.0.100",
-          "Amazon.Lambda.SNSEvents": "2.0.0",
           "Lambdajection": "0.9.0-beta4",
           "Lambdajection.Encryption": "0.9.0-beta4",
           "Lambdajection.Layer": "0.9.0-beta4",

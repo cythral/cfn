@@ -1,21 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
-using Amazon.Lambda.SNSEvents;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
+using AutoFixture.AutoNSubstitute;
+using AutoFixture.NUnit3;
+
 using Cythral.CloudFormation.StackDeploymentStatus;
 using Cythral.CloudFormation.StackDeploymentStatus.Github;
-using Cythral.CloudFormation.StackDeploymentStatus.Request;
 
 using Lambdajection.Core;
+using Lambdajection.Sns;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -27,6 +30,8 @@ using NUnit.Framework;
 
 using static System.Text.Json.JsonSerializer;
 
+using static NSubstitute.Arg;
+
 namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 {
     using TokenInfo = Cythral.CloudFormation.StackDeploymentStatus.TokenInfo;
@@ -34,343 +39,576 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
     [TestFixture]
     public class HandlerTests
     {
-        private const string stackId = "stackId";
-        private const string bucket = "bucket";
-        private const string key = "key";
-        private const string s3Location = "s3://bucket/tokens/key";
-        private const string tokenKey = "bucket-key";
-        private const string token = "token";
-        private const string receiptHandle = "receiptHandle";
-        private const string queueUrl = "queueUrl";
-        private const string accountId = "1";
-        private const string roleArn = "roleArn";
-        private const string githubOwner = "githubOwner";
-        private const string githubRepo = "githubRepo";
-        private const string githubToken = "githubToken";
-        private const string githubRef = "githubRef";
-        private const string githubTopicArn = "githubTopicArn";
-        private const string googleClientId = "googleClientId";
-        private const string identityPoolId = "identityPoolId";
-        private const string environmentName = "environmentName";
-        private const string stackName = "stackName";
-        private static Dictionary<string, string> outputs = new Dictionary<string, string>
+        [Test, Auto]
+        public async Task ShouldDoNothingIfClientRequestTokenIsEmpty(
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
         {
-            ["A"] = "B"
-        };
+            message.Message.ClientRequestToken = string.Empty;
 
-        private static string serializedOutputs = Serialize(outputs);
+            await handler.Handle(message);
 
-        private static TokenInfo tokenInfo = new TokenInfo
-        {
-            ClientRequestToken = token,
-            ReceiptHandle = receiptHandle,
-            QueueUrl = queueUrl,
-            RoleArn = roleArn,
-            EnvironmentName = environmentName,
-            GithubOwner = githubOwner,
-            GithubRepo = githubRepo,
-            GithubRef = githubRef,
-        };
-
-        public StackDeploymentStatusRequestFactory CreateRequestFactory(StackDeploymentStatusRequest request)
-        {
-            var factory = Substitute.For<StackDeploymentStatusRequestFactory>();
-            factory.CreateFromSnsEvent(Arg.Any<SNSEvent>()).Returns(request);
-            return factory;
+            await stepFunctions.DidNotReceiveWithAnyArgs().SendTaskFailureAsync(Any<SendTaskFailureRequest>());
+            await stepFunctions.DidNotReceiveWithAnyArgs().SendTaskSuccessAsync(Any<SendTaskSuccessRequest>());
         }
 
-        public IAmazonStepFunctions CreateStepFunctions()
+        [Test, Auto]
+        public async Task ShouldDoNothingIfStackIdAndPhysicalResourceIdDontMatch(
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
         {
-            var client = Substitute.For<IAmazonStepFunctions>();
-            return client;
+            await handler.Handle(message);
+
+            await stepFunctions.DidNotReceiveWithAnyArgs().SendTaskFailureAsync(Any<SendTaskFailureRequest>());
+            await stepFunctions.DidNotReceiveWithAnyArgs().SendTaskSuccessAsync(Any<SendTaskSuccessRequest>());
         }
 
-        public IAmazonSQS CreateSQS()
+        [Test, Auto]
+        public async Task AllSourcesNotified_OfFailure_WhenSourceTopicIsNotGithub_DeleteComplete(
+            string stackId,
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen] TokenInfo tokenInfo,
+            [Frozen, Substitute] TokenInfoRepository tokenInfoRepository,
+            [Frozen, Substitute] GithubStatusNotifier statusNotifier,
+            [Frozen, Substitute] IAmazonSQS sqs,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
         {
-            var client = Substitute.For<IAmazonSQS>();
-            return client;
+            var status = "DELETE_COMPLETE";
+            message.Message.ResourceStatus = status;
+            message.Message.StackId = stackId;
+            message.Message.PhysicalResourceId = stackId;
+
+            await handler.Handle(message);
+
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Is(message.Message));
+
+            await stepFunctions
+                .Received()
+                .SendTaskFailureAsync(Is<SendTaskFailureRequest>(req => req.TaskToken == tokenInfo.ClientRequestToken && req.Cause == status));
+
+            await sqs
+                .Received()
+                .DeleteMessageAsync(Is<DeleteMessageRequest>(req => req.QueueUrl == tokenInfo.QueueUrl && req.ReceiptHandle == tokenInfo.ReceiptHandle));
+
+            await statusNotifier
+                .Received()
+                .NotifyFailure(Is(tokenInfo.GithubOwner), Is(tokenInfo.GithubRepo), Is(tokenInfo.GithubRef), Is(message.Message.StackName), Is(tokenInfo.EnvironmentName));
         }
 
-        public IAmazonCloudFormation CreateCloudFormation()
+        [Test, Auto]
+        public async Task AllSourcesNotified_OfFailure_WhenSourceTopicIsNotGithub_UpdateRollbackComplete(
+            string stackId,
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen] TokenInfo tokenInfo,
+            [Frozen, Substitute] TokenInfoRepository tokenInfoRepository,
+            [Frozen, Substitute] GithubStatusNotifier statusNotifier,
+            [Frozen, Substitute] IAmazonSQS sqs,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
         {
-            var client = Substitute.For<IAmazonCloudFormation>();
+            var status = "UPDATE_ROLLBACK_COMPLETE";
+            message.Message.ResourceStatus = status;
+            message.Message.StackId = stackId;
+            message.Message.PhysicalResourceId = stackId;
 
-            client.DescribeStacksAsync(Arg.Any<DescribeStacksRequest>()).Returns(new DescribeStacksResponse
+            await handler.Handle(message);
+
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Is(message.Message));
+
+            await stepFunctions
+                .Received()
+                .SendTaskFailureAsync(Is<SendTaskFailureRequest>(req => req.TaskToken == tokenInfo.ClientRequestToken && req.Cause == status));
+
+            await sqs
+                .Received()
+                .DeleteMessageAsync(Is<DeleteMessageRequest>(req => req.QueueUrl == tokenInfo.QueueUrl && req.ReceiptHandle == tokenInfo.ReceiptHandle));
+
+            await statusNotifier
+                .Received()
+                .NotifyFailure(Is(tokenInfo.GithubOwner), Is(tokenInfo.GithubRepo), Is(tokenInfo.GithubRef), Is(message.Message.StackName), Is(tokenInfo.EnvironmentName));
+        }
+
+        [Test, Auto]
+        public async Task AllSourcesNotified_OfFailure_WhenSourceTopicIsNotGithub_UpdateRollbackFailed(
+            string stackId,
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen] TokenInfo tokenInfo,
+            [Frozen, Substitute] TokenInfoRepository tokenInfoRepository,
+            [Frozen, Substitute] GithubStatusNotifier statusNotifier,
+            [Frozen, Substitute] IAmazonSQS sqs,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
+        {
+            var status = "UPDATE_ROLLBACK_FAILED";
+            message.Message.ResourceStatus = status;
+            message.Message.StackId = stackId;
+            message.Message.PhysicalResourceId = stackId;
+
+            await handler.Handle(message);
+
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Is(message.Message));
+
+            await stepFunctions
+                .Received()
+                .SendTaskFailureAsync(Is<SendTaskFailureRequest>(req => req.TaskToken == tokenInfo.ClientRequestToken && req.Cause == status));
+
+            await sqs
+                .Received()
+                .DeleteMessageAsync(Is<DeleteMessageRequest>(req => req.QueueUrl == tokenInfo.QueueUrl && req.ReceiptHandle == tokenInfo.ReceiptHandle));
+
+            await statusNotifier
+                .Received()
+                .NotifyFailure(Is(tokenInfo.GithubOwner), Is(tokenInfo.GithubRepo), Is(tokenInfo.GithubRef), Is(message.Message.StackName), Is(tokenInfo.EnvironmentName));
+        }
+
+        [Test, Auto]
+        public async Task AllSourcesNotified_OfFailure_WhenSourceTopicIsNotGithub_CreateFailed(
+            string stackId,
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen] TokenInfo tokenInfo,
+            [Frozen, Substitute] TokenInfoRepository tokenInfoRepository,
+            [Frozen, Substitute] GithubStatusNotifier statusNotifier,
+            [Frozen, Substitute] IAmazonSQS sqs,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
+        {
+            var status = "CREATE_FAILED";
+            message.Message.ResourceStatus = status;
+            message.Message.StackId = stackId;
+            message.Message.PhysicalResourceId = stackId;
+
+            await handler.Handle(message);
+
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Is(message.Message));
+
+            await stepFunctions
+                .Received()
+                .SendTaskFailureAsync(Is<SendTaskFailureRequest>(req => req.TaskToken == tokenInfo.ClientRequestToken && req.Cause == status));
+
+            await sqs
+                .Received()
+                .DeleteMessageAsync(Is<DeleteMessageRequest>(req => req.QueueUrl == tokenInfo.QueueUrl && req.ReceiptHandle == tokenInfo.ReceiptHandle));
+
+            await statusNotifier
+                .Received()
+                .NotifyFailure(Is(tokenInfo.GithubOwner), Is(tokenInfo.GithubRepo), Is(tokenInfo.GithubRef), Is(message.Message.StackName), Is(tokenInfo.EnvironmentName));
+        }
+
+        [Test, Auto]
+        public async Task OnlyGithubNotified_OfFailure_WhenSourceTopicIsGithub_DeleteComplete(
+            string githubTopicArn,
+            string stackId,
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen] Config config,
+            [Frozen] TokenInfo tokenInfo,
+            [Frozen, Substitute] TokenInfoRepository tokenInfoRepository,
+            [Frozen, Substitute] GithubStatusNotifier statusNotifier,
+            [Frozen, Substitute] IAmazonSQS sqs,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
+        {
+            var status = "DELETE_COMPLETE";
+            config.GithubTopicArn = githubTopicArn;
+            message.Message.ResourceStatus = status;
+            message.Message.SourceTopic = githubTopicArn;
+            message.Message.StackId = stackId;
+            message.Message.PhysicalResourceId = stackId;
+
+            await handler.Handle(message);
+
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Is(message.Message));
+
+            await stepFunctions
+                .DidNotReceive()
+                .SendTaskFailureAsync(Any<SendTaskFailureRequest>());
+
+            await sqs
+                .DidNotReceive()
+                .DeleteMessageAsync(Any<DeleteMessageRequest>());
+
+            await statusNotifier
+                .Received()
+                .NotifyFailure(Is(tokenInfo.GithubOwner), Is(tokenInfo.GithubRepo), Is(tokenInfo.GithubRef), Is(message.Message.StackName), Is(tokenInfo.EnvironmentName));
+        }
+
+        [Test, Auto]
+        public async Task OnlyGithubNotified_OfFailure_WhenSourceTopicIsGithub_UpdateRollbackComplete(
+            string githubTopicArn,
+            string stackId,
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen] Config config,
+            [Frozen] TokenInfo tokenInfo,
+            [Frozen, Substitute] TokenInfoRepository tokenInfoRepository,
+            [Frozen, Substitute] GithubStatusNotifier statusNotifier,
+            [Frozen, Substitute] IAmazonSQS sqs,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
+        {
+            var status = "UPDATE_ROLLBACK_COMPLETE";
+            config.GithubTopicArn = githubTopicArn;
+            message.Message.ResourceStatus = status;
+            message.Message.SourceTopic = githubTopicArn;
+            message.Message.StackId = stackId;
+            message.Message.PhysicalResourceId = stackId;
+
+            await handler.Handle(message);
+
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Is(message.Message));
+
+            await stepFunctions
+                .DidNotReceive()
+                .SendTaskFailureAsync(Any<SendTaskFailureRequest>());
+
+            await sqs
+                .DidNotReceive()
+                .DeleteMessageAsync(Any<DeleteMessageRequest>());
+
+            await statusNotifier
+                .Received()
+                .NotifyFailure(Is(tokenInfo.GithubOwner), Is(tokenInfo.GithubRepo), Is(tokenInfo.GithubRef), Is(message.Message.StackName), Is(tokenInfo.EnvironmentName));
+        }
+
+        [Test, Auto]
+        public async Task OnlyGithubNotified_OfFailure_WhenSourceTopicIsGithub_UpdateRollbackFailed(
+            string githubTopicArn,
+            string stackId,
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen] Config config,
+            [Frozen] TokenInfo tokenInfo,
+            [Frozen, Substitute] TokenInfoRepository tokenInfoRepository,
+            [Frozen, Substitute] GithubStatusNotifier statusNotifier,
+            [Frozen, Substitute] IAmazonSQS sqs,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
+        {
+            var status = "UPDATE_ROLLBACK_FAILED";
+            config.GithubTopicArn = githubTopicArn;
+            message.Message.ResourceStatus = status;
+            message.Message.SourceTopic = githubTopicArn;
+            message.Message.StackId = stackId;
+            message.Message.PhysicalResourceId = stackId;
+
+            await handler.Handle(message);
+
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Is(message.Message));
+
+            await stepFunctions
+                .DidNotReceive()
+                .SendTaskFailureAsync(Any<SendTaskFailureRequest>());
+
+            await sqs
+                .DidNotReceive()
+                .DeleteMessageAsync(Any<DeleteMessageRequest>());
+
+            await statusNotifier
+                .Received()
+                .NotifyFailure(Is(tokenInfo.GithubOwner), Is(tokenInfo.GithubRepo), Is(tokenInfo.GithubRef), Is(message.Message.StackName), Is(tokenInfo.EnvironmentName));
+        }
+
+        [Test, Auto]
+        public async Task OnlyGithubNotified_OfFailure_WhenSourceTopicIsGithub_CreateFailed(
+            string githubTopicArn,
+            string stackId,
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen] Config config,
+            [Frozen] TokenInfo tokenInfo,
+            [Frozen, Substitute] TokenInfoRepository tokenInfoRepository,
+            [Frozen, Substitute] GithubStatusNotifier statusNotifier,
+            [Frozen, Substitute] IAmazonSQS sqs,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
+        {
+            var status = "CREATE_FAILED";
+            config.GithubTopicArn = githubTopicArn;
+            message.Message.ResourceStatus = status;
+            message.Message.SourceTopic = githubTopicArn;
+            message.Message.StackId = stackId;
+            message.Message.PhysicalResourceId = stackId;
+
+            await handler.Handle(message);
+
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Is(message.Message));
+
+            await stepFunctions
+                .DidNotReceive()
+                .SendTaskFailureAsync(Any<SendTaskFailureRequest>());
+
+            await sqs
+                .DidNotReceive()
+                .DeleteMessageAsync(Any<DeleteMessageRequest>());
+
+            await statusNotifier
+                .Received()
+                .NotifyFailure(Is(tokenInfo.GithubOwner), Is(tokenInfo.GithubRepo), Is(tokenInfo.GithubRef), Is(message.Message.StackName), Is(tokenInfo.EnvironmentName));
+        }
+
+        [Test, Auto]
+        public async Task AllSourcesNotified_OfSuccess_WhenSourceTopicIsNotGithub_UpdateComplete(
+            string stackId,
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen] TokenInfo tokenInfo,
+            [Frozen] DescribeStacksResponse describeStacksResponse,
+            [Frozen, Substitute] TokenInfoRepository tokenInfoRepository,
+            [Frozen, Substitute] GithubStatusNotifier statusNotifier,
+            [Frozen, Substitute] IAwsFactory<IAmazonCloudFormation> cloudformationFactory,
+            [Frozen, Substitute] IAmazonCloudFormation cloudformationClient,
+            [Frozen, Substitute] IAmazonSQS sqs,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
+        {
+            var status = "UPDATE_COMPLETE";
+            message.Message.ResourceStatus = status;
+            message.Message.StackId = stackId;
+            message.Message.PhysicalResourceId = stackId;
+            describeStacksResponse.Stacks[0] = new Stack
             {
-                Stacks = new List<Stack>
+                Outputs = new List<Output>()
                 {
-                    new Stack
-                    {
-                        Outputs = outputs
-                                    .Select(entry => new Output { OutputKey = entry.Key, OutputValue = entry.Value })
-                                    .ToList()
-                    }
-                }
-            });
-
-            return client;
-        }
-
-        public IAwsFactory<IAmazonCloudFormation> CreateCloudFormationFactory(IAmazonCloudFormation client)
-        {
-            var factory = Substitute.For<IAwsFactory<IAmazonCloudFormation>>();
-            factory.Create(Arg.Any<string>()).Returns(client);
-            return factory;
-        }
-
-        public GithubStatusNotifier CreateStatusNotifier()
-        {
-            var client = Substitute.For<GithubStatusNotifier>();
-            return client;
-        }
-
-        public TokenInfoRepository CreateTokenInfoRepository()
-        {
-            var repository = Substitute.For<TokenInfoRepository>();
-            repository.FindByRequest(Arg.Any<StackDeploymentStatusRequest>()).Returns(tokenInfo);
-            return repository;
-        }
-
-        public IOptions<Config> CreateConfig()
-        {
-            return Options.Create(new Config
-            {
-                GithubOwner = githubOwner,
-                GithubToken = githubToken,
-                GithubTopicArn = githubTopicArn,
-            });
-        }
-
-        public StackDeploymentStatusRequest CreateRequest(string stackId, string token, string? status = "CREATE_COMPLETE", string resourceType = "AWS::CloudFormation::Stack")
-        {
-            return new StackDeploymentStatusRequest
-            {
-                StackId = stackId,
-                PhysicalResourceId = stackId,
-                StackName = stackName,
-                ClientRequestToken = token,
-                ResourceStatus = status!,
-                ResourceType = resourceType,
-                Namespace = accountId,
+                    new() { OutputKey = "A", OutputValue = "B"},
+                    new() { OutputKey = "Foo", OutputValue = "Bar"},
+                },
             };
-        }
 
-        [Test]
-        public async Task ShouldDoNothingIfClientRequestTokenIsEmpty()
-        {
-            var request = CreateRequest(stackId, "", null, "AWS::CloudFormation::Stack");
-            var requestFactory = CreateRequestFactory(request);
-            var stepFunctions = CreateStepFunctions();
-            var sqs = CreateSQS();
-            var cloudformationClient = CreateCloudFormation();
-            var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var statusNotifier = CreateStatusNotifier();
-            var tokenInfoRepository = CreateTokenInfoRepository();
-            var snsEvent = Substitute.For<SNSEvent>();
-            var config = CreateConfig();
-            var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
+            var serializedOutputs = @"{""A"":""B"",""Foo"":""Bar""}";
 
-            await handler.Handle(snsEvent);
-
-            await stepFunctions.DidNotReceiveWithAnyArgs().SendTaskFailureAsync(Arg.Any<SendTaskFailureRequest>());
-            await stepFunctions.DidNotReceiveWithAnyArgs().SendTaskSuccessAsync(Arg.Any<SendTaskSuccessRequest>());
-        }
-
-        [Test]
-        public async Task ShouldDoNothingIfStackIdAndPhysicalResourceIdDontMatch()
-        {
-            var request = CreateRequest(stackId, "", "clientRequestToken", "AWS::CloudFormation::Stack");
-            var requestFactory = CreateRequestFactory(request);
-            var stepFunctions = CreateStepFunctions();
-            var sqs = CreateSQS();
-            var cloudformationClient = CreateCloudFormation();
-            var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var statusNotifier = CreateStatusNotifier();
-            var tokenInfoRepository = CreateTokenInfoRepository();
-            var snsEvent = Substitute.For<SNSEvent>();
-            var config = CreateConfig();
-            var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
-
-            request.PhysicalResourceId = Guid.NewGuid().ToString();
-
-            await handler.Handle(snsEvent);
-
-            await stepFunctions.DidNotReceiveWithAnyArgs().SendTaskFailureAsync(Arg.Any<SendTaskFailureRequest>());
-            await stepFunctions.DidNotReceiveWithAnyArgs().SendTaskSuccessAsync(Arg.Any<SendTaskSuccessRequest>());
-        }
-
-        [Test]
-        [TestCase("DELETE_COMPLETE")]
-        [TestCase("UPDATE_ROLLBACK_COMPLETE")]
-        [TestCase("UPDATE_ROLLBACK_FAILED")]
-        [TestCase("CREATE_FAILED")]
-        public async Task AllSourcesNotified_OfFailure_WhenSourceTopicIsNotGithub(string status)
-        {
-            var request = CreateRequest(stackId, tokenKey, status);
-            var requestFactory = CreateRequestFactory(request);
-            var stepFunctions = CreateStepFunctions();
-            var sqs = CreateSQS();
-            var cloudformationClient = CreateCloudFormation();
-            var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var statusNotifier = CreateStatusNotifier();
-            var tokenInfoRepository = CreateTokenInfoRepository();
-            var snsEvent = Substitute.For<SNSEvent>();
-            var config = CreateConfig();
-            var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
-
-            await handler.Handle(snsEvent);
+            await handler.Handle(message);
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Arg.Is(request));
-
-            await stepFunctions
-                .Received()
-                .SendTaskFailureAsync(Arg.Is<SendTaskFailureRequest>(req => req.TaskToken == token && req.Cause == status));
-
-            await sqs
-                .Received()
-                .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
-
-            await statusNotifier
-                .Received()
-                .NotifyFailure(Arg.Is(githubOwner), Arg.Is(githubRepo), Arg.Is(githubRef), Arg.Is(stackName), Arg.Is(environmentName));
-        }
-
-        [Test]
-        [TestCase("DELETE_COMPLETE")]
-        [TestCase("UPDATE_ROLLBACK_COMPLETE")]
-        [TestCase("UPDATE_ROLLBACK_FAILED")]
-        [TestCase("CREATE_FAILED")]
-        public async Task OnlyGithubNotified_OfFailure_WhenSourceTopicIsGithub(string status)
-        {
-            var request = CreateRequest(stackId, tokenKey, status);
-            var requestFactory = CreateRequestFactory(request);
-            var stepFunctions = CreateStepFunctions();
-            var sqs = CreateSQS();
-            var cloudformationClient = CreateCloudFormation();
-            var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var statusNotifier = CreateStatusNotifier();
-            var tokenInfoRepository = CreateTokenInfoRepository();
-            var snsEvent = Substitute.For<SNSEvent>();
-            var config = CreateConfig();
-            var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
-
-            request.SourceTopic = githubTopicArn;
-
-            await handler.Handle(snsEvent);
-
-            await tokenInfoRepository
-                .Received()
-                .FindByRequest(Arg.Is(request));
-
-            await stepFunctions
-                .DidNotReceive()
-                .SendTaskFailureAsync(Arg.Any<SendTaskFailureRequest>());
-
-            await sqs
-                .DidNotReceive()
-                .DeleteMessageAsync(Arg.Any<DeleteMessageRequest>());
-
-            await statusNotifier
-                .Received()
-                .NotifyFailure(Arg.Is(githubOwner), Arg.Is(githubRepo), Arg.Is(githubRef), Arg.Is(stackName), Arg.Is(environmentName));
-        }
-
-        [Test]
-        [TestCase("UPDATE_COMPLETE")]
-        [TestCase("CREATE_COMPLETE")]
-        public async Task AllSourcesNotified_OfSuccess_WhenSourceTopicIsNotGithub(string status)
-        {
-            var request = CreateRequest(stackId, tokenKey, status);
-            var requestFactory = CreateRequestFactory(request);
-            var stepFunctions = CreateStepFunctions();
-            var sqs = CreateSQS();
-            var cloudformationClient = CreateCloudFormation();
-            var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var statusNotifier = CreateStatusNotifier();
-            var tokenInfoRepository = CreateTokenInfoRepository();
-            var snsEvent = Substitute.For<SNSEvent>();
-            var config = CreateConfig();
-            var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
-
-            await handler.Handle(snsEvent);
-
-            await tokenInfoRepository
-                .Received()
-                .FindByRequest(Arg.Is(request));
+                .FindByRequest(Is(message.Message));
 
             await cloudformationFactory
                 .Received()
-                .Create(Arg.Is(roleArn));
+                .Create(Is(tokenInfo.RoleArn));
 
             await cloudformationClient
                 .Received()
-                .DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req => req.StackName == stackId));
+                .DescribeStacksAsync(Is<DescribeStacksRequest>(req => req.StackName == stackId));
 
             await stepFunctions
                 .Received()
-                .SendTaskSuccessAsync(Arg.Is<SendTaskSuccessRequest>(req => req.TaskToken == token && req.Output == serializedOutputs));
+                .SendTaskSuccessAsync(Is<SendTaskSuccessRequest>(req => req.TaskToken == tokenInfo.ClientRequestToken && req.Output == serializedOutputs));
 
             await sqs
                 .Received()
-                .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
+                .DeleteMessageAsync(Is<DeleteMessageRequest>(req => req.QueueUrl == tokenInfo.QueueUrl && req.ReceiptHandle == tokenInfo.ReceiptHandle));
 
             await statusNotifier
                 .Received()
-                .NotifySuccess(Arg.Is(githubOwner), Arg.Is(githubRepo), Arg.Is(githubRef), Arg.Is(stackName), Arg.Is(environmentName));
+                .NotifySuccess(Is(tokenInfo.GithubOwner), Is(tokenInfo.GithubRepo), Is(tokenInfo.GithubRef), Is(message.Message.StackName), Is(tokenInfo.EnvironmentName));
         }
 
-        [Test]
-        [TestCase("UPDATE_COMPLETE")]
-        [TestCase("CREATE_COMPLETE")]
-        public async Task OnlyGithubNotified_OfSuccess_WhenSourceTopicIsGithub(string status)
+        [Test, Auto]
+        public async Task AllSourcesNotified_OfSuccess_WhenSourceTopicIsNotGithub_CreateComplete(
+            string stackId,
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen] TokenInfo tokenInfo,
+            [Frozen] DescribeStacksResponse describeStacksResponse,
+            [Frozen, Substitute] TokenInfoRepository tokenInfoRepository,
+            [Frozen, Substitute] GithubStatusNotifier statusNotifier,
+            [Frozen, Substitute] IAwsFactory<IAmazonCloudFormation> cloudformationFactory,
+            [Frozen, Substitute] IAmazonCloudFormation cloudformationClient,
+            [Frozen, Substitute] IAmazonSQS sqs,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
         {
-            var request = CreateRequest(stackId, tokenKey, status);
-            var requestFactory = CreateRequestFactory(request);
-            var stepFunctions = CreateStepFunctions();
-            var sqs = CreateSQS();
-            var cloudformationClient = CreateCloudFormation();
-            var cloudformationFactory = CreateCloudFormationFactory(cloudformationClient);
-            var statusNotifier = CreateStatusNotifier();
-            var tokenInfoRepository = CreateTokenInfoRepository();
-            var snsEvent = Substitute.For<SNSEvent>();
-            var config = CreateConfig();
-            var logger = Substitute.For<ILogger<Handler>>();
-            var handler = new Handler(requestFactory, stepFunctions, sqs, cloudformationFactory, statusNotifier, tokenInfoRepository, config, logger);
+            var status = "CREATE_COMPLETE";
+            message.Message.ResourceStatus = status;
+            message.Message.StackId = stackId;
+            message.Message.PhysicalResourceId = stackId;
+            describeStacksResponse.Stacks[0] = new Stack
+            {
+                Outputs = new List<Output>()
+                {
+                    new() { OutputKey = "A", OutputValue = "B"},
+                    new() { OutputKey = "Foo", OutputValue = "Bar"},
+                },
+            };
 
-            request.SourceTopic = githubTopicArn;
+            var serializedOutputs = @"{""A"":""B"",""Foo"":""Bar""}";
 
-            await handler.Handle(snsEvent);
+            await handler.Handle(message);
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Arg.Is(request));
+                .FindByRequest(Is(message.Message));
 
             await cloudformationFactory
-                .DidNotReceive()
-                .Create(Arg.Is(roleArn));
+                .Received()
+                .Create(Is(tokenInfo.RoleArn));
 
             await cloudformationClient
-                .DidNotReceive()
-                .DescribeStacksAsync(Arg.Is<DescribeStacksRequest>(req => req.StackName == stackId));
+                .Received()
+                .DescribeStacksAsync(Is<DescribeStacksRequest>(req => req.StackName == stackId));
 
             await stepFunctions
-                .DidNotReceive()
-                .SendTaskSuccessAsync(Arg.Is<SendTaskSuccessRequest>(req => req.TaskToken == token && req.Output == serializedOutputs));
+                .Received()
+                .SendTaskSuccessAsync(Is<SendTaskSuccessRequest>(req => req.TaskToken == tokenInfo.ClientRequestToken && req.Output == serializedOutputs));
 
             await sqs
-                .DidNotReceive()
-                .DeleteMessageAsync(Arg.Is<DeleteMessageRequest>(req => req.QueueUrl == queueUrl && req.ReceiptHandle == receiptHandle));
+                .Received()
+                .DeleteMessageAsync(Is<DeleteMessageRequest>(req => req.QueueUrl == tokenInfo.QueueUrl && req.ReceiptHandle == tokenInfo.ReceiptHandle));
 
             await statusNotifier
                 .Received()
-                .NotifySuccess(Arg.Is(githubOwner), Arg.Is(githubRepo), Arg.Is(githubRef), Arg.Is(stackName), Arg.Is(environmentName));
+                .NotifySuccess(Is(tokenInfo.GithubOwner), Is(tokenInfo.GithubRepo), Is(tokenInfo.GithubRef), Is(message.Message.StackName), Is(tokenInfo.EnvironmentName));
+        }
+
+        [Test, Auto]
+        public async Task OnlyGithubNotified_OfSuccess_WhenSourceTopicIsGithub_UpdateComplete(
+            string stackId,
+            string githubTopicArn,
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen] Config config,
+            [Frozen] TokenInfo tokenInfo,
+            [Frozen] DescribeStacksResponse describeStacksResponse,
+            [Frozen, Substitute] TokenInfoRepository tokenInfoRepository,
+            [Frozen, Substitute] GithubStatusNotifier statusNotifier,
+            [Frozen, Substitute] IAwsFactory<IAmazonCloudFormation> cloudformationFactory,
+            [Frozen, Substitute] IAmazonCloudFormation cloudformationClient,
+            [Frozen, Substitute] IAmazonSQS sqs,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
+        {
+            var status = "UPDATE_COMPLETE";
+            config.GithubTopicArn = githubTopicArn;
+            message.Message.SourceTopic = githubTopicArn;
+            message.Message.ResourceStatus = status;
+            message.Message.SourceTopic = githubTopicArn;
+            message.Message.StackId = stackId;
+            message.Message.PhysicalResourceId = stackId;
+
+            describeStacksResponse.Stacks[0] = new Stack
+            {
+                Outputs = new List<Output>()
+                {
+                    new() { OutputKey = "A", OutputValue = "B"},
+                    new() { OutputKey = "Foo", OutputValue = "Bar"},
+                },
+            };
+
+            var serializedOutputs = @"{""A"":""B"",""Foo"":""Bar""}";
+
+            await handler.Handle(message);
+
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Is(message.Message));
+
+            await cloudformationFactory
+                .DidNotReceive()
+                .Create(Is(tokenInfo.RoleArn));
+
+            await cloudformationClient
+                .DidNotReceive()
+                .DescribeStacksAsync(Is<DescribeStacksRequest>(req => req.StackName == stackId));
+
+            await stepFunctions
+                .DidNotReceive()
+                .SendTaskSuccessAsync(Is<SendTaskSuccessRequest>(req => req.TaskToken == tokenInfo.ClientRequestToken && req.Output == serializedOutputs));
+
+            await sqs
+                .DidNotReceive()
+                .DeleteMessageAsync(Is<DeleteMessageRequest>(req => req.QueueUrl == tokenInfo.QueueUrl && req.ReceiptHandle == tokenInfo.ReceiptHandle));
+
+            await statusNotifier
+                .Received()
+                .NotifySuccess(Is(tokenInfo.GithubOwner), Is(tokenInfo.GithubRepo), Is(tokenInfo.GithubRef), Is(message.Message.StackName), Is(tokenInfo.EnvironmentName));
+        }
+
+        [Test, Auto]
+        public async Task OnlyGithubNotified_OfSuccess_WhenSourceTopicIsGithub_CreateComplete(
+            string stackId,
+            string githubTopicArn,
+            SnsMessage<CloudFormationStackEvent> message,
+            [Frozen] Config config,
+            [Frozen] TokenInfo tokenInfo,
+            [Frozen] DescribeStacksResponse describeStacksResponse,
+            [Frozen, Substitute] TokenInfoRepository tokenInfoRepository,
+            [Frozen, Substitute] GithubStatusNotifier statusNotifier,
+            [Frozen, Substitute] IAwsFactory<IAmazonCloudFormation> cloudformationFactory,
+            [Frozen, Substitute] IAmazonCloudFormation cloudformationClient,
+            [Frozen, Substitute] IAmazonSQS sqs,
+            [Frozen, Substitute] IAmazonStepFunctions stepFunctions,
+            [Target] Handler handler
+        )
+        {
+            var status = "CREATE_COMPLETE";
+            config.GithubTopicArn = githubTopicArn;
+            message.Message.SourceTopic = githubTopicArn;
+            message.Message.ResourceStatus = status;
+            message.Message.SourceTopic = githubTopicArn;
+            message.Message.StackId = stackId;
+            message.Message.PhysicalResourceId = stackId;
+
+            describeStacksResponse.Stacks[0] = new Stack
+            {
+                Outputs = new List<Output>()
+                {
+                    new() { OutputKey = "A", OutputValue = "B"},
+                    new() { OutputKey = "Foo", OutputValue = "Bar"},
+                },
+            };
+
+            var serializedOutputs = @"{""A"":""B"",""Foo"":""Bar""}";
+
+            await handler.Handle(message);
+
+            await tokenInfoRepository
+                .Received()
+                .FindByRequest(Is(message.Message));
+
+            await cloudformationFactory
+                .DidNotReceive()
+                .Create(Is(tokenInfo.RoleArn));
+
+            await cloudformationClient
+                .DidNotReceive()
+                .DescribeStacksAsync(Is<DescribeStacksRequest>(req => req.StackName == stackId));
+
+            await stepFunctions
+                .DidNotReceive()
+                .SendTaskSuccessAsync(Is<SendTaskSuccessRequest>(req => req.TaskToken == tokenInfo.ClientRequestToken && req.Output == serializedOutputs));
+
+            await sqs
+                .DidNotReceive()
+                .DeleteMessageAsync(Is<DeleteMessageRequest>(req => req.QueueUrl == tokenInfo.QueueUrl && req.ReceiptHandle == tokenInfo.ReceiptHandle));
+
+            await statusNotifier
+                .Received()
+                .NotifySuccess(Is(tokenInfo.GithubOwner), Is(tokenInfo.GithubRepo), Is(tokenInfo.GithubRef), Is(message.Message.StackName), Is(tokenInfo.EnvironmentName));
         }
     }
 }

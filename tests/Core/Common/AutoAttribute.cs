@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 using Amazon.S3;
 
@@ -16,7 +17,9 @@ internal class AutoAttribute : AutoDataAttribute
     public static IFixture Create()
     {
         var fixture = new Fixture();
-        fixture.Customize(new AutoNSubstituteCustomization());
+        fixture.Register(() => new MemoryStream());
+        fixture.Register(() => RequestCharged.Requester);
+        fixture.Customize(new AutoNSubstituteCustomization { ConfigureMembers = true });
         fixture.Customizations.Add(new OptionsRelay());
         fixture.Customizations.Insert(-1, new TargetRelay());
         return fixture;
