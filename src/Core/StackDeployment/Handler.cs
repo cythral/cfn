@@ -84,7 +84,7 @@ namespace Cythral.CloudFormation.StackDeployment
                     Template = template,
                     RoleArn = request.RoleArn,
                     NotificationArn = config.NotificationArn,
-                    Parameters = MergeParameters(stackConfig?.Parameters ?? Array.Empty<Parameter>(), request.ParameterOverrides ?? new()),
+                    Parameters = MergeParameters(stackConfig?.Parameters ?? new List<Parameter>(), request.ParameterOverrides ?? new()),
                     Tags = stackConfig?.Tags,
                     StackPolicyBody = stackConfig?.StackPolicy?.Value,
                     ClientRequestToken = token,
@@ -130,7 +130,7 @@ namespace Cythral.CloudFormation.StackDeployment
         {
             var fileName = request.TemplateConfigurationFileName;
 
-            if (fileName != null && fileName != "")
+            if (!string.IsNullOrEmpty(fileName))
             {
                 var source = await s3Util.GetZipEntryInObject(request.ZipLocation, fileName);
                 return parseConfigFileFacade.Parse(source);
