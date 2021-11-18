@@ -1,11 +1,10 @@
-using System;
 using System.IO;
 using System.Threading.Tasks;
 
 using Amazon.S3;
 using Amazon.S3.Model;
 
-using Lambdajection.Sns;
+using Cythral.CloudFormation.StackDeploymentStatus.Request;
 
 using Microsoft.Extensions.Options;
 
@@ -31,7 +30,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             config = null!;
         }
 
-        public virtual async Task<TokenInfo> FindByRequest(CloudFormationStackEvent request)
+        public virtual async Task<TokenInfo?> FindByRequest(StackDeploymentStatusRequest request)
         {
             if (request.SourceTopic == config.GithubTopicArn)
             {
@@ -46,7 +45,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
 
             var (bucket, key) = GetBucketAndKeyFromRequestToken(request.ClientRequestToken);
             var sourceString = await GetObject(bucket, $"tokens/{key}");
-            return Deserialize<TokenInfo>(sourceString) ?? throw new Exception("Token info not found.");
+            return Deserialize<TokenInfo>(sourceString);
         }
 
         public virtual async Task<string> GetObject(string bucket, string key)
