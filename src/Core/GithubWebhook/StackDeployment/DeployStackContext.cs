@@ -11,7 +11,7 @@ namespace Cythral.CloudFormation.GithubWebhook.StackDeployment
 
         public string Template { get; set; } = string.Empty;
 
-        public string RoleArn { get; set; } = string.Empty;
+        public string? RoleArn { get; set; }
 
         public string PassRoleArn { get; set; } = string.Empty;
 
