@@ -85,6 +85,16 @@
           "Amazon.Lambda.RuntimeSupport": "1.4.0"
         }
       },
+      "Lambdajection.Sns": {
+        "type": "Direct",
+        "requested": "[0.9.0-beta4, )",
+        "resolved": "0.9.0-beta4",
+        "contentHash": "hha3/wnUyYhiu1Xwj1oCIfS5cXJhxXciT3rTTeSUrc9lqxUQNU0AnJogdrcCKA+qTpJFTWskPGLCse+gslXCUg==",
+        "dependencies": {
+          "Lambdajection.Core": "0.9.0-beta4",
+          "Lambdajection.Framework": "0.9.0-beta4"
+        }
+      },
       "System.Net.Http.Json": {
         "type": "Direct",
         "requested": "[6.0.0, )",

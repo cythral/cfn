@@ -301,6 +301,15 @@
           "Amazon.Lambda.RuntimeSupport": "1.4.0"
         }
       },
+      "Lambdajection.Sns": {
+        "type": "Transitive",
+        "resolved": "0.9.0-beta4",
+        "contentHash": "hha3/wnUyYhiu1Xwj1oCIfS5cXJhxXciT3rTTeSUrc9lqxUQNU0AnJogdrcCKA+qTpJFTWskPGLCse+gslXCUg==",
+        "dependencies": {
+          "Lambdajection.Core": "0.9.0-beta4",
+          "Lambdajection.Framework": "0.9.0-beta4"
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces": {
         "type": "Transitive",
         "resolved": "5.0.0",
@@ -1617,6 +1626,7 @@
           "Lambdajection.Encryption": "0.9.0-beta4",
           "Lambdajection.Layer": "0.9.0-beta4",
           "Lambdajection.Runtime": "0.9.0-beta4",
+          "Lambdajection.Sns": "0.9.0-beta4",
           "System.Net.Http.Json": "6.0.0"
         }
       }
