@@ -7,28 +7,25 @@ using System.Threading.Tasks;
 
 using Amazon.CloudFormation;
 using Amazon.CloudFormation.Model;
-using Amazon.Lambda.Core;
-using Amazon.Lambda.SNSEvents;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 
 using Cythral.CloudFormation.StackDeploymentStatus.Github;
-using Cythral.CloudFormation.StackDeploymentStatus.Request;
 
 using Lambdajection.Attributes;
 using Lambdajection.Core;
+using Lambdajection.Sns;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Cythral.CloudFormation.StackDeploymentStatus
 {
-    [Lambda(typeof(Startup))]
+    [SnsEventHandler(typeof(Startup))]
     public partial class Handler
     {
-        private readonly StackDeploymentStatusRequestFactory requestFactory;
         private readonly IAmazonStepFunctions stepFunctionsClient;
         private readonly IAmazonSQS sqsClient;
         private readonly IAwsFactory<IAmazonCloudFormation> cloudformationFactory;
@@ -38,7 +35,6 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
         private readonly ILogger<Handler> logger;
 
         public Handler(
-            StackDeploymentStatusRequestFactory requestFactory,
             IAmazonStepFunctions stepFunctionsClient,
             IAmazonSQS sqsClient,
             IAwsFactory<IAmazonCloudFormation> cloudformationFactory,
@@ -48,7 +44,6 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             ILogger<Handler> logger
         )
         {
-            this.requestFactory = requestFactory;
             this.stepFunctionsClient = stepFunctionsClient;
             this.sqsClient = sqsClient;
             this.cloudformationFactory = cloudformationFactory;
@@ -58,14 +53,12 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             this.logger = logger;
         }
 
-        public async Task<Response> Handle(SNSEvent snsRequest, CancellationToken cancellationToken = default)
+        public async Task<Response> Handle(SnsMessage<CloudFormationStackEvent> request, CancellationToken cancellationToken = default)
         {
-            logger.LogInformation($"Received request: {JsonSerializer.Serialize(snsRequest)}");
+            var message = request.Message;
+            var status = message.ResourceStatus;
 
-            var request = requestFactory.CreateFromSnsEvent(snsRequest);
-            var status = request.ResourceStatus;
-
-            if (request.ClientRequestToken.Length > 0 && request.StackId == request.PhysicalResourceId)
+            if (message.ClientRequestToken.Length > 0 && message.StackId == message.PhysicalResourceId)
             {
                 if (status == "DELETE_COMPLETE" || status.EndsWith("ROLLBACK_COMPLETE") || status.EndsWith("FAILED"))
                 {
@@ -82,16 +75,16 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             return new Response { Success = true };
         }
 
-        private async Task SendFailure(StackDeploymentStatusRequest request)
+        private async Task SendFailure(SnsMessage<CloudFormationStackEvent> request)
         {
-            var tokenInfo = await tokenInfoRepository.FindByRequest(request) ?? throw new Exception("Token info not found.");
+            var tokenInfo = await tokenInfoRepository.FindByRequest(request.Message);
 
-            if (request.SourceTopic != config.GithubTopicArn)
+            if (request.Message.SourceTopic != config.GithubTopicArn)
             {
                 var response = await stepFunctionsClient.SendTaskFailureAsync(new SendTaskFailureRequest
                 {
                     TaskToken = tokenInfo.ClientRequestToken,
-                    Cause = request.ResourceStatus
+                    Cause = request.Message.ResourceStatus
                 });
 
                 logger.LogInformation($"Received send task failure response: {JsonSerializer.Serialize(response)}");
@@ -102,17 +95,17 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
                 tokenInfo.GithubOwner,
                 tokenInfo.GithubRepo,
                 tokenInfo.GithubRef,
-                request.StackName,
+                request.Message.StackName,
                 tokenInfo.EnvironmentName
             );
         }
 
-        private async Task SendSuccess(StackDeploymentStatusRequest request)
+        private async Task SendSuccess(SnsMessage<CloudFormationStackEvent> request)
         {
-            var tokenInfo = await tokenInfoRepository.FindByRequest(request) ?? throw new Exception("Token Info not found.");
-            if (request.SourceTopic != config.GithubTopicArn)
+            var tokenInfo = await tokenInfoRepository.FindByRequest(request.Message);
+            if (request.Message.SourceTopic != config.GithubTopicArn)
             {
-                var outputs = await GetStackOutputs(request.StackId, tokenInfo.RoleArn);
+                var outputs = await GetStackOutputs(request.Message.StackId, tokenInfo.RoleArn);
                 var response = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest
                 {
                     TaskToken = tokenInfo.ClientRequestToken,
@@ -127,7 +120,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
                 tokenInfo.GithubOwner,
                 tokenInfo.GithubRepo,
                 tokenInfo.GithubRef,
-                request.StackName,
+                request.Message.StackName,
                 tokenInfo.EnvironmentName
             );
         }
