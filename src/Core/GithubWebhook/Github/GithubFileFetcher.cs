@@ -27,9 +27,12 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
         internal GithubFileFetcher()
         {
             // Used for testing
+            httpClient = null!;
+            config = null!;
+            logger = null!;
         }
 
-        public virtual async Task<string> Fetch(string contentsUrl, string filename, string gitRef = null)
+        public virtual async Task<string?> Fetch(string contentsUrl, string filename, string? gitRef = null)
         {
             var url = contentsUrl.Replace("{+path}", filename);
             url += gitRef != null ? $"?ref={gitRef}" : "";

@@ -14,22 +14,22 @@ namespace Cythral.CloudFormation.GithubWebhook
     [LambdaOptions(typeof(Handler), "GithubWebhook")]
     public class Config
     {
-        public string GithubOwner { get; set; }
+        public string GithubOwner { get; set; } = string.Empty;
 
-        [Encrypted] public string GithubToken { get; set; }
+        [Encrypted] public string GithubToken { get; set; } = string.Empty;
 
-        [Encrypted] public string GithubSigningSecret { get; set; }
+        [Encrypted] public string GithubSigningSecret { get; set; } = string.Empty;
 
-        public string StatusNotificationTopicArn { get; set; }
+        public string StatusNotificationTopicArn { get; set; } = string.Empty;
 
-        public string TemplateFilename { get; set; }
+        public string TemplateFilename { get; set; } = string.Empty;
 
-        public string PipelineDefinitionFilename { get; set; }
+        public string PipelineDefinitionFilename { get; set; } = string.Empty;
 
-        public string ArtifactStore { get; set; }
+        public string ArtifactStore { get; set; } = string.Empty;
 
-        public string StackSuffix { get; set; }
+        public string StackSuffix { get; set; } = string.Empty;
 
-        public string RoleArn { get; set; }
+        public string RoleArn { get; set; } = string.Empty;
     }
 }

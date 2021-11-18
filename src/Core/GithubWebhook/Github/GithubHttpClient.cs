@@ -21,6 +21,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
         internal GithubHttpClient()
         {
             // for testing only
+            config = null!;
         }
 
         private void Configure()
@@ -34,7 +35,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
             return client.SendAsync(request);
         }
 
-        public virtual Task<T> GetAsync<T>(string url)
+        public virtual Task<T?> GetAsync<T>(string url)
         {
             return client.GetFromJsonAsync<T>(url);
         }

@@ -7,8 +7,8 @@ namespace Cythral.CloudFormation.GithubWebhook.Tests
     {
         public static T Json<T>(this HttpRequestMessage message)
         {
-            var jsonContent = (JsonContent)message.Content;
-            return (T)jsonContent.Value;
+            var jsonContent = (JsonContent?)message.Content;
+            return (T?)jsonContent?.Value ?? throw new System.Exception("Content was null.");
         }
     }
 }

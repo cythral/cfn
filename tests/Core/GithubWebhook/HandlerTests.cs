@@ -7,7 +7,6 @@ using Amazon.Lambda.ApplicationLoadBalancerEvents;
 using Amazon.S3;
 
 using Cythral.CloudFormation.AwsUtils;
-using Cythral.CloudFormation.AwsUtils.CloudFormation;
 using Cythral.CloudFormation.GithubWebhook.Exceptions;
 using Cythral.CloudFormation.GithubWebhook.Github;
 using Cythral.CloudFormation.GithubWebhook.Github.Entities;

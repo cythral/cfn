@@ -1,6 +1,6 @@
 using System;
-using System.Threading.Tasks;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 using Cythral.CloudFormation.StackDeployment.TemplateConfig.Converters;
 
@@ -16,7 +16,7 @@ namespace Cythral.CloudFormation.StackDeployment.TemplateConfig
             options.Converters.Add(new TagConverter());
             options.Converters.Add(new StackPolicyBodyConverter());
 
-            return JsonSerializer.Deserialize<TemplateConfiguration>(config, options);
+            return JsonSerializer.Deserialize<TemplateConfiguration>(config, options) ?? throw new Exception("Template configuration unexpectedly deserialized to null.");
         }
     }
 }

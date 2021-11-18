@@ -13,7 +13,7 @@ namespace Cythral.CloudFormation.S3Deployment
         {
             var type = typeof(Func<ZipArchiveEntry, bool, Stream>);
             var method = typeof(ZipArchiveEntry).GetMethod("OpenInReadMode", BindingFlags.NonPublic | BindingFlags.Instance);
-            OpenInReadModeDelegate = (Func<ZipArchiveEntry, bool, Stream>)Delegate.CreateDelegate(type, method);
+            OpenInReadModeDelegate = (Func<ZipArchiveEntry, bool, Stream>)Delegate.CreateDelegate(type, method!);
         }
 
 

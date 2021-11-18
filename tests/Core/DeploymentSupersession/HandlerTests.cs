@@ -81,7 +81,7 @@ namespace Cythral.CloudFormation.Tests.DeploymentSupersession
             request.Token = token;
             request.CommitTimestamp = DateTime.Now - TimeSpan.FromHours(1);
             requestFactory.CreateFromSqsEvent(Any<SQSEvent>()).Returns(request);
-            s3GetObjectFacade.TryGetObject<StateInfo>(null, null).ReturnsForAnyArgs(new StateInfo
+            s3GetObjectFacade.TryGetObject<StateInfo>(string.Empty, string.Empty).ReturnsForAnyArgs(new StateInfo
             {
                 LastCommitTimestamp = DateTime.Now
             });

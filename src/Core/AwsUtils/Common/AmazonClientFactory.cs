@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+
 using Amazon;
 using Amazon.Runtime;
 using Amazon.SecurityToken;
@@ -21,13 +22,13 @@ namespace Cythral.CloudFormation.AwsUtils
             var param = Expression.Parameter(typeof(AWSCredentials), "credentials");
             var interfaceType = typeof(TInterface);
             var implementationTypeName = interfaceType.Namespace + "." + interfaceType.Name.Substring(1) + "Client";
-            var implementationType = interfaceType.Assembly.GetType(implementationTypeName);
+            var implementationType = interfaceType.Assembly.GetType(implementationTypeName)!;
 
             New = Expression.Lambda<Func<TInterface>>(Expression.New(implementationType)).Compile();
 
             NewWithCredentials = Expression.Lambda<Func<AWSCredentials, TInterface>>(
                 Expression.New(
-                    implementationType.GetConstructor(new Type[] { typeof(AWSCredentials) }),
+                    implementationType.GetConstructor(new Type[] { typeof(AWSCredentials) })!,
                     new Expression[] { param }
                 ),
                 true,
@@ -35,7 +36,7 @@ namespace Cythral.CloudFormation.AwsUtils
             ).Compile();
         }
 
-        public virtual async Task<TInterface> Create(string roleArn = null)
+        public virtual async Task<TInterface> Create(string? roleArn = null)
         {
             if (roleArn != null)
             {

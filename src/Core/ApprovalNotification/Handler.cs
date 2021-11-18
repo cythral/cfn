@@ -17,10 +17,10 @@ using Microsoft.Extensions.Options;
 
 using static System.Text.Json.JsonSerializer;
 
-public delegate string ComputeHash(string plaintext);
-
 namespace Cythral.CloudFormation.ApprovalNotification
 {
+    public delegate string ComputeHash(string plaintext);
+
     [Lambda(typeof(Startup))]
     public partial class Handler
     {
@@ -53,7 +53,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
 
         public async Task<Response> Handle(Request request, CancellationToken cancellationToken = default)
         {
-            logger.LogDebug($"Received request: {Serialize(request)}");
+            logger.LogDebug("Received request: {}", Serialize(request));
             await approvalCanceler.CancelPreviousApprovalsForPipeline(request.Pipeline);
 
             var approvalHash = await CreateApprovalObject(request);
@@ -80,7 +80,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
                     ["email"] = defaultMessage,
                     ["email - json"] = Serialize(new
                     {
-                        Pipeline = request.Pipeline,
+                        request.Pipeline,
                         Message = request.CustomMessage,
                         ApprovalUrl = approveUrl,
                         RejectionUrl = rejectUrl
@@ -88,7 +88,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
                 })
             });
 
-            logger.LogDebug($"Publish response: {Serialize(response)}");
+            logger.LogDebug("Publish response: {}", Serialize(response));
 
             return new Response
             {
@@ -111,7 +111,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
                 })
             });
 
-            logger.LogDebug($"Put object response: {Serialize(response)}");
+            logger.LogDebug("Put object response: {}", Serialize(response));
             return key;
         }
     }

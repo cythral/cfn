@@ -25,8 +25,6 @@ using NSubstitute.ClearExtensions;
 
 using NUnit.Framework;
 
-using Octokit;
-
 using static System.Text.Json.JsonSerializer;
 
 namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
@@ -143,7 +141,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
             });
         }
 
-        public StackDeploymentStatusRequest CreateRequest(string stackId, string token, string status = "CREATE_COMPLETE", string resourceType = "AWS::CloudFormation::Stack")
+        public StackDeploymentStatusRequest CreateRequest(string stackId, string token, string? status = "CREATE_COMPLETE", string resourceType = "AWS::CloudFormation::Stack")
         {
             return new StackDeploymentStatusRequest
             {
@@ -151,7 +149,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
                 PhysicalResourceId = stackId,
                 StackName = stackName,
                 ClientRequestToken = token,
-                ResourceStatus = status,
+                ResourceStatus = status!,
                 ResourceType = resourceType,
                 Namespace = accountId,
             };

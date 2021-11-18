@@ -7,10 +7,10 @@ using Amazon.CloudFormation.Model;
 using Amazon.S3;
 using Amazon.S3.Model;
 
-using Cythral.CloudFormation.AwsUtils.CloudFormation;
 using Cythral.CloudFormation.GithubWebhook.Github;
 using Cythral.CloudFormation.GithubWebhook.Github.Entities;
 using Cythral.CloudFormation.GithubWebhook.Pipelines;
+using Cythral.CloudFormation.GithubWebhook.StackDeployment;
 
 using FluentAssertions;
 
@@ -119,7 +119,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
                 var s3Client = Substitute.For<IAmazonS3>();
                 var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
 
-                fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns((string)null);
+                fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns((string?)null);
 
                 await pipelineDeployer.Deploy(new PushEvent
                 {
@@ -146,7 +146,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
                 var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
 
                 fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns(template);
-                fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string)null);
+                fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string?)null);
 
                 await pipelineDeployer.Deploy(new PushEvent
                 {
@@ -175,7 +175,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
                 var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
 
                 fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns(template);
-                fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string)null);
+                fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string?)null);
 
                 await pipelineDeployer.Deploy(new PushEvent
                 {
@@ -195,11 +195,11 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
                     req.NotificationArn == notificationArn &&
                     req.ClientRequestToken == commitSha &&
                     req.StackName == $"{githubRepo}-{stackSuffix}" &&
-                    req.Parameters.Count() == 4 &&
-                    req.Parameters.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == githubToken) &&
-                    req.Parameters.Any(parameter => parameter.ParameterKey == "GithubOwner" && parameter.ParameterValue == githubOwner) &&
-                    req.Parameters.Any(parameter => parameter.ParameterKey == "GithubRepo" && parameter.ParameterValue == githubRepo) &&
-                    req.Parameters.Any(parameter => parameter.ParameterKey == "GithubBranch" && parameter.ParameterValue == githubBranch)
+                    req.Parameters!.Count() == 4 &&
+                    req.Parameters!.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == githubToken) &&
+                    req.Parameters!.Any(parameter => parameter.ParameterKey == "GithubOwner" && parameter.ParameterValue == githubOwner) &&
+                    req.Parameters!.Any(parameter => parameter.ParameterKey == "GithubRepo" && parameter.ParameterValue == githubRepo) &&
+                    req.Parameters!.Any(parameter => parameter.ParameterKey == "GithubBranch" && parameter.ParameterValue == githubBranch)
                 ));
             }
 
@@ -236,13 +236,13 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
                     req.NotificationArn == notificationArn &&
                     req.ClientRequestToken == commitSha &&
                     req.StackName == $"{githubRepo}-{stackSuffix}" &&
-                    req.Parameters.Count() == 6 &&
-                    req.Parameters.Any(parameter => parameter.ParameterKey == "PipelineDefinitionBucket" && parameter.ParameterValue == bucketName) &&
-                    req.Parameters.Any(parameter => parameter.ParameterKey == "PipelineDefinitionKey" && parameter.ParameterValue == expectedKey) &&
-                    req.Parameters.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == githubToken) &&
-                    req.Parameters.Any(parameter => parameter.ParameterKey == "GithubOwner" && parameter.ParameterValue == githubOwner) &&
-                    req.Parameters.Any(parameter => parameter.ParameterKey == "GithubRepo" && parameter.ParameterValue == githubRepo) &&
-                    req.Parameters.Any(parameter => parameter.ParameterKey == "GithubBranch" && parameter.ParameterValue == githubBranch)
+                    req.Parameters!.Count() == 6 &&
+                    req.Parameters!.Any(parameter => parameter.ParameterKey == "PipelineDefinitionBucket" && parameter.ParameterValue == bucketName) &&
+                    req.Parameters!.Any(parameter => parameter.ParameterKey == "PipelineDefinitionKey" && parameter.ParameterValue == expectedKey) &&
+                    req.Parameters!.Any(parameter => parameter.ParameterKey == "GithubToken" && parameter.ParameterValue == githubToken) &&
+                    req.Parameters!.Any(parameter => parameter.ParameterKey == "GithubOwner" && parameter.ParameterValue == githubOwner) &&
+                    req.Parameters!.Any(parameter => parameter.ParameterKey == "GithubRepo" && parameter.ParameterValue == githubRepo) &&
+                    req.Parameters!.Any(parameter => parameter.ParameterKey == "GithubBranch" && parameter.ParameterValue == githubBranch)
                 ));
             }
 
@@ -258,7 +258,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
                 var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
 
                 fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns(template);
-                fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string)null);
+                fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string?)null);
 
                 deployer
                 .When(x => x.Deploy(Any<DeployStackContext>()))
@@ -291,7 +291,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
                 var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
 
                 fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns(template);
-                fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string)null);
+                fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string?)null);
 
                 deployer
                 .When(x => x.Deploy(Any<DeployStackContext>()))

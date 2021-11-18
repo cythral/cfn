@@ -26,6 +26,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
         internal RequestValidator()
         {
             // used for testing
+            config = null!;
         }
 
         public virtual GithubEvent Validate(ApplicationLoadBalancerRequest request)
@@ -70,10 +71,10 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
 
         private static void ValidateEvent(ApplicationLoadBalancerRequest request, out string eventType)
         {
-            string @event = "";
+            var @event = "";
 
             request.Headers?.TryGetValue("x-github-event", out @event);
-            @event = @event.ToLower();
+            @event = @event?.ToLower();
 
             if (@event != "push" && @event != "pull_request")
             {
@@ -87,7 +88,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
         {
             try
             {
-                payload = Deserialize<PushEvent>(request.Body);
+                payload = Deserialize<PushEvent>(request.Body) ?? throw new Exception("Body unexpectedly null.");
             }
             catch (Exception e)
             {
@@ -100,7 +101,7 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
         {
             try
             {
-                payload = Deserialize<PullRequestEvent>(request.Body);
+                payload = Deserialize<PullRequestEvent>(request.Body) ?? throw new Exception("Body unexpectedly null.");
             }
             catch (Exception e)
             {
@@ -116,13 +117,13 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
 
         private static void ValidateContentsUrlPresent(GithubEvent payload)
         {
-            if (payload.Repository?.ContentsUrl == null)
+            if (string.IsNullOrEmpty(payload.Repository?.ContentsUrl))
             {
                 throw new NoContentsUrlException();
             }
         }
 
-        private static string GetOwner(GithubEvent githubEvent)
+        private static string? GetOwner(GithubEvent githubEvent)
         {
             switch (githubEvent)
             {
@@ -144,8 +145,8 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
 
             var matcher = new Regex("https:\\/\\/api\\.github\\.com\\/repos\\/([a-zA-Z0-9\\-\\._]+)\\/([a-zA-Z0-9\\-\\._]+)\\/contents\\/{\\+path}");
             var repositoryOwner = GetOwner(payload);
-            var contentsUrlMatches = matcher.Match(payload.Repository?.ContentsUrl).Groups[1]?.Captures;
-            var contentsUrlOwner = contentsUrlMatches.Count == 1 ? contentsUrlMatches[0].Value : null;
+            var contentsUrlMatches = matcher.Match(payload.Repository?.ContentsUrl ?? string.Empty).Groups[1]?.Captures;
+            var contentsUrlOwner = contentsUrlMatches?.Count == 1 ? contentsUrlMatches[0].Value : null;
 
             if (repositoryOwner != expectedOwner)
             {
@@ -160,11 +161,8 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
 
         private void ValidateSignature(ApplicationLoadBalancerRequest request)
         {
-            string givenSignature = null;
-            string actualSignature = null;
-
-            request.Headers.TryGetValue("x-hub-signature", out givenSignature);
-            actualSignature = ComputeSignature(request.Body);
+            request.Headers.TryGetValue("x-hub-signature", out var givenSignature);
+            var actualSignature = ComputeSignature(request.Body);
 
             if (givenSignature != actualSignature)
             {

@@ -41,7 +41,7 @@ namespace Cythral.CloudFormation.AwsUtils.SimpleStorageService
             return result;
         }
 
-        public virtual async Task<T> GetZipEntryInObject<T>(string location, string entry)
+        public virtual async Task<T?> GetZipEntryInObject<T>(string location, string entry)
         {
             var contents = await GetZipEntryInObject(location, entry);
             return Deserialize<T>(contents);
@@ -68,13 +68,13 @@ namespace Cythral.CloudFormation.AwsUtils.SimpleStorageService
             return await GetObject(bucket, key);
         }
 
-        public virtual async Task<T> GetObject<T>(string bucket, string key)
+        public virtual async Task<T?> GetObject<T>(string bucket, string key)
         {
             var stringContent = await GetObject(bucket, key);
             return Deserialize<T>(stringContent);
         }
 
-        public virtual async Task<T> TryGetObject<T>(string bucket, string key) where T : class
+        public virtual async Task<T?> TryGetObject<T>(string bucket, string key) where T : class
         {
             try
             {
@@ -87,7 +87,7 @@ namespace Cythral.CloudFormation.AwsUtils.SimpleStorageService
             }
         }
 
-        public virtual async Task<T> GetObject<T>(string location)
+        public virtual async Task<T?> GetObject<T>(string location)
         {
             var stringContent = await GetObject(location);
             return Deserialize<T>(stringContent);

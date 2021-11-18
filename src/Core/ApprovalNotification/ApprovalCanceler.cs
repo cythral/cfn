@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -52,7 +53,7 @@ namespace Cythral.CloudFormation.ApprovalNotification
 
         private async Task CancelPreviousApproval(S3Object location)
         {
-            var approvalInfo = await s3GetObjectFacade.GetObject<ApprovalInfo>(location.BucketName, location.Key);
+            var approvalInfo = await s3GetObjectFacade.GetObject<ApprovalInfo>(location.BucketName, location.Key) ?? throw new Exception("Invalid approval info object.");
 
             try
             {

@@ -6,6 +6,6 @@ namespace Cythral.CloudFormation.GithubWebhook.Github.Entities
     public class RepoCommit
     {
         [JsonPropertyName("commit")]
-        public RepoCommitDetails Commit { get; set; }
+        public RepoCommitDetails Commit { get; set; } = new();
     }
 }

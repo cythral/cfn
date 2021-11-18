@@ -17,11 +17,12 @@ namespace Cythral.CloudFormation.ApprovalNotification.Links
         public async Task<string> Shorten(string url)
         {
             var uri = new Uri("", UriKind.Relative);
-            var response = await httpClient.PostAsJsonAsync(uri, new {
+            var response = await httpClient.PostAsJsonAsync(uri, new
+            {
                 Destination = url,
             });
 
-            return $"https://cythr.al{response.Headers.Location.ToString()}";
-       }
+            return $"https://cythr.al{response.Headers.Location}";
+        }
     }
 }

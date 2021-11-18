@@ -13,14 +13,11 @@ using Amazon.S3.Model;
 
 using Cythral.CloudFormation.AwsUtils;
 using Cythral.CloudFormation.AwsUtils.SimpleStorageService;
-using Cythral.CloudFormation.GithubUtils;
 
 using Lambdajection.Attributes;
 using Lambdajection.Core;
 
 using Microsoft.Extensions.Logging;
-
-using Octokit;
 
 using static System.Text.Json.JsonSerializer;
 
@@ -33,7 +30,7 @@ namespace Cythral.CloudFormation.S3Deployment
         private readonly GithubStatusNotifier githubStatusNotifier;
         private readonly S3GetObjectFacade s3GetObjectFacade;
         private readonly ILogger<Handler> logger;
-        private IAmazonS3 s3Client;
+        private IAmazonS3? s3Client;
         private bool disposed;
 
         public Handler(
@@ -108,7 +105,7 @@ namespace Cythral.CloudFormation.S3Deployment
         private async Task MarkExistingObjectsAsDirty(string destinationBucket)
         {
             var request = new ListObjectsV2Request { BucketName = destinationBucket };
-            var response = await s3Client.ListObjectsV2Async(request);
+            var response = await s3Client!.ListObjectsV2Async(request);
             var dirtyTag = new Tag { Key = "dirty", Value = "true" };
             var tagging = new Tagging
             {
@@ -139,7 +136,7 @@ namespace Cythral.CloudFormation.S3Deployment
             };
 
             request.Headers.ContentLength = entry.Length;
-            await s3Client.PutObjectAsync(request);
+            await s3Client!.PutObjectAsync(request);
 
             logger.LogInformation($"Uploaded {entry.FullName}");
         }
@@ -151,7 +148,7 @@ namespace Cythral.CloudFormation.S3Deployment
                 return;
             }
 
-            s3Client.Dispose();
+            s3Client!.Dispose();
             s3Client = null;
             disposed = true;
         }

@@ -11,7 +11,7 @@ namespace Cythral.CloudFormation.StackDeployment.Github
 {
     public class GithubStatusNotifier
     {
-        private const string BaseDetailsUrl = "https://console.aws.amazon.com/cloudformation/home?region=us-east-1%23/stacks/stackinfo%3FfilteringText=%26filteringStatus=active%26viewNested=true%26hideStacks=false%26stackId=";
+        private const string BaseDetailsUrl = "https://console.aws.amazon.com/cloudformation/home?region=us-east-1%2523/stacks/stackinfo%253FfilteringText=%2526filteringStatus=active%2526viewNested=true%2526hideStacks=false%2526stackId=";
         private readonly GithubHttpClient httpClient;
 
         public GithubStatusNotifier(GithubHttpClient httpClient)
@@ -22,11 +22,12 @@ namespace Cythral.CloudFormation.StackDeployment.Github
         internal GithubStatusNotifier()
         {
             // for testing only
+            httpClient = null!;
         }
 
         private async Task Notify(string state, string description, string owner, string repo, string sha, string stackName, string environmentName)
         {
-            var destination = Uri.EscapeUriString(BaseDetailsUrl + stackName);
+            var destination = BaseDetailsUrl + Uri.EscapeDataString(stackName);
             await httpClient.SendAsync(new HttpRequestMessage
             {
                 Method = Post,

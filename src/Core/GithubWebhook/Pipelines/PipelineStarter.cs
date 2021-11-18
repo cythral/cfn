@@ -26,6 +26,8 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
         internal PipelineStarter()
         {
             // used for testing
+            stepFunctionsClient = null!;
+            logger = null!;
         }
 
         public virtual async Task StartPipelineIfExists(GithubEvent payload)

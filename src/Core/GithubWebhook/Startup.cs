@@ -4,9 +4,9 @@ using Amazon.CloudFormation;
 using Amazon.S3;
 using Amazon.StepFunctions;
 
-using Cythral.CloudFormation.AwsUtils.CloudFormation;
 using Cythral.CloudFormation.GithubWebhook.Github;
 using Cythral.CloudFormation.GithubWebhook.Pipelines;
+using Cythral.CloudFormation.GithubWebhook.StackDeployment;
 
 using Lambdajection.Core;
 

@@ -19,7 +19,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts
     {
         private readonly IAmazonS3 s3Client;
         private readonly S3GetObjectFacade getObject;
-        private Manifest manifest;
+        private Manifest? manifest;
 
         private static readonly Tagging currentTagSet = new Tagging
         {
@@ -45,7 +45,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts
 
         public async Task<bool> Handle(Request request, CancellationToken cancellationToken = default)
         {
-            manifest = await getObject.GetZipEntryInObject<Manifest>(request.ManifestLocation, request.ManifestFilename);
+            manifest = await getObject.GetZipEntryInObject<Manifest>(request.ManifestLocation, request.ManifestFilename) ?? throw new Exception("Manifest not found.");
 
             var objects = await s3Client.ListObjectsV2Async(new ListObjectsV2Request { BucketName = manifest.BucketName, Prefix = manifest.Prefix });
             var tasks = objects.S3Objects.Select(PutObjectTagging);
@@ -57,7 +57,7 @@ namespace Cythral.CloudFormation.S3TagOutdatedArtifacts
 
         private async Task PutObjectTagging(S3Object @object)
         {
-            var tagging = manifest.Files.ContainsValue(@object.Key) ? currentTagSet : outdatedTagSet;
+            var tagging = manifest!.Files.ContainsValue(@object.Key) ? currentTagSet : outdatedTagSet;
             await s3Client.PutObjectTaggingAsync(new PutObjectTaggingRequest
             {
                 BucketName = manifest.BucketName,

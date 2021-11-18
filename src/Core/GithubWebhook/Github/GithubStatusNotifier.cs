@@ -28,6 +28,9 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
         internal GithubStatusNotifier()
         {
             // Used for testing
+            client = null!;
+            config = null!;
+            logger = null!;
         }
 
         private async Task Notify(string repoName, string sha, string state, string description, string filteringStatus)

@@ -24,6 +24,7 @@ namespace Cythral.CloudFormation.StackDeployment
         internal TokenGenerator()
         {
             // Used for testing
+            s3Client = null!;
         }
 
         public virtual async Task<string> Generate(SQSEvent sqsEvent, Request request)
@@ -46,9 +47,9 @@ namespace Cythral.CloudFormation.StackDeployment
                     QueueUrl = ConvertQueueArnToUrl(sqsRecord.EventSourceArn),
                     ReceiptHandle = sqsRecord.ReceiptHandle,
                     RoleArn = request.RoleArn,
-                    GithubOwner = request.CommitInfo?.GithubOwner,
-                    GithubRepo = request.CommitInfo?.GithubRepository,
-                    GithubRef = request.CommitInfo?.GithubRef,
+                    GithubOwner = request.CommitInfo.GithubOwner,
+                    GithubRepo = request.CommitInfo.GithubRepository,
+                    GithubRef = request.CommitInfo.GithubRef,
                     EnvironmentName = request.EnvironmentName,
                 })
             });
@@ -66,13 +67,13 @@ namespace Cythral.CloudFormation.StackDeployment
             return (bucket, key);
         }
 
-        private string ConvertToS3Uri(string arn)
+        private static string ConvertToS3Uri(string arn)
         {
             var parts = arn.Split(':');
             return parts[5];
         }
 
-        private string ConvertQueueArnToUrl(string arn)
+        private static string ConvertQueueArnToUrl(string arn)
         {
             var parts = arn.Split(":");
             return $"https://sqs.{parts[3]}.amazonaws.com/{parts[4]}/{parts[5]}";

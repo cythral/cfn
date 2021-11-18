@@ -9,10 +9,10 @@ namespace Cythral.CloudFormation.GithubWebhook.Github
     public abstract class GithubEvent
     {
         [JsonPropertyName("repository")]
-        public Repository Repository { get; set; }
+        public Repository Repository { get; set; } = new();
 
         [JsonPropertyName("head_commit_message")]
-        public string HeadCommitMessage { get; set; }
+        public string HeadCommitMessage { get; set; } = string.Empty;
 
         [JsonPropertyName("head_commit_id")]
         public abstract string HeadCommitId { get; }

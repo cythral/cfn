@@ -26,9 +26,11 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
         internal TokenInfoRepository()
         {
             // for testing only
+            s3Client = null!;
+            config = null!;
         }
 
-        public virtual async Task<TokenInfo> FindByRequest(StackDeploymentStatusRequest request)
+        public virtual async Task<TokenInfo?> FindByRequest(StackDeploymentStatusRequest request)
         {
             if (request.SourceTopic == config.GithubTopicArn)
             {

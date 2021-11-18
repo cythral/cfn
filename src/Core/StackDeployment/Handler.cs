@@ -84,7 +84,7 @@ namespace Cythral.CloudFormation.StackDeployment
                     Template = template,
                     RoleArn = request.RoleArn,
                     NotificationArn = config.NotificationArn,
-                    Parameters = MergeParameters(stackConfig?.Parameters, request.ParameterOverrides),
+                    Parameters = MergeParameters(stackConfig?.Parameters ?? Array.Empty<Parameter>(), request.ParameterOverrides ?? new()),
                     Tags = stackConfig?.Tags,
                     StackPolicyBody = stackConfig?.StackPolicy?.Value,
                     ClientRequestToken = token,
@@ -126,7 +126,7 @@ namespace Cythral.CloudFormation.StackDeployment
             throw new Exception();
         }
 
-        private async Task<TemplateConfiguration> GetConfig(Request request)
+        private async Task<TemplateConfiguration?> GetConfig(Request request)
         {
             var fileName = request.TemplateConfigurationFileName;
 
@@ -139,7 +139,7 @@ namespace Cythral.CloudFormation.StackDeployment
             return null;
         }
 
-        private static List<Parameter> MergeParameters(List<Parameter> parameters, Dictionary<string, string> overrides)
+        private static List<Parameter> MergeParameters(IEnumerable<Parameter> parameters, Dictionary<string, string> overrides)
         {
             var result = parameters?.ToDictionary(param => param.ParameterKey, param => param.ParameterValue) ?? new Dictionary<string, string>();
             overrides = overrides ?? new Dictionary<string, string>();
