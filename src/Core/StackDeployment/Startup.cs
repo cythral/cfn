@@ -22,7 +22,7 @@ namespace Cythral.CloudFormation.StackDeployment
             services.AddSingleton<ParseConfigFileFacade>();
             services.AddSingleton<TokenGenerator>();
             services.AddSingleton<RequestFactory>();
-            services.AddSingleton<IGithubHttpClient, GithubHttpClient>();
+            services.AddSingleton<GithubHttpClient>();
             services.AddSingleton<GithubStatusNotifier>();
 
             services.UseAwsService<IAmazonStepFunctions>();

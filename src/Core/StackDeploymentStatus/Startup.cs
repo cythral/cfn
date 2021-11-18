@@ -4,6 +4,7 @@ using Amazon.SQS;
 using Amazon.StepFunctions;
 
 using Cythral.CloudFormation.StackDeploymentStatus.Github;
+using Cythral.CloudFormation.StackDeploymentStatus.Request;
 
 using Lambdajection.Core;
 
@@ -21,9 +22,10 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             services.UseAwsService<IAmazonS3>();
 
             services.AddSingleton<TokenInfoRepository>();
-            services.AddSingleton<IGithubHttpClient, GithubHttpClient>();
+            services.AddSingleton<GithubHttpClient>();
             services.AddSingleton<GithubStatusNotifier>();
             services.AddSingleton<TokenInfoRepository>();
+            services.AddSingleton<StackDeploymentStatusRequestFactory>();
         }
     }
 }

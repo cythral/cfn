@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace Cythral.CloudFormation.StackDeploymentStatus.Github
 {
-    public class GithubHttpClient : IGithubHttpClient
+    public class GithubHttpClient
     {
         private static readonly HttpClient client = new HttpClient();
         private readonly Config config;

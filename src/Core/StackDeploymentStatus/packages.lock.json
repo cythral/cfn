@@ -2,6 +2,12 @@
   "version": 1,
   "dependencies": {
     "net6.0": {
+      "Amazon.Lambda.SNSEvents": {
+        "type": "Direct",
+        "requested": "[2.0.0, )",
+        "resolved": "2.0.0",
+        "contentHash": "NzEV+hsQygpukxwuyN4gyOINYhFGOilc6uSuHIeTRiOncz+dvtw100UbeBxObCMuAbofL9U4yidKV/rObnpInQ=="
+      },
       "AWSSDK.CloudFormation": {
         "type": "Direct",
         "requested": "[3.7.5.44, )",
@@ -83,16 +89,6 @@
         "contentHash": "k2ImYhB90Wvodo8c9lA3zQ8JHzNlnEoe5B/5ClEYoYcryhPatuh1EUgQ1urdN2OIZq9m7a0mzriVdqAoIpfhvw==",
         "dependencies": {
           "Amazon.Lambda.RuntimeSupport": "1.4.0"
-        }
-      },
-      "Lambdajection.Sns": {
-        "type": "Direct",
-        "requested": "[0.9.0-beta3, )",
-        "resolved": "0.9.0-beta3",
-        "contentHash": "0AQFMKOZwNyAg1vet9DWHQBuZ6KZcSOIAW3qsaV3cDSDsXr6/v90niuhZmGm/Bipkh9QrVMWLNuY7MNC1+wf9Q==",
-        "dependencies": {
-          "Lambdajection.Core": "0.9.0-beta3",
-          "Lambdajection.Framework": "0.9.0-beta3"
         }
       },
       "System.Net.Http.Json": {
