@@ -4,18 +4,18 @@
     "net6.0": {
       "AWSSDK.ECS": {
         "type": "Direct",
-        "requested": "[3.7.4.9, )",
-        "resolved": "3.7.4.9",
-        "contentHash": "me+DZJasI8BK4KCnTlOaLkU9AOV89tCspSMtQzl/QcnVShktYNsTMVzZXFwVGIMjOrzRRm3IF0PmOadr0zFB2A==",
+        "requested": "[3.7.4.10, )",
+        "resolved": "3.7.4.10",
+        "contentHash": "fcZ/mmOYisXNM/u1SLv1NQDE5zNxPnooxp3uTRtPXTFgVbmmMhPKALzqJj5sG3qzOBGU/iwf8uIf/6/0q/AtFQ==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.5.2, 4.0.0)"
         }
       },
       "AWSSDK.SecurityToken": {
         "type": "Direct",
-        "requested": "[3.7.1.93, )",
-        "resolved": "3.7.1.93",
-        "contentHash": "z9w84Rboc4Ps1vIFbGYNfVM1a4jqGyo/KR+BowlStwlkDjw4FefxBZ+HOv5rbbUuwRHLZQBXOI0snduKoUXsPw==",
+        "requested": "[3.7.1.94, )",
+        "resolved": "3.7.1.94",
+        "contentHash": "ZIMTpi5RRd29zsUrwulpizvF9MkBeOPG2w8dIXGpqvwfVvkYZAz5Vx4Z+5PUgIms8JkluVd5mrNi7AercNeHyw==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.5.2, 4.0.0)"
         }
