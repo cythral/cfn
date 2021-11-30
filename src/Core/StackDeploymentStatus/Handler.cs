@@ -55,6 +55,7 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
 
         public async Task<Response> Handle(SnsMessage<CloudFormationStackEvent> request, CancellationToken cancellationToken = default)
         {
+            logger.LogInformation("Received request: {@request}", JsonSerializer.Serialize(request));
             var message = request.Message;
             var status = message.ResourceStatus;
 
