@@ -59,7 +59,10 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
 
         public virtual async Task Deploy(PushEvent payload)
         {
-            var stackName = $"{payload.Repository.Name}-{config.StackSuffix}";
+            var normalizedRepoName = payload.Repository.Name.Replace('.', '-');
+            normalizedRepoName = normalizedRepoName.StartsWith('-') ? $"dot{normalizedRepoName}" : normalizedRepoName;
+
+            var stackName = $"{normalizedRepoName}-{config.StackSuffix}";
             var contentsUrl = payload.Repository.ContentsUrl;
             var templateContent = await fileFetcher.Fetch(contentsUrl, config.TemplateFilename, payload.Ref);
             var pipelineDefinition = await fileFetcher.Fetch(contentsUrl, config.PipelineDefinitionFilename, payload.Ref);

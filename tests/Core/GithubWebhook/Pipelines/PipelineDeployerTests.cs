@@ -204,6 +204,72 @@ namespace Cythral.CloudFormation.GithubWebhook.Pipelines
             }
 
             [Test]
+            public async Task Deploy_ShouldDeployStack_WithDotsReplacedWithHyphensInName_IfTemplateWasFound()
+            {
+                var logger = Substitute.For<ILogger<PipelineDeployer>>();
+                var fileFetcher = Substitute.For<GithubFileFetcher>();
+                var deployer = Substitute.For<DeployStackFacade>();
+                var sumComputer = Substitute.For<Sha256SumComputer>();
+                var statusNotifier = Substitute.For<GithubStatusNotifier>();
+                var s3Client = Substitute.For<IAmazonS3>();
+                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
+
+                fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns(template);
+                fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string?)null);
+
+                var name = "my.repository";
+
+                await pipelineDeployer.Deploy(new PushEvent
+                {
+                    Ref = gitRef,
+                    Repository = new Repository
+                    {
+                        Name = name,
+                        ContentsUrl = contentsUrl,
+                        DefaultBranch = githubBranch
+                    },
+                    HeadCommit = new Commit { Id = commitSha }
+                });
+
+                await deployer.Received().Deploy(Is<DeployStackContext>(req =>
+                    req.StackName == $"my-repository-{stackSuffix}"
+                ));
+            }
+
+            [Test]
+            public async Task Deploy_ShouldDeployStack_WithDotPrefix_IfTemplateWasFound_AndNameStartsWithADot()
+            {
+                var logger = Substitute.For<ILogger<PipelineDeployer>>();
+                var fileFetcher = Substitute.For<GithubFileFetcher>();
+                var deployer = Substitute.For<DeployStackFacade>();
+                var sumComputer = Substitute.For<Sha256SumComputer>();
+                var statusNotifier = Substitute.For<GithubStatusNotifier>();
+                var s3Client = Substitute.For<IAmazonS3>();
+                var pipelineDeployer = new PipelineDeployer(s3Client, sumComputer, fileFetcher, statusNotifier, deployer, config, logger);
+
+                fileFetcher.Fetch(Any<string>(), Is(templateFileName), Any<string>()).Returns(template);
+                fileFetcher.Fetch(Any<string>(), Is(definitionFileName), Any<string>()).Returns((string?)null);
+
+                var name = ".repository";
+
+                await pipelineDeployer.Deploy(new PushEvent
+                {
+                    Ref = gitRef,
+                    Repository = new Repository
+                    {
+                        Name = name,
+                        ContentsUrl = contentsUrl,
+                        DefaultBranch = githubBranch
+                    },
+                    HeadCommit = new Commit { Id = commitSha }
+                });
+
+                await deployer.Received().Deploy(Is<DeployStackContext>(req =>
+                    req.StackName == $"dot-repository-{stackSuffix}"
+                ));
+            }
+
+            [Test]
             public async Task Deploy_ShouldDeployStackWithPipelineDefinition_IfPipelineDefinitionWasFound()
             {
                 var logger = Substitute.For<ILogger<PipelineDeployer>>();
