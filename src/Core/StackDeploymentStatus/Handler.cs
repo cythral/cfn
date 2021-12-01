@@ -78,9 +78,9 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
 
         private async Task SendFailure(SnsMessage<CloudFormationStackEvent> request)
         {
-            var tokenInfo = await tokenInfoRepository.FindByRequest(request.Message);
+            var tokenInfo = await tokenInfoRepository.FindByRequest(request);
 
-            if (request.Message.SourceTopic != config.GithubTopicArn)
+            if (request.TopicArn != config.GithubTopicArn)
             {
                 var response = await stepFunctionsClient.SendTaskFailureAsync(new SendTaskFailureRequest
                 {
@@ -103,8 +103,8 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
 
         private async Task SendSuccess(SnsMessage<CloudFormationStackEvent> request)
         {
-            var tokenInfo = await tokenInfoRepository.FindByRequest(request.Message);
-            if (request.Message.SourceTopic != config.GithubTopicArn)
+            var tokenInfo = await tokenInfoRepository.FindByRequest(request);
+            if (request.TopicArn != config.GithubTopicArn)
             {
                 var outputs = await GetStackOutputs(request.Message.StackId, tokenInfo.RoleArn);
                 var response = await stepFunctionsClient.SendTaskSuccessAsync(new SendTaskSuccessRequest

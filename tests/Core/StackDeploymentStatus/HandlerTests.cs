@@ -88,7 +88,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Is(message.Message));
+                .FindByRequest(Is(message));
 
             await stepFunctions
                 .Received()
@@ -124,7 +124,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Is(message.Message));
+                .FindByRequest(Is(message));
 
             await stepFunctions
                 .Received()
@@ -160,7 +160,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Is(message.Message));
+                .FindByRequest(Is(message));
 
             await stepFunctions
                 .Received()
@@ -196,7 +196,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Is(message.Message));
+                .FindByRequest(Is(message));
 
             await stepFunctions
                 .Received()
@@ -227,8 +227,8 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         {
             var status = "DELETE_COMPLETE";
             config.GithubTopicArn = githubTopicArn;
+            message.TopicArn = githubTopicArn;
             message.Message.ResourceStatus = status;
-            message.Message.SourceTopic = githubTopicArn;
             message.Message.StackId = stackId;
             message.Message.PhysicalResourceId = stackId;
 
@@ -236,7 +236,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Is(message.Message));
+                .FindByRequest(Is(message));
 
             await stepFunctions
                 .DidNotReceive()
@@ -267,8 +267,8 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         {
             var status = "UPDATE_ROLLBACK_COMPLETE";
             config.GithubTopicArn = githubTopicArn;
+            message.TopicArn = githubTopicArn;
             message.Message.ResourceStatus = status;
-            message.Message.SourceTopic = githubTopicArn;
             message.Message.StackId = stackId;
             message.Message.PhysicalResourceId = stackId;
 
@@ -276,7 +276,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Is(message.Message));
+                .FindByRequest(Is(message));
 
             await stepFunctions
                 .DidNotReceive()
@@ -307,8 +307,8 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         {
             var status = "UPDATE_ROLLBACK_FAILED";
             config.GithubTopicArn = githubTopicArn;
+            message.TopicArn = githubTopicArn;
             message.Message.ResourceStatus = status;
-            message.Message.SourceTopic = githubTopicArn;
             message.Message.StackId = stackId;
             message.Message.PhysicalResourceId = stackId;
 
@@ -316,7 +316,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Is(message.Message));
+                .FindByRequest(Is(message));
 
             await stepFunctions
                 .DidNotReceive()
@@ -347,8 +347,8 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         {
             var status = "CREATE_FAILED";
             config.GithubTopicArn = githubTopicArn;
+            message.TopicArn = githubTopicArn;
             message.Message.ResourceStatus = status;
-            message.Message.SourceTopic = githubTopicArn;
             message.Message.StackId = stackId;
             message.Message.PhysicalResourceId = stackId;
 
@@ -356,7 +356,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Is(message.Message));
+                .FindByRequest(Is(message));
 
             await stepFunctions
                 .DidNotReceive()
@@ -405,7 +405,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Is(message.Message));
+                .FindByRequest(Is(message));
 
             await cloudformationFactory
                 .Received()
@@ -462,7 +462,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Is(message.Message));
+                .FindByRequest(Is(message));
 
             await cloudformationFactory
                 .Received()
@@ -504,9 +504,8 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         {
             var status = "UPDATE_COMPLETE";
             config.GithubTopicArn = githubTopicArn;
-            message.Message.SourceTopic = githubTopicArn;
             message.Message.ResourceStatus = status;
-            message.Message.SourceTopic = githubTopicArn;
+            message.TopicArn = githubTopicArn;
             message.Message.StackId = stackId;
             message.Message.PhysicalResourceId = stackId;
 
@@ -525,7 +524,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Is(message.Message));
+                .FindByRequest(Is(message));
 
             await cloudformationFactory
                 .DidNotReceive()
@@ -567,9 +566,8 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
         {
             var status = "CREATE_COMPLETE";
             config.GithubTopicArn = githubTopicArn;
-            message.Message.SourceTopic = githubTopicArn;
+            message.TopicArn = githubTopicArn;
             message.Message.ResourceStatus = status;
-            message.Message.SourceTopic = githubTopicArn;
             message.Message.StackId = stackId;
             message.Message.PhysicalResourceId = stackId;
 
@@ -588,7 +586,7 @@ namespace Cythral.CloudFormation.Tests.StackDeploymentStatus
 
             await tokenInfoRepository
                 .Received()
-                .FindByRequest(Is(message.Message));
+                .FindByRequest(Is(message));
 
             await cloudformationFactory
                 .DidNotReceive()

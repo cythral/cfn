@@ -31,20 +31,20 @@ namespace Cythral.CloudFormation.StackDeploymentStatus
             config = null!;
         }
 
-        public virtual async Task<TokenInfo> FindByRequest(CloudFormationStackEvent request)
+        public virtual async Task<TokenInfo> FindByRequest(SnsMessage<CloudFormationStackEvent> request)
         {
-            if (request.SourceTopic == config.GithubTopicArn)
+            if (request.TopicArn == config.GithubTopicArn)
             {
                 return new TokenInfo
                 {
                     EnvironmentName = "shared",
                     GithubOwner = config.GithubOwner,
-                    GithubRepo = request.StackName.Replace($"-{config.StackSuffix}", ""),
-                    GithubRef = request.ClientRequestToken,
+                    GithubRepo = request.Message.StackName.Replace($"-{config.StackSuffix}", ""),
+                    GithubRef = request.Message.ClientRequestToken,
                 };
             }
 
-            var (bucket, key) = GetBucketAndKeyFromRequestToken(request.ClientRequestToken);
+            var (bucket, key) = GetBucketAndKeyFromRequestToken(request.Message.ClientRequestToken);
             var sourceString = await GetObject(bucket, $"tokens/{key}");
             return Deserialize<TokenInfo>(sourceString) ?? throw new Exception("Token info not found.");
         }
