@@ -454,7 +454,7 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable
       SubnetId: !Ref PrivateSubnet4
 
-  # Security - Roles & Policies
+  # Security - Roles, Policies & Identity Providers
   # -------------------------------------------
 
   MasterRole:
@@ -475,6 +475,13 @@ Resources:
                 - codepipeline.amazonaws.com
                 - lambda.amazonaws.com
                 - !Sub states.${AWS::Region}.amazonaws.com
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !Ref GithubOidcProvider
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: https://github.com/cythral
 
   AgentRole:
     Type: AWS::IAM::Role
@@ -496,6 +503,13 @@ Resources:
               Service:
                 - cloudformation.amazonaws.com
                 - codepipeline.amazonaws.com
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !Ref GithubOidcProvider
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: https://github.com/cythral
 
   AdminRole:
     Type: AWS::IAM::Role
@@ -639,6 +653,15 @@ Resources:
               - serverlessrepo:CreateCloudFormationChangeSet
               - serverlessrepo:PutApplicationPolicy
             Resource: "*"
+
+  GithubOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+      ThumbprintList:
+        - a031c46782e6e6c662c2c87c76da9aa62ccabd8e
 
 
   # Security - Encryption
