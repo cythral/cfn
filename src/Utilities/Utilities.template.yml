@@ -480,8 +480,8 @@ Resources:
             Principal:
               Federated: !Ref GithubOidcProvider
             Condition:
-              StringEquals:
-                token.actions.githubusercontent.com:repository_owner: cythral
+              StringLike:
+                token.actions.githubusercontent.com:sub: repo:cythral/*
 
   AgentRole:
     Type: AWS::IAM::Role
@@ -508,8 +508,8 @@ Resources:
             Principal:
               Federated: !Ref GithubOidcProvider
             Condition:
-              StringEquals:
-                token.actions.githubusercontent.com:repository_owner: cythral
+              StringLike:
+                token.actions.githubusercontent.com:sub: repo:cythral/*
 
   AdminRole:
     Type: AWS::IAM::Role
