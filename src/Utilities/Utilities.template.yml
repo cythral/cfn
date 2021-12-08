@@ -481,7 +481,7 @@ Resources:
               Federated: !Ref GithubOidcProvider
             Condition:
               StringEquals:
-                token.actions.githubusercontent.com:aud: https://github.com/cythral
+                token.actions.githubusercontent.com:repository_owner: cythral
 
   AgentRole:
     Type: AWS::IAM::Role
@@ -509,7 +509,7 @@ Resources:
               Federated: !Ref GithubOidcProvider
             Condition:
               StringEquals:
-                token.actions.githubusercontent.com:aud: https://github.com/cythral
+                token.actions.githubusercontent.com:repository_owner: cythral
 
   AdminRole:
     Type: AWS::IAM::Role
