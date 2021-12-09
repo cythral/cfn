@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cythral.CloudFormation.BuildTasks" Version="0.5.2" />
+    <PackageReference Include="Cythral.CloudFormation.BuildTasks" Version="0.5.3" />
   </ItemGroup>
 
   <ItemGroup>
