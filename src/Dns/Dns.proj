@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Cythral.CloudFormation.BuildTasks" Version="0.5.3" />
+        <PackageReference Include="Cythral.CloudFormation.BuildTasks" Version="0.5.4" />
     </ItemGroup>
     
     <Target Name="Publish">
