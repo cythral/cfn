@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lambdajection" Version="0.9.0-beta5" />
+    <PackageReference Include="Lambdajection" Version="0.9.0" />
   </ItemGroup>
 
   <Target Name="Configure" AfterTargets="Build">

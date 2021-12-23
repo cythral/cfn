@@ -84,8 +84,8 @@
       },
       "Amazon.Lambda.RuntimeSupport": {
         "type": "Transitive",
-        "resolved": "1.4.0",
-        "contentHash": "xmpJ+iQWEL/vDRoBIxsGoLAX9k7al7uS6Xd3xcj3IWB4mPAUx4/J4RQO5jZ7vKnD8SjnYvRe8i6dyh788r2BVA==",
+        "resolved": "1.5.0",
+        "contentHash": "WIS3H+58HtH1UOHkF8VN6q29HWFAVOoUqTA18cxmhtuxIHMoAk5kNxxqyqevsFO8akcKaU3UN09b3oQGjU2stg==",
         "dependencies": {
           "Amazon.Lambda.Core": "2.1.0",
           "NSwag.MSBuild": "12.0.4",
@@ -129,10 +129,10 @@
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
-        "resolved": "3.7.2.45",
-        "contentHash": "UrvYWOeMBiewN94kHnVUzHTHpbQLQmpE0Lre7EyzrPVHnWRvB7P65gGee1Awk/8OiuhhIMaZ1hBJkbZc1ZUYmw==",
+        "resolved": "3.7.2.51",
+        "contentHash": "5QtMZY7pvKUN4YUlUVHNNb3gyNR3na1OMPg/QMM9QvJN+E3OlVSh+KkLSD/CdwQcbdLEndRS+289+3F6eSSHUQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.4.5, 4.0.0)"
+          "AWSSDK.Core": "[3.7.5.5, 4.0.0)"
         }
       },
       "AWSSDK.S3": {
@@ -223,29 +223,29 @@
       },
       "Lambdajection": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta5",
-        "contentHash": "JNtDL28/Q0liwosIy+3t78Xj2IbKIIzIAqYS5wwQPeUAIr86fhAe8cEh8tl6L0Q3KZHmdP/hOoEk4PRIkIVpeg==",
+        "resolved": "0.9.0",
+        "contentHash": "RA4XnkONp/DHuzjvbTdvhED6u58nN6KMgn7awxhpxGPvMgKjYFxIKTPPkoVODUoBwMuyAo1P0BXoUZqkS+kQ0Q==",
         "dependencies": {
-          "Lambdajection.Attributes": "0.9.0-beta5",
-          "Lambdajection.Core": "0.9.0-beta5",
-          "Lambdajection.Framework": "0.9.0-beta5",
-          "Lambdajection.Framework.BuildTime": "0.9.0-beta5",
-          "Lambdajection.Generator": "0.9.0-beta5"
+          "Lambdajection.Attributes": "0.9.0",
+          "Lambdajection.Core": "0.9.0",
+          "Lambdajection.Framework": "0.9.0",
+          "Lambdajection.Framework.BuildTime": "0.9.0",
+          "Lambdajection.Generator": "0.9.0"
         }
       },
       "Lambdajection.Attributes": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta5",
-        "contentHash": "E+ularw6JSQDFj4rpmC2HSgTi7rhQELomOB3AmrZtjasG8yV8y5zo6W4ENUn2UScQAi4K+Q+J7503MzY00T5/A=="
+        "resolved": "0.9.0",
+        "contentHash": "6WTezXVJWQ4zYa5HAWdiElicfyJRhJzaegY9+Ym5lS9gjlDU79+fCsewwktm1J0zcG2bV6fkaktVdVO0V5MwHA=="
       },
       "Lambdajection.Core": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta5",
-        "contentHash": "bUxZz96suSwv43Zkh8c+/xwMvFgZWo75/IfvoEDHhvBEezG48RnMksl1AGynJM7uf4fcjJ4IB9lH67KTS4mf5Q==",
+        "resolved": "0.9.0",
+        "contentHash": "qvIfUHGORcqe1IAIkaEAFvQi2uyn6ODBEkyH4zT+o534379wooEXqB2tJi8gYOmLfm9vyK9BPiUAQNEgJ8HXQw==",
         "dependencies": {
           "Amazon.Lambda.Core": "2.1.0",
-          "Lambdajection.Attributes": "0.9.0-beta5",
-          "Lambdajection.Framework": "0.9.0-beta5",
+          "Lambdajection.Attributes": "0.9.0",
+          "Lambdajection.Framework": "0.9.0",
           "Microsoft.Extensions.Configuration": "6.0.0",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "6.0.0",
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
@@ -255,31 +255,31 @@
       },
       "Lambdajection.Encryption": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta5",
-        "contentHash": "IHDfEk4iBpxLC+qa5TR0k6YnFP+/ilGn/aXzcuF6hImi4kCIPyIrKSqAxeWjfnrA83967KdH89knQjR1FF3spg==",
+        "resolved": "0.9.0",
+        "contentHash": "0C2xB/FxrIxRs52XM8+IyMbl2ct5fNs0UMZLpb0XNN9ZCUytfzDRu3h26jrNhtBUi24AD9Ika1TQwgUHGLqH3w==",
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.7.2.45",
-          "Lambdajection.Framework": "0.9.0-beta5"
+          "AWSSDK.KeyManagementService": "3.7.2.51",
+          "Lambdajection.Framework": "0.9.0"
         }
       },
       "Lambdajection.Framework": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta5",
-        "contentHash": "5OT1Qxs0tkehbkuY27JTgbEQ2n4eFw75T5Cl+fSGQxfOMKTJ+uBxnRlc4jMg8xTuIc+83nYcdr8ROm28pC4IOQ=="
+        "resolved": "0.9.0",
+        "contentHash": "O6dbl8gqmlBOiiGlhaTFvOXGjVj87iBQOnt0Z9GM/DPuAsv8QFBCk01ub/IczvSxJtII2qkT9EBupMj32ya7PQ=="
       },
       "Lambdajection.Framework.BuildTime": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta5",
-        "contentHash": "5W/pfjwG/Gf4KXI3/zg7DFFMUa4Q3U1BaO9QSC7eD9IbNSTjtRbrUomuop7Iszdhp9WU5AWtn3/vC4qkuCB0UQ=="
+        "resolved": "0.9.0",
+        "contentHash": "+54kDuXPXuuRpRC0++WUmfBrAtt4m2bsZAuAVLRvKUeUvf+/8/ASGHl6n1LCJ1kiAsYV2ip3+Nag/2O1lKJ7UQ=="
       },
       "Lambdajection.Generator": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta5",
-        "contentHash": "ziMaLFIlY5Cz/dVGh5PkUiXAD+TLfRBF0CzDl/1R/qyG7phZAsGpz5tSGFv7wZUhy9vE6ESVRZdAsYMmO87/HQ==",
+        "resolved": "0.9.0",
+        "contentHash": "4i49UwHj4M/pK7+M+DueZM+TK1HIIgb6FSB3KiVYsC5sAgw0VZ5bW0dEzBNo2w9U+e1uo7dLRKA5LKYoEINDsw==",
         "dependencies": {
-          "Lambdajection.Attributes": "0.9.0-beta5",
-          "Lambdajection.Framework": "0.9.0-beta5",
-          "Lambdajection.Framework.BuildTime": "0.9.0-beta5",
+          "Lambdajection.Attributes": "0.9.0",
+          "Lambdajection.Framework": "0.9.0",
+          "Lambdajection.Framework.BuildTime": "0.9.0",
           "Microsoft.CodeAnalysis": "4.0.1",
           "Microsoft.CodeAnalysis.CSharp.Workspaces": "4.0.1",
           "Microsoft.Extensions.Hosting": "6.0.0",
@@ -290,24 +290,24 @@
       },
       "Lambdajection.Layer": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta5",
-        "contentHash": "VwO4ZwD5HJwvVkxjQ7uT5gq+p+tC+HfqdP68T8TuRI6aThlM4YC64InvdiFT0vQGtWfzPdnCHEr+1zLsM+rUEQ=="
+        "resolved": "0.9.0",
+        "contentHash": "Bjylol3SIUq+PRSdHx8A4YP+GZRqy1jAHF39OxRRVppl2WcELk1xPM8e5vHJ8ioCDMvEE+SMP3wf7cyS1MutJw=="
       },
       "Lambdajection.Runtime": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta5",
-        "contentHash": "/Z91csTKbKTouiH6TM/HzbJzaGwAOlpFT5Djo/7ceRoUFQAZ6wF6qOxdlYWytSS4s8PhKjXUSDF28K5zUrXoXQ==",
+        "resolved": "0.9.0",
+        "contentHash": "+49TT9RAIM9fdnoHODog4PP51UlEbWYKzGBnf3YqFcgMyTrSZInEsIlh6YPk6DJNDvU9yB+kDqxBZzQIGLGEjg==",
         "dependencies": {
-          "Amazon.Lambda.RuntimeSupport": "1.4.0"
+          "Amazon.Lambda.RuntimeSupport": "1.5.0"
         }
       },
       "Lambdajection.Sns": {
         "type": "Transitive",
-        "resolved": "0.9.0-beta5",
-        "contentHash": "FA7PbspxctpB8PYWHU3J5+HlMSRoh9JsJK4Upuo2Ocieh5pVqtCttc6H50jTWdObRcWPlBeNGVBDzmxG4VITmQ==",
+        "resolved": "0.9.0",
+        "contentHash": "sOPrbj12xWlq9HNxAyb42B6oxTQ/E/yerHjm2DArZ0KrL9Hv0+VgigZc5eI2NlodlyxEs2i0IhaYkX7ITGvyiw==",
         "dependencies": {
-          "Lambdajection.Core": "0.9.0-beta5",
-          "Lambdajection.Framework": "0.9.0-beta5"
+          "Lambdajection.Core": "0.9.0",
+          "Lambdajection.Framework": "0.9.0"
         }
       },
       "Microsoft.Bcl.AsyncInterfaces": {
@@ -1502,10 +1502,10 @@
           "AWSSDK.SimpleNotificationService": "3.7.3.9",
           "AWSSDK.StepFunctions": "3.7.0.109",
           "Brighid.Identity.Client": "0.5.0-beta4",
-          "Lambdajection": "0.9.0-beta5",
-          "Lambdajection.Encryption": "0.9.0-beta5",
-          "Lambdajection.Layer": "0.9.0-beta5",
-          "Lambdajection.Runtime": "0.9.0-beta5",
+          "Lambdajection": "0.9.0",
+          "Lambdajection.Encryption": "0.9.0",
+          "Lambdajection.Layer": "0.9.0",
+          "Lambdajection.Runtime": "0.9.0",
           "SimpleStorageService": "1.0.0"
         }
       },
@@ -1515,9 +1515,9 @@
           "AWSSDK.StepFunctions": "3.7.0.109",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
           "AwsUtils.Common": "1.0.0",
-          "Lambdajection": "0.9.0-beta5",
-          "Lambdajection.Layer": "0.9.0-beta5",
-          "Lambdajection.Runtime": "0.9.0-beta5",
+          "Lambdajection": "0.9.0",
+          "Lambdajection.Layer": "0.9.0",
+          "Lambdajection.Runtime": "0.9.0",
           "SimpleStorageService": "1.0.0"
         }
       },
@@ -1532,9 +1532,9 @@
         "dependencies": {
           "AWSSDK.StepFunctions": "3.7.0.109",
           "Amazon.Lambda.SQSEvents": "2.0.0",
-          "Lambdajection": "0.9.0-beta5",
-          "Lambdajection.Layer": "0.9.0-beta5",
-          "Lambdajection.Runtime": "0.9.0-beta5",
+          "Lambdajection": "0.9.0",
+          "Lambdajection.Layer": "0.9.0",
+          "Lambdajection.Runtime": "0.9.0",
           "SimpleStorageService": "1.0.0"
         }
       },
@@ -1543,17 +1543,17 @@
         "dependencies": {
           "AWSSDK.ECS": "3.7.4.16",
           "AWSSDK.SecurityToken": "3.7.1.100",
-          "Lambdajection": "0.9.0-beta5",
-          "Lambdajection.Layer": "0.9.0-beta5",
-          "Lambdajection.Runtime": "0.9.0-beta5"
+          "Lambdajection": "0.9.0",
+          "Lambdajection.Layer": "0.9.0",
+          "Lambdajection.Runtime": "0.9.0"
         }
       },
       "extractfilefromzip": {
         "type": "Project",
         "dependencies": {
-          "Lambdajection": "0.9.0-beta5",
-          "Lambdajection.Layer": "0.9.0-beta5",
-          "Lambdajection.Runtime": "0.9.0-beta5",
+          "Lambdajection": "0.9.0",
+          "Lambdajection.Layer": "0.9.0",
+          "Lambdajection.Runtime": "0.9.0",
           "SimpleStorageService": "1.0.0"
         }
       },
@@ -1565,10 +1565,10 @@
           "AWSSDK.SecurityToken": "3.7.1.100",
           "AWSSDK.StepFunctions": "3.7.0.109",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
-          "Lambdajection": "0.9.0-beta5",
-          "Lambdajection.Encryption": "0.9.0-beta5",
-          "Lambdajection.Layer": "0.9.0-beta5",
-          "Lambdajection.Runtime": "0.9.0-beta5",
+          "Lambdajection": "0.9.0",
+          "Lambdajection.Encryption": "0.9.0",
+          "Lambdajection.Layer": "0.9.0",
+          "Lambdajection.Runtime": "0.9.0",
           "System.Net.Http.Json": "6.0.0"
         }
       },
@@ -1576,19 +1576,19 @@
         "type": "Project",
         "dependencies": {
           "AwsUtils.Common": "1.0.0",
-          "Lambdajection": "0.9.0-beta5",
-          "Lambdajection.Encryption": "0.9.0-beta5",
-          "Lambdajection.Layer": "0.9.0-beta5",
-          "Lambdajection.Runtime": "0.9.0-beta5",
+          "Lambdajection": "0.9.0",
+          "Lambdajection.Encryption": "0.9.0",
+          "Lambdajection.Layer": "0.9.0",
+          "Lambdajection.Runtime": "0.9.0",
           "SimpleStorageService": "1.0.0"
         }
       },
       "s3tagoutdatedartifacts": {
         "type": "Project",
         "dependencies": {
-          "Lambdajection": "0.9.0-beta5",
-          "Lambdajection.Layer": "0.9.0-beta5",
-          "Lambdajection.Runtime": "0.9.0-beta5",
+          "Lambdajection": "0.9.0",
+          "Lambdajection.Layer": "0.9.0",
+          "Lambdajection.Runtime": "0.9.0",
           "SimpleStorageService": "1.0.0"
         }
       },
@@ -1607,10 +1607,10 @@
           "AWSSDK.SecurityToken": "3.7.1.100",
           "AWSSDK.StepFunctions": "3.7.0.109",
           "Amazon.Lambda.SQSEvents": "2.0.0",
-          "Lambdajection": "0.9.0-beta5",
-          "Lambdajection.Encryption": "0.9.0-beta5",
-          "Lambdajection.Layer": "0.9.0-beta5",
-          "Lambdajection.Runtime": "0.9.0-beta5",
+          "Lambdajection": "0.9.0",
+          "Lambdajection.Encryption": "0.9.0",
+          "Lambdajection.Layer": "0.9.0",
+          "Lambdajection.Runtime": "0.9.0",
           "System.Net.Http.Json": "6.0.0"
         }
       },
@@ -1622,11 +1622,11 @@
           "AWSSDK.SQS": "3.7.2.6",
           "AWSSDK.SecurityToken": "3.7.1.100",
           "AWSSDK.StepFunctions": "3.7.0.109",
-          "Lambdajection": "0.9.0-beta5",
-          "Lambdajection.Encryption": "0.9.0-beta5",
-          "Lambdajection.Layer": "0.9.0-beta5",
-          "Lambdajection.Runtime": "0.9.0-beta5",
-          "Lambdajection.Sns": "0.9.0-beta5",
+          "Lambdajection": "0.9.0",
+          "Lambdajection.Encryption": "0.9.0",
+          "Lambdajection.Layer": "0.9.0",
+          "Lambdajection.Runtime": "0.9.0",
+          "Lambdajection.Sns": "0.9.0",
           "System.Net.Http.Json": "6.0.0"
         }
       }
