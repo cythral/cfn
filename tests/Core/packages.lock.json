@@ -108,8 +108,8 @@
       },
       "AWSSDK.CloudFormation": {
         "type": "Transitive",
-        "resolved": "3.7.7.18",
-        "contentHash": "YYFNkGP1A8rem8KSqYVFjmJchJgoCCcKq5md4J8f/2nBVx7j8sWpYodAg0ENLc/DoQLw44/oX0NCsFfkbdaTlQ==",
+        "resolved": "3.7.8",
+        "contentHash": "A0g25hSbOZihGXK7ZD+YRJF07t7JJp6KsjuXSAmDEtNx7xlys96J1gaM1C/tmqcXn4oBOx0B47ET174DW+W/YQ==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.6.4, 4.0.0)"
         }
@@ -1561,7 +1561,7 @@
       "githubwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.7.18",
+          "AWSSDK.CloudFormation": "3.7.8",
           "AWSSDK.S3": "3.7.7.19",
           "AWSSDK.SecurityToken": "3.7.1.112",
           "AWSSDK.StepFunctions": "3.7.0.121",
@@ -1603,7 +1603,7 @@
       "stackdeployment": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.7.18",
+          "AWSSDK.CloudFormation": "3.7.8",
           "AWSSDK.S3": "3.7.7.19",
           "AWSSDK.SecurityToken": "3.7.1.112",
           "AWSSDK.StepFunctions": "3.7.0.121",
@@ -1618,7 +1618,7 @@
       "stackdeploymentstatus": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "3.7.7.18",
+          "AWSSDK.CloudFormation": "3.7.8",
           "AWSSDK.S3": "3.7.7.19",
           "AWSSDK.SQS": "3.7.2.18",
           "AWSSDK.SecurityToken": "3.7.1.112",
