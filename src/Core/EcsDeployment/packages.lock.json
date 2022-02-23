@@ -4,11 +4,11 @@
     "net6.0": {
       "AWSSDK.ECS": {
         "type": "Direct",
-        "requested": "[3.7.4.34, )",
-        "resolved": "3.7.4.34",
-        "contentHash": "xAGLVCERHR2qvX2q+hj8PMUpoMIRms63BlRtt1vRt67NSYerdEtOzwRgZaNcHjWLnzwON0lMo7VJR+81Xq24SQ==",
+        "requested": "[3.7.4.35, )",
+        "resolved": "3.7.4.35",
+        "contentHash": "krjeK3zDA5KJorQgVWjqoB/fPATnzDcaMVFqRrF3h0sSplUUv8kCyrmYzXi+8EKmKhgGRvzx1TWqBmda7ZygGg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.8.1, 4.0.0)"
+          "AWSSDK.Core": "[3.7.8.2, 4.0.0)"
         }
       },
       "AWSSDK.SecurityToken": {
@@ -65,8 +65,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.8.1",
-        "contentHash": "TqnPuacfd8xBvc7dzVfXr4Fak/Q2mddFnI5TKiuMHgixBWKfvfnDIj17GncerMODpNr8IRuwUKrMDUWB3deQUw=="
+        "resolved": "3.7.8.2",
+        "contentHash": "v9e+U+dVcLOTXSxRWbt49DK9n6zMmJ8mD/4KVBG0LuWjpFotEhXWWACVvqpdl6J4WoJh7HsF6jndmT1vgAmAOg=="
       },
       "Humanizer.Core": {
         "type": "Transitive",
