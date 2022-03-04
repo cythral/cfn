@@ -145,8 +145,8 @@
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.7.1.123",
-        "contentHash": "sFqcbdgxZN/qawemTA9qEhyeeHPSjeEiGSAEsTqNsI/rxW73VPu2UcWqW9cCwKjkDWkokffBN932v0jtrD+Gmw==",
+        "resolved": "3.7.1.124",
+        "contentHash": "vKsIWc60QcwBNtoeGC9t0VnWwHYNcm4mvTR7revlFzp+lZnH9jrEs+mRWBWqtQOukdRS2xfGZEY6+UarD9GE5g==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.8.6, 4.0.0)"
         }
@@ -1525,7 +1525,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "3.7.1.123"
+          "AWSSDK.SecurityToken": "3.7.1.124"
         }
       },
       "deploymentsupersession": {
@@ -1543,7 +1543,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.ECS": "3.7.4.39",
-          "AWSSDK.SecurityToken": "3.7.1.123",
+          "AWSSDK.SecurityToken": "3.7.1.124",
           "Lambdajection": "0.9.2",
           "Lambdajection.Layer": "0.9.2",
           "Lambdajection.Runtime": "0.9.2"
@@ -1563,7 +1563,7 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.9.10",
           "AWSSDK.S3": "3.7.8.4",
-          "AWSSDK.SecurityToken": "3.7.1.123",
+          "AWSSDK.SecurityToken": "3.7.1.124",
           "AWSSDK.StepFunctions": "3.7.0.132",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "2.1.0",
           "Lambdajection": "0.9.2",
@@ -1605,7 +1605,7 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "3.7.9.10",
           "AWSSDK.S3": "3.7.8.4",
-          "AWSSDK.SecurityToken": "3.7.1.123",
+          "AWSSDK.SecurityToken": "3.7.1.124",
           "AWSSDK.StepFunctions": "3.7.0.132",
           "Amazon.Lambda.SQSEvents": "2.1.0",
           "Lambdajection": "0.9.2",
@@ -1621,7 +1621,7 @@
           "AWSSDK.CloudFormation": "3.7.9.10",
           "AWSSDK.S3": "3.7.8.4",
           "AWSSDK.SQS": "3.7.2.29",
-          "AWSSDK.SecurityToken": "3.7.1.123",
+          "AWSSDK.SecurityToken": "3.7.1.124",
           "AWSSDK.StepFunctions": "3.7.0.132",
           "Lambdajection": "0.9.2",
           "Lambdajection.Encryption": "0.9.2",
