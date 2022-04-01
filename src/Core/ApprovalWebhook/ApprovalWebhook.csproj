@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.ApplicationLoadBalancerEvents" Version="2.1.0" />
-    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.142" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.143" />
     <PackageReference Include="Lambdajection" Version="0.9.2" />
     <PackageReference Include="Lambdajection.Runtime" Version="0.9.2" />
     <PackageReference Include="Lambdajection.Layer" Version="0.9.2" />
