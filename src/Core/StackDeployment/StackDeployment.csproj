@@ -8,10 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.SQSEvents" Version="2.1.0" />
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.154" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.9.5" />
-    <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.9.39" />
-    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.161" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.155" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.9.6" />
+    <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.9.40" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.162" />
     <PackageReference Include="Lambdajection.Layer" Version="0.10.0-beta1" />
     <PackageReference Include="Lambdajection.Runtime" Version="0.10.0-beta1" />
     <PackageReference Include="Lambdajection.Encryption" Version="0.10.0-beta1" />
