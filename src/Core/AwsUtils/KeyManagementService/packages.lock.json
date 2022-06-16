@@ -4,30 +4,30 @@
     "net6.0": {
       "AWSSDK.KeyManagementService": {
         "type": "Direct",
-        "requested": "[3.7.3.24, )",
-        "resolved": "3.7.3.24",
-        "contentHash": "zlY3QMxHxQ/EcvPvn59SLVC26BkJBfnE9+0B1kW2BuU9n/wXWjveJU7r/hQnAV9yf2QByJ8TM49IXBLW7g1Dqw==",
+        "requested": "[3.7.3.25, )",
+        "resolved": "3.7.3.25",
+        "contentHash": "w7OzTe1PFRJrwvk8uVwLALyTWoWESAB+NOaKrtda58uP3N5wRvifNeyp3Cb/MjFeoqTPWp4l65AONXnAGUr71w==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.12, 4.0.0)"
+          "AWSSDK.Core": "[3.7.12.1, 4.0.0)"
         }
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.12",
-        "contentHash": "mIQRvJhLwIB90hxMaRBMOs9FKd8fHZcOKIToYELupCMOPzkwthh0S4y674ExL8n5f+wQ/5m4U26lm1yBkHtqtA=="
+        "resolved": "3.7.12.1",
+        "contentHash": "11UsNwz0mljKDjJHTVjOJ9Wnmvfc8vUGfwkbIN8C0Qu/TlPalsA7S8ZdmDnBa7oDVrYsyVr5TJAsCDTrv+Mf7w=="
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.7.1.165",
-        "contentHash": "vz0ryVyjs6r9FD2cy9yzujNR5MKesRivfEJJ6tOaSNcw1gw268fq9dXBLD70H/Ppdw++xxMD9HuFwANj7d8mUg==",
+        "resolved": "3.7.1.166",
+        "contentHash": "4zwfVyTK5RR/8zHPi81Lo4tII+ajH5KPDaVxbuH3Jp0VvBURl4tCkRhuwUKu6Tw573/y3RAhWC141vl/216Oyg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.12, 4.0.0)"
+          "AWSSDK.Core": "[3.7.12.1, 4.0.0)"
         }
       },
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "3.7.1.165"
+          "AWSSDK.SecurityToken": "3.7.1.166"
         }
       }
     }
