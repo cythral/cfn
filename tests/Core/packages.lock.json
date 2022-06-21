@@ -119,8 +119,8 @@
       },
       "AWSSDK.ECS": {
         "type": "Transitive",
-        "resolved": "3.7.5.44",
-        "contentHash": "AhJ91Qephu9qmlP5dYUVwRJRLNHLWTrKDPYl2uaXty9B9n+HEVWQ9BqDsO3Kd8yZAXW0cqldSEkCkY7KkSNUpA==",
+        "resolved": "3.7.5.45",
+        "contentHash": "T8WKquWsVwp2yD7Z3Nd093qvicK5Iq+r80IGBgDlliwcXC4xvxlAjj3JHweixX2BL2B0f6B2A5pC56KH04Neng==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.12.2, 4.0.0)"
         }
@@ -1545,7 +1545,7 @@
       "ecsdeployment": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.ECS": "3.7.5.44",
+          "AWSSDK.ECS": "3.7.5.45",
           "AWSSDK.SecurityToken": "3.7.1.167",
           "Lambdajection": "0.10.0-beta1",
           "Lambdajection.Layer": "0.10.0-beta1",
