@@ -64,7 +64,7 @@ Resources:
       CidrBlock: !Ref NetworkCidr
       EnableDnsSupport: true
       EnableDnsHostnames: true
-  
+
   VPCFlowLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -341,7 +341,7 @@ Resources:
 
   # Private Networking
   # -------------------------------------------
-  
+
   NatNetworkInterface:
     Type: AWS::EC2::NetworkInterface
     Properties:
@@ -368,7 +368,7 @@ Resources:
       SourceDestCheck: false
       ImageId: ami-008a8487adc2b32ec
       NetworkInterfaces:
-        - DeviceIndex: '0'
+        - DeviceIndex: "0"
           NetworkInterfaceId: !Ref NatNetworkInterface
       Tags:
         - Key: Name
@@ -378,7 +378,7 @@ Resources:
           #!/bin/bash -xe
           sysctl -w net.ipv4.ip_forward=1
           /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-  
+
   PrivateVpcCidr:
     Type: AWS::EC2::VPCCidrBlock
     Properties:
@@ -620,6 +620,35 @@ Resources:
                 - !Ref AWS::NoValue
                 - !Sub arn:aws:iam::${MasterAccountId}:role/Broker
 
+  TunnelingTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Tunneler
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+        - !Ref TunnelingAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+
+  TunnelingAccess:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource: "*"
+            Action:
+              - ssmmessages:CreateControlChannel
+              - ssmmessages:CreateDataChannel
+              - ssmmessages:OpenControlChannel
+              - ssmmessages:OpenDataChannel
+
   AssumeRoleAccess:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -662,7 +691,6 @@ Resources:
         - sts.amazonaws.com
       ThumbprintList:
         - 6938FD4D98BAB03FAADB97B34396831E3780AEA1
-
 
   # Security - Encryption
   # -------------------------------------------
