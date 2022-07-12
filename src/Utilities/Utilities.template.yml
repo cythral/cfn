@@ -160,6 +160,7 @@ Resources:
       AvailabilityZone: !Select [0, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
+      AssignIpv6AddressOnCreation: true
 
   Subnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -177,6 +178,7 @@ Resources:
       AvailabilityZone: !Select [1, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
+      AssignIpv6AddressOnCreation: true
 
   Subnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -194,6 +196,7 @@ Resources:
       AvailabilityZone: !Select [2, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
+      AssignIpv6AddressOnCreation: true
 
   Subnet3RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -211,6 +214,7 @@ Resources:
       AvailabilityZone: !Select [3, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
+      AssignIpv6AddressOnCreation: true
 
   Subnet4RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
