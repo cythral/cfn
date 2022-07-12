@@ -30,6 +30,7 @@ Parameters:
   MasterAccountv6Cidr:
     Type: String
     Description: Master account IPv6 cidr block. A route to the peering connection is setup with this range
+    Default: ""
 
 Conditions:
   # Master/Shared account - one that has control of "agent" accounts like (dev/staging/prod)
