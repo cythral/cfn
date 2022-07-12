@@ -108,7 +108,7 @@ Resources:
     Type: AWS::EC2::Route
     Condition: SetupOssAccount
     Properties:
-      DestinationCidrBlock: !Ref OssIpv6Cidr
+      DestinationIpv6CidrBlock: !Ref OssIpv6Cidr
       RouteTableId: !ImportValue cfn-utilities:RouteTableId
       VpcPeeringConnectionId: !Ref OssPeeringConnection
 
@@ -133,7 +133,7 @@ Resources:
     Type: AWS::EC2::Route
     Condition: SetupDevAccount
     Properties:
-      DestinationCidrBlock: !Ref DevIpv6Cidr
+      DestinationIpv6CidrBlock: !Ref DevIpv6Cidr
       RouteTableId: !ImportValue cfn-utilities:RouteTableId
       VpcPeeringConnectionId: !Ref DevPeeringConnection
 
@@ -164,7 +164,7 @@ Resources:
     Type: AWS::EC2::Route
     Condition: SetupProdAccount
     Properties:
-      DestinationCidrBlock: !Ref ProdIpv6Cidr
+      DestinationIpv6CidrBlock: !Ref ProdIpv6Cidr
       RouteTableId: !ImportValue cfn-utilities:RouteTableId
       VpcPeeringConnectionId: !Ref ProdPeeringConnection
 

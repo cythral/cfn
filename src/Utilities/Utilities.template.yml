@@ -159,7 +159,7 @@ Resources:
     Type: AWS::EC2::Route
     Condition: SetupPeeringRoute
     Properties:
-      DestinationCidrBlock: !Ref MasterAccountv6Cidr
+      DestinationIpv6CidrBlock: !Ref MasterAccountv6Cidr
       RouteTableId: !Ref RouteTable
       VpcPeeringConnectionId: !Ref PeeringConnectionId
 
@@ -296,7 +296,7 @@ Resources:
       IpProtocol: tcp
       FromPort: 80
       ToPort: 80
-      CidrIp: 10.1.0.0/16
+      CidrIpv6: !Ref MasterAccountv6Cidr
 
   WebSecurityGroupMasterPort443Ingress:
     Type: AWS::EC2::SecurityGroupIngress
@@ -307,6 +307,16 @@ Resources:
       FromPort: 443
       ToPort: 443
       CidrIp: 10.1.0.0/16
+
+  WebSecurityGroupMasterPort443Ingressv6:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: IsAgentAccount
+    Properties:
+      GroupId: !GetAtt WebSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      CidrIpv6: !Ref MasterAccountv6Cidr
 
   EnvoySecurityGroup:
     Type: AWS::EC2::SecurityGroup
