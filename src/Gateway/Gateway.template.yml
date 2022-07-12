@@ -67,7 +67,7 @@ Resources:
       GroupDescription: Allows HTTP and HTTPS traffic from the public internet.
       VpcId: !ImportValue cfn-utilities:VpcId
       SecurityGroupIngress:
-         # Port 80 - HTTP
+        # Port 80 - HTTP
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
@@ -171,7 +171,7 @@ Resources:
       Spec:
         EgressFilter:
           Type: ALLOW_ALL
-  
+
   AppMeshGateway:
     Type: AWS::AppMesh::VirtualGateway
     Properties:
@@ -254,10 +254,13 @@ Resources:
       TaskRoleArn: !GetAtt TaskRole.Arn
       RequiresCompatibilities:
         - FARGATE
+      RuntimePlatform:
+        CpuArchitecture: ARM64
+        OperatingSystemFamily: LINUX
       ContainerDefinitions:
         - Name: envoy
           Essential: true
-          Image: !Sub 840364872350.dkr.ecr.${AWS::Region}.amazonaws.com/aws-appmesh-envoy:v1.19.1.1-prod
+          Image: !Sub 840364872350.dkr.ecr.${AWS::Region}.amazonaws.com/aws-appmesh-envoy:arm64-v1.22.2.0-prod
           PortMappings:
             - ContainerPort: 80
             - ContainerPort: 9901
@@ -297,7 +300,7 @@ Resources:
         PredefinedMetricSpecification:
           PredefinedMetricType: ECSServiceAverageCPUUtilization
         TargetValue: 70
-  
+
   TaskRole:
     Type: AWS::IAM::Role
     Properties:
@@ -312,7 +315,7 @@ Resources:
             Action: sts:AssumeRole
             Principal:
               Service: ecs-tasks.amazonaws.com
-  
+
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -332,7 +335,7 @@ Resources:
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: "30"
-  
+
   DecryptedDevClientSecret:
     Type: Custom::Secret
     Properties:
