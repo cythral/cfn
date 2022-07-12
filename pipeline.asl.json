@@ -69,7 +69,7 @@
     "Deploy Utilities to Shared": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
-      "ResultPath": "$.UtilityOutputs.Shared",
+      "ResultPath": "$.SharedUtilityOutputs",
       "Parameters": {
         "QueueUrl": "${DeploymentQueue}",
         "MessageGroupId": "${GithubRepo}-utilities-shared",
@@ -79,7 +79,9 @@
           "TemplateFileName": "Utilities.template.yml",
           "RoleArn": "${SharedRoleArn}",
           "Token.$": "$$.Task.Token",
-          "Capabilities": ["CAPABILITY_NAMED_IAM"],
+          "Capabilities": [
+            "CAPABILITY_NAMED_IAM"
+          ],
           "EnvironmentName": "shared",
           "CommitInfo": {
             "GithubOwner": "${GithubOwner}",
@@ -105,11 +107,14 @@
           "Token.$": "$$.Task.Token",
           "ParameterOverrides": {
             "MasterAccountId": "${AccountId}",
+            "MasterAccountv6Cidr.$": "$.SharedUtilityOutputs.Ipv6CidrBlock",
             "NetworkCidr": "10.2.0.0/16",
             "PrivateNetworkCidr": "10.128.0.0/16",
             "PeeringConnectionId.$": "$.NetworkingConfig.DevPeeringConnectionId"
           },
-          "Capabilities": ["CAPABILITY_NAMED_IAM"],
+          "Capabilities": [
+            "CAPABILITY_NAMED_IAM"
+          ],
           "EnvironmentName": "dev",
           "CommitInfo": {
             "GithubOwner": "${GithubOwner}",
@@ -135,11 +140,14 @@
           "Token.$": "$$.Task.Token",
           "ParameterOverrides": {
             "MasterAccountId": "${AccountId}",
+            "MasterAccountv6Cidr.$": "$.SharedUtilityOutputs.Ipv6CidrBlock",
             "NetworkCidr": "10.3.0.0/16",
             "PrivateNetworkCidr": "10.129.0.0/16",
             "PeeringConnectionId.$": "$.NetworkingConfig.ProdPeeringConnectionId"
           },
-          "Capabilities": ["CAPABILITY_NAMED_IAM"],
+          "Capabilities": [
+            "CAPABILITY_NAMED_IAM"
+          ],
           "EnvironmentName": "prod",
           "CommitInfo": {
             "GithubOwner": "${GithubOwner}",
@@ -165,6 +173,7 @@
           "Token.$": "$$.Task.Token",
           "ParameterOverrides": {
             "MasterAccountId": "${AccountId}",
+            "MasterAccountv6Cidr.$": "$.SharedUtilityOutputs.Ipv6CidrBlock",
             "NetworkCidr": "10.4.0.0/16",
             "PrivateNetworkCidr": "10.130.0.0/16",
             "PeeringConnectionId.$": "$.NetworkingConfig.OssPeeringConnectionId"
@@ -331,7 +340,9 @@
           "TemplateConfigurationFileName": "Dns.config.json",
           "RoleArn": "${SharedRoleArn}",
           "Token.$": "$$.Task.Token",
-          "Capabilities": ["CAPABILITY_IAM"],
+          "Capabilities": [
+            "CAPABILITY_IAM"
+          ],
           "EnvironmentName": "shared",
           "CommitInfo": {
             "GithubOwner": "${GithubOwner}",
@@ -355,7 +366,9 @@
           "TemplateFileName": "Gateway.template.yml",
           "RoleArn": "${SharedRoleArn}",
           "Token.$": "$$.Task.Token",
-          "Capabilities": ["CAPABILITY_IAM"],
+          "Capabilities": [
+            "CAPABILITY_IAM"
+          ],
           "EnvironmentName": "shared",
           "CommitInfo": {
             "GithubOwner": "${GithubOwner}",
@@ -382,13 +395,19 @@
           "Token.$": "$$.Task.Token",
           "ParameterOverrides": {
             "DevVpcId.$": "$.DevUtilityOutputs.VpcId",
+            "DevIpv6Cidr.$": "$.DevUtilityOutputs.Ipv6CidrBlock",
             "ProdVpcId.$": "$.ProdUtilityOutputs.VpcId",
+            "ProdIpv6Cidr.$": "$.ProdUtilityOutputs.Ipv6CidrBlock",
             "OssVpcId.$": "$.OssUtilityOutputs.VpcId",
+            "OssIpv6Cidr.$": "$.OssUtilityOutputs.Ipv6CidrBlock",
             "Version.$": "$.head_commit.id",
             "LambdajectionLayerArn.$": "$.LayerOutputs[0].LambdajectionArn",
             "DotnetLayerArn.$": "$.LayerOutputs[0].DotnetArn"
           },
-          "Capabilities": ["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"],
+          "Capabilities": [
+            "CAPABILITY_IAM",
+            "CAPABILITY_AUTO_EXPAND"
+          ],
           "EnvironmentName": "shared",
           "CommitInfo": {
             "GithubOwner": "${GithubOwner}",

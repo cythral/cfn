@@ -27,6 +27,10 @@ Parameters:
     Description: Master account cidr block. A route to the peering connection is setup with this range
     Default: 10.1.0.0/16
 
+  MasterAccountv6Cidr:
+    Type: String
+    Description: Master account IPv6 cidr block. A route to the peering connection is setup with this range
+
 Conditions:
   # Master/Shared account - one that has control of "agent" accounts like (dev/staging/prod)
   IsMasterAccount: !Equals
@@ -150,6 +154,14 @@ Resources:
       RouteTableId: !Ref RouteTable
       VpcPeeringConnectionId: !Ref PeeringConnectionId
 
+  PeeringRoutev6:
+    Type: AWS::EC2::Route
+    Condition: SetupPeeringRoute
+    Properties:
+      DestinationCidrBlock: !Ref MasterAccountv6Cidr
+      RouteTableId: !Ref RouteTable
+      VpcPeeringConnectionId: !Ref PeeringConnectionId
+
   Subnet1:
     Type: AWS::EC2::Subnet
     DependsOn: Ipv6CidrBlock
@@ -266,6 +278,16 @@ Resources:
       VpcId: !Ref VPC
 
   WebSecurityGroupMasterPort80Ingress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: IsAgentAccount
+    Properties:
+      GroupId: !GetAtt WebSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      CidrIp: 10.1.0.0/16
+
+  WebSecurityGroupMasterPort80Ingressv6:
     Type: AWS::EC2::SecurityGroupIngress
     Condition: IsAgentAccount
     Properties:
@@ -802,6 +824,12 @@ Outputs:
     Value: !Ref VPC
     Export:
       Name: !Sub ${AWS::StackName}:VpcId
+
+  Ipv6CidrBlock:
+    Description: Ipv6 CIDR Range of the VPC
+    Value: !Select [0, !GetAtt VPC.Ipv6CidrBlocks]
+    Export:
+      Name: !Sub ${AWS::StackName}:Ipv6CidrBlock
 
   SubnetIds:
     Description: Comma-delimited list of Subnet Ids

@@ -32,15 +32,30 @@ Parameters:
     Default: ""
     Description: ID of the VPC to peer to in dev
 
+  DevIpv6Cidr:
+    Type: String
+    Default: ""
+    Description: Dev Ipv6 CIDR Block
+
   ProdVpcId:
     Type: String
     Default: ""
     Description: ID of the VPC to peer to in prod
 
+  ProdIpv6Cidr:
+    Type: String
+    Default: ""
+    Description: Prod Ipv6 CIDR Block
+
   OssVpcId:
     Type: String
     Default: ""
     Description: ID of the VPC to peer to in oss
+
+  OssIpv6Cidr:
+    Type: String
+    Default: ""
+    Description: OSS Ipv6 CIDR Block
 
   Version:
     Type: String
@@ -80,13 +95,20 @@ Resources:
       PeerRoleArn: !ImportValue cfn-metadata:OssAgentRoleArn
       PeerVpcId: !Ref OssVpcId
       VpcId: !ImportValue cfn-utilities:VpcId
-      
 
   OssPeeringRoute:
     Type: AWS::EC2::Route
     Condition: SetupOssAccount
     Properties:
       DestinationCidrBlock: 10.4.0.0/16
+      RouteTableId: !ImportValue cfn-utilities:RouteTableId
+      VpcPeeringConnectionId: !Ref OssPeeringConnection
+
+  OssPeeringRoutev6:
+    Type: AWS::EC2::Route
+    Condition: SetupOssAccount
+    Properties:
+      DestinationCidrBlock: !Ref OssIpv6Cidr
       RouteTableId: !ImportValue cfn-utilities:RouteTableId
       VpcPeeringConnectionId: !Ref OssPeeringConnection
 
@@ -104,6 +126,14 @@ Resources:
     Condition: SetupDevAccount
     Properties:
       DestinationCidrBlock: 10.2.0.0/16
+      RouteTableId: !ImportValue cfn-utilities:RouteTableId
+      VpcPeeringConnectionId: !Ref DevPeeringConnection
+
+  DevPeeringRoutev6:
+    Type: AWS::EC2::Route
+    Condition: SetupDevAccount
+    Properties:
+      DestinationCidrBlock: !Ref DevIpv6Cidr
       RouteTableId: !ImportValue cfn-utilities:RouteTableId
       VpcPeeringConnectionId: !Ref DevPeeringConnection
 
@@ -127,6 +157,14 @@ Resources:
     Condition: SetupProdAccount
     Properties:
       DestinationCidrBlock: 10.3.0.0/16
+      RouteTableId: !ImportValue cfn-utilities:RouteTableId
+      VpcPeeringConnectionId: !Ref ProdPeeringConnection
+
+  ProdPeeringRoutev6:
+    Type: AWS::EC2::Route
+    Condition: SetupProdAccount
+    Properties:
+      DestinationCidrBlock: !Ref ProdIpv6Cidr
       RouteTableId: !ImportValue cfn-utilities:RouteTableId
       VpcPeeringConnectionId: !Ref ProdPeeringConnection
 
