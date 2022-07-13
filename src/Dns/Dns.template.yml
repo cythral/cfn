@@ -63,8 +63,6 @@ Resources:
             Principal:
               Service: dnssec-route53.amazonaws.com
             Condition:
-              StringEquals:
-                aws:SourceAccount: !Ref AWS::AccountId
               Bool:
                 kms:GrantIsForAWSResource: true
           - Effect: Allow
@@ -75,9 +73,6 @@ Resources:
             Resource: "*"
             Principal:
               Service: dnssec-route53.amazonaws.com
-            Condition:
-              StringEquals:
-                aws:SourceAccount: !Ref AWS::AccountId
 
   DnsSecKeySigningKey:
     Type: AWS::Route53::KeySigningKey
