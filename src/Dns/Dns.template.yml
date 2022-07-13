@@ -47,7 +47,6 @@ Resources:
   DnsSecKmsKey:
     Type: AWS::KMS::Key
     Properties:
-      EnableKeyRotation: true
       KeySpec: RSA_4096
       KeyUsage: SIGN_VERIFY
       KeyPolicy:
