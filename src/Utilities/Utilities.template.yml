@@ -375,6 +375,7 @@ Resources:
 
   DatabaseSecurityGroupMasterAccountIngress:
     Type: AWS::EC2::SecurityGroupIngress
+    Condition: IsAgentAccount
     Properties:
       GroupId: !GetAtt DatabaseSecurityGroup.GroupId
       IpProtocol: tcp
@@ -384,6 +385,7 @@ Resources:
 
   DatabaseSecurityGroupMasterAccountIngressv6:
     Type: AWS::EC2::SecurityGroupIngress
+    Condition: IsAgentAccount
     Properties:
       GroupId: !GetAtt DatabaseSecurityGroup.GroupId
       IpProtocol: tcp
