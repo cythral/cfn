@@ -47,7 +47,7 @@ Resources:
   DnsSec:
     Type: AWS::Route53::DNSSEC
     Properties:
-      HostedZoneId: !Ref PrimaryHostedZone
+      HostedZoneId: !Select [1, !Split ["/", !Ref PrimaryHostedZone]]
 
   MoragRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
