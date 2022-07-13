@@ -82,7 +82,7 @@ Resources:
       Name: brighid
       Status: ACTIVE
       HostedZoneId: !Select [2, !Split ["/", !Ref PrimaryHostedZone]]
-      KeyManagementServiceArn: !Ref DnsSecKmsKey
+      KeyManagementServiceArn: !GetAtt DnsSecKmsKey.Arn
 
   MoragRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
