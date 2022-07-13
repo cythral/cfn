@@ -44,6 +44,11 @@ Resources:
       HostedZoneConfig:
         Comment: The hosted zone for brigh.id
 
+  DnsSec:
+    Type: AWS::Route53::DNSSEC
+    Properties:
+      HostedZoneId: !Ref PrimaryHostedZone
+
   MoragRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
     Properties:
