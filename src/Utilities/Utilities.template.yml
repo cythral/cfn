@@ -367,14 +367,29 @@ Resources:
           FromPort: 3306
           ToPort: 3306
           CidrIp: !Ref NetworkCidr
-        - !If
-          - IsMasterAccount
-          - !Ref AWS::NoValue
-          - IpProtocol: tcp
-            FromPort: 3306
-            ToPort: 3306
-            CidrIp: 10.1.0.0/16
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIpv6: !Select [0, !GetAtt VPC.Ipv6CidrBlocks]
       VpcId: !Ref VPC
+
+  DatabaseSecurityGroupMasterAccountIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !GetAtt DatabaseSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 3306
+      ToPort: 3306
+      CidrIp: 10.1.0.0/16
+
+  DatabaseSecurityGroupMasterAccountIngressv6:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !GetAtt DatabaseSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 3306
+      ToPort: 3306
+      CidrIpv6: !Ref MasterAccountv6Cidr
 
   # Private Networking
   # -------------------------------------------
