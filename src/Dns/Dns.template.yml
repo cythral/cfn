@@ -84,6 +84,11 @@ Resources:
       HostedZoneId: !Select [2, !Split ["/", !Ref PrimaryHostedZone]]
       KeyManagementServiceArn: !GetAtt DnsSecKmsKey.Arn
 
+  DnsSec:
+    Type: AWS::Route53::DNSSEC
+    Properties:
+      HostedZoneId: !Select [2, !Split ["/", !Ref PrimaryHostedZone]]
+
   MoragRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
     Properties:
