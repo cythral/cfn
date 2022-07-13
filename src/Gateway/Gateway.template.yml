@@ -326,6 +326,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       TargetType: ip
+      IpAddressType: ipv6
       VpcId: !ImportValue cfn-utilities:VpcId
       HealthCheckPath: /ready
       HealthCheckPort: 9901
