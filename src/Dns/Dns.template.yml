@@ -47,7 +47,7 @@ Resources:
   DnsSecKmsKey:
     Type: AWS::KMS::Key
     Properties:
-      KeySpec: RSA_4096
+      KeySpec: ECC_NIST_P256
       KeyUsage: SIGN_VERIFY
       KeyPolicy:
         Version: 2012-10-17
@@ -57,6 +57,27 @@ Resources:
             Resource: "*"
             Principal:
               AWS: !Ref AWS::AccountId
+          - Effect: Allow
+            Action: kms:CreateGrant
+            Resource: "*"
+            Principal:
+              Service: dnssec-route53.amazonaws.com
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              Bool:
+                kms:GrantIsForAWSResource: true
+          - Effect: Allow
+            Action:
+              - kms:DescribeKey
+              - kms:GetPublicKey
+              - kms:Sign
+            Resource: "*"
+            Principal:
+              Service: dnssec-route53.amazonaws.com
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
 
   DnsSecKeySigningKey:
     Type: AWS::Route53::KeySigningKey
