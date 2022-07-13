@@ -203,7 +203,7 @@ Resources:
     Properties:
       ClusterName: brighid
 
-  EnvoyService:
+  GatewayService:
     Type: AWS::ECS::Service
     DependsOn:
       - HttpsListener
@@ -281,7 +281,7 @@ Resources:
     Properties:
       MinCapacity: 1
       MaxCapacity: 5
-      ResourceId: !Sub service/${Cluster}/${EnvoyService.Name}
+      ResourceId: !Sub service/${Cluster}/${GatewayService.Name}
       ScalableDimension: ecs:service:DesiredCount
       RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/AWSServiceRoleForApplicationAutoScaling_ECSService
       ServiceNamespace: ecs
@@ -293,7 +293,7 @@ Resources:
     Properties:
       PolicyName: EnvoyServiceAutoScaling
       PolicyType: TargetTrackingScaling
-      ResourceId: !Sub service/${Cluster}/${EnvoyService.Name}
+      ResourceId: !Sub service/${Cluster}/${GatewayService.Name}
       ScalableDimension: ecs:service:DesiredCount
       ServiceNamespace: ecs
       TargetTrackingScalingPolicyConfiguration:
