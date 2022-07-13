@@ -44,10 +44,28 @@ Resources:
       HostedZoneConfig:
         Comment: The hosted zone for brigh.id
 
-  DnsSec:
-    Type: AWS::Route53::DNSSEC
+  DnsSecKmsKey:
+    Type: AWS::KMS::Key
     Properties:
-      HostedZoneId: !Select [1, !Split ["/", !Ref PrimaryHostedZone]]
+      EnableKeyRotation: true
+      KeySpec: RSA_4096
+      KeyUsage: SIGN_VERIFY
+      KeyPolicy:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: kms:*
+            Resource: "*"
+            Principal:
+              AWS: !Ref AWS::AccountId
+
+  DnsSecKeySigningKey:
+    Type: AWS::Route53::KeySigningKey
+    Properties:
+      Name: brighid
+      Status: ACTIVE
+      HostedZoneId: !Ref PrimaryHostedZone
+      KeyManagementServiceArn: !Ref DnsSecKmsKey
 
   MoragRecordSetGroup:
     Type: AWS::Route53::RecordSetGroup
