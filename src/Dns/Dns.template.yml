@@ -47,6 +47,8 @@ Resources:
   DnsSecKmsKey:
     Type: AWS::KMS::Key
     Properties:
+      Enabled: true
+      EnableKeyRotation: false
       KeySpec: ECC_NIST_P256
       KeyUsage: SIGN_VERIFY
       KeyPolicy:
