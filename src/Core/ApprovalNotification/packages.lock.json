@@ -22,9 +22,9 @@
       },
       "Brighid.Identity.Client": {
         "type": "Direct",
-        "requested": "[0.6.3, )",
-        "resolved": "0.6.3",
-        "contentHash": "fL181rgJdBL5ZS7iiL7aDVWvQGWBK0AgI60kPM7AdVYcAr7yJD6IOeY+DyRy4/VcZveDea9lvwetEsiuhXLaTA==",
+        "requested": "[0.6.4.6, )",
+        "resolved": "0.6.4.6",
+        "contentHash": "1NA69E5r+FTheoRBEdt3mSxSe0rISygAEklt5cyJIMewtsvC+ZCulZJDih522lVI9j5/+/YtSALXrsMBIWONSw==",
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "6.0.1",
           "Microsoft.Extensions.Configuration": "6.0.1",
