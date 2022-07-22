@@ -80,7 +80,8 @@
           "RoleArn": "${SharedRoleArn}",
           "Token.$": "$$.Task.Token",
           "Capabilities": [
-            "CAPABILITY_NAMED_IAM"
+            "CAPABILITY_NAMED_IAM",
+            "CAPABILITY_AUTO_EXPAND"
           ],
           "EnvironmentName": "shared",
           "CommitInfo": {
@@ -113,7 +114,8 @@
             "PeeringConnectionId.$": "$.NetworkingConfig.DevPeeringConnectionId"
           },
           "Capabilities": [
-            "CAPABILITY_NAMED_IAM"
+            "CAPABILITY_NAMED_IAM",
+            "CAPABILITY_AUTO_EXPAND"
           ],
           "EnvironmentName": "dev",
           "CommitInfo": {
@@ -146,7 +148,8 @@
             "PeeringConnectionId.$": "$.NetworkingConfig.ProdPeeringConnectionId"
           },
           "Capabilities": [
-            "CAPABILITY_NAMED_IAM"
+            "CAPABILITY_NAMED_IAM",
+            "CAPABILITY_AUTO_EXPAND"
           ],
           "EnvironmentName": "prod",
           "CommitInfo": {
@@ -179,7 +182,8 @@
             "PeeringConnectionId.$": "$.NetworkingConfig.OssPeeringConnectionId"
           },
           "Capabilities": [
-            "CAPABILITY_NAMED_IAM"
+            "CAPABILITY_NAMED_IAM",
+            "CAPABILITY_AUTO_EXPAND"
           ],
           "EnvironmentName": "oss",
           "CommitInfo": {
