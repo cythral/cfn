@@ -169,7 +169,7 @@ Resources:
     Properties:
       CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
       Ipv6CidrBlock:
-        !Select [0, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
+        !Select [0, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 8, 69]]
       AvailabilityZone: !Select [0, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
@@ -187,7 +187,7 @@ Resources:
     Properties:
       CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
       Ipv6CidrBlock:
-        !Select [1, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
+        !Select [1, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 8, 69]]
       AvailabilityZone: !Select [1, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
@@ -205,7 +205,7 @@ Resources:
     Properties:
       CidrBlock: !Select [2, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
       Ipv6CidrBlock:
-        !Select [2, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
+        !Select [2, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 8, 69]]
       AvailabilityZone: !Select [2, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
@@ -223,7 +223,7 @@ Resources:
     Properties:
       CidrBlock: !Select [3, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
       Ipv6CidrBlock:
-        !Select [3, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 4, 64]]
+        !Select [3, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 8, 69]]
       AvailabilityZone: !Select [3, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
@@ -514,6 +514,9 @@ Resources:
     DependsOn: PrivateVpcCidr
     Properties:
       CidrBlock: !Select [0, !Cidr [!Ref PrivateNetworkCidr, 4, 14]]
+      Ipv6CidrBlock:
+        !Select [4, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 8, 69]]
+      AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Select [0, !GetAZs us-east-1]
       VpcId: !Ref VPC
 
@@ -528,6 +531,9 @@ Resources:
     DependsOn: PrivateVpcCidr
     Properties:
       CidrBlock: !Select [1, !Cidr [!Ref PrivateNetworkCidr, 4, 14]]
+      Ipv6CidrBlock:
+        !Select [5, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 8, 69]]
+      AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Select [1, !GetAZs us-east-1]
       VpcId: !Ref VPC
 
@@ -542,6 +548,9 @@ Resources:
     DependsOn: PrivateVpcCidr
     Properties:
       CidrBlock: !Select [2, !Cidr [!Ref PrivateNetworkCidr, 4, 14]]
+      Ipv6CidrBlock:
+        !Select [6, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 8, 69]]
+      AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Select [2, !GetAZs us-east-1]
       VpcId: !Ref VPC
 
@@ -556,6 +565,9 @@ Resources:
     DependsOn: PrivateVpcCidr
     Properties:
       CidrBlock: !Select [3, !Cidr [!Ref PrivateNetworkCidr, 4, 14]]
+      Ipv6CidrBlock:
+        !Select [7, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 8, 69]]
+      AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Select [3, !GetAZs us-east-1]
       VpcId: !Ref VPC
 
