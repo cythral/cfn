@@ -235,6 +235,12 @@ Resources:
       RouteTableId: !Ref RouteTable
       SubnetId: !Ref Subnet4
 
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Lambda security group
+      VpcId: !Ref VPC
+
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -961,6 +967,12 @@ Outputs:
     Value: !GetAtt VPC.DefaultSecurityGroup
     Export:
       Name: !Sub ${AWS::StackName}:DefaultSecurityGroupId
+
+  LambdaSecurityGroupId:
+    Description: Lambda security group ID
+    Value: !GetAtt LambdaSecurityGroup.GroupId
+    Export:
+      Name: !Sub ${AWS::StackName}:LambdaSecurityGroupId
 
   WebSecurityGroupId:
     Description: Group ID for the public-web security group
