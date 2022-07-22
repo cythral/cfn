@@ -1,4 +1,5 @@
 Description: Misc tools for storage and simple networking
+Transform: AWS::Serverless-2016-10-31
 Parameters:
   MasterAccountId:
     Type: String
@@ -235,12 +236,6 @@ Resources:
       RouteTableId: !Ref RouteTable
       SubnetId: !Ref Subnet4
 
-  LambdaSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Lambda security group
-      VpcId: !Ref VPC
-
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -250,6 +245,26 @@ Resources:
         - !Ref Subnet2
         - !Ref Subnet3
         - !Ref Subnet4
+
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Lambda security group
+      VpcId: !Ref VPC
+
+  LambdaNetworkingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageUri: public.ecr.aws/lambda/nodejs:latest
+      VpcConfig:
+        SecurityGroupIds:
+          - !GetAtt LambdaSecurityGroup.GroupId
+        SubnetIds:
+          - !Ref Subnet1
+          - !Ref Subnet2
+          - !Ref Subnet3
+          - !Ref Subnet4
 
   WebSecurityGroup:
     Type: AWS::EC2::SecurityGroup
