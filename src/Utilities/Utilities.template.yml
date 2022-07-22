@@ -431,7 +431,7 @@ Resources:
     Properties:
       LaunchTemplateData:
         InstanceType: t4g.nano
-        ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2022-ami-kernel-5.15-arm64}}"
+        ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-arm64-gp2}}"
         NetworkInterfaces:
           - DeviceIndex: "0"
             SubnetId: !Ref Subnet1
@@ -440,8 +440,18 @@ Resources:
         IamInstanceProfile:
           Name: !Ref NatInstanceProfile
         UserData:
-          Fn::Base64: |
+          Fn::Base64: !Sub |
             #!/bin/bash -xe
+
+            function signal() {
+              /opt/aws/bin/cfn-signal \
+                --exit-code $1 \
+                --region ${AWS::Region} \
+                --stack ${AWS::StackName} \
+                --resource NatInstance
+            }
+
+            trap 'signal $?' exit
             sysctl -w net.ipv4.ip_forward=1
             /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
         TagSpecifications:
@@ -456,6 +466,9 @@ Resources:
 
   NatInstance:
     Type: AWS::EC2::Instance
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT5M
     Properties:
       SourceDestCheck: false
       LaunchTemplate:
