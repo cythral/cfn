@@ -431,7 +431,7 @@ Resources:
     Properties:
       LaunchTemplateData:
         InstanceType: t4g.nano
-        ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2022-ami-kernel-5.15-arm64:latest}}"
+        ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2022-ami-kernel-5.15-arm64}}"
         NetworkInterfaces:
           - DeviceIndex: "0"
             SubnetId: !Ref Subnet1
