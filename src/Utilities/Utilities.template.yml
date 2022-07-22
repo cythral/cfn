@@ -428,6 +428,16 @@ Resources:
 
   NatInstanceTemplate:
     Type: AWS::EC2::LaunchTemplate
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          files:
+            /etc/sysctl.d/100-custom.conf:
+              group: root
+              owner: root
+              mode: "000644"
+              content: |
+                net.ipv4.ip_forward=1
     Properties:
       LaunchTemplateData:
         InstanceType: t4g.nano
@@ -452,7 +462,12 @@ Resources:
             }
 
             trap 'signal $?' exit
-            sysctl -w net.ipv4.ip_forward=1
+            /opt/aws/bin/cfn-init -v \
+              --stack ${AWS::StackName} \
+              --region ${AWS::Region} \
+              --resource NatInstanceTemplate
+
+            sysctl -p /etc/sysctl.d/100-custom.conf
             /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
         TagSpecifications:
           - ResourceType: instance
