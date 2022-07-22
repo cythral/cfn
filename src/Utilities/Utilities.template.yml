@@ -255,8 +255,12 @@ Resources:
   LambdaNetworkingFunction:
     Type: AWS::Serverless::Function
     Properties:
-      PackageType: Image
-      ImageUri: public.ecr.aws/lambda/nodejs:latest
+      Runtime: nodejs16.x
+      Handler: index.handler
+      InlineCode: |
+        exports.handler = function(event, context) {
+          return "OK"
+        }
       VpcConfig:
         SecurityGroupIds:
           - !GetAtt LambdaSecurityGroup.GroupId
