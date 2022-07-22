@@ -396,14 +396,6 @@ Resources:
   # Private Networking
   # -------------------------------------------
 
-  NatNetworkInterface:
-    Type: AWS::EC2::NetworkInterface
-    Properties:
-      SourceDestCheck: false
-      SubnetId: !Ref Subnet1
-      GroupSet:
-        - !Ref NatSecurityGroup
-
   NatSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -415,23 +407,60 @@ Resources:
           ToPort: -1
           CidrIp: !Ref PrivateNetworkCidr
 
+  NatInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: ec2.amazonaws.com
+
+  NatInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref NatInstanceRole
+
+  NatInstanceTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        InstanceType: t4g.nano
+        ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2022-ami-kernel-5.15-arm64:latest}}"
+        NetworkInterfaces:
+          - DeviceIndex: "0"
+            SubnetId: !Ref Subnet1
+            Groups:
+              - !GetAtt NatSecurityGroup.GroupId
+        IamInstanceProfile:
+          Name: !Ref NatInstanceProfile
+        UserData:
+          Fn::Base64: |
+            #!/bin/bash -xe
+            sysctl -w net.ipv4.ip_forward=1
+            /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: nat-instance
+          - ResourceType: volume
+            Tags:
+              - Key: instance:name
+                Value: nat-instance
+
   NatInstance:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: t4g.nano
       SourceDestCheck: false
-      ImageId: ami-008a8487adc2b32ec
-      NetworkInterfaces:
-        - DeviceIndex: "0"
-          NetworkInterfaceId: !Ref NatNetworkInterface
-      Tags:
-        - Key: Name
-          Value: nat-instance
-      UserData:
-        Fn::Base64: |
-          #!/bin/bash -xe
-          sysctl -w net.ipv4.ip_forward=1
-          /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+      LaunchTemplate:
+        LaunchTemplateId: !Ref NatInstanceTemplate
+        Version: !GetAtt NatInstanceTemplate.LatestVersionNumber
 
   PrivateVpcCidr:
     Type: AWS::EC2::VPCCidrBlock
@@ -450,7 +479,7 @@ Resources:
     Properties:
       RouteTableId: !Ref PrivateRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      NetworkInterfaceId: !Ref NatNetworkInterface
+      InstanceId: !Ref NatInstance
 
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
