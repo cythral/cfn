@@ -418,88 +418,6 @@ Resources:
       ToPort: 3306
       CidrIpv6: !Ref MasterAccountv6Cidr
 
-  # Private Networking
-  # -------------------------------------------
-
-  PrivateVpcCidr:
-    Type: AWS::EC2::VPCCidrBlock
-    Properties:
-      CidrBlock: !Ref PrivateNetworkCidr
-      VpcId: !Ref VPC
-
-  PrivateRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-
-  PrivateSubnet1:
-    Type: AWS::EC2::Subnet
-    DependsOn: PrivateVpcCidr
-    Properties:
-      CidrBlock: !Select [0, !Cidr [!Ref PrivateNetworkCidr, 4, 14]]
-      Ipv6CidrBlock:
-        !Select [4, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 8, 64]]
-      AssignIpv6AddressOnCreation: true
-      AvailabilityZone: !Select [0, !GetAZs us-east-1]
-      VpcId: !Ref VPC
-
-  PrivateSubnet1RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable
-      SubnetId: !Ref PrivateSubnet1
-
-  PrivateSubnet2:
-    Type: AWS::EC2::Subnet
-    DependsOn: PrivateVpcCidr
-    Properties:
-      CidrBlock: !Select [1, !Cidr [!Ref PrivateNetworkCidr, 4, 14]]
-      Ipv6CidrBlock:
-        !Select [5, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 8, 64]]
-      AssignIpv6AddressOnCreation: true
-      AvailabilityZone: !Select [1, !GetAZs us-east-1]
-      VpcId: !Ref VPC
-
-  PrivateSubnet2RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable
-      SubnetId: !Ref PrivateSubnet2
-
-  PrivateSubnet3:
-    Type: AWS::EC2::Subnet
-    DependsOn: PrivateVpcCidr
-    Properties:
-      CidrBlock: !Select [2, !Cidr [!Ref PrivateNetworkCidr, 4, 14]]
-      Ipv6CidrBlock:
-        !Select [6, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 8, 64]]
-      AssignIpv6AddressOnCreation: true
-      AvailabilityZone: !Select [2, !GetAZs us-east-1]
-      VpcId: !Ref VPC
-
-  PrivateSubnet3RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable
-      SubnetId: !Ref PrivateSubnet3
-
-  PrivateSubnet4:
-    Type: AWS::EC2::Subnet
-    DependsOn: PrivateVpcCidr
-    Properties:
-      CidrBlock: !Select [3, !Cidr [!Ref PrivateNetworkCidr, 4, 14]]
-      Ipv6CidrBlock:
-        !Select [7, !Cidr [!Select [0, !GetAtt VPC.Ipv6CidrBlocks], 8, 64]]
-      AssignIpv6AddressOnCreation: true
-      AvailabilityZone: !Select [3, !GetAZs us-east-1]
-      VpcId: !Ref VPC
-
-  PrivateSubnet4RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable
-      SubnetId: !Ref PrivateSubnet4
-
   # Security - Roles, Policies & Identity Providers
   # -------------------------------------------
 
@@ -861,17 +779,6 @@ Outputs:
         - !Ref Subnet4
     Export:
       Name: !Sub ${AWS::StackName}:SubnetIds
-
-  PrivateSubnetIds:
-    Description: Comma-delimited list of Private Subnet Ids
-    Value: !Join
-      - ","
-      - - !Ref PrivateSubnet1
-        - !Ref PrivateSubnet2
-        - !Ref PrivateSubnet3
-        - !Ref PrivateSubnet4
-    Export:
-      Name: !Sub ${AWS::StackName}:PrivateSubnetIds
 
   DBSubnetGroupName:
     Description: Name of the db subnet group for the primary VPC
