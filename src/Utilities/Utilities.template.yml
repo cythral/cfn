@@ -421,100 +421,6 @@ Resources:
   # Private Networking
   # -------------------------------------------
 
-  NatSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security group to allow traffic to the NAT instance.
-      VpcId: !Ref VPC
-      SecurityGroupIngress:
-        - IpProtocol: -1
-          FromPort: -1
-          ToPort: -1
-          CidrIp: !Ref PrivateNetworkCidr
-
-  NatInstanceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service: ec2.amazonaws.com
-
-  NatInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Roles:
-        - !Ref NatInstanceRole
-
-  NatInstanceTemplate:
-    Type: AWS::EC2::LaunchTemplate
-    Metadata:
-      AWS::CloudFormation::Init:
-        config:
-          files:
-            /etc/sysctl.d/100-custom.conf:
-              group: root
-              owner: root
-              mode: "000644"
-              content: |
-                net.ipv4.ip_forward=1
-    Properties:
-      LaunchTemplateData:
-        InstanceType: t4g.nano
-        ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-arm64-gp2}}"
-        NetworkInterfaces:
-          - DeviceIndex: "0"
-            SubnetId: !Ref Subnet1
-            Groups:
-              - !GetAtt NatSecurityGroup.GroupId
-        IamInstanceProfile:
-          Name: !Ref NatInstanceProfile
-        UserData:
-          Fn::Base64: !Sub |
-            #!/bin/bash -xe
-
-            function signal() {
-              /opt/aws/bin/cfn-signal \
-                --exit-code $1 \
-                --region ${AWS::Region} \
-                --stack ${AWS::StackName} \
-                --resource NatInstance
-            }
-
-            trap 'signal $?' exit
-            /opt/aws/bin/cfn-init -v \
-              --stack ${AWS::StackName} \
-              --region ${AWS::Region} \
-              --resource NatInstanceTemplate
-
-            sysctl -p /etc/sysctl.d/100-custom.conf
-            /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-        TagSpecifications:
-          - ResourceType: instance
-            Tags:
-              - Key: Name
-                Value: nat-instance
-          - ResourceType: volume
-            Tags:
-              - Key: instance:name
-                Value: nat-instance
-
-  NatInstance:
-    Type: AWS::EC2::Instance
-    CreationPolicy:
-      ResourceSignal:
-        Timeout: PT5M
-    Properties:
-      SourceDestCheck: false
-      LaunchTemplate:
-        LaunchTemplateId: !Ref NatInstanceTemplate
-        Version: !GetAtt NatInstanceTemplate.LatestVersionNumber
-
   PrivateVpcCidr:
     Type: AWS::EC2::VPCCidrBlock
     Properties:
@@ -525,14 +431,6 @@ Resources:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
-
-  PrivateNatRoute:
-    Type: AWS::EC2::Route
-    DependsOn: InternetGatewayAttachment
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      InstanceId: !Ref NatInstance
 
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
