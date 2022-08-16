@@ -12,11 +12,11 @@
     <PackageReference Include="Lambdajection.Layer" Version="0.10.0-beta1" />
     <PackageReference Include="Lambdajection.Encryption" Version="0.10.0-beta1" />
     <PackageReference Include="Lambdajection.Sns" Version="0.10.0-beta1" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.9.39" />
-    <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.11.15" />
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.185" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.7.2.89" />
-    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.192" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.9.40" />
+    <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.11.16" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.186" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.2.90" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.193" />
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
   </ItemGroup>
 </Project>
