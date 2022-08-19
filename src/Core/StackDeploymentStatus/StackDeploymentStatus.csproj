@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lambdajection" Version="0.10.0-beta1" />
-    <PackageReference Include="Lambdajection.Runtime" Version="0.10.0-beta1" />
-    <PackageReference Include="Lambdajection.Layer" Version="0.10.0-beta1" />
-    <PackageReference Include="Lambdajection.Encryption" Version="0.10.0-beta1" />
-    <PackageReference Include="Lambdajection.Sns" Version="0.10.0-beta1" />
+    <PackageReference Include="Lambdajection" Version="0.10.0-beta2" />
+    <PackageReference Include="Lambdajection.Runtime" Version="0.10.0-beta2" />
+    <PackageReference Include="Lambdajection.Layer" Version="0.10.0-beta2" />
+    <PackageReference Include="Lambdajection.Encryption" Version="0.10.0-beta2" />
+    <PackageReference Include="Lambdajection.Sns" Version="0.10.0-beta2" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.9.40" />
     <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.11.16" />
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.186" />

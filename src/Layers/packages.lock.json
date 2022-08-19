@@ -4,15 +4,15 @@
     "net6.0": {
       "Lambdajection": {
         "type": "Direct",
-        "requested": "[0.10.0-beta1, )",
-        "resolved": "0.10.0-beta1",
-        "contentHash": "4UMHpDgDf2Zqb/x8JJm+5SnnN+agVBBJDQpsJVHoOAzkTC7HAvSTgOKCnN4VM8jeMSUeDrs6OZ+8nWDbZOn0KQ==",
+        "requested": "[0.10.0-beta2, )",
+        "resolved": "0.10.0-beta2",
+        "contentHash": "uD7d/WmanbRB6J7y7yFq+E/sWmt5BudbZiSx5sTEtI2WNDeU+M6Uk6HTJHRPvn3HJC8Nuaw6hSo0vVe8TwPyqw==",
         "dependencies": {
-          "Lambdajection.Attributes": "0.10.0-beta1",
-          "Lambdajection.Core": "0.10.0-beta1",
-          "Lambdajection.Framework": "0.10.0-beta1",
-          "Lambdajection.Framework.BuildTime": "0.10.0-beta1",
-          "Lambdajection.Generator": "0.10.0-beta1"
+          "Lambdajection.Attributes": "0.10.0-beta2",
+          "Lambdajection.Core": "0.10.0-beta2",
+          "Lambdajection.Framework": "0.10.0-beta2",
+          "Lambdajection.Framework.BuildTime": "0.10.0-beta2",
+          "Lambdajection.Generator": "0.10.0-beta2"
         }
       },
       "Amazon.Lambda.Core": {
@@ -30,17 +30,17 @@
       },
       "Lambdajection.Attributes": {
         "type": "Transitive",
-        "resolved": "0.10.0-beta1",
-        "contentHash": "64FHmfNAggpfjWKnB3ftqXUwxOwD6jLcnppLk23j0v+a/YcwYRdXa9s5EeRqOw3P/9hE7W8s66ga98V51RC28Q=="
+        "resolved": "0.10.0-beta2",
+        "contentHash": "jpw14heldjdxbxi6wMtCOTS71O683CK3OqAGNrLIf5uEV3mfpQQGLZVn8x6teyrQ/+EyEctdEHNKTZQHZLHzzA=="
       },
       "Lambdajection.Core": {
         "type": "Transitive",
-        "resolved": "0.10.0-beta1",
-        "contentHash": "uBFNg0X309bC0SxEhRjkvmY/qUndfjLmkpW6GDmqOTZP6YapCkkbFpEMIDC+0JBoqMtdgD6Yx5OOtsY3hEbFJw==",
+        "resolved": "0.10.0-beta2",
+        "contentHash": "OOCKKKXtTn9jlclUS9/3esfppt0SlEMy+Fp1G1hsJxO1jV1dZlQqXqBV5nwzie5VqJe3jrCIDvWUJlkp7boMYQ==",
         "dependencies": {
           "Amazon.Lambda.Core": "2.1.0",
-          "Lambdajection.Attributes": "0.10.0-beta1",
-          "Lambdajection.Framework": "0.10.0-beta1",
+          "Lambdajection.Attributes": "0.10.0-beta2",
+          "Lambdajection.Framework": "0.10.0-beta2",
           "Microsoft.Extensions.Configuration": "6.0.1",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "6.0.1",
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
@@ -52,22 +52,22 @@
       },
       "Lambdajection.Framework": {
         "type": "Transitive",
-        "resolved": "0.10.0-beta1",
-        "contentHash": "nA827eJf/kApoluD7LFuzOud2XiklB3u8NTv9QQuUnhpIki5qWl2JMUKpzJ4oHt70NwdxygOcT/d4MSJWj0hiQ=="
+        "resolved": "0.10.0-beta2",
+        "contentHash": "JTlTV/9/wfHHfO8XefYC9gErDkkml7H6M2LjzxhAErrLMf5KQ66uebx0tUOczsucs8+lZI8wLb9LLEVCtKK1tQ=="
       },
       "Lambdajection.Framework.BuildTime": {
         "type": "Transitive",
-        "resolved": "0.10.0-beta1",
-        "contentHash": "EjCvo4dq8LQjdPHmWI0Fh37jDsG4P5u66CK6DBCrn82cINA7czVbi8SUjM+/vNAifd2bQTbTTPnG8bJq58k8SQ=="
+        "resolved": "0.10.0-beta2",
+        "contentHash": "vmA1GMWui13bbIyxsTFQW6AjbnPWSnGoiLngdXilnn7QauBsLKgyymdKm/paurmlqVwyLs0Xs4aAJaEGBTxuLQ=="
       },
       "Lambdajection.Generator": {
         "type": "Transitive",
-        "resolved": "0.10.0-beta1",
-        "contentHash": "fHqUrehYm0M417lFoY7O+L/bTbJqh9UqTjRYqXPw4MR53cwUajnyvr5npknlUiW6Y71LK+U1wM0IL3Wljgi88Q==",
+        "resolved": "0.10.0-beta2",
+        "contentHash": "VpH2x8pdhC7+cOC4oAayb/dpZ7bSXGM4SngKQ0wXC/355B2V2g3AhliRqP5tSHZTYVdLDgsjtKEV1CTACVF5lA==",
         "dependencies": {
-          "Lambdajection.Attributes": "0.10.0-beta1",
-          "Lambdajection.Framework": "0.10.0-beta1",
-          "Lambdajection.Framework.BuildTime": "0.10.0-beta1",
+          "Lambdajection.Attributes": "0.10.0-beta2",
+          "Lambdajection.Framework": "0.10.0-beta2",
+          "Lambdajection.Framework.BuildTime": "0.10.0-beta2",
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
           "Microsoft.CodeAnalysis": "4.1.0",
           "Microsoft.CodeAnalysis.CSharp.Workspaces": "4.1.0",
