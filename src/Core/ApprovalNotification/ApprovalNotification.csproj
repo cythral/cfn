@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.196" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.3.97" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.0.197" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.3.98" />
     <PackageReference Include="Brighid.Identity.Client" Version="0.6.4.6" />
     <PackageReference Include="Lambdajection.Runtime" Version="0.10.0-beta2" />
     <PackageReference Include="Lambdajection.Layer" Version="0.10.0-beta2" />
