@@ -4,20 +4,20 @@
     "net6.0": {
       "AWSSDK.SimpleNotificationService": {
         "type": "Direct",
-        "requested": "[3.7.4.13, )",
-        "resolved": "3.7.4.13",
-        "contentHash": "mqAW5fXSPRSoFix2PTpIImanv72V3S6yhQg4N3s6QWWHws+zZVkLOt4i7iJRgaaExrKfOu+kcpYaKW7BK3HRJw==",
+        "requested": "[3.7.4.14, )",
+        "resolved": "3.7.4.14",
+        "contentHash": "pa5x4gHa5/BsKCQYs/rR7Fz01mvso/SKFZ0Tlq8JHAvbBgdfpCEOICJss4zmJpUVkwlMDGDJgRg0qkmaOM4XZA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.13.11, 4.0.0)"
+          "AWSSDK.Core": "[3.7.13.12, 4.0.0)"
         }
       },
       "AWSSDK.StepFunctions": {
         "type": "Direct",
-        "requested": "[3.7.0.213, )",
-        "resolved": "3.7.0.213",
-        "contentHash": "EHN8QmE4+xoE4rtssbtuOyZx1e6HppXishwdTtgiZZyzKq00ebAjJtACdxywdV1EHUGDDieW9TinnZswtsfFRw==",
+        "requested": "[3.7.0.214, )",
+        "resolved": "3.7.0.214",
+        "contentHash": "TbaCBN7M0xT/tR4yMt9x1+FmqgcAn+dxR5iQcopWC4xySNcvtlDh7JhuxNFU2/yyY3hN3ehKM8cH5BMpW50k3g==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.13.11, 4.0.0)"
+          "AWSSDK.Core": "[3.7.13.12, 4.0.0)"
         }
       },
       "Brighid.Identity.Client": {
@@ -87,8 +87,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.13.11",
-        "contentHash": "lAp9roZfDR0xlmJ4Dfohdd0wJmDgguGUsgdXcuDML84fpg1vo2LzUDo9O+gaSjMST2RqsXQ9QsYZa8oe5C+BfA=="
+        "resolved": "3.7.13.12",
+        "contentHash": "d55x/zTkL7vmD3HguNziBPN1HsSHiniPR/uNH9r7R8i4PVRJP9ppXbciyHPuhWaDziU1poXx50FgyokY/Ukw9w=="
       },
       "AWSSDK.KeyManagementService": {
         "type": "Transitive",
@@ -100,18 +100,18 @@
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "3.7.9.60",
-        "contentHash": "caxL9+YChrirISH5oFfN/sUcCYH95o6UNw3Bs1iV1O0Gd50dv1TiYPnSgYjohKEQTf63qqeLJKi479+0RvbHlA==",
+        "resolved": "3.7.9.61",
+        "contentHash": "QPv31iz8kbz8sNTsfWS2bzy7MavywtlNDDIjNsRNkTNHd2R5DCiAreMTK0H15UBBD9F33divOI1cmcwW4YjGuA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.13.11, 4.0.0)"
+          "AWSSDK.Core": "[3.7.13.12, 4.0.0)"
         }
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.7.1.206",
-        "contentHash": "M1J+YnOymNiWSCUqBW9FvwI+iy7tJJSGjVsKPU14l/6UQnXNxbL0vr4H5EMjEiyqLxjHjdz2T4MKSn1UlTRVXg==",
+        "resolved": "3.7.1.207",
+        "contentHash": "WfXBaRplMjWjucqZfo3o1LdUKHCSD8hFeyF0uaAD+KJO+yOaCVbze/KBCWJdTm0Oy2ETYbbIlUSK2490c2YiTQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.13.11, 4.0.0)"
+          "AWSSDK.Core": "[3.7.13.12, 4.0.0)"
         }
       },
       "Humanizer.Core": {
@@ -1632,13 +1632,13 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "3.7.1.206"
+          "AWSSDK.SecurityToken": "3.7.1.207"
         }
       },
       "simplestorageservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.9.60",
+          "AWSSDK.S3": "3.7.9.61",
           "AwsUtils.Common": "1.0.0"
         }
       }
