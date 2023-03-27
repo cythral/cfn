@@ -184,6 +184,30 @@ Resources:
       ResourceRecords:
         - !Sub morag.${DomainName}. ${SoaContactEmail} 1 7200 900 1209600 86400
 
+  EmailIdentity:
+    Type: AWS::SES::EmailIdentity
+    Properties:
+      EmailIdentity: !Ref DomainName
+
+  DkimRecords:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      Comment: DKIM Records for brigh.id
+      HostedZoneId: !Ref PrimaryHostedZone
+      RecordSets:
+        - Name: !GetAtt EmailIdentity.DkimDNSTokenName1
+          Type: CNAME
+          ResourceRecords:
+            - !GetAtt EmailIdentity.DkimDNSTokenValue1
+        - Name: !GetAtt EmailIdentity.DkimDNSTokenName2
+          Type: CNAME
+          ResourceRecords:
+            - !GetAtt EmailIdentity.DkimDNSTokenValue2
+        - Name: !GetAtt EmailIdentity.DkimDNSTokenName3
+          Type: CNAME
+          ResourceRecords:
+            - !GetAtt EmailIdentity.DkimDNSTokenValue3
+
 Outputs:
   DelegationSetId:
     Description: ID of a reusable delegation set to use for the hosted zone
