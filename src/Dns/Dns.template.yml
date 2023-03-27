@@ -197,14 +197,17 @@ Resources:
       RecordSets:
         - Name: !GetAtt EmailIdentity.DkimDNSTokenName1
           Type: CNAME
+          TTL: 60
           ResourceRecords:
             - !GetAtt EmailIdentity.DkimDNSTokenValue1
         - Name: !GetAtt EmailIdentity.DkimDNSTokenName2
           Type: CNAME
+          TTL: 60
           ResourceRecords:
             - !GetAtt EmailIdentity.DkimDNSTokenValue2
         - Name: !GetAtt EmailIdentity.DkimDNSTokenName3
           Type: CNAME
+          TTL: 60
           ResourceRecords:
             - !GetAtt EmailIdentity.DkimDNSTokenValue3
 
