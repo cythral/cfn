@@ -115,6 +115,21 @@ Resources:
       Certificates:
         - CertificateArn: !Ref Certificate
 
+  Ipv6ListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Priority: 1
+      ListenerArn: !Ref HttpsListener
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref MeshTargetGroupv6
+      Conditions:
+        - Field: http-header
+          HttpHeaderConfig:
+            HttpHeaderName: x-use-ipv6
+            Values:
+              - "true"
+
   DevTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -208,6 +223,7 @@ Resources:
     Type: AWS::ECS::Service
     DependsOn:
       - HttpsListener
+      - Ipv6ListenerRule
     Properties:
       Cluster: !Ref Cluster
       LaunchType: FARGATE
@@ -225,6 +241,9 @@ Resources:
         - ContainerName: envoy
           ContainerPort: 80
           TargetGroupArn: !Ref MeshTargetGroup
+        - ContainerName: envoy
+          ContainerPort: 80
+          TargetGroupArn: !Ref MeshTargetGroupv6
       DesiredCount: 1
       DeploymentConfiguration:
         MinimumHealthyPercent: 1
@@ -333,6 +352,21 @@ Resources:
       Protocol: HTTP
       ProtocolVersion: HTTP2
       Port: 80
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "30"
+
+  MeshTargetGroupv6:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      TargetType: ip
+      VpcId: !ImportValue cfn-utilities:VpcId
+      HealthCheckPath: /ready
+      HealthCheckPort: 9901
+      Protocol: HTTP
+      ProtocolVersion: HTTP2
+      Port: 80
+      IpAddressType: ipv6
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: "30"
