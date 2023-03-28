@@ -118,7 +118,7 @@ Resources:
   Ipv6ListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Properties:
-      Priority: 1
+      Priority: 71
       ListenerArn: !Ref HttpsListener
       Actions:
         - Type: forward
