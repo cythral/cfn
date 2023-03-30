@@ -1530,14 +1530,14 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "3.7.101.36"
+          "AWSSDK.SecurityToken": "[3.7.101.36, )"
         }
       },
       "simplestorageservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "3.7.103.38",
-          "AwsUtils.Common": "1.0.0"
+          "AWSSDK.S3": "[3.7.103.38, )",
+          "AwsUtils.Common": "[1.0.0, )"
         }
       }
     },
