@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net7.0": {
+    "net6.0": {
       "Cythral.CloudFormation.BuildTasks": {
         "type": "Direct",
         "requested": "[0.5.4, )",

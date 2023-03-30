@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net7.0": {
+    "net6.0": {
       "Lambdajection": {
         "type": "Direct",
         "requested": "[0.10.0-beta2, )",
@@ -1559,7 +1559,7 @@
         }
       }
     },
-    "net7.0/linux-x64": {
+    "net6.0/linux-x64": {
       "Microsoft.Win32.Primitives": {
         "type": "Transitive",
         "resolved": "4.3.0",
