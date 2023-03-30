@@ -11,7 +11,6 @@ phases:
       docker: 19
 
     commands:
-      - dotnet-install.sh --channel 6.0
       - dotnet-install.sh --jsonfile global.json
       - dotnet --info
 

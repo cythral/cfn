@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net6.0": {
+    "net7.0": {
       "Amazon.Lambda.ApplicationLoadBalancerEvents": {
         "type": "Direct",
         "requested": "[2.1.0, )",
@@ -1556,7 +1556,7 @@
         }
       }
     },
-    "net6.0/linux-x64": {
+    "net7.0/linux-x64": {
       "Microsoft.Win32.Primitives": {
         "type": "Transitive",
         "resolved": "4.3.0",
