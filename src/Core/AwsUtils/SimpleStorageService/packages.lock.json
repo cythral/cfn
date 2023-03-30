@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net6.0": {
+    "net7.0": {
       "AWSSDK.S3": {
         "type": "Direct",
         "requested": "[3.7.103.38, )",
@@ -27,7 +27,7 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "3.7.101.36"
+          "AWSSDK.SecurityToken": "[3.7.101.36, )"
         }
       }
     }

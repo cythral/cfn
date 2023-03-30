@@ -9,7 +9,7 @@ phases:
   install:
     runtime-versions:
       docker: 19
-    
+
     commands:
       - dotnet-install.sh --jsonfile global.json
       - dotnet --info
