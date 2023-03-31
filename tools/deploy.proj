@@ -13,22 +13,6 @@
         <GetAccountIdCommand>aws sts get-caller-identity --query Account --output text</GetAccountIdCommand>
         <GetUtilityBucketCommand>aws cloudformation list-exports --query Exports[?Name==\`cfn-utilities:UtilityBucketName\`].Value --output text</GetUtilityBucketCommand>
     </PropertyGroup>
-
-    <Target Name="Prepare" BeforeTargets="Deploy">
-        <!-- Get Metadata -->
-        <Exec Command="$(GetAccountIdCommand) --profile dev" ConsoleToMsBuild="true">
-            <Output TaskParameter="ConsoleOutput" PropertyName="DevAccountId" />
-        </Exec>
-
-        <Exec Command="$(GetAccountIdCommand) --profile prod" ConsoleToMsBuild="true">
-            <Output TaskParameter="ConsoleOutput" PropertyName="ProdAccountId" />
-        </Exec>
-
-        <MSBuild 
-            Projects="$(SourceDirectory)/BuildTasks/BuildTasks.csproj" 
-            Targets="Publish" 
-            Properties="Configuration=$(Configuration)" />
-    </Target>
     
     <Target Name="Deploy">
         <!-- Deploy Utilities to all accounts -->
