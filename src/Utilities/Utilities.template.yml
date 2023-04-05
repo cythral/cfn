@@ -599,6 +599,22 @@ Resources:
             Principal:
               Service: ecs-tasks.amazonaws.com
 
+  EmailerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Emailer
+      ManagedPolicyArns:
+        - !Ref EmailerAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              AWS:
+                - !ImportValue cfn-metadata:DevAccountId
+                - !ImportValue cfn-metadata:ProdAccountId
+
   TunnelingAccess:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -645,6 +661,16 @@ Resources:
               - serverlessrepo:ListApplicationDependencies
               - serverlessrepo:CreateCloudFormationChangeSet
               - serverlessrepo:PutApplicationPolicy
+            Resource: "*"
+
+  EmailerAccess:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: ses:Send*
             Resource: "*"
 
   GithubOidcProvider:
