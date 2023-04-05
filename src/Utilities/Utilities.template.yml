@@ -601,6 +601,7 @@ Resources:
 
   EmailerRole:
     Type: AWS::IAM::Role
+    Condition: IsMasterAccount
     Properties:
       RoleName: Emailer
       ManagedPolicyArns:
@@ -899,6 +900,12 @@ Outputs:
     Value: !GetAtt BrokerRole.Arn
     Export:
       Name: !Sub ${AWS::StackName}:BrokerRoleArn
+
+  EmailerRoleArn:
+    Description: ARN of the emailer role
+    Value: !Sub arn:aws:iam::${MasterAccountId}:role/Emailer
+    Export:
+      Name: !Sub ${AWS::StackName}:EmailerRoleArn
 
   SecretsKeyArn:
     Description: ARN of the secrets key alias
