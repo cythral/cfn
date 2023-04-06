@@ -175,15 +175,15 @@
       },
       "Brighid.Identity.Client": {
         "type": "Transitive",
-        "resolved": "0.6.4.6",
-        "contentHash": "1NA69E5r+FTheoRBEdt3mSxSe0rISygAEklt5cyJIMewtsvC+ZCulZJDih522lVI9j5/+/YtSALXrsMBIWONSw==",
+        "resolved": "0.7.0.3",
+        "contentHash": "LIfpHyCoc0Gtoqjuhxn8jI5lIcO9dwkZOhyFzZRoKgeTpDluGCW4HTCTFJkkCrkfAa9naBhH888GGGGU/knACg==",
         "dependencies": {
-          "Microsoft.Extensions.Caching.Memory": "6.0.1",
-          "Microsoft.Extensions.Configuration": "6.0.1",
-          "Microsoft.Extensions.DependencyInjection": "6.0.0",
-          "Microsoft.Extensions.Options": "6.0.0",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "6.0.0",
-          "System.IdentityModel.Tokens.Jwt": "6.21.0"
+          "Microsoft.Extensions.Caching.Memory": "7.0.0",
+          "Microsoft.Extensions.Configuration": "7.0.0",
+          "Microsoft.Extensions.DependencyInjection": "7.0.0",
+          "Microsoft.Extensions.Options": "7.0.1",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "7.0.0",
+          "System.IdentityModel.Tokens.Jwt": "6.28.1"
         }
       },
       "Castle.Core": {
@@ -401,22 +401,22 @@
       },
       "Microsoft.Extensions.Caching.Abstractions": {
         "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "bcz5sSFJbganH0+YrfvIjJDIcKNW7TL07C4d1eTmXy/wOt52iz4LVogJb6pazs7W0+74j0YpXFErvp++Aq5Bsw==",
+        "resolved": "7.0.0",
+        "contentHash": "IeimUd0TNbhB4ded3AbgBLQv2SnsiVugDyGV1MvspQFVlA07nDC7Zul7kcwH5jWN3JiTcp/ySE83AIJo8yfKjg==",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "6.0.0"
+          "Microsoft.Extensions.Primitives": "7.0.0"
         }
       },
       "Microsoft.Extensions.Caching.Memory": {
         "type": "Transitive",
-        "resolved": "6.0.1",
-        "contentHash": "B4y+Cev05eMcjf1na0v9gza6GUtahXbtY1JCypIgx3B4Ea/KAgsWyXEmW4q6zMbmTMtKzmPVk09rvFJirvMwTg==",
+        "resolved": "7.0.0",
+        "contentHash": "xpidBs2KCE2gw1JrD0quHE72kvCaI3xFql5/Peb2GRtUuZX+dYPoK/NTdVMiM67Svym0M0Df9A3xyU0FbMQhHw==",
         "dependencies": {
-          "Microsoft.Extensions.Caching.Abstractions": "6.0.0",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "6.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
-          "Microsoft.Extensions.Options": "6.0.0",
-          "Microsoft.Extensions.Primitives": "6.0.0"
+          "Microsoft.Extensions.Caching.Abstractions": "7.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "7.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "7.0.0",
+          "Microsoft.Extensions.Options": "7.0.0",
+          "Microsoft.Extensions.Primitives": "7.0.0"
         }
       },
       "Microsoft.Extensions.Configuration": {
@@ -679,32 +679,35 @@
       },
       "Microsoft.IdentityModel.Abstractions": {
         "type": "Transitive",
-        "resolved": "6.21.0",
-        "contentHash": "XeE6LQtD719Qs2IG7HDi1TSw9LIkDbJ33xFiOBoHbApVw/8GpIBCbW+t7RwOjErUDyXZvjhZliwRkkLb8Z1uzg=="
+        "resolved": "6.28.1",
+        "contentHash": "V0uc3NCfGs/tUeOx2NrXvX6ljFC6Ifls/+P8Vzvq6JfW6XiDambu0nLUYWAew9WAKvxMzpCvM4O7vSrY+Q1lMA=="
       },
       "Microsoft.IdentityModel.JsonWebTokens": {
         "type": "Transitive",
-        "resolved": "6.21.0",
-        "contentHash": "d3h1/BaMeylKTkdP6XwRCxuOoDJZ44V9xaXr6gl5QxmpnZGdoK3bySo3OQN8ehRLJHShb94ElLUvoXyglQtgAw==",
+        "resolved": "6.28.1",
+        "contentHash": "wBNnCngOQnjIjlAIrfs2VGKSFYugt26A+b27rrlYJXEUU6wFy9QT63ELcvJ8xg+e8cc2EgSiiSI0/nU5TKnk+w==",
         "dependencies": {
-          "Microsoft.IdentityModel.Tokens": "6.21.0"
+          "Microsoft.IdentityModel.Tokens": "6.28.1",
+          "System.Text.Encoding": "4.3.0",
+          "System.Text.Encodings.Web": "4.7.2",
+          "System.Text.Json": "4.7.2"
         }
       },
       "Microsoft.IdentityModel.Logging": {
         "type": "Transitive",
-        "resolved": "6.21.0",
-        "contentHash": "tuEhHIQwvBEhMf8I50hy8FHmRSUkffDFP5EdLsSDV4qRcl2wvOPkQxYqEzWkh+ytW6sbdJGEXElGhmhDfAxAKg==",
+        "resolved": "6.28.1",
+        "contentHash": "RDCyLISPCzXZRznT/kBzpQUg9ZCMfbBTxGEURKbKg7AJj4Y/gJ3rzjpU39gPJ8S1vRyIx3X+hg6tfaxQreQJNg==",
         "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "6.21.0"
+          "Microsoft.IdentityModel.Abstractions": "6.28.1"
         }
       },
       "Microsoft.IdentityModel.Tokens": {
         "type": "Transitive",
-        "resolved": "6.21.0",
-        "contentHash": "AAEHZvZyb597a+QJSmtxH3n2P1nIJGpZ4Q89GTenknRx6T6zyfzf592yW/jA5e8EHN4tNMjjXHQaYWEq5+L05w==",
+        "resolved": "6.28.1",
+        "contentHash": "6WNq6Vo1nBgbZOibwG1eOHlrYrj81+NEEAldkGIPfdiCE8calwr0WVqJKwe2R6NcGF9W0YL0Yq3MFi8cVW+p7Q==",
         "dependencies": {
           "Microsoft.CSharp": "4.5.0",
-          "Microsoft.IdentityModel.Logging": "6.21.0",
+          "Microsoft.IdentityModel.Logging": "6.28.1",
           "System.Security.Cryptography.Cng": "4.5.0"
         }
       },
@@ -991,11 +994,11 @@
       },
       "System.IdentityModel.Tokens.Jwt": {
         "type": "Transitive",
-        "resolved": "6.21.0",
-        "contentHash": "JRD8AuypBE+2zYxT3dMJomQVsPYsCqlyZhWel3J1d5nzQokSRyTueF+Q4ID3Jcu6zSZKuzOdJ1MLTkbQsDqcvQ==",
+        "resolved": "6.28.1",
+        "contentHash": "KNUS+KRkc0hNHHAhe8IygkVEf/2JS1rkrzVH8HrdlkX/rRihSLFnRDCyJAYTuTT0EtJmhGRlFXFagWl6tlciEw==",
         "dependencies": {
-          "Microsoft.IdentityModel.JsonWebTokens": "6.21.0",
-          "Microsoft.IdentityModel.Tokens": "6.21.0"
+          "Microsoft.IdentityModel.JsonWebTokens": "6.28.1",
+          "Microsoft.IdentityModel.Tokens": "6.28.1"
         }
       },
       "System.IO": {
@@ -1389,7 +1392,7 @@
         "dependencies": {
           "AWSSDK.SimpleNotificationService": "[3.7.101.42, )",
           "AWSSDK.StepFunctions": "[3.7.102.79, )",
-          "Brighid.Identity.Client": "[0.6.4.6, )",
+          "Brighid.Identity.Client": "[0.7.0.3, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
