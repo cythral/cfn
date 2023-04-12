@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.101.44" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.101.45" />
   </ItemGroup>
 
 </Project>
