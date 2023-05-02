@@ -166,10 +166,10 @@
       },
       "AWSSDK.StepFunctions": {
         "type": "Transitive",
-        "resolved": "3.7.102.96",
-        "contentHash": "iaOkWBm6FVQcWKMIdxTxw/SqEZz+KXiwtSGCiJI22gJ/KlDcV/InNhWWz7Y7JWJGanppn0tltgRGWznt3prq3Q==",
+        "resolved": "3.7.102.97",
+        "contentHash": "nNWtr8YnRdHlCv/z6ibUCmsY8fC53ubQZadztajGQsU2CpKqGyuDdEga58pQuPOKqgPdfY/CsEC9O97HzBU2Rg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.30, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.31, 4.0.0)"
         }
       },
       "Brighid.Identity.Client": {
@@ -979,7 +979,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.SimpleNotificationService": "[3.7.101.60, )",
-          "AWSSDK.StepFunctions": "[3.7.102.96, )",
+          "AWSSDK.StepFunctions": "[3.7.102.97, )",
           "Brighid.Identity.Client": "[0.7.0.3, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
@@ -991,7 +991,7 @@
       "approvalwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.StepFunctions": "[3.7.102.96, )",
+          "AWSSDK.StepFunctions": "[3.7.102.97, )",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "[2.1.0, )",
           "AwsUtils.Common": "[1.0.0, )",
           "Lambdajection": "[0.10.0-beta3, )",
@@ -1009,7 +1009,7 @@
       "deploymentsupersession": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.StepFunctions": "[3.7.102.96, )",
+          "AWSSDK.StepFunctions": "[3.7.102.97, )",
           "Amazon.Lambda.SQSEvents": "[2.1.0, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
@@ -1042,7 +1042,7 @@
           "AWSSDK.CloudFormation": "[3.7.105.17, )",
           "AWSSDK.S3": "[3.7.104.9, )",
           "AWSSDK.SecurityToken": "[3.7.101.59, )",
-          "AWSSDK.StepFunctions": "[3.7.102.96, )",
+          "AWSSDK.StepFunctions": "[3.7.102.97, )",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "[2.1.0, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
@@ -1084,7 +1084,7 @@
           "AWSSDK.CloudFormation": "[3.7.105.17, )",
           "AWSSDK.S3": "[3.7.104.9, )",
           "AWSSDK.SecurityToken": "[3.7.101.59, )",
-          "AWSSDK.StepFunctions": "[3.7.102.96, )",
+          "AWSSDK.StepFunctions": "[3.7.102.97, )",
           "Amazon.Lambda.SQSEvents": "[2.1.0, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
@@ -1100,7 +1100,7 @@
           "AWSSDK.S3": "[3.7.104.9, )",
           "AWSSDK.SQS": "[3.7.100.124, )",
           "AWSSDK.SecurityToken": "[3.7.101.59, )",
-          "AWSSDK.StepFunctions": "[3.7.102.96, )",
+          "AWSSDK.StepFunctions": "[3.7.102.97, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
