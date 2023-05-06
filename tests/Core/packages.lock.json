@@ -158,8 +158,8 @@
       },
       "AWSSDK.SQS": {
         "type": "Transitive",
-        "resolved": "3.7.101",
-        "contentHash": "czkXsa0Z+CxbzaBUjNjwvjfsj0lk80NGC+y8rHKHJSiE+TZJYNpGx3nGT7Y30OXtuE2hVnZqSZooCmLKz9Chmg==",
+        "resolved": "3.7.102",
+        "contentHash": "x6ZcaL8GafMpZSYAq5cUuMhb3y3nj8J90WhvG5OIF3pjAnQybZo6ID4JAIW5gOBsnYPYl58rAXgl8tbvcEyJWQ==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.106.32, 4.0.0)"
         }
@@ -1098,7 +1098,7 @@
         "dependencies": {
           "AWSSDK.CloudFormation": "[3.7.105.18, )",
           "AWSSDK.S3": "[3.7.104.11, )",
-          "AWSSDK.SQS": "[3.7.101, )",
+          "AWSSDK.SQS": "[3.7.102, )",
           "AWSSDK.SecurityToken": "[3.7.101.60, )",
           "AWSSDK.StepFunctions": "[3.7.102.98, )",
           "Lambdajection": "[0.10.0-beta3, )",
