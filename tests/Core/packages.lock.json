@@ -105,23 +105,23 @@
       },
       "AWSSDK.CloudFormation": {
         "type": "Transitive",
-        "resolved": "3.7.105.25",
-        "contentHash": "yUoKoVmRF3CQEIeH6Ge1y3uEOIWrwQ7ij3yjWvjga6sGeqtq8deT/rX2/N26LJm1xip9PAa7xnbisJ3AabPjSw==",
+        "resolved": "3.7.105.26",
+        "contentHash": "x+2fgtDPf1GxLaQ5Hy2e/wnhDLb2Up7zZE/6X84ytdbYkxbzhsg0SpB5lXV84QK+bpCJs+sgX4NvX1G2ILBY8A==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.40, 4.0.0)"
         }
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.106.39",
-        "contentHash": "F8YJ6QV7+btBpqo+9DfDu2+IziCLA7yDo5sdBAiJpF4Wdd4pL4YLF3sy2if0c9XsC8b3XThdoDJJ88AboDMkyg=="
+        "resolved": "3.7.106.40",
+        "contentHash": "HfvEWQ6RKr3BDR5IDOPIExaHcXvgdhK2yUrBZWzby6uv4DS3iIGmbK2nH86pJPcyYhj0nNqo3MnMxRX9cKkIYQ=="
       },
       "AWSSDK.ECS": {
         "type": "Transitive",
-        "resolved": "3.7.108.7",
-        "contentHash": "IJt+C1MrqcElqGVJjwcOamOHzyVcbNzQ5CPko0Lw/KN+1aGAmLJjFbfiadEePdsuM2usW0/HAyzl3wd47spisg==",
+        "resolved": "3.7.108.8",
+        "contentHash": "qhDezmBBAjQl2NxvV86r9tC42r+n4bo2jTW8qYARntPBBGUP752XsePGAuJJS92iIfcSHcqcx9bjRYtbYaoTEQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.40, 4.0.0)"
         }
       },
       "AWSSDK.KeyManagementService": {
@@ -134,42 +134,42 @@
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "3.7.104.19",
-        "contentHash": "lHzqZP7Z2SqIUV5IPlpGoZ6U8Ww6uP1An3cx9z9uIkzEKso8TBc8DoZMMPUDUknHOLVP7nKpTV6r4xH441/X+g==",
+        "resolved": "3.7.104.20",
+        "contentHash": "qhhq+Q9NlVg/TEK+x09+zArI04HnwS/NJ2cxRpcA5+CXqXx0VqCbA0qmNSnnq1esvy5EJHIerudFwvasY7qZ8A==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.40, 4.0.0)"
         }
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.7.103.1",
-        "contentHash": "ui8ZTyApqoVgiCvTK8fXasoeHoMchLwDgvIApaiUNcGzQb1CWY4qBIFQwxw8Tj+0jr4b7yLbhOsvyRGOSOSKGQ==",
+        "resolved": "3.7.103.2",
+        "contentHash": "S/2bd7bHPRbinD9riUnK69E3+BCkNfmqCht1QtDQYspGi+DhoH+q1VPW7XGs2cuQMdshSp9wVMeIGDC1+arYZw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.40, 4.0.0)"
         }
       },
       "AWSSDK.SimpleNotificationService": {
         "type": "Transitive",
-        "resolved": "3.7.101.68",
-        "contentHash": "MobKTlb+u8EFmNuZgczffAcH8X5Izg1QlGtLw1DGx8hht0Wsiy7AuWkpx69Qrim3xTv0YvpiWbnpeF6f8yt5iw==",
+        "resolved": "3.7.101.69",
+        "contentHash": "5TA7tVBplrwckXvKTp3Ld5QRHeXzcPE+RFFUnUz+Ssm5Gdb7Gy+0IV4A8dQrG4ezv2q+yHUQMBK0p/g0l9W5Hg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.40, 4.0.0)"
         }
       },
       "AWSSDK.SQS": {
         "type": "Transitive",
-        "resolved": "3.7.102.7",
-        "contentHash": "N1Y2dfC/QM4eX9ayr7iZCRfETopZBhpKQEuey8PqGvGCOKvybGGjKeEEo0li4fAiuJGu6o8cpHHROqxjtsJdNg==",
+        "resolved": "3.7.102.8",
+        "contentHash": "hIr2/Amcrr+bs8WNLh8rQpD0+XlGeSIDqn9F2R9AHB/wJODgVIRmpxkhiG4lHR+715TGeXK6e8vRyIyHUXzvfQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.40, 4.0.0)"
         }
       },
       "AWSSDK.StepFunctions": {
         "type": "Transitive",
-        "resolved": "3.7.102.105",
-        "contentHash": "wgKT2//puAmlVnLpXMvp++TjF8pplDwBTqdD0Wl0vAEli09Cwlmfd2LAemzoW41lHecuzct92bQWadKjI7fi2w==",
+        "resolved": "3.7.102.106",
+        "contentHash": "uIGoSsZP2j0DIGrXVdWk4N8LmKQ7yAgte0yAzNmwVvk96t++by9SIwRinmIe8TO0G/1Ugkwi0Om8Jb995YdvkA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.40, 4.0.0)"
         }
       },
       "Brighid.Identity.Client": {
@@ -978,8 +978,8 @@
       "approvalnotification": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SimpleNotificationService": "[3.7.101.68, )",
-          "AWSSDK.StepFunctions": "[3.7.102.105, )",
+          "AWSSDK.SimpleNotificationService": "[3.7.101.69, )",
+          "AWSSDK.StepFunctions": "[3.7.102.106, )",
           "Brighid.Identity.Client": "[0.7.0.62, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
@@ -991,7 +991,7 @@
       "approvalwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.StepFunctions": "[3.7.102.105, )",
+          "AWSSDK.StepFunctions": "[3.7.102.106, )",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "[2.1.0, )",
           "AwsUtils.Common": "[1.0.0, )",
           "Lambdajection": "[0.10.0-beta3, )",
@@ -1003,13 +1003,13 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "[3.7.103.1, )"
+          "AWSSDK.SecurityToken": "[3.7.103.2, )"
         }
       },
       "deploymentsupersession": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.StepFunctions": "[3.7.102.105, )",
+          "AWSSDK.StepFunctions": "[3.7.102.106, )",
           "Amazon.Lambda.SQSEvents": "[2.1.0, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
@@ -1020,8 +1020,8 @@
       "ecsdeployment": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.ECS": "[3.7.108.7, )",
-          "AWSSDK.SecurityToken": "[3.7.103.1, )",
+          "AWSSDK.ECS": "[3.7.108.8, )",
+          "AWSSDK.SecurityToken": "[3.7.103.2, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
           "Lambdajection.Runtime": "[0.10.0-beta3, )"
@@ -1039,10 +1039,10 @@
       "githubwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "[3.7.105.25, )",
-          "AWSSDK.S3": "[3.7.104.19, )",
-          "AWSSDK.SecurityToken": "[3.7.103.1, )",
-          "AWSSDK.StepFunctions": "[3.7.102.105, )",
+          "AWSSDK.CloudFormation": "[3.7.105.26, )",
+          "AWSSDK.S3": "[3.7.104.20, )",
+          "AWSSDK.SecurityToken": "[3.7.103.2, )",
+          "AWSSDK.StepFunctions": "[3.7.102.106, )",
           "Amazon.Lambda.ApplicationLoadBalancerEvents": "[2.1.0, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
@@ -1074,17 +1074,17 @@
       "simplestorageservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "[3.7.104.19, )",
+          "AWSSDK.S3": "[3.7.104.20, )",
           "AwsUtils.Common": "[1.0.0, )"
         }
       },
       "stackdeployment": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "[3.7.105.25, )",
-          "AWSSDK.S3": "[3.7.104.19, )",
-          "AWSSDK.SecurityToken": "[3.7.103.1, )",
-          "AWSSDK.StepFunctions": "[3.7.102.105, )",
+          "AWSSDK.CloudFormation": "[3.7.105.26, )",
+          "AWSSDK.S3": "[3.7.104.20, )",
+          "AWSSDK.SecurityToken": "[3.7.103.2, )",
+          "AWSSDK.StepFunctions": "[3.7.102.106, )",
           "Amazon.Lambda.SQSEvents": "[2.1.0, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
@@ -1096,11 +1096,11 @@
       "stackdeploymentstatus": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "[3.7.105.25, )",
-          "AWSSDK.S3": "[3.7.104.19, )",
-          "AWSSDK.SQS": "[3.7.102.7, )",
-          "AWSSDK.SecurityToken": "[3.7.103.1, )",
-          "AWSSDK.StepFunctions": "[3.7.102.105, )",
+          "AWSSDK.CloudFormation": "[3.7.105.26, )",
+          "AWSSDK.S3": "[3.7.104.20, )",
+          "AWSSDK.SQS": "[3.7.102.8, )",
+          "AWSSDK.SecurityToken": "[3.7.103.2, )",
+          "AWSSDK.StepFunctions": "[3.7.102.106, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
