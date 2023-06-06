@@ -15,8 +15,8 @@
     <PackageReference Include="AWSSDK.S3" Version="3.7.104.28" />
     <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.106" />
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.103.10" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.7.102.15" />
-    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.102.113" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.102.16" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.102.114" />
     <PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
   </ItemGroup>
 </Project>
