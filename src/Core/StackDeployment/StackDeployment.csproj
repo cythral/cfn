@@ -11,7 +11,7 @@
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.103.10" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.104.28" />
     <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.106" />
-    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.102.113" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.102.114" />
     <PackageReference Include="Lambdajection.Layer" Version="0.10.0-beta3" />
     <PackageReference Include="Lambdajection.Runtime" Version="0.10.0-beta3" />
     <PackageReference Include="Lambdajection.Encryption" Version="0.10.0-beta3" />
