@@ -105,8 +105,8 @@
       },
       "AWSSDK.CloudFormation": {
         "type": "Transitive",
-        "resolved": "3.7.107.4",
-        "contentHash": "3lWm9/5YAVOmn2//ZBhDK26rwJWisdrIwR+h1dGosDwST2SPk1JRbPED0LQyrwE8M5hR/p4TXevXCinJxAP+pQ==",
+        "resolved": "3.7.108",
+        "contentHash": "IGmu9/6Lzvpk27RUwDi9s+zUX8v7W4GWl3t7qHuosTgf4WD76rdg+wOGogYpHjDjKr0LmVIACpucT4E+2iJ7eA==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.107.7, 4.0.0)"
         }
@@ -118,8 +118,8 @@
       },
       "AWSSDK.ECS": {
         "type": "Transitive",
-        "resolved": "3.7.108.21",
-        "contentHash": "WPfZuBLK4CiSvn//m0EU2tv0tcKMssQBpUXYpmLJ8Dyq9haG3HIJdkZ6qdlYlvTNi+uy3zkLuVcw6290rn2Yqg==",
+        "resolved": "3.7.108.22",
+        "contentHash": "l490W2iWs1xBRclRG9C4Z8idxPhxXZSCqLs8GToK38d0vocRl+7iK6g1glBu/8xno7GixwJnrIvru8FcLOgdEA==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.107.7, 4.0.0)"
         }
@@ -1020,7 +1020,7 @@
       "ecsdeployment": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.ECS": "[3.7.108.21, )",
+          "AWSSDK.ECS": "[3.7.108.22, )",
           "AWSSDK.SecurityToken": "[3.7.103.15, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
@@ -1039,7 +1039,7 @@
       "githubwebhook": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "[3.7.107.4, )",
+          "AWSSDK.CloudFormation": "[3.7.108, )",
           "AWSSDK.S3": "[3.7.106, )",
           "AWSSDK.SecurityToken": "[3.7.103.15, )",
           "AWSSDK.StepFunctions": "[3.7.102.119, )",
@@ -1081,7 +1081,7 @@
       "stackdeployment": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "[3.7.107.4, )",
+          "AWSSDK.CloudFormation": "[3.7.108, )",
           "AWSSDK.S3": "[3.7.106, )",
           "AWSSDK.SecurityToken": "[3.7.103.15, )",
           "AWSSDK.StepFunctions": "[3.7.102.119, )",
@@ -1096,7 +1096,7 @@
       "stackdeploymentstatus": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.CloudFormation": "[3.7.107.4, )",
+          "AWSSDK.CloudFormation": "[3.7.108, )",
           "AWSSDK.S3": "[3.7.106, )",
           "AWSSDK.SQS": "[3.7.103.4, )",
           "AWSSDK.SecurityToken": "[3.7.103.15, )",
