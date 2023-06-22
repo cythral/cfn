@@ -10,9 +10,9 @@
       },
       "AWSSDK.StepFunctions": {
         "type": "Direct",
-        "requested": "[3.7.102.120, )",
-        "resolved": "3.7.102.120",
-        "contentHash": "1Zkjr37cZqZOaLhcKWmejupqQzGwDniV4vwDkIuZqn2y+Dzs/+fIyBerHSxKfvlmvn+D3+l1Y4uLpNDVuXh8Hw==",
+        "requested": "[3.7.103, )",
+        "resolved": "3.7.103",
+        "contentHash": "87oOuWS3uWNd+NsmuSY4ZfBP0IKmSFBVrA9yG8R7UiUhGiKOcq/eGFONXS5nGFlu+mHdgXqlVfMLg0/841QA0w==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.107.8, 4.0.0)"
         }
