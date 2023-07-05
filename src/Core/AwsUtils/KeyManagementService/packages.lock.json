@@ -4,9 +4,9 @@
     "net7.0": {
       "AWSSDK.KeyManagementService": {
         "type": "Direct",
-        "requested": "[3.7.103.8, )",
-        "resolved": "3.7.103.8",
-        "contentHash": "i6YIMONX0fgeJwbueocAmSVnhoA463WqmIAjTUtmhP6GRwn1OVB15Gn8EIF6i+yMDUk349M9KzIempn9X2XIOA==",
+        "requested": "[3.7.104, )",
+        "resolved": "3.7.104",
+        "contentHash": "AWZRbTHo0L7GrgCNxZvMe2204o3AJCGYa1m+k4VRGyQ7cJJubmVhYYvNurxv2q2fXganI4nhYut89++POi6yUA==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.107.11, 4.0.0)"
         }
