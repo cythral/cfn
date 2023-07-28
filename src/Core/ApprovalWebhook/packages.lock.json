@@ -10,11 +10,11 @@
       },
       "AWSSDK.StepFunctions": {
         "type": "Direct",
-        "requested": "[3.7.200.5, )",
-        "resolved": "3.7.200.5",
-        "contentHash": "WCJh7wqCD6zrncZPkm5WYNEXtXHON+jj1e/TqC9ydfSC7wnqdLuwyimmoHEBVIFkVXknBWdRtyaFsqJtWZQkOw==",
+        "requested": "[3.7.200.6, )",
+        "resolved": "3.7.200.6",
+        "contentHash": "GByPQLhtmFc6EmAAc9lrdPForOiL4XEzGcBEXvqaOLeZFQJ0qaeBdPtwVYvDgPk/yM0Jbky4VM5WierQX+1fww==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.200.5, 4.0.0)"
+          "AWSSDK.Core": "[3.7.200.6, 4.0.0)"
         }
       },
       "Lambdajection": {
@@ -60,23 +60,23 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.200.5",
-        "contentHash": "LuNBHgs8f5VBgHxHSQelFHWrIDnEkWgMrTunVvHN7ONO9fEIwzTwspXUQGLmEk/OiMSYt36ug0IQJOJ8oGwzJA=="
+        "resolved": "3.7.200.6",
+        "contentHash": "VMVg97XHVObeMxZevEbEGxvtGU0/TWGyHZ1kOqqSngeOb44koH7i876alpxwILbIaFGA1qWAJ2UDqLBD/wKnMw=="
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "3.7.201.3",
-        "contentHash": "kSdmG2rPirww+dlR2vaMm6Nk7AlGZGQlIq2qr2iUenDW2kwk8foRkFG63ApAtw3KVIbsypx+JPjrzSsmA+wzuw==",
+        "resolved": "3.7.201.4",
+        "contentHash": "VZN5Gdm3xuU5HrZahggzo8Ek6yGOpWMVL8jdQtAKDoDXiWzhOXS6l1FCvhQ73awt32jp0AP3HnwpGTGbrvF29Q==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.200.5, 4.0.0)"
+          "AWSSDK.Core": "[3.7.200.6, 4.0.0)"
         }
       },
       "AWSSDK.SecurityToken": {
         "type": "Transitive",
-        "resolved": "3.7.201.1",
-        "contentHash": "l0msXNa/EPva4Pv/0ITvu16947dNq+7ciX70RJq6tMPUXD8PC0T0zlxNCy3/VO2IfjGlGNr+Pzgg0Pg9XQdipg==",
+        "resolved": "3.7.201.2",
+        "contentHash": "7DWMbJAF38f5UggyZFPP0jjLfxtFlygfmrXIYlKT4KueHLdnq59DwzLMNc/Jv2bW2Z5OQf8knekLuynQdG9liA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.200.5, 4.0.0)"
+          "AWSSDK.Core": "[3.7.200.6, 4.0.0)"
         }
       },
       "Humanizer.Core": {
@@ -678,13 +678,13 @@
       "awsutils.common": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.SecurityToken": "[3.7.201.1, )"
+          "AWSSDK.SecurityToken": "[3.7.201.2, )"
         }
       },
       "simplestorageservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "[3.7.201.3, )",
+          "AWSSDK.S3": "[3.7.201.4, )",
           "AwsUtils.Common": "[1.0.0, )"
         }
       }
