@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.KeyManagementService" Version="3.7.200.15" />
+    <PackageReference Include="AWSSDK.KeyManagementService" Version="3.7.200.16" />
   </ItemGroup>
 
   <ItemGroup>
