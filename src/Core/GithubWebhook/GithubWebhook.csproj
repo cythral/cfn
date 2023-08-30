@@ -9,10 +9,10 @@
 
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.ApplicationLoadBalancerEvents" Version="2.1.0" />
-    <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.203.21" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.203.2" />
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.201.23" />
-    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.200.27" />
+    <PackageReference Include="AWSSDK.CloudFormation" Version="3.7.203.22" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.203.3" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.201.24" />
+    <PackageReference Include="AWSSDK.StepFunctions" Version="3.7.200.28" />
     <PackageReference Include="Lambdajection.Runtime" Version="0.10.0-beta3" />
     <PackageReference Include="Lambdajection.Encryption" Version="0.10.0-beta3" />
     <PackageReference Include="Lambdajection" Version="0.10.0-beta3" />
