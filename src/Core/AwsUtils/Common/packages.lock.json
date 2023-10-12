@@ -4,17 +4,17 @@
     "net7.0": {
       "AWSSDK.SecurityToken": {
         "type": "Direct",
-        "requested": "[3.7.202.4, )",
-        "resolved": "3.7.202.4",
-        "contentHash": "gSUKtmGOFeGpVC6Hva6n0V4Q26XRli62ndi+H5/mjAVuGDPIRUkdH6czt2gY13/tgejOa8d4L1BSHT4khlhLvQ==",
+        "requested": "[3.7.202.5, )",
+        "resolved": "3.7.202.5",
+        "contentHash": "+k8hRL+feLuvBxh0rOnol1qoUDjvT5i7XJpV/8Z1fSFW8sib6xfiB6UPQYQrexyYQKk370jZZRkY914pCjhEFw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.204, 4.0.0)"
+          "AWSSDK.Core": "[3.7.204.1, 4.0.0)"
         }
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.204",
-        "contentHash": "lr9Ttgl7sP+8JKlAXsusDfVXOGWRGB7y14tN7zUuRP1IeXacIogFxOsfDTbecuvut/LnwYOj8J3s0h7R+oHiDw=="
+        "resolved": "3.7.204.1",
+        "contentHash": "3QE4yFkJ8DlPPp7sm+uEUjiTecGxquVKjNw3LkRFyPkMHXIJApWJZ53FzGRyBpGhkqM0mmqtRnJw0UriGGN4CA=="
       }
     }
   }
