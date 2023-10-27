@@ -91,8 +91,8 @@
       },
       "Amazon.Lambda.SQSEvents": {
         "type": "Transitive",
-        "resolved": "2.1.0",
-        "contentHash": "a1xaCIuXDleJ8iRE3vHWWhtPqUiURmoQUS68INMEQmtfHr4wTz837TQZONo4cyubv5sZj78DDrYessZEzgFRGQ=="
+        "resolved": "2.2.0",
+        "contentHash": "RyYLgEa6nh+VJrCfTDKxvTLS1+eLDIIDyHgwDY3TR1WQz1+UeDIcccOJvoDk2nmjkSA0TfWJmZX9Ld0ySf57lA=="
       },
       "AutoFixture": {
         "type": "Transitive",
@@ -1010,7 +1010,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.StepFunctions": "[3.7.200.62, )",
-          "Amazon.Lambda.SQSEvents": "[2.1.0, )",
+          "Amazon.Lambda.SQSEvents": "[2.2.0, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
           "Lambdajection.Runtime": "[0.10.0-beta3, )",
@@ -1085,7 +1085,7 @@
           "AWSSDK.S3": "[3.7.205.18, )",
           "AWSSDK.SecurityToken": "[3.7.202.13, )",
           "AWSSDK.StepFunctions": "[3.7.200.62, )",
-          "Amazon.Lambda.SQSEvents": "[2.1.0, )",
+          "Amazon.Lambda.SQSEvents": "[2.2.0, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
