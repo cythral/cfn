@@ -73,8 +73,8 @@
       },
       "Amazon.Lambda.ApplicationLoadBalancerEvents": {
         "type": "Transitive",
-        "resolved": "2.1.0",
-        "contentHash": "lxOKr4kuooqQV84YsNjgrJp7c4lcYDe+RPIMcdvpLEM6XlLzar38OoG4DeCdzsgnxy0aFQ25nzaDUnrqjIFC/A=="
+        "resolved": "2.2.0",
+        "contentHash": "UtCd9tFuVyED8+DmDKEkdXJbAb/TdHIz51R/CsJCexKerO6HGOG87FGId4Ce9IXE+qjlBGyNQsKCw9oLLNe0hw=="
       },
       "Amazon.Lambda.Core": {
         "type": "Transitive",
@@ -992,7 +992,7 @@
         "type": "Project",
         "dependencies": {
           "AWSSDK.StepFunctions": "[3.7.200.62, )",
-          "Amazon.Lambda.ApplicationLoadBalancerEvents": "[2.1.0, )",
+          "Amazon.Lambda.ApplicationLoadBalancerEvents": "[2.2.0, )",
           "AwsUtils.Common": "[1.0.0, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
@@ -1043,7 +1043,7 @@
           "AWSSDK.S3": "[3.7.205.18, )",
           "AWSSDK.SecurityToken": "[3.7.202.13, )",
           "AWSSDK.StepFunctions": "[3.7.200.62, )",
-          "Amazon.Lambda.ApplicationLoadBalancerEvents": "[2.1.0, )",
+          "Amazon.Lambda.ApplicationLoadBalancerEvents": "[2.2.0, )",
           "Lambdajection": "[0.10.0-beta3, )",
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
