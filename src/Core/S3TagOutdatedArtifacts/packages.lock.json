@@ -50,8 +50,8 @@
       },
       "AWSSDK.S3": {
         "type": "Transitive",
-        "resolved": "3.7.205.20",
-        "contentHash": "BPD1Y9GaZdS2+XQCOX3zOGidrkBK4mlfea+1kNF1rFyeypQfE6sJtdJZ+2iuq96BDOMPNsxLx8oI7EC9ZOoZiw==",
+        "resolved": "3.7.205.21",
+        "contentHash": "uy37CvVG+m3Ol0bpyd6pZI3tU/Py4DwRSdIunVzHFZaIkN1uwljytrdGj9Aft8MsXSSrm0I6rkWIyjeYLDztRw==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.204.10, 4.0.0)"
         }
@@ -669,7 +669,7 @@
       "simplestorageservice": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.S3": "[3.7.205.20, )",
+          "AWSSDK.S3": "[3.7.205.21, )",
           "AwsUtils.Common": "[1.0.0, )"
         }
       }
