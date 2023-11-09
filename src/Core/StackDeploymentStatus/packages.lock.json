@@ -4,9 +4,9 @@
     "net7.0": {
       "AWSSDK.CloudFormation": {
         "type": "Direct",
-        "requested": "[3.7.204.12, )",
-        "resolved": "3.7.204.12",
-        "contentHash": "1aIuzy9YgbQFbn0ME4ZC3u2htsvOALFtn5KqSf84leQX/2FKzQm1hod8T9+E00LTO73nFKQv4HvnXJ8tXkD4SA==",
+        "requested": "[3.7.205, )",
+        "resolved": "3.7.205",
+        "contentHash": "DknkKFbyiPscu1wdh3nWAphHoltgO2rCz7cVjdHfxtxkghg4opzyFvZeViu8FFzZa2oTzJcjHtMXno73r3zQew==",
         "dependencies": {
           "AWSSDK.Core": "[3.7.204.15, 4.0.0)"
         }
