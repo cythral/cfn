@@ -470,7 +470,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group to allow traffic to the NAT instance.
-      VpcId: !Ref VPC
+      VpcId: !Ref Ipv4InternetVpc
       SecurityGroupIngress:
         - IpProtocol: -1
           FromPort: -1
