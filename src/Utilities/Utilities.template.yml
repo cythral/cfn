@@ -441,7 +441,7 @@ Resources:
   Ipv4InternetSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
-      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
+      CidrBlock: !Select [0, !Cidr [!GetAtt Ipv4InternetVpc.CidrBlock, 4, 14]]
       AvailabilityZone: !Select [0, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
@@ -455,7 +455,7 @@ Resources:
   Ipv4InternetSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
-      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
+      CidrBlock: !Select [1, !Cidr [!GetAtt Ipv4InternetVpc.CidrBlock, 4, 14]]
       AvailabilityZone: !Select [1, !GetAZs us-east-1]
       VpcId: !Ref VPC
       MapPublicIpOnLaunch: true
