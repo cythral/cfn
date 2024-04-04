@@ -10,11 +10,6 @@ Parameters:
     Description: Cidr to use for the VPC.
     Default: 10.1.0.0/16
 
-  PrivateNetworkCidr:
-    Type: String
-    Description: Cidr to use for private networking within the VPC.
-    Default: 10.127.0.0/16
-
   # DO NOT SET THIS MANUALLY
   # This value should only be controlled by CI/CD CodePipeline.
   # Setting this adds a route to the master account's VPC
@@ -283,20 +278,12 @@ Resources:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: !Ref PrivateNetworkCidr
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
           CidrIpv6: !Select [0, !GetAtt VPC.Ipv6CidrBlocks]
         # Port 443 - HTTPS
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
           CidrIp: !Ref NetworkCidr
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: !Ref PrivateNetworkCidr
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
@@ -417,6 +404,161 @@ Resources:
       FromPort: 3306
       ToPort: 3306
       CidrIpv6: !Ref MasterAccountv6Cidr
+
+  # -------------------------------------------
+  # Ipv4 Public Networking
+  # -------------------------------------------
+
+  Ipv4InternetVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.255.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  Ipv4InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  Ipv4InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref Ipv4InternetVpc
+
+  Ipv4InternetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Ipv4InternetVpc
+
+  Ipv4InternetPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref Ipv4InternetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref Ipv4InternetGateway
+
+  Ipv4InternetSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
+      AvailabilityZone: !Select [0, !GetAZs us-east-1]
+      VpcId: !Ref VPC
+      MapPublicIpOnLaunch: true
+
+  Ipv4InternetSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref Ipv4InternetRouteTable
+      SubnetId: !Ref Ipv4InternetSubnet1
+
+  Ipv4InternetSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 4, 14]]
+      AvailabilityZone: !Select [1, !GetAZs us-east-1]
+      VpcId: !Ref VPC
+      MapPublicIpOnLaunch: true
+
+  Ipv4InternetSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref Ipv4InternetRouteTable
+      SubnetId: !Ref Ipv4InternetSubnet2
+
+  NatSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group to allow traffic to the NAT instance.
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref NetworkCidr
+
+  NatInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: ec2.amazonaws.com
+
+  NatInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref NatInstanceRole
+
+  NatInstanceTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          files:
+            /etc/sysctl.d/100-custom.conf:
+              group: root
+              owner: root
+              mode: "000644"
+              content: |
+                net.ipv4.ip_forward=1
+    Properties:
+      LaunchTemplateData:
+        InstanceType: t4g.nano
+        ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-arm64-gp2}}"
+        NetworkInterfaces:
+          - DeviceIndex: "0"
+            SubnetId: !Ref Ipv4InternetSubnet1
+            Groups:
+              - !GetAtt NatSecurityGroup.GroupId
+        IamInstanceProfile:
+          Name: !Ref NatInstanceProfile
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash -xe
+
+            function signal() {
+              /opt/aws/bin/cfn-signal \
+                --exit-code $1 \
+                --region ${AWS::Region} \
+                --stack ${AWS::StackName} \
+                --resource NatInstance
+            }
+
+            trap 'signal $?' exit
+            /opt/aws/bin/cfn-init -v \
+              --stack ${AWS::StackName} \
+              --region ${AWS::Region} \
+              --resource NatInstanceTemplate
+
+            sysctl -p /etc/sysctl.d/100-custom.conf
+            /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: nat-instance
+          - ResourceType: volume
+            Tags:
+              - Key: instance:name
+                Value: nat-instance
+
+  NatInstance:
+    Type: AWS::EC2::Instance
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT5M
+    Properties:
+      SourceDestCheck: false
+      LaunchTemplate:
+        LaunchTemplateId: !Ref NatInstanceTemplate
+        Version: !GetAtt NatInstanceTemplate.LatestVersionNumber
 
   # Security - Roles, Policies & Identity Providers
   # -------------------------------------------
