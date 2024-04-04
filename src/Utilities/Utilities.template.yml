@@ -412,7 +412,7 @@ Resources:
   Ipv4InternetVpc:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: 10.200.0.0/16
+      CidrBlock: 10.128.0.0/16
       EnableDnsSupport: true
       EnableDnsHostnames: true
 
