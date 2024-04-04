@@ -412,7 +412,7 @@ Resources:
   Ipv4InternetVpc:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: 10.128.0.0/16
+      CidrBlock: 10.255.0.0/16
       EnableDnsSupport: true
       EnableDnsHostnames: true
 
@@ -443,7 +443,7 @@ Resources:
     Properties:
       CidrBlock: !Select [0, !Cidr [!GetAtt Ipv4InternetVpc.CidrBlock, 4, 14]]
       AvailabilityZone: !Select [0, !GetAZs us-east-1]
-      VpcId: !Ref VPC
+      VpcId: !Ref Ipv4InternetVpc
       MapPublicIpOnLaunch: true
 
   Ipv4InternetSubnet1RouteTableAssociation:
@@ -457,7 +457,7 @@ Resources:
     Properties:
       CidrBlock: !Select [1, !Cidr [!GetAtt Ipv4InternetVpc.CidrBlock, 4, 14]]
       AvailabilityZone: !Select [1, !GetAZs us-east-1]
-      VpcId: !Ref VPC
+      VpcId: !Ref Ipv4InternetVpc
       MapPublicIpOnLaunch: true
 
   Ipv4InternetSubnet2RouteTableAssociation:
