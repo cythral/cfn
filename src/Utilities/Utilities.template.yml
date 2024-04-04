@@ -549,16 +549,16 @@ Resources:
               - Key: instance:name
                 Value: nat-instance
 
-  NatInstance:
-    Type: AWS::EC2::Instance
-    CreationPolicy:
-      ResourceSignal:
-        Timeout: PT5M
-    Properties:
-      SourceDestCheck: false
-      LaunchTemplate:
-        LaunchTemplateId: !Ref NatInstanceTemplate
-        Version: !GetAtt NatInstanceTemplate.LatestVersionNumber
+  # NatInstance:
+  #   Type: AWS::EC2::Instance
+  #   CreationPolicy:
+  #     ResourceSignal:
+  #       Timeout: PT5M
+  #   Properties:
+  #     SourceDestCheck: false
+  #     LaunchTemplate:
+  #       LaunchTemplateId: !Ref NatInstanceTemplate
+  #       Version: !GetAtt NatInstanceTemplate.LatestVersionNumber
 
   # Security - Roles, Policies & Identity Providers
   # -------------------------------------------
