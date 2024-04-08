@@ -405,6 +405,22 @@ Resources:
       ToPort: 3306
       CidrIpv6: !Ref MasterAccountv6Cidr
 
+  S3VpcEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Gateway
+      VpcId: !Ref VPC
+      RouteTableIds:
+        - !Ref RouteTable
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: "*"
+            Resource: "*"
+
   # -------------------------------------------
   # Ipv4 Public Networking
   # -------------------------------------------
