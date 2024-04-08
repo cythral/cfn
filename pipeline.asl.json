@@ -110,7 +110,6 @@
             "MasterAccountId": "${AccountId}",
             "MasterAccountv6Cidr.$": "$.SharedUtilityOutputs.Ipv6CidrBlock",
             "NetworkCidr": "10.2.0.0/16",
-            "PrivateNetworkCidr": "10.128.0.0/16",
             "PeeringConnectionId.$": "$.NetworkingConfig.DevPeeringConnectionId"
           },
           "Capabilities": [
@@ -144,7 +143,6 @@
             "MasterAccountId": "${AccountId}",
             "MasterAccountv6Cidr.$": "$.SharedUtilityOutputs.Ipv6CidrBlock",
             "NetworkCidr": "10.3.0.0/16",
-            "PrivateNetworkCidr": "10.129.0.0/16",
             "PeeringConnectionId.$": "$.NetworkingConfig.ProdPeeringConnectionId"
           },
           "Capabilities": [
@@ -178,7 +176,6 @@
             "MasterAccountId": "${AccountId}",
             "MasterAccountv6Cidr.$": "$.SharedUtilityOutputs.Ipv6CidrBlock",
             "NetworkCidr": "10.4.0.0/16",
-            "PrivateNetworkCidr": "10.130.0.0/16",
             "PeeringConnectionId.$": "$.NetworkingConfig.OssPeeringConnectionId"
           },
           "Capabilities": [
