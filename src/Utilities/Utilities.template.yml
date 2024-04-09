@@ -425,153 +425,158 @@ Resources:
   # Ipv4 Public Networking
   # -------------------------------------------
 
-  Ipv4InternetVpc:
-    Type: AWS::EC2::VPC
-    Properties:
-      CidrBlock: 10.255.0.0/16
-      EnableDnsSupport: true
-      EnableDnsHostnames: true
-
-  Ipv4InternetGateway:
-    Type: AWS::EC2::InternetGateway
-
-  Ipv4InternetGatewayAttachment:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      InternetGatewayId: !Ref Ipv4InternetGateway
-      VpcId: !Ref Ipv4InternetVpc
-
-  Ipv4InternetRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref Ipv4InternetVpc
-
-  Ipv4InternetPublicRoute:
-    Type: AWS::EC2::Route
-    DependsOn: InternetGatewayAttachment
-    Properties:
-      RouteTableId: !Ref Ipv4InternetRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref Ipv4InternetGateway
-
-  Ipv4InternetSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      CidrBlock: !Select [0, !Cidr [!GetAtt Ipv4InternetVpc.CidrBlock, 4, 14]]
-      AvailabilityZone: !Select [0, !GetAZs us-east-1]
-      VpcId: !Ref Ipv4InternetVpc
-      MapPublicIpOnLaunch: true
-
-  Ipv4InternetSubnet1RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref Ipv4InternetRouteTable
-      SubnetId: !Ref Ipv4InternetSubnet1
-
-  Ipv4InternetSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      CidrBlock: !Select [1, !Cidr [!GetAtt Ipv4InternetVpc.CidrBlock, 4, 14]]
-      AvailabilityZone: !Select [1, !GetAZs us-east-1]
-      VpcId: !Ref Ipv4InternetVpc
-      MapPublicIpOnLaunch: true
-
-  Ipv4InternetSubnet2RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref Ipv4InternetRouteTable
-      SubnetId: !Ref Ipv4InternetSubnet2
-
-  NatSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security group to allow traffic to the NAT instance.
-      VpcId: !Ref Ipv4InternetVpc
-      SecurityGroupIngress:
-        - IpProtocol: -1
-          FromPort: -1
-          ToPort: -1
-          CidrIp: !Ref NetworkCidr
-
-  NatInstanceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action: sts:AssumeRole
-            Principal:
-              Service: ec2.amazonaws.com
-
-  NatInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Roles:
-        - !Ref NatInstanceRole
-
-  NatInstanceTemplate:
-    Type: AWS::EC2::LaunchTemplate
-    Metadata:
-      AWS::CloudFormation::Init:
-        config:
-          files:
-            /etc/sysctl.d/100-custom.conf:
-              group: root
-              owner: root
-              mode: "000644"
-              content: |
-                net.ipv4.ip_forward=1
-    Properties:
-      LaunchTemplateData:
-        InstanceType: t4g.nano
-        ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-arm64-gp2}}"
-        NetworkInterfaces:
-          - DeviceIndex: "0"
-            SubnetId: !Ref Ipv4InternetSubnet1
-            Groups:
-              - !GetAtt NatSecurityGroup.GroupId
-        IamInstanceProfile:
-          Name: !Ref NatInstanceProfile
-        UserData:
-          Fn::Base64: !Sub |
-            #!/bin/bash -xe
-
-            function signal() {
-              /opt/aws/bin/cfn-signal \
-                --exit-code $1 \
-                --region ${AWS::Region} \
-                --stack ${AWS::StackName} \
-                --resource NatInstance
-            }
-
-            trap 'signal $?' exit
-            /opt/aws/bin/cfn-init -v \
-              --stack ${AWS::StackName} \
-              --region ${AWS::Region} \
-              --resource NatInstanceTemplate
-
-            sysctl -p /etc/sysctl.d/100-custom.conf
-            /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-        TagSpecifications:
-          - ResourceType: instance
-            Tags:
-              - Key: Name
-                Value: nat-instance
-          - ResourceType: volume
-            Tags:
-              - Key: instance:name
-                Value: nat-instance
-
-  # NatInstance:
-  #   Type: AWS::EC2::Instance
-  #   CreationPolicy:
-  #     ResourceSignal:
-  #       Timeout: PT5M
+  # Ipv4InternetCidrBlock:
+  #   Type: AWS::EC2::VPCCidrBlock
   #   Properties:
-  #     SourceDestCheck: false
+  #     CidrBlock: 10.255.0.0/16
+  #     VpcId: !Ref VPC
+
+  # Ipv4InternetRouteTable:
+  #   Type: AWS::EC2::RouteTable
+  #   Properties:
+  #     VpcId: !Ref VPC
+
+  # Ipv4InternetPublicRoute:
+  #   Type: AWS::EC2::Route
+  #   DependsOn: InternetGatewayAttachment
+  #   Properties:
+  #     RouteTableId: !Ref Ipv4InternetRouteTable
+  #     DestinationCidrBlock: 0.0.0.0/0
+  #     GatewayId: !Ref InternetGateway
+
+  # Ipv4InternetSubnet1:
+  #   Type: AWS::EC2::Subnet
+  #   Properties:
+  #     CidrBlock: !Select [0, !Cidr [10.255.0.0/16, 4, 14]]
+  #     AvailabilityZone: !Select [0, !GetAZs us-east-1]
+  #     VpcId: !Ref VPC
+  #     MapPublicIpOnLaunch: true
+
+  # Ipv4InternetSubnet1RouteTableAssociation:
+  #   Type: AWS::EC2::SubnetRouteTableAssociation
+  #   Properties:
+  #     RouteTableId: !Ref Ipv4InternetRouteTable
+  #     SubnetId: !Ref Ipv4InternetSubnet1
+
+  # Ipv4InternetSubnet2:
+  #   Type: AWS::EC2::Subnet
+  #   Properties:
+  #     CidrBlock: !Select [1, !Cidr [10.255.0.0/16, 4, 14]]
+  #     AvailabilityZone: !Select [1, !GetAZs us-east-1]
+  #     VpcId: !Ref VPC
+  #     MapPublicIpOnLaunch: true
+
+  # Ipv4InternetSubnet2RouteTableAssociation:
+  #   Type: AWS::EC2::SubnetRouteTableAssociation
+  #   Properties:
+  #     RouteTableId: !Ref Ipv4InternetRouteTable
+  #     SubnetId: !Ref Ipv4InternetSubnet2
+
+  # NatSecurityGroup:
+  #   Type: AWS::EC2::SecurityGroup
+  #   Properties:
+  #     GroupDescription: Security group to allow traffic to the NAT instance.
+  #     VpcId: !Ref VPC
+  #     SecurityGroupIngress:
+  #       - IpProtocol: -1
+  #         FromPort: -1
+  #         ToPort: -1
+  #         CidrIp: !Ref NetworkCidr
+
+  # NatInstanceRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     ManagedPolicyArns:
+  #       - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+  #       - !Ref NatInstancePolicy
+  #     AssumeRolePolicyDocument:
+  #       Version: 2012-10-17
+  #       Statement:
+  #         - Effect: Allow
+  #           Action: sts:AssumeRole
+  #           Principal:
+  #             Service: ec2.amazonaws.com
+
+  # NatInstancePolicy:
+  #   Type: AWS::IAM::ManagedPolicy
+  #   Properties:
+  #     PolicyDocument:
+  #       Version: 2012-10-17
+  #       Statement:
+  #         - Effect: Allow
+  #           Action: ec2:ReplaceRoute
+  #           Resource: "*"
+
+  # NatInstanceProfile:
+  #   Type: AWS::IAM::InstanceProfile
+  #   Properties:
+  #     Roles:
+  #       - !Ref NatInstanceRole
+
+  # NatInstanceTemplate:
+  #   Type: AWS::EC2::LaunchTemplate
+  #   Metadata:
+  #     AWS::CloudFormation::Init:
+  #       config:
+  #         files:
+  #           /etc/sysctl.d/100-custom.conf:
+  #             group: root
+  #             owner: root
+  #             mode: "000644"
+  #             content: |
+  #               net.ipv4.ip_forward=1
+  #   Properties:
+  #     LaunchTemplateData:
+  #       InstanceType: t4g.nano
+  #       ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-arm64-gp2}}"
+  #       SecurityGroupIds:
+  #         - !GetAtt NatSecurityGroup.GroupId
+  #       IamInstanceProfile:
+  #         Name: !Ref NatInstanceProfile
+  #       UserData:
+  #         Fn::Base64: !Sub |
+  #           #!/bin/bash -xe
+
+  #           function signal() {
+  #             /opt/aws/bin/cfn-signal \
+  #               --exit-code $1 \
+  #               --region ${AWS::Region} \
+  #               --stack ${AWS::StackName} \
+  #               --resource NatInstance
+  #           }
+
+  #           trap 'signal $?' exit
+  #           /opt/aws/bin/cfn-init -v \
+  #             --stack ${AWS::StackName} \
+  #             --region ${AWS::Region} \
+  #             --resource NatInstanceTemplate
+
+  #           sysctl -p /etc/sysctl.d/100-custom.conf
+  #           /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+  #           instance_id=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id)
+  #           aws ec2 replace-route \
+  #             --route-table-id ${RouteTable} \
+  #             --instance-id $instance_id \
+  #             --destination-cidr-block "0.0.0.0/0"
+  #       TagSpecifications:
+  #         - ResourceType: instance
+  #           Tags:
+  #             - Key: Name
+  #               Value: nat-instance
+  #         - ResourceType: volume
+  #           Tags:
+  #             - Key: instance:name
+  #               Value: nat-instance
+
+  # NatAutoScalingGroup:
+  #   Type: AWS::AutoScaling::AutoScalingGroup
+  #   Properties:
+  #     MaxSize: 1
+  #     MinSize: 1
+  #     VPCZoneIdentifier:
+  #       - !Ref Ipv4InternetSubnet1
+  #       - !Ref Ipv4InternetSubnet2
   #     LaunchTemplate:
   #       LaunchTemplateId: !Ref NatInstanceTemplate
   #       Version: !GetAtt NatInstanceTemplate.LatestVersionNumber
