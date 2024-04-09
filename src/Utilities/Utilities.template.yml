@@ -447,6 +447,7 @@ Resources:
 
   Ipv4InternetSubnet1:
     Type: AWS::EC2::Subnet
+    DependsOn: Ipv4InternetCidrBlock
     Properties:
       CidrBlock: !Select [0, !Cidr [10.255.0.0/16, 4, 14]]
       AvailabilityZone: !Select [0, !GetAZs us-east-1]
@@ -461,6 +462,7 @@ Resources:
 
   Ipv4InternetSubnet2:
     Type: AWS::EC2::Subnet
+    DependsOn: Ipv4InternetCidrBlock
     Properties:
       CidrBlock: !Select [1, !Cidr [10.255.0.0/16, 4, 14]]
       AvailabilityZone: !Select [1, !GetAZs us-east-1]
