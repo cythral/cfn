@@ -854,10 +854,10 @@
       },
       "System.Net.Http.Json": {
         "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "48Bxrd6zcGeQzS4GMEDVjuqCcAw/9wcEWnIu48FQJ5IzfKPiMR1nGtz9LrvGzU4+3TLbx/9FDlGmCUeLin1Eqg==",
+        "resolved": "8.0.1",
+        "contentHash": "F423ZLoJFYg1s6iA+Y7BLflVKjEK5XEA2+Z9CHbxJEUtS3+R5pgnFN499QzriRjYpOu6kS2Crd2YBkOFDHrblg==",
         "dependencies": {
-          "System.Text.Json": "8.0.0"
+          "System.Text.Json": "8.0.5"
         }
       },
       "System.Reflection": {
@@ -949,8 +949,8 @@
       },
       "System.Text.Json": {
         "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "OdrZO2WjkiEG6ajEFRABTRCi/wuXQPxeV6g8xvUJqdxMvvuCCEk86zPla8UiIQJz3durtUEbNyY/3lIhS0yZvQ==",
+        "resolved": "8.0.5",
+        "contentHash": "0f1B50Ss7rqxXiaBJyzUu9bWFOO2/zSlifZ/UNMdiIpDYe4cY4LQQicP4nirK1OS31I43rn062UIJ1Q9bpmHpg==",
         "dependencies": {
           "System.Text.Encodings.Web": "8.0.0"
         }
@@ -1048,7 +1048,7 @@
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
           "Lambdajection.Runtime": "[0.10.0-beta3, )",
-          "System.Net.Http.Json": "[8.0.0, )"
+          "System.Net.Http.Json": "[8.0.1, )"
         }
       },
       "s3deployment": {
@@ -1090,7 +1090,7 @@
           "Lambdajection.Encryption": "[0.10.0-beta3, )",
           "Lambdajection.Layer": "[0.10.0-beta3, )",
           "Lambdajection.Runtime": "[0.10.0-beta3, )",
-          "System.Net.Http.Json": "[8.0.0, )"
+          "System.Net.Http.Json": "[8.0.1, )"
         }
       },
       "stackdeploymentstatus": {
@@ -1106,7 +1106,7 @@
           "Lambdajection.Layer": "[0.10.0-beta3, )",
           "Lambdajection.Runtime": "[0.10.0-beta3, )",
           "Lambdajection.Sns": "[0.10.0-beta3, )",
-          "System.Net.Http.Json": "[8.0.0, )"
+          "System.Net.Http.Json": "[8.0.1, )"
         }
       }
     }
